@@ -1,0 +1,20 @@
+{
+	"name": "airplane-bot",
+	"version": "1.0.0",
+	"description": "",
+	"main": "src/main.ts",
+	"scripts": {
+		"run": "ts-node src/main.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"discord.js": "^14.14.1",
+		"dotenv": "^16.4.5",
+		"ts-node": "^10.9.2"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.30"
+	}
+}
