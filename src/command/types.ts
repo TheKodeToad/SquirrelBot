@@ -1,4 +1,4 @@
-import { BaseMessageOptions, EmbedBuilder, Guild, Message, Snowflake, User } from "discord.js";
+import { BaseMessageOptions, Guild, Message, Snowflake, User } from "discord.js";
 
 type Id = string | [string, ...string[]];
 
@@ -7,7 +7,7 @@ export interface Command<F extends Record<string, Flag> = Record<string, Flag>> 
 	flags?: F;
 	support_slash?: boolean;
 	support_prefix?: boolean;
-	run(context: Context<{ [K in keyof F]: FlagValue<F[K]> }>): Promise<void> | void;
+	run(context: Context<{ [K in keyof F]?: FlagValue<F[K]>; }>): Promise<void> | void;
 }
 
 export interface Context<A extends Record<string, any> = Record<string, any>> {

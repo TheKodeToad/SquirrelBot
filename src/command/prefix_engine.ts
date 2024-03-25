@@ -14,7 +14,7 @@ class ParseError extends Error {
 
 // 17 - length of Jason Citron's ID
 // 20 - length of 64-bit integer limit
-const SNOWFLAKE_REGEX = /[0-9]{17,20}/;
+const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
 
 class Parser {
 	private input: string;
@@ -26,29 +26,24 @@ class Parser {
 	}
 
 	parse(context: PrefixContext) {
-		const flags = Object.values(context.command.flags ?? {});
-		const flag_lookup = new Map<String, Flag>;
+		const flag_lookup = new Map<String, [string, Flag]>;
 
-		if (flags.length === 0) {
-			if (!this.is_end())
-				throw new ParseError("This command accepts no arguments");
-
-			return;
-		}
-
-		for (const flag of flags) {
+		for (const [key, flag] of Object.entries(context.command.flags)) {
 			if (flag.primary) {
-				flag_lookup.set("", flag);
+				flag_lookup.set("", [key, flag]);
 				continue;
 			}
 
 			if (typeof (flag.id) === "string")
-				flag_lookup.set(flag.id, flag);
+				flag_lookup.set(flag.id, [key, flag]);
 			else
-				flag.id.forEach(id => flag_lookup.set(id, flag));
+				flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
+
+			if ("default" in flag)
+				context.args[key] = flag.default;
 		}
 
-		let flag: Flag | null = flag_lookup.get("") ?? null;
+		let current_flag: [string, Flag] | null = flag_lookup.get("") ?? null;
 
 		while (!this.is_end()) {
 			if (this.peek(2) === "--") {
@@ -57,14 +52,19 @@ class Parser {
 				if (!flag_lookup.has(flag_id))
 					throw new ParseError(`Cannot find flag ${flag_id}`);
 
-				flag = flag_lookup.get(flag_id);
-			} else if (flag === null)
-				throw new ParseError(`Expected a flag but got \`${this.read_word()}\``);
+				current_flag = flag_lookup.get(flag_id);
+			} else if (current_flag === null)
+				throw new ParseError(`Expected a flag but got '${this.read_word()}'`);
 			else {
-				context.args[typeof flag.id === "string" ? flag.id : flag.id[0]] = this.read_value(flag.type);
-				flag = null;
+				context.args[current_flag[0]] = this.read_value(current_flag[1].type);
+				current_flag = null;
 			}
 		}
+
+		const missing_flags = Object.entries(context.command.flags).filter(([key, flag]) => !flag.primary && flag.required && context.args[key] === undefined);
+
+		if (missing_flags.length !== 0)
+			throw new ParseError(`Missing ${missing_flags.map(([_, flag]) => `'${flag.id}'`).join(", ")}`);
 	}
 
 	read_value(type: FlagType) {
@@ -100,7 +100,7 @@ class Parser {
 		}
 
 		if (!SNOWFLAKE_REGEX.test(id))
-			throw new ParseError(`Not a user: \`${input}\``);
+			throw new ParseError(`Not a user: '${input}'`);
 
 		return id;
 	}
@@ -113,7 +113,7 @@ class Parser {
 			id = id.slice(3, id.length - 1);
 
 		if (!SNOWFLAKE_REGEX.test(id))
-			throw new ParseError(`Not a role: \`${input}\``);
+			throw new ParseError(`Not a role: '${input}'`);
 
 		return id;
 	}
@@ -126,7 +126,7 @@ class Parser {
 			id = id.slice(2, id.length - 1);
 
 		if (!SNOWFLAKE_REGEX.test(id))
-			throw new ParseError(`Not a channel: \`${input}\``);
+			throw new ParseError(`Not a channel: '${input}'`);
 
 		return id;
 	}
@@ -135,7 +135,7 @@ class Parser {
 		const input = this.read_word();
 
 		if (!SNOWFLAKE_REGEX.test(input))
-			throw new ParseError(`Not an ID: \`${input}\``);
+			throw new ParseError(`Not an ID: '${input}'`);
 
 		return input;
 	}
@@ -153,7 +153,7 @@ class Parser {
 				return true;
 
 			default:
-				throw new ParseError(`Expected false (0) or true (1) but got \`${input}\``);
+				throw new ParseError(`Expected false (0) or true (1) but got '${input}'`);
 		}
 	}
 
@@ -210,7 +210,7 @@ class Parser {
 		const result = Number(input);
 
 		if (Number.isNaN(result))
-			throw new ParseError(`Not a number: \`${input}\``);
+			throw new ParseError(`Not a number: '${input}'`);
 
 		return result;
 	}
@@ -273,7 +273,9 @@ class PrefixContext implements Context {
 }
 
 async function message_create(message: Message) {
-	if (!message.content.startsWith("!"))
+	const prefix = "!";
+
+	if (!message.content.startsWith(prefix))
 		return;
 
 	const unprefixed = message.content.slice(1);
@@ -294,14 +296,14 @@ async function message_create(message: Message) {
 		parser.parse(context);
 	} catch (error) {
 		if (error instanceof ParseError)
-			await context.respond(error.message);
+			await context.respond(":x: " + error.message);
 		return;
 	}
 
 	try {
 		await command.run(context);
 	} catch (error) {
-		await context.respond(`:boom: Failed to execute \`${command.id}\``);
+		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
 		console.error(error);
 	}
 }

@@ -30,11 +30,18 @@ register_command({
 			type: FlagType.USER,
 			id: "user",
 			primary: true,
+			required: true,
+		},
+		emoji: {
+			type: FlagType.STRING,
+			id: "emoji",
+			required: true,
+			default: ":white_check_mark:"
 		}
 	},
 	async run(context) {
 		const user = await client.users.fetch(context.args.user);
-		await context.respond(`:white_check_mark: Successfully beaned ${user.username}!`);
+		await context.respond(`${context.args.emoji} Successfully beaned ${user.username}!`);
 	},
 });
 
