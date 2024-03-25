@@ -1,7 +1,6 @@
-import { BaseMessageOptions, Client, Guild, Message, Snowflake, User } from "discord.js";
+import { Client, Guild, Message, Snowflake, User } from "discord.js";
 import { get_commands } from "./registry";
 import { Command, Context, Flag, FlagType, Reply } from "./types";
-import { isDataView } from "util/types";
 
 export function install_prefix_engine(client: Client) {
 	client.on("messageCreate", message_create);
