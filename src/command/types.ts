@@ -1,12 +1,12 @@
-import { BaseMessageOptions, Guild, Message, Snowflake, User } from "discord.js";
+import { BaseMessageOptions, ChatInputCommandInteraction, Guild, Interaction, Message, Snowflake, User } from "discord.js";
 
 type Id = string | [string, ...string[]];
 
 export interface Command<F extends Record<string, Flag> = Record<string, Flag>> {
 	id: Id;
 	flags?: F;
-	support_slash?: boolean;
 	support_prefix?: boolean;
+	support_slash?: boolean;
 	run(context: Context<{ [K in keyof F]?: FlagValue<F[K]>; }>): Promise<void> | void;
 }
 
@@ -15,7 +15,8 @@ export interface Context<A extends Record<string, any> = Record<string, any>> {
 	args: A;
 	user: User;
 	guild: Guild | null;
-	message: Message | null;
+	message?: Message;
+	interaction?: ChatInputCommandInteraction;
 	respond(reply: Reply): Promise<void>;
 }
 

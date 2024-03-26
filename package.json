@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "src/main.ts",
 	"scripts": {
-		"run": "ts-node src/main.ts"
+		"start": "ts-node src/main.ts"
 	},
 	"keywords": [],
 	"author": "",

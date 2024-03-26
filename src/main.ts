@@ -3,6 +3,7 @@ import { DISCORD_TOKEN } from "./config";
 import { register_command } from "./command/registry";
 import { Context, FlagType } from "./command/types";
 import { install_prefix_engine } from "./command/prefix_engine";
+import { install_slash_engine } from "./command/slash_engine";
 
 const client = new Client({
 	intents: [
@@ -44,8 +45,13 @@ register_command({
 	},
 });
 
-install_prefix_engine(client);
+client.on("ready", async () => {
+	console.log("I'm ready :O");
 
-client.on("ready", () => console.log("I'm ready :O"));
+	install_prefix_engine(client);
+	await install_slash_engine(client);
+
+	console.log("Added commands!");
+});
 
 client.login(DISCORD_TOKEN);

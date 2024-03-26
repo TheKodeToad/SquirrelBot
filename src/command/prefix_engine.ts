@@ -1,4 +1,4 @@
-import { Client, Guild, Message, Snowflake, User } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, Client, Guild, Message, Snowflake, User } from "discord.js";
 import { get_commands } from "./registry";
 import { Command, Context, Flag, FlagType, Reply } from "./types";
 
@@ -9,6 +9,7 @@ export function install_prefix_engine(client: Client) {
 class ParseError extends Error {
 	constructor(message: string) {
 		super(message);
+		this.name = "ParseError";
 	}
 }
 
@@ -27,21 +28,23 @@ class Parser {
 	}
 
 	parse(context: PrefixContext) {
-		const flag_lookup = new Map<String, [string, Flag]>;
+		const flag_lookup = new Map<string, [string, Flag]>;
 
-		for (const [key, flag] of Object.entries(context.command.flags)) {
-			if (flag.primary) {
-				flag_lookup.set("", [key, flag]);
-				continue;
+		if (context.command.flags) {
+			for (const [key, flag] of Object.entries(context.command.flags)) {
+				if (flag.primary) {
+					flag_lookup.set("", [key, flag]);
+					continue;
+				}
+
+				if (typeof flag.id === "string")
+					flag_lookup.set(flag.id, [key, flag]);
+				else
+					flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
+
+				if ("default" in flag)
+					context.args[key] = flag.default;
 			}
-
-			if (typeof flag.id === "string")
-				flag_lookup.set(flag.id, [key, flag]);
-			else
-				flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
-
-			if ("default" in flag)
-				context.args[key] = flag.default;
 		}
 
 		if (!this.is_end() && !(this.has(2) && this.peek(2) === "--")) {
@@ -282,7 +285,7 @@ class PrefixContext implements Context {
 	guild: Guild | null;
 	message: Message;
 
-	constructor(command: Command, message: Message, input: string) {
+	constructor(command: Command, message: Message) {
 		this.command = command;
 		this.args = {};
 		this.message = message;
@@ -310,9 +313,9 @@ async function message_create(message: Message) {
 		return;
 
 	const command = matches[0];
-	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
-	const context = new PrefixContext(command, message, input);
+	const context = new PrefixContext(command, message);
 
+	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
 	const parser = new Parser(input);
 
 	try {
