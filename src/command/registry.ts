@@ -1,4 +1,4 @@
-import { Command, Flag } from "./types";
+import { Command, Flag, FlagType } from "./types";
 
 const list: Command[] = [];
 const lookup = new Map<string, Command[]>();

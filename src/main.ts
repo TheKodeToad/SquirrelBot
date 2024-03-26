@@ -36,7 +36,6 @@ register_command({
 			type: FlagType.STRING,
 			id: "emoji",
 			required: true,
-			default: ":white_check_mark:"
 		}
 	},
 	async run(context) {
