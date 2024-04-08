@@ -1,4 +1,4 @@
-import { APIApplicationCommand, ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, Interaction, InteractionType, Message, Routes, User } from "discord.js";
+import { APIApplicationCommand, APIGuildMember, APIInteractionGuildMember, ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, Interaction, InteractionType, Message, Routes, User } from "discord.js";
 import { get_all_commands, get_commands } from "./registry";
 import { Command, Context, Flag, FlagType, Reply } from "./types";
 
@@ -45,15 +45,15 @@ function map_flag_type(type: FlagType): ApplicationCommandOptionType {
 
 class SlashContext implements Context {
 	command: Command;
-	args: Record<string, any>;
 	user: User;
+	member: GuildMember | APIInteractionGuildMember | null;
 	guild: Guild;
 	interaction: ChatInputCommandInteraction;
 
 	constructor(command: Command, interaction: ChatInputCommandInteraction) {
 		this.command = command;
-		this.args = {};
 		this.user = interaction.user;
+		this.member = interaction.member;
 		this.guild = interaction.guild;
 		this.interaction = interaction;
 	}
@@ -75,6 +75,8 @@ async function interaction_create(interaction: Interaction) {
 	const command = matches[0];
 	const context = new SlashContext(command, interaction);
 
+	const args = {};
+
 	if (command.flags) {
 		const flag_keys = new Map<string, string>;
 
@@ -83,7 +85,7 @@ async function interaction_create(interaction: Interaction) {
 			flag_keys.set(id, key);
 
 			if ("default" in flag)
-				context.args[key] = flag.default;
+				args[key] = flag.default;
 		}
 
 		for (const option of interaction.options.data) {
@@ -91,9 +93,9 @@ async function interaction_create(interaction: Interaction) {
 				continue;
 
 			const key = flag_keys.get(option.name);
-			context.args[key] = option.value;
+			args[key] = option.value;
 		}
 	}
 
-	await command.run(context);
+	await command.run(args, context);
 }

@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, Client, Guild, Message, Snowflake, User } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, Client, Guild, GuildMember, Message, Snowflake, User } from "discord.js";
 import { get_commands } from "./registry";
 import { Command, Context, Flag, FlagType, Reply } from "./types";
 
@@ -19,19 +19,22 @@ const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
 const format_flag_name = (flag: Flag) => typeof flag.id === "string" ? flag.id : flag.id[0];
 
 class Parser {
+	private context: PrefixContext;
 	private input: string;
 	private next: number;
 
-	constructor(input: string) {
+	constructor(context: PrefixContext, input: string) {
+		this.context = context;
 		this.input = input;
 		this.next = 0;
 	}
 
-	parse(context: PrefixContext) {
+	parse(): Record<string, any> {
+		const result = {};
 		const flag_lookup = new Map<string, [string, Flag]>;
 
-		if (context.command.flags) {
-			for (const [key, flag] of Object.entries(context.command.flags)) {
+		if (this.context.command.flags) {
+			for (const [key, flag] of Object.entries(this.context.command.flags)) {
 				if (flag.primary) {
 					flag_lookup.set("", [key, flag]);
 					continue;
@@ -43,7 +46,7 @@ class Parser {
 					flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
 
 				if ("default" in flag)
-					context.args[key] = flag.default;
+					result[key] = flag.default;
 			}
 		}
 
@@ -54,7 +57,7 @@ class Parser {
 			const [key, flag] = flag_lookup.get("");
 			const value = this.read_value(flag.type);
 
-			context.args[key] = value;
+			result[key] = value;
 		}
 
 		while (!this.is_end()) {
@@ -74,11 +77,11 @@ class Parser {
 			const [key, flag] = flag_lookup.get(flag_id);
 			const value = this.read_value(flag.type);
 
-			context.args[key] = value;
+			result[key] = value;
 		}
 
-		const missing_flags = Object.entries(context.command.flags)
-			.filter(([key, flag]) => flag.required && !(key in context.args));
+		const missing_flags = Object.entries(this.context.command.flags)
+			.filter(([key, flag]) => flag.required && !(key in result));
 
 		if (missing_flags.length !== 0) {
 			const missing_flag_names = missing_flags
@@ -87,6 +90,8 @@ class Parser {
 
 			throw new ParseError(`Missing ${missing_flag_names}`);
 		}
+
+		return result;
 	}
 
 	read_value(type: FlagType) {
@@ -280,15 +285,15 @@ class Parser {
 
 class PrefixContext implements Context {
 	command: Command;
-	args: Record<string, any>;
 	user: User;
+	member: GuildMember | null;
 	guild: Guild | null;
 	message: Message;
 
 	constructor(command: Command, message: Message) {
 		this.command = command;
-		this.args = {};
 		this.message = message;
+		this.member = message.member;
 		this.user = message.author;
 		this.guild = message.guild;
 	}
@@ -316,10 +321,10 @@ async function message_create(message: Message) {
 	const context = new PrefixContext(command, message);
 
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
-	const parser = new Parser(input);
+	const parser = new Parser(context, input);
 
 	try {
-		parser.parse(context);
+		var args = parser.parse();
 	} catch (error) {
 		if (error instanceof ParseError)
 			await context.respond(error.message);
@@ -328,7 +333,7 @@ async function message_create(message: Message) {
 	}
 
 	try {
-		await command.run(context);
+		await command.run(args, context);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
 		console.error(error);

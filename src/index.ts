@@ -39,9 +39,9 @@ register_command({
 			required: true,
 		}
 	},
-	async run(context) {
-		const user = await client.users.fetch(context.args.user);
-		await context.respond(`${context.args.emoji} Successfully beaned ${user.username}!`);
+	async run(args, context) {
+		const resolved_user = await client.users.fetch(args.user);
+		await context.respond(`${args.emoji} Successfully beaned ${resolved_user.username}!`);
 	},
 });
 

@@ -1,4 +1,4 @@
-import { BaseMessageOptions, ChatInputCommandInteraction, Guild, Interaction, Message, Snowflake, User } from "discord.js";
+import { APIInteractionGuildMember, BaseMessageOptions, ChatInputCommandInteraction, Guild, GuildMember, Interaction, Message, Snowflake, User } from "discord.js";
 
 type Id = string | [string, ...string[]];
 
@@ -7,13 +7,13 @@ export interface Command<F extends Record<string, Flag> = Record<string, Flag>> 
 	flags?: F;
 	support_prefix?: boolean;
 	support_slash?: boolean;
-	run(context: Context<{ [K in keyof F]: FlagValue<F[K]> }>): Promise<void> | void;
+	run(args: { [K in keyof F]: FlagValue<F[K]> }, context: Context): Promise<void> | void;
 }
 
-export interface Context<A extends Record<string, any> = Record<string, any>> {
+export interface Context {
 	command: Command;
-	args: A;
 	user: User;
+	member: GuildMember | APIInteractionGuildMember | null;
 	guild: Guild | null;
 	message?: Message;
 	interaction?: ChatInputCommandInteraction;
