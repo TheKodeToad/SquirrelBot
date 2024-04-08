@@ -7,7 +7,7 @@ export interface Command<F extends Record<string, Flag> = Record<string, Flag>> 
 	flags?: F;
 	support_prefix?: boolean;
 	support_slash?: boolean;
-	run(context: Context<{ [K in keyof F]?: FlagValue<F[K]>; }>): Promise<void> | void;
+	run(context: Context<{ [K in keyof F]: FlagValue<F[K]> }>): Promise<void> | void;
 }
 
 export interface Context<A extends Record<string, any> = Record<string, any>> {
@@ -38,43 +38,24 @@ export enum FlagType {
 	SNOWFLAKE
 }
 
-export type Flag =
-	(VoidFlag | BooleanFlag | StringFlag | NumberFlag | SnowflakeFlag)
-	& {
-		id: Id;
-		required?: boolean;
-		/** with prefix mode, becomes the unnamed flag */
-		primary?: boolean;
-	};
+export interface Flag {
+	type: FlagType;
+	id: Id;
+	required?: boolean;
+	/** with prefix mode, becomes the unnamed flag */
+	primary?: boolean;
+};
 
-export interface VoidFlag {
-	type: FlagType.VOID;
-}
 
-export interface BooleanFlag {
-	type: FlagType.BOOLEAN;
-	default?: boolean;
-}
+type FlagValue<F extends Flag> = F["required"] extends true ? FlagTypeValue<F["type"]> : FlagTypeValue<F["type"]> | undefined;
 
-export interface StringFlag {
-	type: FlagType.STRING;
-	default?: string;
-}
-
-export interface NumberFlag {
-	type: FlagType.NUMBER;
-	default?: number;
-}
-
-export interface SnowflakeFlag {
-	type: FlagType.USER | FlagType.ROLE | FlagType.CHANNEL | FlagType.SNOWFLAKE;
-	default?: Snowflake;
-}
-
-type FlagValue<F extends Flag> =
-	F extends VoidFlag ? boolean :
-	F extends BooleanFlag ? boolean :
-	F extends StringFlag ? string :
-	F extends NumberFlag ? number :
-	F extends SnowflakeFlag ? Snowflake :
+type FlagTypeValue<F extends FlagType> =
+	F extends FlagType.VOID ? boolean :
+	F extends FlagType.BOOLEAN ? boolean :
+	F extends FlagType.STRING ? string :
+	F extends FlagType.NUMBER ? number :
+	F extends FlagType.USER ? Snowflake :
+	F extends FlagType.ROLE ? Snowflake :
+	F extends FlagType.CHANNEL ? Snowflake :
+	F extends FlagType.SNOWFLAKE ? Snowflake :
 	never;
