@@ -1,8 +1,10 @@
 import { APIApplicationCommand, APIGuildMember, APIInteractionGuildMember, ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, Interaction, InteractionType, Message, Routes, User } from "discord.js";
-import { get_all_commands, get_commands } from "./registry";
-import { Command, Context, Flag, FlagType, Reply } from "./types";
+import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
+import { get_all_commands, get_commands } from "../../plugin/registry";
 
-export async function install_slash_engine(client: Client) {
+export const slash_listener = define_event_listener("interactionCreate", interaction_create);
+
+export async function register_slash_commands(client: Client<true>): Promise<void> {
 	const body = get_all_commands().map(command => (
 		{
 			name: typeof command.id === "string" ? command.id : command.id[0],
@@ -47,7 +49,7 @@ class SlashContext implements Context {
 	command: Command;
 	user: User;
 	member: GuildMember | APIInteractionGuildMember | null;
-	guild: Guild;
+	guild: Guild | null;
 	interaction: ChatInputCommandInteraction;
 
 	constructor(command: Command, interaction: ChatInputCommandInteraction) {
@@ -58,12 +60,12 @@ class SlashContext implements Context {
 		this.interaction = interaction;
 	}
 
-	async respond(reply: Reply) {
-		this.interaction.reply(reply);
+	async respond(reply: Reply): Promise<void> {
+		await this.interaction.reply(reply);
 	}
 }
 
-async function interaction_create(interaction: Interaction) {
+async function interaction_create(interaction: Interaction): Promise<void> {
 	if (!interaction.isChatInputCommand())
 		return;
 
@@ -75,12 +77,12 @@ async function interaction_create(interaction: Interaction) {
 	const command = matches[0];
 	const context = new SlashContext(command, interaction);
 
-	const args = {};
+	const args: Record<string, any> = {};
 
 	if (command.flags) {
 		const flag_keys = new Map<string, string>;
 
-		for (const [key, flag] of Object.entries(context.command.flags)) {
+		for (const [key, flag] of Object.entries(command.flags)) {
 			const id = typeof flag.id === "string" ? flag.id : flag.id[0];
 			flag_keys.set(id, key);
 
@@ -92,7 +94,7 @@ async function interaction_create(interaction: Interaction) {
 			if (!flag_keys.has(option.name))
 				continue;
 
-			const key = flag_keys.get(option.name);
+			const key = flag_keys.get(option.name)!;
 			args[key] = option.value;
 		}
 	}

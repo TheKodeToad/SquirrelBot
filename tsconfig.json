@@ -1,6 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext"
-  }
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "NodeNext",
+		"strict": true,
+		"noImplicitAny": false
+	}
 }

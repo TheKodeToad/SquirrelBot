@@ -1,10 +1,8 @@
-import { CacheType, ChatInputCommandInteraction, Client, Guild, GuildMember, Message, Snowflake, User } from "discord.js";
-import { get_commands } from "./registry";
-import { Command, Context, Flag, FlagType, Reply } from "./types";
+import { Guild, GuildMember, Message, Snowflake, User } from "discord.js";
+import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
+import { get_commands } from "../../plugin/registry";
 
-export function install_prefix_engine(client: Client) {
-	client.on("messageCreate", message_create);
-}
+export const prefix_listener = define_event_listener("messageCreate", message_create);
 
 class ParseError extends Error {
 	constructor(message: string) {
@@ -30,7 +28,7 @@ class Parser {
 	}
 
 	parse(): Record<string, any> {
-		const result = {};
+		const result: Record<string, any> = {};
 		const flag_lookup = new Map<string, [string, Flag]>;
 
 		if (this.context.command.flags) {
@@ -45,8 +43,7 @@ class Parser {
 				else
 					flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
 
-				if ("default" in flag)
-					result[key] = flag.default;
+				result[key] = null;
 			}
 		}
 
@@ -54,7 +51,7 @@ class Parser {
 			if (!flag_lookup.has(""))
 				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
 
-			const [key, flag] = flag_lookup.get("");
+			const [key, flag] = flag_lookup.get("")!;
 			const value = this.read_value(flag.type);
 
 			result[key] = value;
@@ -67,28 +64,29 @@ class Parser {
 			const flag_id = this.read_word().slice(2);
 
 			if (!flag_lookup.has(flag_id)) {
-				if (flag_id.length === 0) {
+				if (flag_id.length === 0)
 					throw new ParseError("Expected flag name after '--'");
-				} else {
+				else
 					throw new ParseError(`Cannot find flag '${flag_id}'`);
-				}
 			}
 
-			const [key, flag] = flag_lookup.get(flag_id);
+			const [key, flag] = flag_lookup.get(flag_id)!;
 			const value = this.read_value(flag.type);
 
 			result[key] = value;
 		}
 
-		const missing_flags = Object.entries(this.context.command.flags)
-			.filter(([key, flag]) => flag.required && !(key in result));
+		if (this.context.command.flags) {
+			const missing_flags = Object.entries(this.context.command.flags)
+				.filter(([key, flag]) => flag.required && !(key in result));
 
-		if (missing_flags.length !== 0) {
-			const missing_flag_names = missing_flags
-				.map(([_, flag]) => format_flag_name(flag))
-				.join(", ");
+			if (missing_flags.length !== 0) {
+				const missing_flag_names = missing_flags
+					.map(([_, flag]) => format_flag_name(flag))
+					.join(", ");
 
-			throw new ParseError(`Missing ${missing_flag_names}`);
+				throw new ParseError(`Missing ${missing_flag_names}`);
+			}
 		}
 
 		return result;
@@ -184,8 +182,7 @@ class Parser {
 		}
 	}
 
-
-	read_string() {
+	read_string(): string {
 		let result = "";
 
 		if (this.peek_next() === "\"" || this.peek_next() === "'") {
@@ -217,8 +214,6 @@ class Parser {
 				result += this.peek_prev();
 			}
 		} else {
-			let result = "";
-
 			while (!this.is_end()) {
 				this.read();
 
@@ -227,9 +222,9 @@ class Parser {
 
 				result += this.peek_prev();
 			}
-
-			return result;
 		}
+
+		return result;
 	}
 
 	read_number(): number {
@@ -298,12 +293,12 @@ class PrefixContext implements Context {
 		this.guild = message.guild;
 	}
 
-	async respond(reply: Reply) {
-		this.message.channel.send(reply);
+	async respond(reply: Reply): Promise<void> {
+		await this.message.channel.send(reply);
 	}
 }
 
-async function message_create(message: Message) {
+async function message_create(message: Message): Promise<void> {
 	const prefix = "!";
 
 	if (!message.content.startsWith(prefix))

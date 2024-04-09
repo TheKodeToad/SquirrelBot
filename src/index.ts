@@ -1,9 +1,8 @@
 import { Client, CommandInteraction, GatewayIntentBits, Interaction, Message, Partials } from "discord.js";
 import { DISCORD_TOKEN } from "./config";
-import { register_command } from "./command/registry";
-import { Context, FlagType } from "./command/types";
-import { install_prefix_engine } from "./command/prefix_engine";
-import { install_slash_engine } from "./command/slash_engine";
+import { define_event_listener, EventListener } from "./plugin/types";
+import { core_plugin } from "./plugins/core";
+import { register_plugin, apply_plugins } from "./plugin/registry";
 
 const client = new Client({
 	intents: [
@@ -24,34 +23,11 @@ const client = new Client({
 	allowedMentions: {}
 });
 
-register_command({
-	id: "bean",
-	flags: {
-		user: {
-			type: FlagType.USER,
-			id: "user",
-			primary: true,
-			required: true,
-		},
-		emoji: {
-			type: FlagType.STRING,
-			id: "emoji",
-			required: true,
-		}
-	},
-	async run(args, context) {
-		const resolved_user = await client.users.fetch(args.user);
-		await context.respond(`${args.emoji} Successfully beaned ${resolved_user.username}!`);
-	},
-});
-
-client.on("ready", async () => {
+client.on("ready", async client => {
 	console.log("I'm ready :O");
 
-	install_prefix_engine(client);
-	await install_slash_engine(client);
-
-	console.log("Added commands!");
+	register_plugin(core_plugin);
+	await apply_plugins(client);
 });
 
 client.login(DISCORD_TOKEN);
