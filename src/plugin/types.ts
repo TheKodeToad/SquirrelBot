@@ -1,4 +1,4 @@
-import { APIInteractionGuildMember, BaseMessageOptions, Channel, ChatInputCommandInteraction, Client, ClientEvents, Guild, GuildChannel, GuildMember, Message, Snowflake, User, WebSocketShardEventTypes } from "discord.js";
+import { APIInteractionGuildMember, BaseMessageOptions, Channel, ChatInputCommandInteraction, Client, ClientEvents, Guild, GuildChannel, GuildMember, Message, Snowflake, TextBasedChannel, TextChannel, User, WebSocketShardEventTypes } from "discord.js";
 
 type Id = string | [string, ...string[]];
 
@@ -6,7 +6,7 @@ export interface Plugin {
 	id: string;
 	commands?: Command[];
 	listeners?: EventListener[];
-	apply(client: Client<true>): Promise<void> | void;
+	apply?(client: Client<true>): Promise<void> | void;
 }
 
 export function define_plugin(plugin: Plugin): Plugin {
@@ -30,6 +30,7 @@ export interface Context {
 	user: User;
 	member: GuildMember | APIInteractionGuildMember | null;
 	guild: Guild | null;
+	channel: TextBasedChannel | null;
 	message?: Message;
 	interaction?: ChatInputCommandInteraction;
 	respond(reply: Reply): Promise<void>;

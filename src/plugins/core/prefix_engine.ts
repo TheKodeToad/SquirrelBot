@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Message, Snowflake, User } from "discord.js";
+import { Guild, GuildMember, Message, Snowflake, TextBasedChannel, User } from "discord.js";
 import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 import { get_commands } from "../../plugin/registry";
 
@@ -325,6 +325,7 @@ class PrefixContext implements Context {
 	user: User;
 	member: GuildMember | null;
 	guild: Guild | null;
+	channel: TextBasedChannel | null;
 	message: Message;
 
 	constructor(command: Command, message: Message) {
@@ -333,6 +334,7 @@ class PrefixContext implements Context {
 		this.member = message.member;
 		this.user = message.author;
 		this.guild = message.guild;
+		this.channel = message.channel;
 	}
 
 	async respond(reply: Reply): Promise<void> {

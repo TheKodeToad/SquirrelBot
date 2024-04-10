@@ -1,4 +1,4 @@
-import { APIApplicationCommand, APIGuildMember, APIInteractionGuildMember, ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, Interaction, InteractionType, Message, Routes, User } from "discord.js";
+import { APIApplicationCommand, APIGuildMember, APIInteractionGuildMember, ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, Interaction, InteractionType, Message, Routes, TextBasedChannel, User } from "discord.js";
 import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
 import { get_all_commands, get_commands } from "../../plugin/registry";
 
@@ -20,8 +20,6 @@ export async function register_slash_commands(client: Client<true>): Promise<voi
 		}
 	));
 	await client.rest.put(Routes.applicationCommands(client.application.id), { body });
-
-	client.on("interactionCreate", interaction_create);
 }
 
 function map_flag_type(type: FlagType): ApplicationCommandOptionType {
@@ -50,6 +48,7 @@ class SlashContext implements Context {
 	user: User;
 	member: GuildMember | APIInteractionGuildMember | null;
 	guild: Guild | null;
+	channel: TextBasedChannel | null;
 	interaction: ChatInputCommandInteraction;
 
 	constructor(command: Command, interaction: ChatInputCommandInteraction) {
@@ -57,6 +56,7 @@ class SlashContext implements Context {
 		this.user = interaction.user;
 		this.member = interaction.member;
 		this.guild = interaction.guild;
+		this.channel = interaction.channel;
 		this.interaction = interaction;
 	}
 

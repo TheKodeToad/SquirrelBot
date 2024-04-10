@@ -58,6 +58,7 @@ export async function apply_plugins(client: Client<true>): Promise<void> {
 			});
 		}
 
-		await plugin.apply(client);
+		if (plugin.apply)
+			await plugin.apply(client);
 	}
 }
