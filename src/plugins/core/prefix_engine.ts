@@ -1,5 +1,5 @@
 import { Guild, GuildMember, Message, Snowflake, User } from "discord.js";
-import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
+import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 import { get_commands } from "../../plugin/registry";
 
 export const prefix_listener = define_event_listener("messageCreate", message_create);
@@ -43,11 +43,11 @@ class Parser {
 				else
 					flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
 
-				result[key] = null;
+				result[key] = flag.array ? [] : null;
 			}
 		}
 
-		if (!this.is_end() && !(this.has(2) && this.peek(2) === "--")) {
+		if (!this.is_end() && this.peek(2) !== "--") {
 			if (!flag_lookup.has(""))
 				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
 
@@ -58,7 +58,7 @@ class Parser {
 		}
 
 		while (!this.is_end()) {
-			if (!(this.has(2) && this.peek(2) === "--"))
+			if (this.peek(2) !== "--")
 				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
 
 			const flag_id = this.read_word().slice(2);
@@ -78,7 +78,16 @@ class Parser {
 
 		if (this.context.command.flags) {
 			const missing_flags = Object.entries(this.context.command.flags)
-				.filter(([key, flag]) => flag.required && !(key in result));
+				.filter(([key, flag]) => {
+					if (!flag.required)
+						return true;
+
+					if (!(key in result))
+						return false;
+
+					const value = result[key];
+					return !(Array.isArray(value) && value.length === 0);
+				});
 
 			if (missing_flags.length !== 0) {
 				const missing_flag_names = missing_flags
@@ -111,6 +120,39 @@ class Parser {
 			case FlagType.SNOWFLAKE:
 				return this.read_snowflake();
 		}
+	}
+
+	read_values(type: FlagType): FlagTypeValue<FlagType>[] {
+		switch (type) {
+			case FlagType.VOID:
+				return [];
+			case FlagType.BOOLEAN:
+				return this.read_sequence(this.read_boolean.bind(this));
+			case FlagType.STRING:
+				return this.read_sequence(() => this.read_string(true));
+			case FlagType.NUMBER:
+				return this.read_sequence(this.read_number.bind(this));
+			case FlagType.USER:
+				return this.read_sequence(this.read_user.bind(this));
+			case FlagType.ROLE:
+				return this.read_sequence(this.read_role.bind(this));
+			case FlagType.CHANNEL:
+				return this.read_sequence(this.read_channel.bind(this));
+			case FlagType.SNOWFLAKE:
+				return this.read_sequence(this.read_snowflake.bind(this));
+		}
+	}
+
+	read_sequence<T>(reader: () => T): T[] {
+		const result: T[] = [];
+
+		while (!this.is_end() && !(this.has(2) && this.peek(2) === "--"))
+			result.push(reader());
+
+		if (result.length === 0)
+			throw new ParseError("Expected at least one value");
+
+		return result;
 	}
 
 	read_user(): Snowflake {
@@ -182,7 +224,7 @@ class Parser {
 		}
 	}
 
-	read_string(): string {
+	read_string(limited = false): string {
 		let result = "";
 
 		if (this.peek_next() === "\"" || this.peek_next() === "'") {
@@ -217,7 +259,7 @@ class Parser {
 			while (!this.is_end()) {
 				this.read();
 
-				if (this.peek_prev() === " " && this.has(2) && this.peek(2) === "--")
+				if (this.peek_prev() === " " && (limited || this.peek(2) === "--"))
 					break;
 
 				result += this.peek_prev();
@@ -262,9 +304,9 @@ class Parser {
 			return "";
 
 		if (count < 0)
-			return this.input.slice(this.next + count, this.next);
+			return this.input.slice(Math.max(this.next + count, 0), this.next);
 
-		return this.input.slice(this.next, this.next + count);
+		return this.input.slice(this.next, Math.min(this.next + count, this.input.length - 1));
 	}
 
 	read_word(): string {

@@ -21,6 +21,10 @@ export interface Command<F extends Record<string, Flag> = Record<string, Flag>> 
 	run(args: { [K in keyof F]: FlagValue<F[K]> }, context: Context): Promise<void> | void;
 }
 
+export function define_command<F extends Record<string, Flag>>(command: Command<F>): Command<F> {
+	return command;
+}
+
 export interface Context {
 	command: Command;
 	user: User;
@@ -53,15 +57,17 @@ export interface Flag {
 	type: FlagType;
 	id: Id;
 	required?: boolean;
+	array?: boolean;
 	/** with prefix mode, becomes the unnamed flag */
 	primary?: boolean;
 };
 
 type FlagValue<F extends Flag> =
+	F["array"] extends true ? FlagTypeValue<F["type"]>[] :
 	F["required"] extends true ? FlagTypeValue<F["type"]> :
 	FlagTypeValue<F["type"]> | null;
 
-type FlagTypeValue<F extends FlagType> =
+export type FlagTypeValue<F extends FlagType> =
 	F extends FlagType.VOID ? boolean :
 	F extends FlagType.BOOLEAN ? boolean :
 	F extends FlagType.STRING ? string :

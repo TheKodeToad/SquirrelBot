@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, GatewayIntentBits, Interaction, Message, Partials } from "discord.js";
+import { Client, CommandInteraction, GatewayIntentBits, GuildExplicitContentFilter, GuildVerificationLevel, Interaction, Message, Partials, PermissionFlagsBits, Routes } from "discord.js";
 import { DISCORD_TOKEN } from "./config";
 import { define_event_listener, EventListener } from "./plugin/types";
 import { core_plugin } from "./plugins/core";
