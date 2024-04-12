@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Message, Snowflake, TextBasedChannel, User } from "discord.js";
+import { Client, Guild, GuildMember, Message, Snowflake, TextBasedChannel, User } from "discord.js";
 import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 import { get_commands } from "../../plugin/registry";
 
@@ -33,6 +33,8 @@ class Parser {
 
 		if (this.context.command.flags) {
 			for (const [key, flag] of Object.entries(this.context.command.flags)) {
+				result[key] = flag.array ? [] : null;
+
 				if (flag.primary) {
 					flag_lookup.set("", [key, flag]);
 					continue;
@@ -42,8 +44,6 @@ class Parser {
 					flag_lookup.set(flag.id, [key, flag]);
 				else
 					flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
-
-				result[key] = flag.array ? [] : null;
 			}
 		}
 
@@ -52,7 +52,7 @@ class Parser {
 				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
 
 			const [key, flag] = flag_lookup.get("")!;
-			const value = this.read_value(flag.type);
+			const value = flag.array ? this.read_values(flag.type) : this.read_value(flag.type);
 
 			result[key] = value;
 		}
@@ -71,7 +71,7 @@ class Parser {
 			}
 
 			const [key, flag] = flag_lookup.get(flag_id)!;
-			const value = this.read_value(flag.type);
+			const value = flag.array ? this.read_values(flag.type) : this.read_value(flag.type);
 
 			result[key] = value;
 		}
@@ -86,7 +86,7 @@ class Parser {
 						return false;
 
 					const value = result[key];
-					return !(Array.isArray(value) && value.length === 0);
+					return Array.isArray(value) && value.length === 0;
 				});
 
 			if (missing_flags.length !== 0) {
@@ -146,11 +146,8 @@ class Parser {
 	read_sequence<T>(reader: () => T): T[] {
 		const result: T[] = [];
 
-		while (!this.is_end() && !(this.has(2) && this.peek(2) === "--"))
+		while (!(this.is_end() || this.peek(2) === "--"))
 			result.push(reader());
-
-		if (result.length === 0)
-			throw new ParseError("Expected at least one value");
 
 		return result;
 	}
@@ -312,7 +309,7 @@ class Parser {
 	read_word(): string {
 		let result = "";
 
-		while (!(this.is_end() || this.read() == " "))
+		while (!(this.is_end() || this.read() === " "))
 			result += this.peek_prev();
 
 		return result;
@@ -322,6 +319,7 @@ class Parser {
 
 class PrefixContext implements Context {
 	command: Command;
+	client: Client<true>;
 	user: User;
 	member: GuildMember | null;
 	guild: Guild | null;
@@ -330,6 +328,7 @@ class PrefixContext implements Context {
 
 	constructor(command: Command, message: Message) {
 		this.command = command;
+		this.client = message.client;
 		this.message = message;
 		this.member = message.member;
 		this.user = message.author;
@@ -367,7 +366,6 @@ async function message_create(message: Message): Promise<void> {
 	} catch (error) {
 		if (error instanceof ParseError)
 			await context.respond(error.message);
-
 		return;
 	}
 

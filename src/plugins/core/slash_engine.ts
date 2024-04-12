@@ -45,16 +45,18 @@ function map_flag_type(type: FlagType): ApplicationCommandOptionType {
 
 class SlashContext implements Context {
 	command: Command;
+	client: Client<true>;
 	user: User;
-	member: GuildMember | APIInteractionGuildMember | null;
+	member: GuildMember | null;
 	guild: Guild | null;
 	channel: TextBasedChannel | null;
 	interaction: ChatInputCommandInteraction;
 
 	constructor(command: Command, interaction: ChatInputCommandInteraction) {
 		this.command = command;
+		this.client = interaction.client;
 		this.user = interaction.user;
-		this.member = interaction.member;
+		this.member = interaction.member instanceof GuildMember ? interaction.member : null;
 		this.guild = interaction.guild;
 		this.channel = interaction.channel;
 		this.interaction = interaction;

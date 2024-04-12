@@ -27,8 +27,9 @@ export function define_command<F extends Record<string, Flag>>(command: Command<
 
 export interface Context {
 	command: Command;
+	client: Client<true>;
 	user: User;
-	member: GuildMember | APIInteractionGuildMember | null;
+	member: GuildMember | null;
 	guild: Guild | null;
 	channel: TextBasedChannel | null;
 	message?: Message;
