@@ -44,15 +44,13 @@ export const ban_command = define_command({
 				const target_member = await context.guild.members.fetch(id);
 				name = target_member.user.tag;
 
-				if (!(context.guild.ownerId === context.user.id
-					|| context.member.roles.highest.comparePositionTo(target_member.roles.highest) > 0)) {
+				if (context.guild.ownerId !== context.user.id
+					&& context.member.roles.highest.comparePositionTo(target_member.roles.highest) <= 0) {
 					unsuccessful_bans.push({ id, name, error: "Your highest role is not above target's highest role" });
 					continue;
 				}
 
-				const me = await context.guild.members.fetchMe();
-				if (context.guild.ownerId === id
-					|| context.member.roles.highest.comparePositionTo((me.roles.highest)) > 0) {
+				if (!target_member.moderatable) {
 					unsuccessful_bans.push({ id, name, error: "Bot's highest role is not above target's highest role" });
 					continue;
 				}
