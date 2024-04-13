@@ -34,4 +34,12 @@ client.on("ready", async client => {
 	await apply_plugins(client);
 });
 
+function exception_handler(error: unknown) {
+	console.error("Unhandled exception!");
+	console.error(error);
+}
+
+process.on("uncaughtException", exception_handler);
+process.on("unhandledRejection", exception_handler);
+
 client.login(DISCORD_TOKEN);

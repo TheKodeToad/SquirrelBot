@@ -33,7 +33,6 @@ export interface Context {
 	guild: Guild | null;
 	channel: TextBasedChannel | null;
 	message?: Message;
-	interaction?: ChatInputCommandInteraction;
 	respond(reply: Reply): Promise<void>;
 }
 

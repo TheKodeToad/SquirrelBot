@@ -104,6 +104,6 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		await command.run(args, context);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute /${command.id}`);
-		console.error(error);
+		throw error;
 	}
 }
