@@ -39,10 +39,12 @@ export const ban_command = define_command({
 
 		for (const id of args.user) {
 			let name: string;
+			let in_guild = false;
 
 			try {
 				const target_member = await context.guild.members.fetch(id);
 				name = target_member.user.tag;
+				in_guild = true;
 
 				if (context.guild.ownerId !== context.user.id
 					&& context.member.roles.highest.comparePositionTo(target_member.roles.highest) <= 0) {
@@ -77,7 +79,7 @@ export const ban_command = define_command({
 
 			let dm_sent = false;
 
-			if (!args.no_dm) {
+			if (in_guild && !args.no_dm) {
 				try {
 					const dm = await context.client.users.createDM(id);
 					await dm.send("You were banned :regional_indicator_l:");
