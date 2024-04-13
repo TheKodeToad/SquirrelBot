@@ -4,5 +4,5 @@
 const FORMATTING_REGEX = /[\\*_\-`#@<>.~|:]/;
 
 export function escape_all(input: string) {
-	return input.replace(FORMATTING_REGEX, "\\$1");
+	return input.replace(FORMATTING_REGEX, "\\$&");
 }
