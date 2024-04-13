@@ -1,6 +1,6 @@
 import { DiscordAPIError, GuildMember, PermissionFlagsBits, REST, RESTJSONErrorCodes, SnowflakeUtil } from "discord.js";
 import { Context, FlagType, define_command } from "../../plugin/types";
-import { escape_all } from "../../util/markdown";
+import { escape_all } from "../../common/markdown";
 
 export const ban_command = define_command({
 	id: "ban",

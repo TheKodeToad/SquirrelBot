@@ -1,6 +1,6 @@
 import { DiscordAPIError, PermissionFlagsBits, RESTJSONErrorCodes } from "discord.js";
 import { FlagType, define_command } from "../../plugin/types";
-import { escape_all } from "../../util/markdown";
+import { escape_all } from "../../common/markdown";
 
 export const kick_command = define_command({
 	id: "kick",
