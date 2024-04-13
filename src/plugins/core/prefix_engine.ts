@@ -80,13 +80,10 @@ class Parser {
 			const missing_flags = Object.entries(this.context.command.flags)
 				.filter(([key, flag]) => {
 					if (!flag.required)
-						return true;
-
-					if (!(key in result))
 						return false;
 
 					const value = result[key];
-					return Array.isArray(value) && value.length === 0;
+					return value === null || (Array.isArray(value) && value.length === 0);
 				});
 
 			if (missing_flags.length !== 0) {
