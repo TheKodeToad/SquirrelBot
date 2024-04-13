@@ -17,6 +17,14 @@ export const ban_command = define_command({
 			type: FlagType.STRING,
 			id: "reason",
 		},
+		dm: {
+			type: FlagType.VOID,
+			id: "dm",
+		},
+		no_dm: {
+			type: FlagType.VOID,
+			id: ["no-dm", "!dm"],
+		},
 	},
 
 	async run(args, context) {
@@ -66,13 +74,15 @@ export const ban_command = define_command({
 
 			let dm_sent = false;
 
-			try {
-				const dm = await context.client.users.createDM(id);
-				await dm.send("You were banned :regional_indicator_l:");
-				dm_sent = true;
-			} catch (error) {
-				if (!(error instanceof DiscordAPIError))
-					throw error;
+			if (!args.no_dm) {
+				try {
+					const dm = await context.client.users.createDM(id);
+					await dm.send("You were banned :regional_indicator_l:");
+					dm_sent = true;
+				} catch (error) {
+					if (!(error instanceof DiscordAPIError))
+						throw error;
+				}
 			}
 
 			try {
@@ -95,8 +105,8 @@ export const ban_command = define_command({
 				await context.respond(`:x: Could not ban <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}!`);
 			}
 		} else {
-			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${ban.name}) ${ban.dm_sent ? " with direct message" : ""}`).join("\n");
-			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${ban.name}): ${ban.error}`).join("\n");
+			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}) ${ban.dm_sent ? " with direct message" : ""}`).join("\n");
+			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}`).join("\n");
 
 			if (unsuccessful_bans.length === 0) {
 				await context.respond(
