@@ -4,6 +4,7 @@ import { define_event_listener, EventListener } from "./plugin/types";
 import { core_plugin } from "./plugins/core";
 import { register_plugin, apply_plugins } from "./plugin/registry";
 import { reminder_plugin } from "./plugins/reminder";
+import { moderation_plugin } from "./plugins/moderation";
 
 const client = new Client({
 	intents: [
@@ -28,6 +29,7 @@ client.on("ready", async client => {
 	console.log("I'm ready :O");
 
 	register_plugin(core_plugin);
+	register_plugin(moderation_plugin);
 	register_plugin(reminder_plugin);
 	await apply_plugins(client);
 });
