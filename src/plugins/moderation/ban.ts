@@ -1,4 +1,4 @@
-import { DiscordAPIError, GuildMember, PermissionFlagsBits, RESTJSONErrorCodes } from "discord.js";
+import { DiscordAPIError, GuildMember, PermissionFlagsBits, REST, RESTJSONErrorCodes, SnowflakeUtil } from "discord.js";
 import { Context, FlagType, define_command } from "../../plugin/types";
 import { escape_all } from "../../util/markdown";
 
@@ -55,8 +55,13 @@ export const ban_command = define_command({
 					continue;
 				}
 			} catch (error) {
-				if (!(error instanceof DiscordAPIError && error.code === RESTJSONErrorCodes.UnknownMember))
+				if (!(error instanceof DiscordAPIError))
 					throw error;
+
+				if (error.code !== RESTJSONErrorCodes.UnknownMember) {
+					unsuccessful_bans.push({ id, name: "<unknown>", error: error.message });
+					continue;
+				}
 
 				try {
 					const user = await context.client.users.fetch(id);

@@ -14,7 +14,12 @@ class ParseError extends Error {
 // 17 - length of Jason Citron's ID
 // 20 - length of 64-bit integer limit
 const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
+const MAX_SNOWFLAKE_VALUE = 9223372036854775807n;
 const format_flag_name = (flag: Flag) => typeof flag.id === "string" ? flag.id : flag.id[0];
+
+function is_snowflake(id: string) {
+	return SNOWFLAKE_REGEX.test(id) && BigInt(id) <= MAX_SNOWFLAKE_VALUE;
+}
 
 class Parser {
 	private context: PrefixContext;
@@ -160,7 +165,7 @@ class Parser {
 				id = id.slice(1);
 		}
 
-		if (!SNOWFLAKE_REGEX.test(id))
+		if (!is_snowflake(id))
 			throw new ParseError(`Not a user: '${input}'`);
 
 		return id;
@@ -173,7 +178,7 @@ class Parser {
 		if (id.startsWith("<@&") && id.endsWith(">"))
 			id = id.slice(3, id.length - 1);
 
-		if (!SNOWFLAKE_REGEX.test(id))
+		if (!is_snowflake(id))
 			throw new ParseError(`Not a role: '${input}'`);
 
 		return id;
@@ -186,19 +191,19 @@ class Parser {
 		if (id.startsWith("<#") && id.endsWith(">"))
 			id = id.slice(2, id.length - 1);
 
-		if (!SNOWFLAKE_REGEX.test(id))
+		if (!is_snowflake(id))
 			throw new ParseError(`Not a channel: '${input}'`);
 
 		return id;
 	}
 
 	read_snowflake(): Snowflake {
-		const input = this.read_word();
+		const id = this.read_word();
 
-		if (!SNOWFLAKE_REGEX.test(input))
-			throw new ParseError(`Not an ID: '${input}'`);
+		if (!is_snowflake(id))
+			throw new ParseError(`Not an ID: '${id}'`);
 
-		return input;
+		return id;
 	}
 
 	read_boolean(): boolean {
