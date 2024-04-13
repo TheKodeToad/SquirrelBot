@@ -1,5 +1,6 @@
 import { Client, GuildChannel } from "discord.js";
 import { Command, EVENT_TO_GUILD, Plugin } from "./types";
+import { ALLOWED_GUILDS } from "../config";
 
 const plugins: Plugin[] = [];
 const command_lookup: Map<string, Command[]> = new Map;
@@ -51,7 +52,7 @@ export async function apply_plugins(client: Client<true>): Promise<void> {
 				if (listener.type in EVENT_TO_GUILD)
 					guild ??= EVENT_TO_GUILD[listener.type](...args);
 
-				if (guild !== "1103990392657023076")
+				if (guild !== null && !ALLOWED_GUILDS.has(guild))
 					return;
 
 				listener.listener(...args);
