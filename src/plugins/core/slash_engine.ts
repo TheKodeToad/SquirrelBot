@@ -1,6 +1,6 @@
 import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
 import { get_all_commands, get_commands, get_plugins } from "../../plugin/registry";
-import { AnyInteractionChannel, AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionResponse, InteractionTypes, Member, User } from "oceanic.js";
+import { AnyInteractionChannel, AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionResponse, InteractionTypes, Member, User, InteractionContent } from "oceanic.js";
 
 export const slash_listener = define_event_listener("interactionCreate", interaction_create);
 
@@ -57,7 +57,10 @@ class SlashContext implements Context {
 	member: Member | null;
 	guild: Guild | null;
 	channel: AnyInteractionChannel | null;
-	#interaction: CommandInteraction;
+	_interaction: CommandInteraction;
+	_responded: boolean;
+	_defer_timeout: NodeJS.Timeout | null;
+	_defer_promise: Promise<void> | null;
 
 	constructor(command: Command, interaction: CommandInteraction) {
 		this.command = command;
@@ -66,11 +69,37 @@ class SlashContext implements Context {
 		this.member = interaction.member ?? null;
 		this.guild = interaction.guild;
 		this.channel = interaction.channel ?? null;
-		this.#interaction = interaction;
+		this._interaction = interaction;
+		this._responded = false;
+		this._defer_promise = null;
+		this._defer_timeout = setTimeout(() => {
+			this._defer_timeout = null;
+			this._responded = true;
+			this._defer_promise = interaction.defer();
+		}, 1000);
+		this._defer_timeout.unref();
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		await this.#interaction.editOriginal(typeof reply === "string" ? { content: reply } : reply);
+		const content: InteractionContent = typeof reply === "string" ? { content: reply } : reply;
+
+		if (this._responded) {
+			if (this._defer_promise !== null)
+				await this._defer_promise;
+
+			await this._interaction.editOriginal(content);
+		} else {
+			this._remove_timeout();
+			await this._interaction.reply(content);
+			this._responded = true;
+		}
+	}
+
+	_remove_timeout() {
+		if (this._defer_timeout !== null) {
+			clearTimeout(this._defer_timeout);
+			this._defer_timeout = null;
+		}
 	}
 }
 
@@ -87,8 +116,6 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 
 	if (matches.length !== 1)
 		return;
-
-	await interaction.defer();
 
 	const [command] = matches;
 	const context = new SlashContext(command, interaction);
@@ -119,8 +146,10 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 
 	try {
 		await command.run(args, context);
+		context._remove_timeout();
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute /${command.id}`);
+		context._remove_timeout();
 		throw error;
 	}
 }
