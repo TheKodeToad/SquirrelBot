@@ -2,7 +2,7 @@ import { FlagType, define_command } from "../../plugin/types";
 import { escape_all } from "../../common/markdown";
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { get_highest_role } from "../../common/member";
-import { format_rest_error } from "../../common/rest";
+import { format_rest_error, get_member_cached, get_user_cached } from "../../common/rest";
 
 export const kick_command = define_command({
 	id: "kick",
@@ -43,11 +43,11 @@ export const kick_command = define_command({
 			let name: string;
 
 			try {
-				const target_member = await context.guild.getMember(id);
+				const target_member = await get_member_cached(context.client, context.guild, id);
 				name = target_member.user.tag;
 
 				try {
-					var bot_member = await context.guild.getMember(context.client.user.id);
+					var bot_member = await get_member_cached(context.client, context.guild, context.client.user.id);
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
@@ -82,7 +82,7 @@ export const kick_command = define_command({
 				}
 
 				try {
-					const user = await context.client.rest.users.get(id);
+					const user = await get_user_cached(context.client, id);
 					unsuccessful_kicks.push({ id, name: user.tag, error: "User is not in the server" });
 					continue;
 				} catch (error) {

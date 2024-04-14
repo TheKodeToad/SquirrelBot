@@ -2,7 +2,7 @@ import { Context, FlagType, define_command } from "../../plugin/types";
 import { escape_all } from "../../common/markdown";
 import { get_highest_role } from "../../common/member";
 import { DiscordHTTPError, DiscordRESTError, JSONErrorCodes, Member, Permission, Permissions } from "oceanic.js";
-import { format_rest_error } from "../../common/rest";
+import { create_dm_cached, format_rest_error, get_member_cached, get_user_cached } from "../../common/rest";
 
 export const ban_command = define_command({
 	id: "ban",
@@ -44,12 +44,12 @@ export const ban_command = define_command({
 			let in_guild = false;
 
 			try {
-				const target_member = await context.guild.getMember(id);
+				const target_member = await get_member_cached(context.client, context.guild, id);
 				name = target_member.user.tag;
 				in_guild = true;
 
 				try {
-					var bot_member = await context.guild.getMember(context.client.user.id);
+					var bot_member = await get_member_cached(context.client, context.guild, context.client.user.id);
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
@@ -84,7 +84,7 @@ export const ban_command = define_command({
 				}
 
 				try {
-					const user = await context.client.rest.users.get(id);
+					const user = await get_user_cached(context.client, id);
 					name = user.tag;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
@@ -99,7 +99,7 @@ export const ban_command = define_command({
 
 			if (in_guild && !args.no_dm) {
 				try {
-					const dm = await context.client.rest.users.createDM(id);
+					const dm = await create_dm_cached(context.client, context.user.id);
 					await dm.createMessage({ content: "You were banned :regional_indicator_l:" });
 					dm_sent = true;
 				} catch (error) {

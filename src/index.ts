@@ -11,7 +11,7 @@ const client = new Client({
 	gateway: {
 		intents: AllNonPrivilegedIntents | Intents.MESSAGE_CONTENT
 	},
-	allowedMentions: {}
+	allowedMentions: {},
 });
 
 client.on("ready", async () => {
