@@ -1,12 +1,13 @@
-import { APIApplicationCommand, APIGuildMember, APIInteractionGuildMember, ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, Interaction, InteractionResponse, InteractionType, Message, Routes, TextBasedChannel, User } from "discord.js";
 import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
 import { get_all_commands, get_commands } from "../../plugin/registry";
+import { AnyInteractionChannel, AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionResponse, InteractionTypes, Member, User } from "oceanic.js";
 
 export const slash_listener = define_event_listener("interactionCreate", interaction_create);
 
-export async function register_slash_commands(client: Client<true>): Promise<void> {
-	const body = get_all_commands().map(command => (
+export async function register_slash_commands(client: Client): Promise<void> {
+	const commands = get_all_commands().map(command => (
 		{
+			type: ApplicationCommandTypes.CHAT_INPUT,
 			name: typeof command.id === "string" ? command.id : command.id[0],
 			description: "slash command :D",
 			options: command.flags ? Object.values(command.flags).map(flag => (
@@ -17,67 +18,68 @@ export async function register_slash_commands(client: Client<true>): Promise<voi
 					type: map_flag_type(flag.type),
 				}
 			)) : []
-		}
+		} as CreateApplicationCommandOptions
 	));
-	await client.rest.put(Routes.applicationCommands(client.application.id), { body });
+	await client.application.bulkEditGlobalCommands(commands);
 }
 
-function map_flag_type(type: FlagType): ApplicationCommandOptionType {
+function map_flag_type(type: FlagType): ApplicationCommandOptionTypes {
 	switch (type) {
 		case FlagType.VOID:
-			return ApplicationCommandOptionType.Boolean;
 		case FlagType.BOOLEAN:
-			return ApplicationCommandOptionType.Boolean;
+			return ApplicationCommandOptionTypes.BOOLEAN;
 		case FlagType.STRING:
-			return ApplicationCommandOptionType.String;
+			return ApplicationCommandOptionTypes.STRING;
 		case FlagType.NUMBER:
-			return ApplicationCommandOptionType.Number;
+			return ApplicationCommandOptionTypes.NUMBER;
 		case FlagType.USER:
-			return ApplicationCommandOptionType.User;
+			return ApplicationCommandOptionTypes.USER;
 		case FlagType.ROLE:
-			return ApplicationCommandOptionType.Role;
+			return ApplicationCommandOptionTypes.ROLE;
 		case FlagType.CHANNEL:
-			return ApplicationCommandOptionType.Channel;
+			return ApplicationCommandOptionTypes.CHANNEL;
 		case FlagType.SNOWFLAKE:
-			return ApplicationCommandOptionType.Integer;
+			return ApplicationCommandOptionTypes.INTEGER;
 	}
 }
 
 class SlashContext implements Context {
 	command: Command;
-	client: Client<true>;
+	client: Client;
 	user: User;
-	member: GuildMember | null;
+	member: Member | null;
 	guild: Guild | null;
-	channel: TextBasedChannel | null;
-	#reply: InteractionResponse;
+	channel: AnyInteractionChannel | null;
+	#interaction: CommandInteraction;
 
-	constructor(command: Command, interaction: ChatInputCommandInteraction, reply: InteractionResponse) {
+	constructor(command: Command, interaction: CommandInteraction) {
 		this.command = command;
 		this.client = interaction.client;
 		this.user = interaction.user;
-		this.member = interaction.member instanceof GuildMember ? interaction.member : null;
+		this.member = interaction.member ?? null;
 		this.guild = interaction.guild;
-		this.channel = interaction.channel;
-		this.#reply = reply;
+		this.channel = interaction.channel ?? null;
+		this.#interaction = interaction;
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		await this.#reply.edit(reply);
+		await this.#interaction.editOriginal(typeof reply === "string" ? { content: reply } : reply);
 	}
 }
 
 async function interaction_create(interaction: Interaction): Promise<void> {
-	if (!interaction.isChatInputCommand())
+	if (!interaction.isCommandInteraction())
 		return;
 
-	const matches = get_commands(interaction.commandName).filter(command => command.support_slash ?? true);
+	const matches = get_commands(interaction.data.name).filter(command => command.support_slash ?? true);
 
 	if (matches.length !== 1)
 		return;
 
-	const command = matches[0];
-	const context = new SlashContext(command, interaction, await interaction.deferReply());
+	await interaction.defer();
+
+	const [command] = matches;
+	const context = new SlashContext(command, interaction);
 
 	const args: Record<string, any> = {};
 
@@ -91,7 +93,10 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 			flag_lookup.set(id, [key, flag]);
 		}
 
-		for (const option of interaction.options.data) {
+		for (const option of interaction.data.options.raw) {
+			if (!("value" in option))
+				continue;
+
 			if (!flag_lookup.has(option.name))
 				continue;
 

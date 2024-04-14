@@ -1,6 +1,8 @@
-import { DiscordAPIError, PermissionFlagsBits, RESTJSONErrorCodes } from "discord.js";
 import { FlagType, define_command } from "../../plugin/types";
 import { escape_all } from "../../common/markdown";
+import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
+import { get_highest_role } from "../../common/member";
+import { format_rest_error } from "../../common/rest";
 
 export const kick_command = define_command({
 	id: "kick",
@@ -31,7 +33,7 @@ export const kick_command = define_command({
 		if (context.guild === null)
 			return;
 
-		if (!context.member?.permissions?.has(PermissionFlagsBits.KickMembers))
+		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
 			return;
 
 		let successful_kicks: { id: string, name: string, dm_sent: boolean; }[] = [];
@@ -41,34 +43,50 @@ export const kick_command = define_command({
 			let name: string;
 
 			try {
-				const target_member = await context.guild.members.fetch(id);
+				const target_member = await context.guild.getMember(id);
 				name = target_member.user.tag;
 
-				if (context.guild.ownerId !== context.user.id
-					&& context.member.roles.highest.comparePositionTo(target_member.roles.highest) <= 0) {
+				try {
+					var bot_member = await context.guild.getMember(context.client.user.id);
+				} catch (error) {
+					if (!(error instanceof DiscordRESTError))
+						throw error;
+
+					unsuccessful_kicks.push({ id, name, error: `Bot member fetch failed: ${format_rest_error(error)}` });
+					continue;
+				}
+
+				const target_position = get_highest_role(target_member).position;
+
+				if (context.guild.ownerID !== context.user.id
+					&& (context.guild.ownerID === id
+						|| get_highest_role(context.member).position <= target_position)) {
 					unsuccessful_kicks.push({ id, name, error: "Your highest role is not above target's highest role" });
 					continue;
 				}
 
-				if (!target_member.moderatable) {
+				if (context.guild.ownerID !== context.client.user.id
+					&& (context.guild.ownerID === id
+						|| get_highest_role(bot_member).position <= target_position)
+				) {
 					unsuccessful_kicks.push({ id, name, error: "Bot's highest role is not above target's highest role" });
 					continue;
 				}
 			} catch (error) {
-				if (!(error instanceof DiscordAPIError))
+				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				if (error.code !== RESTJSONErrorCodes.UnknownMember) {
-					unsuccessful_kicks.push({ id, name: "<unknown>", error: error.message });
+				if (error.code !== JSONErrorCodes.UNKNOWN_MEMBER) {
+					unsuccessful_kicks.push({ id, name: "<unknown>", error: `Member fetch failed: ${format_rest_error(error)}` });
 					continue;
 				}
 
 				try {
-					const user = await context.client.users.fetch(id);
+					const user = await context.client.rest.users.get(id);
 					unsuccessful_kicks.push({ id, name: user.tag, error: "User is not in the server" });
 					continue;
 				} catch (error) {
-					if (!(error instanceof DiscordAPIError))
+					if (!(error instanceof DiscordRESTError))
 						throw error;
 
 					unsuccessful_kicks.push({ id, name: "<unknown>", error: "User is not in the server" });
@@ -80,23 +98,23 @@ export const kick_command = define_command({
 
 			if (!args.no_dm) {
 				try {
-					const dm = await context.client.users.createDM(id);
-					await dm.send("You were kicked :regional_indicator_l:");
+					const dm = await context.client.rest.users.createDM(id);
+					await dm.createMessage({ content: "You were kicked :regional_indicator_l:" });
 					dm_sent = true;
 				} catch (error) {
-					if (!(error instanceof DiscordAPIError))
+					if (!(error instanceof DiscordRESTError))
 						throw error;
 				}
 			}
 
 			try {
-				await context.guild.members.kick(id);
+				await context.guild.removeMember(id, args.reason ?? undefined);
 				successful_kicks.push({ id, name, dm_sent });
 			} catch (error) {
-				if (!(error instanceof DiscordAPIError))
+				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				unsuccessful_kicks.push({ id, name, error: error.message });
+				unsuccessful_kicks.push({ id, name, error: format_rest_error(error) });
 			}
 		}
 

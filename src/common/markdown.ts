@@ -3,6 +3,9 @@
 // perhaps this is not the best way to do this but it should work everywhere apart from inside codeblocks
 const FORMATTING_REGEX = /[\\/*_\-`#@<>.~|:\[\]\(\)]/g;
 
+/**
+ * Escape all characters used for markdown formatting.
+ */
 export function escape_all(input: string) {
 	return input.replace(FORMATTING_REGEX, "\\$&");
 }

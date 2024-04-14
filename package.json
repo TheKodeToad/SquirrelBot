@@ -10,8 +10,8 @@
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"discord.js": "^14.14.1",
 		"dotenv": "^16.4.5",
+		"oceanic.js": "^1.10.0",
 		"ts-node": "^10.9.2"
 	},
 	"devDependencies": {

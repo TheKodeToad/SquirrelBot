@@ -1,4 +1,4 @@
-import { Client, GuildChannel } from "discord.js";
+import { Client, GuildChannel } from "oceanic.js";
 import { Command, EVENT_TO_GUILD, Plugin } from "./types";
 import { ALLOWED_GUILDS } from "../config";
 
@@ -41,7 +41,7 @@ function add_command(id: string, command: Command): void {
 	list.push(command);
 }
 
-export async function apply_plugins(client: Client<true>): Promise<void> {
+export async function apply_plugins(client: Client): Promise<void> {
 	for (const plugin of get_plugins()) {
 		if (!plugin.listeners)
 			continue;

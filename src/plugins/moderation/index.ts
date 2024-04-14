@@ -5,7 +5,4 @@ import { kick_command } from "./kick";
 export const moderation_plugin = define_plugin({
 	id: "moderation",
 	commands: [ban_command, kick_command],
-	apply(client) {
-
-	},
 });

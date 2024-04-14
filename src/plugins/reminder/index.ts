@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { ChannelTypes } from "oceanic.js";
 import { FlagType, define_command, define_plugin } from "../../plugin/types";
 
 export const reminder_plugin = define_plugin({
@@ -20,9 +20,14 @@ export const reminder_plugin = define_plugin({
 				}
 			},
 			async run({ seconds, message }, context) {
+				if (!context.channel || context.channel?.type === ChannelTypes.GROUP_DM)
+					return;
+
+				const { channel } = context;
+
 				await context.respond(`:white_check_mark: Reminder set for <t:${Math.floor(Date.now() / 1000 + seconds)}:R>: '${message}'!`);
 				setTimeout(async () => {
-					await context.channel?.send({
+					await channel.createMessage({
 						content: `:bell: Reminder for <@${context.user.id}>: ${message}`,
 						allowedMentions: { users: [context.user.id] }
 					});

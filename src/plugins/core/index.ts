@@ -1,4 +1,3 @@
-import { Client } from "discord.js";
 import { define_event_listener, define_plugin } from "../../plugin/types";
 import { register_slash_commands, slash_listener } from "./slash_engine";
 import { prefix_listener } from "./prefix_engine";

@@ -1,6 +1,6 @@
-import { Client, Guild, GuildMember, Message, Snowflake, TextBasedChannel, User } from "discord.js";
 import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 import { get_commands } from "../../plugin/registry";
+import { AnyInteractionChannel, AnyTextableChannel, Client, Guild, Member, Message, TextableChannel, User } from "oceanic.js";
 
 export const prefix_listener = define_event_listener("messageCreate", message_create);
 
@@ -154,7 +154,7 @@ class Parser {
 		return result;
 	}
 
-	read_user(): Snowflake {
+	read_user(): string {
 		const input = this.read_word();
 		let id = input;
 
@@ -171,7 +171,7 @@ class Parser {
 		return id;
 	}
 
-	read_role(): Snowflake {
+	read_role(): string {
 		const input = this.read_word();
 		let id = input;
 
@@ -184,7 +184,7 @@ class Parser {
 		return id;
 	}
 
-	read_channel(): Snowflake {
+	read_channel(): string {
 		const input = this.read_word();
 		let id = input;
 
@@ -197,7 +197,7 @@ class Parser {
 		return id;
 	}
 
-	read_snowflake(): Snowflake {
+	read_snowflake(): string {
 		const id = this.read_word();
 
 		if (!is_snowflake(id))
@@ -321,29 +321,35 @@ class Parser {
 
 class PrefixContext implements Context {
 	command: Command;
-	client: Client<true>;
+	client: Client;
 	user: User;
-	member: GuildMember | null;
+	member: Member | null;
 	guild: Guild | null;
-	channel: TextBasedChannel | null;
+	channel: AnyTextableChannel | null;
 	message: Message;
 
 	constructor(command: Command, message: Message) {
 		this.command = command;
 		this.client = message.client;
 		this.message = message;
-		this.member = message.member;
+		this.member = message.member ?? null;
 		this.user = message.author;
 		this.guild = message.guild;
-		this.channel = message.channel;
+		this.channel = message.channel ?? null;
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		await this.message.channel.send(reply);
+		await this.client.rest.channels.createMessage(
+			this.message.channelID,
+			typeof reply === "string" ? { content: reply } : reply
+		);
 	}
 }
 
 async function message_create(message: Message): Promise<void> {
+	if (!message.inCachedGuildChannel())
+		return;
+
 	const prefix = "!";
 
 	if (!message.content.startsWith(prefix))
