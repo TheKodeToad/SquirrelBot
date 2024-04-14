@@ -1,23 +1,30 @@
 import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
-import { get_all_commands, get_commands } from "../../plugin/registry";
+import { get_all_commands, get_commands, get_plugins } from "../../plugin/registry";
 import { AnyInteractionChannel, AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionResponse, InteractionTypes, Member, User } from "oceanic.js";
 
 export const slash_listener = define_event_listener("interactionCreate", interaction_create);
 
 export async function register_slash_commands(client: Client): Promise<void> {
-	const commands = get_all_commands().map(command => (
+	const commands = get_plugins().filter(plugin => plugin.commands !== undefined).map(plugin => (
 		{
 			type: ApplicationCommandTypes.CHAT_INPUT,
-			name: typeof command.id === "string" ? command.id : command.id[0],
-			description: "slash command :D",
-			options: command.flags ? Object.values(command.flags).map(flag => (
+			name: plugin.id,
+			description: "plugin",
+			options: plugin.commands!.map(command => (
 				{
-					name: typeof flag.id === "string" ? flag.id : flag.id[0],
-					description: "option :O",
-					required: flag.required && !("default" in flag && flag.default),
-					type: map_flag_type(flag.type),
+					type: ApplicationCommandOptionTypes.SUB_COMMAND,
+					name: typeof command.id === "string" ? command.id : command.id[0],
+					description: "command",
+					options: command.flags ? Object.values(command.flags).map(flag => (
+						{
+							name: typeof flag.id === "string" ? flag.id : flag.id[0],
+							description: "option",
+							required: flag.required && !("default" in flag && flag.default),
+							type: map_flag_type(flag.type),
+						}
+					)) : [],
 				}
-			)) : []
+			)),
 		} as CreateApplicationCommandOptions
 	));
 	await client.application.bulkEditGlobalCommands(commands);
@@ -71,7 +78,12 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 	if (!interaction.isCommandInteraction())
 		return;
 
-	const matches = get_commands(interaction.data.name).filter(command => command.support_slash ?? true);
+	const [data] = interaction.data.options.raw;
+
+	if (data?.type !== ApplicationCommandOptionTypes.SUB_COMMAND)
+		return;
+
+	const matches = get_commands(data.name).filter(command => command.support_slash ?? true);
 
 	if (matches.length !== 1)
 		return;
@@ -83,7 +95,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 
 	const args: Record<string, any> = {};
 
-	if (command.flags) {
+	if (command.flags && data.options) {
 		const flag_lookup = new Map<string, [string, Flag]>;
 
 		for (const [key, flag] of Object.entries(command.flags)) {
@@ -93,7 +105,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 			flag_lookup.set(id, [key, flag]);
 		}
 
-		for (const option of interaction.data.options.raw) {
+		for (const option of data.options) {
 			if (!("value" in option))
 				continue;
 
