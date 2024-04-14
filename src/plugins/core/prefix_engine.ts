@@ -1,6 +1,6 @@
-import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
+import { AnyTextableChannel, Client, Guild, Member, Message, User } from "oceanic.js";
 import { get_commands } from "../../plugin/registry";
-import { AnyInteractionChannel, AnyTextableChannel, Client, Guild, Member, Message, TextableChannel, User } from "oceanic.js";
+import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 
 export const prefix_listener = define_event_listener("messageCreate", message_create);
 

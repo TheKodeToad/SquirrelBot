@@ -1,6 +1,6 @@
-import { Client, GuildChannel, ClientEvents } from "oceanic.js";
-import { Command, Plugin } from "./types";
+import { Client, ClientEvents } from "oceanic.js";
 import { ALLOWED_GUILDS } from "../config";
+import { Command, Plugin } from "./types";
 
 const plugins: Plugin[] = [];
 const command_lookup: Map<string, Command[]> = new Map;

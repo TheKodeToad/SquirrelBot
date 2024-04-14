@@ -1,6 +1,6 @@
+import { AnyInteractionChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, User } from "oceanic.js";
+import { get_commands, get_plugins } from "../../plugin/registry";
 import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
-import { get_all_commands, get_commands, get_plugins } from "../../plugin/registry";
-import { AnyInteractionChannel, AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionResponse, InteractionTypes, Member, User, InteractionContent } from "oceanic.js";
 
 export const slash_listener = define_event_listener("interactionCreate", interaction_create);
 

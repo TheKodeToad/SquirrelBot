@@ -1,8 +1,8 @@
-import { Context, FlagType, define_command } from "../../plugin/types";
+import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { escape_all } from "../../common/markdown";
 import { get_highest_role } from "../../common/member";
-import { DiscordHTTPError, DiscordRESTError, JSONErrorCodes, Member, Permission, Permissions } from "oceanic.js";
 import { create_dm_cached, format_rest_error, get_member_cached, get_user_cached } from "../../common/rest";
+import { FlagType, define_command } from "../../plugin/types";
 
 export const ban_command = define_command({
 	id: "ban",

@@ -1,6 +1,6 @@
-import { define_event_listener, define_plugin } from "../../plugin/types";
-import { register_slash_commands, slash_listener } from "./slash_engine";
+import { define_plugin } from "../../plugin/types";
 import { prefix_listener } from "./prefix_engine";
+import { register_slash_commands, slash_listener } from "./slash_engine";
 
 export const core_plugin = define_plugin({
 	id: "core",

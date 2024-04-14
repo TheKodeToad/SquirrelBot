@@ -1,10 +1,9 @@
+import { AllNonPrivilegedIntents, Client, Intents } from "oceanic.js";
 import { DISCORD_TOKEN } from "./config";
-import { define_event_listener, EventListener } from "./plugin/types";
+import { apply_plugins, register_plugin } from "./plugin/registry";
 import { core_plugin } from "./plugins/core";
-import { register_plugin, apply_plugins } from "./plugin/registry";
-import { reminder_plugin } from "./plugins/reminder";
 import { moderation_plugin } from "./plugins/moderation";
-import { AllNonPrivilegedIntents, Client, Constants, Intents } from "oceanic.js";
+import { reminder_plugin } from "./plugins/reminder";
 
 const client = new Client({
 	auth: `Bot ${DISCORD_TOKEN}`,
