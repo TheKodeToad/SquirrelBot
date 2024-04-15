@@ -1,4 +1,4 @@
-import { AnyTextableChannel, Client, Guild, Member, Message, User } from "oceanic.js";
+import { AnyTextableChannel, Client, CreateMessageOptions, EditMessageOptions, Guild, Member, Message, User } from "oceanic.js";
 import { get_commands } from "../../plugin/registry";
 import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 
@@ -327,6 +327,7 @@ class PrefixContext implements Context {
 	guild: Guild | null;
 	channel: AnyTextableChannel | null;
 	message: Message;
+	_response: Message | null;
 
 	constructor(command: Command, message: Message) {
 		this.command = command;
@@ -336,13 +337,17 @@ class PrefixContext implements Context {
 		this.user = message.author;
 		this.guild = message.guild;
 		this.channel = message.channel ?? null;
+		this._response = null;
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		await this.client.rest.channels.createMessage(
-			this.message.channelID,
-			typeof reply === "string" ? { content: reply } : reply
-		);
+		const content: CreateMessageOptions | EditMessageOptions =
+			typeof reply === "string" ? { content: reply } : reply;
+
+		if (this._response === null)
+			this._response = await this.client.rest.channels.createMessage(this.message.channelID, content);
+		else
+			await this._response.edit(content);
 	}
 }
 
