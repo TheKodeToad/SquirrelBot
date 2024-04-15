@@ -19,7 +19,7 @@ export const reminder_plugin = define_plugin({
 					required: true,
 				}
 			},
-			async run({ seconds, message }, context) {
+			async run(context, { seconds, message }) {
 				if (!context.channel || context.channel?.type === ChannelTypes.GROUP_DM)
 					return;
 

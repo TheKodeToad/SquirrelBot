@@ -18,7 +18,10 @@ export interface Command<F extends Record<string, Flag> = Record<string, Flag>> 
 	flags?: F;
 	support_prefix?: boolean;
 	support_slash?: boolean;
-	run(args: { [K in keyof F]: FlagValue<F[K]> }, context: Context): Promise<void> | void;
+	run(
+		context: Context,
+		args: keyof F extends never ? {} : { [K in keyof F]: FlagValue<F[K]> }
+	): Promise<void> | void;
 }
 
 export function define_command<F extends Record<string, Flag>>(command: Command<F>): Command<F> {

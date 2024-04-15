@@ -378,7 +378,7 @@ async function message_create(message: Message): Promise<void> {
 	}
 
 	try {
-		await command.run(args, context);
+		await command.run(context, args);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
 		throw error;

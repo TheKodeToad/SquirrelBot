@@ -29,7 +29,7 @@ export const ban_command = define_command({
 		},
 	},
 
-	async run(args, context) {
+	async run(context, args) {
 		if (context.guild === null)
 			return;
 
