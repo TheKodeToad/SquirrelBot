@@ -2,9 +2,9 @@
 	"name": "airplane-bot",
 	"version": "1.0.0",
 	"description": "",
-	"main": "src/index.ts",
+	"main": "src/main.ts",
 	"scripts": {
-		"start": "ts-node src/index.ts"
+		"start": "ts-node src/main.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -12,9 +12,11 @@
 	"dependencies": {
 		"dotenv": "^16.4.5",
 		"oceanic.js": "^1.10.0",
+		"pg": "^8.11.5",
 		"ts-node": "^10.9.2"
 	},
 	"devDependencies": {
-		"@types/node": "^20.11.30"
+		"@types/node": "^20.11.30",
+		"@types/pg": "^8.11.5"
 	}
 }

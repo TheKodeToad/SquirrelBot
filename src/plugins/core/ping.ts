@@ -1,4 +1,3 @@
-import { Shard } from "oceanic.js";
 import { define_command } from "../../plugin/types";
 
 export const ping_command = define_command({
@@ -11,7 +10,7 @@ export const ping_command = define_command({
 		await context.respond("...");
 
 		const rest_ping = Date.now() - pre_respond;
-		const shard: Shard = context.guild!.shard;
+		const shard = context.guild!.shard;
 
 		await context.respond(`REST: ${rest_ping}ms\nGateway: ${shard.latency}ms`);
 	},
