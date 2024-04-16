@@ -13,7 +13,7 @@ const client = new Client({
 	allowedMentions: {},
 });
 
-client.on("ready", async () => {
+client.once("shardPreReady", async () => {
 	console.log("I'm ready :O");
 
 	register_plugin(core_plugin);
