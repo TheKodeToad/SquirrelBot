@@ -41,12 +41,14 @@ export const ban_command = define_command({
 
 		for (const id of args.user) {
 			let name: string;
-			let in_guild = false;
+			let in_guild: boolean;
+			let bot: boolean;
 
 			try {
 				const target_member = await get_member_cached(context.client, context.guild, id);
 				name = target_member.user.tag;
 				in_guild = true;
+				bot = target_member.bot;
 
 				try {
 					var bot_member = await get_member_cached(context.client, context.guild, context.client.user.id);
@@ -86,6 +88,8 @@ export const ban_command = define_command({
 				try {
 					const user = await get_user_cached(context.client, id);
 					name = user.tag;
+					in_guild = false;
+					bot = user.bot;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
@@ -97,9 +101,9 @@ export const ban_command = define_command({
 
 			let dm_sent = false;
 
-			if (in_guild && !args.no_dm) {
+			if (in_guild && !bot && !args.no_dm) {
 				try {
-					const dm = await create_dm_cached(context.client, context.user.id);
+					const dm = await create_dm_cached(context.client, id);
 					await dm.createMessage({ content: "You were banned :regional_indicator_l:" });
 					dm_sent = true;
 				} catch (error) {

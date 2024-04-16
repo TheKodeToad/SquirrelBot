@@ -41,10 +41,12 @@ export const kick_command = define_command({
 
 		for (const id of args.user) {
 			let name: string;
+			let bot: boolean;
 
 			try {
 				const target_member = await get_member_cached(context.client, context.guild, id);
 				name = target_member.user.tag;
+				bot = target_member.bot;
 
 				try {
 					var bot_member = await get_member_cached(context.client, context.guild, context.client.user.id);
@@ -96,7 +98,7 @@ export const kick_command = define_command({
 
 			let dm_sent = false;
 
-			if (!args.no_dm) {
+			if (!bot && !args.no_dm) {
 				try {
 					const dm = await context.client.rest.users.createDM(id);
 					await dm.createMessage({ content: "You were kicked :regional_indicator_l:" });
