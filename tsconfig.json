@@ -3,6 +3,7 @@
 		"target": "ESNext",
 		"module": "NodeNext",
 		"strict": true,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"noUncheckedIndexedAccess": true
 	}
 }

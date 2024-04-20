@@ -7,7 +7,6 @@ import { reminder_plugin } from "./plugins/reminder";
 client.once("shardPreReady", async () => {
 	console.log("I'm ready :O");
 
-
 	register_plugin(core_plugin);
 	register_plugin(moderation_plugin);
 	register_plugin(reminder_plugin);

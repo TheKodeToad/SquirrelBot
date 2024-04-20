@@ -125,10 +125,10 @@ export const ban_command = define_command({
 
 		if (args.user.length === 1) {
 			if (successful_bans.length === 1) {
-				const [ban] = successful_bans;
+				const ban = successful_bans[0]!;
 				await context.respond(`:white_check_mark: Banned <@${ban.id}> (${escape_all(ban.name)})${ban.dm_sent ? " with direct message" : ""}!`);
 			} else if (unsuccessful_bans.length === 1) {
-				const [ban] = unsuccessful_bans;
+				const ban = unsuccessful_bans[0]!;
 				await context.respond(`:x: Could not ban <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}!`);
 			}
 		} else {

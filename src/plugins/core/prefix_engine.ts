@@ -286,15 +286,15 @@ class Parser {
 		return this.next + count <= this.input.length;
 	}
 
-	read(): string {
+	read(): string | undefined {
 		return this.input[this.next++];
 	}
 
-	peek_prev(): string {
+	peek_prev(): string | undefined {
 		return this.input[this.next - 1];
 	}
 
-	peek_next(): string {
+	peek_next(): string | undefined {
 		return this.input[this.next];
 	}
 
@@ -362,13 +362,13 @@ async function message_create(message: Message): Promise<void> {
 
 	const unprefixed = message.content.slice(1);
 
-	const name = unprefixed.split(" ", 1)[0];
+	const name = unprefixed.split(" ", 1)[0]!;
 	const matches = get_commands(name).filter(command => command.support_prefix ?? true);
 
 	if (matches.length !== 1)
 		return;
 
-	const command = matches[0];
+	const command = matches[0]!;
 	const context = new PrefixContext(command, message);
 
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";

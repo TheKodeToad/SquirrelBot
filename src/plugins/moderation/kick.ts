@@ -122,10 +122,10 @@ export const kick_command = define_command({
 
 		if (args.user.length === 1) {
 			if (successful_kicks.length === 1) {
-				const [kick] = successful_kicks;
+				const kick = successful_kicks[0]!;
 				await context.respond(`:white_check_mark: Kicked <@${kick.id}> (${escape_all(kick.name)})${kick.dm_sent ? " with direct message" : ""}!`);
 			} else if (unsuccessful_kicks.length === 1) {
-				const [kick] = unsuccessful_kicks;
+				const kick = unsuccessful_kicks[0]!;
 				await context.respond(`:x: Could not kick <@${kick.id}> (${escape_all(kick.name)}): ${kick.error}!`);
 			}
 		} else {
