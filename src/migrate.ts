@@ -56,7 +56,7 @@ async function process(dir: string, include_subdirs: boolean) {
 			continue;
 
 		if (index <= last_run) {
-			console.log(`Skipping ${file} as it has already been run`);
+			console.log(`Skipping '${file}' as it has already been run`);
 			continue;
 		}
 

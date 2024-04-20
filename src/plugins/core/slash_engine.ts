@@ -117,7 +117,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 	if (matches.length !== 1)
 		return;
 
-	const [command] = matches;
+	const command = matches[0]!;
 	const context = new SlashContext(command, interaction);
 
 	const args: Record<string, any> = {};

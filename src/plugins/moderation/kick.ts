@@ -3,6 +3,7 @@ import { escape_all } from "../../common/markdown";
 import { get_highest_role } from "../../common/member";
 import { format_rest_error, get_member_cached, get_user_cached } from "../../common/rest";
 import { FlagType, define_command } from "../../plugin/types";
+import { CaseType, create_case } from "./case";
 
 export const kick_command = define_command({
 	id: "kick",
@@ -36,7 +37,7 @@ export const kick_command = define_command({
 		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
 			return;
 
-		let successful_kicks: { id: string, name: string, dm_sent: boolean; }[] = [];
+		let successful_kicks: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_kicks: { id: string, name: string, error: string; }[] = [];
 
 		for (const id of args.user) {
@@ -111,25 +112,33 @@ export const kick_command = define_command({
 
 			try {
 				await context.guild.removeMember(id, args.reason ?? undefined);
-				successful_kicks.push({ id, name, dm_sent });
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				unsuccessful_kicks.push({ id, name, error: format_rest_error(error) });
 			}
+
+			const case_number = await create_case(context.guild.id, {
+				type: CaseType.KICK,
+				actor_id: context.user.id,
+				target_id: id,
+				reason: args.reason ?? undefined
+			});
+
+			successful_kicks.push({ case_number, id, name, dm_sent });
 		}
 
 		if (args.user.length === 1) {
 			if (successful_kicks.length === 1) {
 				const kick = successful_kicks[0]!;
-				await context.respond(`:white_check_mark: Kicked <@${kick.id}> (${escape_all(kick.name)})${kick.dm_sent ? " with direct message" : ""}!`);
+				await context.respond(`:white_check_mark: Kicked <@${kick.id}> (${escape_all(kick.name)})${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]!`);
 			} else if (unsuccessful_kicks.length === 1) {
 				const kick = unsuccessful_kicks[0]!;
 				await context.respond(`:x: Could not kick <@${kick.id}> (${escape_all(kick.name)}): ${kick.error}!`);
 			}
 		} else {
-			const successful_message = successful_kicks.map(kick => `- <@${kick.id}> (${escape_all(kick.name)}) ${kick.dm_sent ? " with direct message" : ""}`).join("\n");
+			const successful_message = successful_kicks.map(kick => `- <@${kick.id}> (${escape_all(kick.name)}) ${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]`).join("\n");
 			const unsuccessful_message = unsuccessful_kicks.map(kick => `- <@${kick.id}> (${escape_all(kick.name)}): ${kick.error}`).join("\n");
 
 			if (unsuccessful_kicks.length === 0) {

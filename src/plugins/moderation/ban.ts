@@ -3,6 +3,7 @@ import { escape_all } from "../../common/markdown";
 import { get_highest_role } from "../../common/member";
 import { create_dm_cached, format_rest_error, get_member_cached, get_user_cached } from "../../common/rest";
 import { FlagType, define_command } from "../../plugin/types";
+import { CaseType, create_case } from "./case";
 
 export const ban_command = define_command({
 	id: "ban",
@@ -36,7 +37,7 @@ export const ban_command = define_command({
 		if (!context.member?.permissions?.has(Permissions.BAN_MEMBERS))
 			return;
 
-		let successful_bans: { id: string, name: string, dm_sent: boolean; }[] = [];
+		let successful_bans: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_bans: { id: string, name: string, error: string; }[] = [];
 
 		for (const id of args.user) {
@@ -114,25 +115,33 @@ export const ban_command = define_command({
 
 			try {
 				await context.guild.createBan(id, { reason: args.reason ?? undefined });
-				successful_bans.push({ id, name, dm_sent });
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				unsuccessful_bans.push({ id, name, error: format_rest_error(error) });
 			}
+
+			const case_number = await create_case(context.guild.id, {
+				type: CaseType.BAN,
+				actor_id: context.user.id,
+				target_id: id,
+				reason: args.reason ?? undefined
+			});
+
+			successful_bans.push({ case_number, id, name, dm_sent });
 		}
 
 		if (args.user.length === 1) {
 			if (successful_bans.length === 1) {
 				const ban = successful_bans[0]!;
-				await context.respond(`:white_check_mark: Banned <@${ban.id}> (${escape_all(ban.name)})${ban.dm_sent ? " with direct message" : ""}!`);
+				await context.respond(`:white_check_mark: Banned <@${ban.id}> (${escape_all(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]!`);
 			} else if (unsuccessful_bans.length === 1) {
 				const ban = unsuccessful_bans[0]!;
 				await context.respond(`:x: Could not ban <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}!`);
 			}
 		} else {
-			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}) ${ban.dm_sent ? " with direct message" : ""}`).join("\n");
+			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}) ${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
 			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}`).join("\n");
 
 			if (unsuccessful_bans.length === 0) {
