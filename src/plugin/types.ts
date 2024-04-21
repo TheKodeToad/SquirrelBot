@@ -50,6 +50,7 @@ export enum FlagType {
 	VOID,
 	BOOLEAN,
 	STRING,
+	INTEGER,
 	NUMBER,
 	USER,
 	ROLE,
@@ -75,6 +76,7 @@ export type FlagTypeValue<F extends FlagType> =
 	F extends FlagType.VOID ? boolean :
 	F extends FlagType.BOOLEAN ? boolean :
 	F extends FlagType.STRING ? string :
+	F extends FlagType.INTEGER ? number :
 	F extends FlagType.NUMBER ? number :
 	F extends FlagType.USER ? string :
 	F extends FlagType.ROLE ? string :

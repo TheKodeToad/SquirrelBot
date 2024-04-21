@@ -111,6 +111,8 @@ class Parser {
 				return this.read_boolean();
 			case FlagType.STRING:
 				return this.read_string();
+			case FlagType.INTEGER:
+				return this.read_integer();
 			case FlagType.NUMBER:
 				return this.read_number();
 			case FlagType.USER:
@@ -132,6 +134,8 @@ class Parser {
 				return this.read_sequence(this.read_boolean.bind(this));
 			case FlagType.STRING:
 				return this.read_sequence(() => this.read_string(true));
+			case FlagType.INTEGER:
+				return this.read_sequence(this.read_integer.bind(this));
 			case FlagType.NUMBER:
 				return this.read_sequence(this.read_number.bind(this));
 			case FlagType.USER:
@@ -268,6 +272,16 @@ class Parser {
 		return result;
 	}
 
+	read_integer(): number {
+		const input = this.read_word();
+		const result = Number(input);
+
+		if (!Number.isInteger(result))
+			throw new ParseError(`Not a integer: '${input}'`);
+
+		return result;
+	}
+
 	read_number(): number {
 		const input = this.read_word();
 		const result = Number(input);
@@ -379,6 +393,7 @@ async function message_create(message: Message): Promise<void> {
 	} catch (error) {
 		if (error instanceof ParseError)
 			await context.respond(error.message);
+
 		return;
 	}
 

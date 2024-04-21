@@ -1,5 +1,5 @@
 import AsyncLock from "async-lock";
-import { pg } from "../..";
+import { pg } from "../../..";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -13,6 +13,20 @@ export enum CaseType {
 	KICK = 7,
 	BAN = 8,
 	UNBAN = 9,
+}
+
+export interface Case {
+	guild_id: string;
+	number: number;
+
+	type: CaseType;
+	created_at: Date;
+	expires_at: Date | null;
+
+	actor_id: string;
+	target_id: string;
+
+	reason: string | null;
 }
 
 export interface CreateCaseOptions {
@@ -73,4 +87,28 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 
 		return number;
 	});
+}
+
+export async function get_case_by_number(guild_id: string, number: number): Promise<Case | null> {
+	if (number < 0 || number >= 2 ** 32)
+		return null;
+
+	const result = await pg.query(
+		`
+			SELECT
+				"guild_id",
+				"number",
+				"type",
+				"created_at",
+				"expires_at",
+				"actor_id",
+				"target_id",
+				"reason"
+			FROM "moderation_cases"
+			WHERE "guild_id" = $1 AND "number" = $2
+		`,
+		[guild_id, number]
+	);
+
+	return result.rows[0] ?? null;
 }

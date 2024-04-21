@@ -37,6 +37,8 @@ function map_flag_type(type: FlagType): ApplicationCommandOptionTypes {
 			return ApplicationCommandOptionTypes.BOOLEAN;
 		case FlagType.STRING:
 			return ApplicationCommandOptionTypes.STRING;
+		case FlagType.INTEGER:
+			return ApplicationCommandOptionTypes.INTEGER;
 		case FlagType.NUMBER:
 			return ApplicationCommandOptionTypes.NUMBER;
 		case FlagType.USER:
