@@ -14,7 +14,7 @@ class ParseError extends Error {
 // 17 - length of Jason Citron's ID
 // 20 - length of 64-bit integer limit
 const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
-const MAX_SNOWFLAKE_VALUE = 9223372036854775807n;
+const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
 const format_flag_name = (flag: Flag) => typeof flag.id === "string" ? flag.id : flag.id[0];
 
 function is_snowflake(id: string) {
