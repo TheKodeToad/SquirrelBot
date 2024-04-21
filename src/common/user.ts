@@ -1,4 +1,24 @@
-import { Member, Role } from "oceanic.js";
+import { Client, DiscordRESTError, Member, Role } from "oceanic.js";
+import { get_user_cached } from "./rest";
+
+/**
+ * <@id> (name or <unknown>)
+ */
+export async function format_user(client: Client, user_id: string, quiet = true) {
+	let name = "<unknown>";
+
+	try {
+		name = (await get_user_cached(client, user_id)).tag;
+	} catch (error) {
+		if (!(error instanceof DiscordRESTError))
+			throw error;
+
+		if (!quiet)
+			throw error;
+	}
+
+	return `<@${user_id}> (${name})`;
+}
 
 /**
  * Resolve member roles from cached guild.

@@ -1,21 +1,7 @@
-import { DiscordRESTError, Permissions } from "oceanic.js";
-import { escape_all } from "../../../common/markdown";
-import { get_user_cached } from "../../../common/rest";
+import { Permissions } from "oceanic.js";
+import { format_user } from "../../../common/user";
 import { FlagType, define_command } from "../../../plugin/types";
-import { CaseType, get_case_by_number } from "../common/case";
-
-const case_string: { [T in CaseType]: string } = {
-	[CaseType.NOTE]: ":pencil: Note",
-	[CaseType.WARN]: ":warning: Warn",
-	[CaseType.UNWARN]: ":warning: Unwarn",
-	[CaseType.VOICE_MUTE]: ":mute: Voice Mute",
-	[CaseType.VOICE_UNMUTE]: ":mute: Voice Unmute",
-	[CaseType.MUTE]: ":microphone2: Mute",
-	[CaseType.UNMUTE]: ":microphone2: Unmute",
-	[CaseType.KICK]: ":boot: Kick",
-	[CaseType.BAN]: ":hammer: Ban",
-	[CaseType.UNBAN]: ":hammer: Unban"
-};
+import { CASE_TYPE_NAME, get_case } from "../common/case";
 
 export const case_command = define_command({
 	id: "case",
@@ -34,34 +20,22 @@ export const case_command = define_command({
 		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
 			return;
 
-		const found_case = await get_case_by_number(context.guild.id, number);
-		if (found_case === null) {
+		const info = await get_case(context.guild.id, number);
+		if (info === null) {
 			await context.respond(`:x: Case #${number} not found`);
 			return;
 		}
 
-		let actor_name = "<unknown>";
-		let target_name = "<unknown>";
-
-		try {
-			actor_name = (await get_user_cached(context.client, found_case.actor_id)).tag;
-			target_name = (await get_user_cached(context.client, found_case.target_id)).tag;
-		} catch (error) {
-			if (!(error instanceof DiscordRESTError))
-				throw error;
-		}
-
 		await context.respond(
 			`
-**:closed_book: Case #${found_case.number}**
+:closed_book: Case #${info.number}:
+Type: ${CASE_TYPE_NAME[info.type]}
+Created at: ${info.created_at}
 
-Type: ${case_string[found_case.type]}
-Created at: ${found_case.created_at}
+Actor: ${await format_user(context.client, info.actor_id)}
+Target: ${await format_user(context.client, info.target_id)}
 
-Actor: <@${found_case.actor_id}> (${escape_all(actor_name)})
-Target: <@${found_case.target_id}> (${escape_all(target_name)})
-
-Reason: ${found_case.reason !== null ? `"${found_case.reason}"` : "Not provided"}
+Reason: ${info.reason !== null ? `"${info.reason}"` : "Not provided"}
 			`
 		);
 	},

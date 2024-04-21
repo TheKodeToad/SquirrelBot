@@ -1,7 +1,7 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { escape_all } from "../../../common/markdown";
-import { get_highest_role } from "../../../common/member";
 import { format_rest_error, get_member_cached, get_user_cached } from "../../../common/rest";
+import { get_highest_role } from "../../../common/user";
 import { FlagType, define_command } from "../../../plugin/types";
 import { CaseType, create_case } from "../common/case";
 
@@ -157,5 +157,5 @@ export const kick_command = define_command({
 				);
 			}
 		}
-	}
+	},
 });
