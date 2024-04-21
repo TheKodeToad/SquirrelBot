@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS "moderation_cases" (
-	"guild_id" BIGINT NOT NULL,
+	"guild_id" NUMERIC(20, 0) NOT NULL,
 	"number" INT NOT NULL,
 
 	"type" SMALLINT NOT NULL,
 	"created_at" TIMESTAMPTZ NOT NULL,
 	"expires_at" TIMESTAMPTZ,
 
-	"actor_id" BIGINT NOT NULL,
-	"target_id" BIGINT NOT NULL,
+	"actor_id" NUMERIC(20, 0) NOT NULL,
+	"target_id" NUMERIC(20, 0) NOT NULL,
 
 	"reason" TEXT,
 
