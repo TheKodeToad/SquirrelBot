@@ -12,6 +12,6 @@ export const ping_command = define_command({
 		const rest_ping = Date.now() - pre_respond;
 		const shard = context.guild!.shard;
 
-		await context.respond(`REST: ${rest_ping}ms\nGateway: ${shard.latency}ms`);
+		await context.respond(`REST: ${rest_ping}ms, Gateway: ${shard.latency}ms`);
 	},
 });
