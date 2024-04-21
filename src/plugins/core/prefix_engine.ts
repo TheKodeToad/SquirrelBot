@@ -233,7 +233,7 @@ class Parser {
 		if (this.peek_next() === "\"" || this.peek_next() === "'") {
 			const end_char = this.read();
 
-			while (this.read() !== end_char) {
+			while (!this.is_end() && this.read() !== end_char) {
 				if (this.peek_prev() === "\\") {
 					const escape_code = this.read();
 
@@ -300,15 +300,24 @@ class Parser {
 		return this.next + count <= this.input.length;
 	}
 
-	read(): string | undefined {
-		return this.input[this.next++];
+	read(): string {
+		if (this.next >= this.input.length)
+			throw new Error(`Index ${this.next} out of bounds`);
+
+		return this.input[this.next++]!;
 	}
 
-	peek_prev(): string | undefined {
-		return this.input[this.next - 1];
+	peek_prev(): string {
+		if (this.next <= 0)
+			throw new Error(`Index ${this.next - 1} out of bounds`);
+
+		return this.input[this.next - 1]!;
 	}
 
 	peek_next(): string | undefined {
+		if (this.next >= this.input.length)
+			throw new Error(`Index ${this.next} out of bounds`);
+
 		return this.input[this.next];
 	}
 
