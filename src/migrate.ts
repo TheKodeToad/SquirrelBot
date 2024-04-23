@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { pg } from ".";
+import { pg } from "./index";
 
 async function migrate() {
 	console.log("Running migrations");

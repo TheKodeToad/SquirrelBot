@@ -2,10 +2,10 @@
 	"name": "airplane-bot",
 	"version": "1.0.0",
 	"description": "",
-	"main": "src/main.ts",
 	"scripts": {
-		"start": "ts-node src/main.ts",
-		"migrate": "ts-node src/migrate.ts"
+		"build": "node build.mjs",
+		"start": "npm run build && node out/main.js",
+		"migrate": "npm run build && node out/migrate.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -14,12 +14,12 @@
 		"async-lock": "^1.4.1",
 		"dotenv": "^16.4.5",
 		"oceanic.js": "^1.10.0",
-		"pg": "^8.11.5",
-		"ts-node": "^10.9.2"
+		"pg": "^8.11.5"
 	},
 	"devDependencies": {
 		"@types/async-lock": "^1.4.2",
 		"@types/node": "^20.11.30",
-		"@types/pg": "^8.11.5"
+		"@types/pg": "^8.11.5",
+		"esbuild": "0.20.2"
 	}
 }

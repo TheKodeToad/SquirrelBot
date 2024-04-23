@@ -1,4 +1,4 @@
-import { client } from ".";
+import { client } from "./index";
 import { apply_plugins, register_plugin } from "./plugin/registry";
 import { core_plugin } from "./plugins/core";
 import { moderation_plugin } from "./plugins/moderation";

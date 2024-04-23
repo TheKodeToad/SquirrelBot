@@ -1,5 +1,4 @@
 import { Permissions } from "oceanic.js";
-import { client } from "../../..";
 import { format_user } from "../../../common/user";
 import { FlagType, define_command } from "../../../plugin/command";
 import { CaseType, get_cases } from "../common/case";
@@ -60,9 +59,9 @@ export const cases_command = define_command({
 
 		if (args.actor !== null || args.target !== null) {
 			if (args.actor)
-				filter = `by ${await format_user(context.client, args.actor)}`;
+				filter = `by ${await format_user(args.actor)}`;
 			if (args.target)
-				filter = `targeting ${await format_user(context.client, args.target)}`;
+				filter = `targeting ${await format_user(args.target)}`;
 		} else
 			filter = "for this server";
 
@@ -71,8 +70,8 @@ export const cases_command = define_command({
 		else {
 			const items = await Promise.all(cases.map(async (info) => {
 				const icon = CASE_ICON[info.type];
-				const actor = await format_user(client, info.actor_id);
-				const target = await format_user(client, info.target_id);
+				const actor = await format_user(info.actor_id);
+				const target = await format_user(info.target_id);
 
 				return `${icon} [#${info.number}] ${actor} ${CASE_ACTION[info.type]} ${target}`;
 			}));
