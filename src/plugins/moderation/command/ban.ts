@@ -8,7 +8,6 @@ import { CaseType, create_case } from "../common/case";
 
 export const ban_command = define_command({
 	id: "ban",
-
 	flags: {
 		user: {
 			type: FlagType.USER,
@@ -30,7 +29,6 @@ export const ban_command = define_command({
 			id: ["no-dm", "!dm"],
 		},
 	},
-
 	async run(context, args) {
 		if (context.guild === null)
 			return;
