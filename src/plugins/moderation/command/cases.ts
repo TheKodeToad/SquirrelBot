@@ -1,5 +1,7 @@
+import { Permissions } from "oceanic.js";
+import { client } from "../../..";
 import { format_user } from "../../../common/user";
-import { FlagType, define_command } from "../../../plugin/types";
+import { FlagType, define_command } from "../../../plugin/command";
 import { CaseType, get_cases } from "../common/case";
 
 export const CASE_ICON: { [T in CaseType]: string } = {
@@ -44,6 +46,9 @@ export const cases_command = define_command({
 		if (context.guild === null)
 			return;
 
+		if (context.member?.permissions.has(Permissions.KICK_MEMBERS))
+			return;
+
 		const cases = await get_cases(
 			context.guild.id,
 			args.actor ?? undefined,
@@ -66,8 +71,8 @@ export const cases_command = define_command({
 		else {
 			const items = await Promise.all(cases.map(async (info) => {
 				const icon = CASE_ICON[info.type];
-				const actor = await format_user(context.client, info.actor_id);
-				const target = await format_user(context.client, info.target_id);
+				const actor = await format_user(client, info.actor_id);
+				const target = await format_user(client, info.target_id);
 
 				return `${icon} [#${info.number}] ${actor} ${CASE_ACTION[info.type]} ${target}`;
 			}));

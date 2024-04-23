@@ -1,6 +1,8 @@
-import { AnyTextableChannel, Client, CreateMessageOptions, EditMessageOptions, Guild, Member, Message, User } from "oceanic.js";
+import { CreateMessageOptions, EditMessageOptions, Guild, Member, Message, User } from "oceanic.js";
+import { client } from "../..";
+import { Command, Context, Flag, FlagType, FlagTypeValue, Reply } from "../../plugin/command";
+import { define_event_listener } from "../../plugin/event_listener";
 import { get_commands } from "../../plugin/registry";
-import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, define_event_listener } from "../../plugin/types";
 
 export const prefix_listener = define_event_listener("messageCreate", message_create);
 
@@ -344,22 +346,20 @@ class Parser {
 
 class PrefixContext implements Context {
 	command: Command;
-	client: Client;
+	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	guild: Guild | null;
-	channel: AnyTextableChannel | null;
+	channel_id: string;
 	message: Message;
-	_response: Message | null;
+	private _response: Message | null;
 
 	constructor(command: Command, message: Message) {
 		this.command = command;
-		this.client = message.client;
-		this.message = message;
-		this.member = message.member ?? null;
-		this.user = message.author;
 		this.guild = message.guild;
-		this.channel = message.channel ?? null;
+		this.message = message;
+		this.user = message.author;
+		this.member = message.member ?? null;
+		this.channel_id = message.channelID;
 		this._response = null;
 	}
 
@@ -368,7 +368,7 @@ class PrefixContext implements Context {
 			typeof reply === "string" ? { content: reply } : reply;
 
 		if (this._response === null)
-			this._response = await this.client.rest.channels.createMessage(this.message.channelID, content);
+			this._response = await client.rest.channels.createMessage(this.channel_id, content);
 		else
 			await this._response.edit(content);
 	}

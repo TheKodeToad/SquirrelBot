@@ -1,6 +1,7 @@
-import { AnyInteractionChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, User } from "oceanic.js";
+import { ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, User } from "oceanic.js";
+import { Command, Context, Flag, FlagType, Reply } from "../../plugin/command";
+import { define_event_listener } from "../../plugin/event_listener";
 import { get_commands, get_plugins } from "../../plugin/registry";
-import { Command, Context, Flag, FlagType, Reply, define_event_listener } from "../../plugin/types";
 
 export const slash_listener = define_event_listener("interactionCreate", interaction_create);
 
@@ -58,11 +59,11 @@ class SlashContext implements Context {
 	user: User;
 	member: Member | null;
 	guild: Guild | null;
-	channel: AnyInteractionChannel | null;
-	_interaction: CommandInteraction;
-	_responded: boolean;
-	_defer_timeout: NodeJS.Timeout | null;
-	_defer_promise: Promise<void> | null;
+	channel_id: string;
+	private _interaction: CommandInteraction;
+	private _responded: boolean;
+	private _defer_timeout: NodeJS.Timeout | null;
+	private _defer_promise: Promise<void> | null;
 
 	constructor(command: Command, interaction: CommandInteraction) {
 		this.command = command;
@@ -70,7 +71,7 @@ class SlashContext implements Context {
 		this.user = interaction.user;
 		this.member = interaction.member ?? null;
 		this.guild = interaction.guild;
-		this.channel = interaction.channel ?? null;
+		this.channel_id = interaction.channelID;
 		this._interaction = interaction;
 		this._responded = false;
 		this._defer_promise = null;
@@ -97,7 +98,7 @@ class SlashContext implements Context {
 		}
 	}
 
-	_remove_timeout() {
+	private _remove_timeout() {
 		if (this._defer_timeout !== null) {
 			clearTimeout(this._defer_timeout);
 			this._defer_timeout = null;
@@ -148,10 +149,10 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 
 	try {
 		await command.run(context, args);
-		context._remove_timeout();
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute /${command.id}`);
-		context._remove_timeout();
 		throw error;
+	} finally {
+		context["_remove_timeout"](); // wink
 	}
 }

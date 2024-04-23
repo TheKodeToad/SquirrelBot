@@ -1,8 +1,9 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
+import { client } from "../../..";
 import { escape_all } from "../../../common/markdown";
 import { format_rest_error, get_member_cached, get_user_cached } from "../../../common/rest";
 import { get_highest_role } from "../../../common/user";
-import { FlagType, define_command } from "../../../plugin/types";
+import { FlagType, define_command } from "../../../plugin/command";
 import { CaseType, create_case } from "../common/case";
 
 export const kick_command = define_command({
@@ -45,12 +46,12 @@ export const kick_command = define_command({
 			let bot: boolean;
 
 			try {
-				const target_member = await get_member_cached(context.client, context.guild, id);
+				const target_member = await get_member_cached(context.guild, id);
 				name = target_member.user.tag;
 				bot = target_member.bot;
 
 				try {
-					var bot_member = await get_member_cached(context.client, context.guild, context.client.user.id);
+					var bot_member = await get_member_cached(context.guild, client.user.id);
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
@@ -68,7 +69,7 @@ export const kick_command = define_command({
 					continue;
 				}
 
-				if (context.guild.ownerID !== context.client.user.id
+				if (context.guild.ownerID !== client.user.id
 					&& (context.guild.ownerID === id
 						|| get_highest_role(bot_member).position <= target_position)
 				) {
@@ -85,7 +86,7 @@ export const kick_command = define_command({
 				}
 
 				try {
-					const user = await get_user_cached(context.client, id);
+					const user = await get_user_cached(id);
 					unsuccessful_kicks.push({ id, name: user.tag, error: "User is not in the server" });
 					continue;
 				} catch (error) {
@@ -101,7 +102,7 @@ export const kick_command = define_command({
 
 			if (!bot && !args.no_dm) {
 				try {
-					const dm = await context.client.rest.users.createDM(id);
+					const dm = await client.rest.users.createDM(id);
 					await dm.createMessage({ content: "You were kicked :regional_indicator_l:" });
 					dm_sent = true;
 				} catch (error) {

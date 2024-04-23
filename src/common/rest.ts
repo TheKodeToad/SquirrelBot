@@ -1,4 +1,5 @@
-import { Client, DiscordRESTError, Guild, Member, PrivateChannel, User } from "oceanic.js";
+import { DiscordRESTError, Guild, Member, PrivateChannel, User } from "oceanic.js";
+import { client } from "..";
 
 export function format_rest_error(rest_error: DiscordRESTError) {
 	if (rest_error.resBody !== null
@@ -9,14 +10,14 @@ export function format_rest_error(rest_error: DiscordRESTError) {
 	return `HTTP Error ${rest_error.status}: ${rest_error.statusText}`;
 }
 
-export function get_user_cached(client: Client, user_id: string): User | Promise<User> {
+export function get_user_cached(user_id: string): User | Promise<User> {
 	return client.users.get(user_id) ?? client.rest.users.get(user_id);
 }
 
-export function get_member_cached(client: Client, guild: Guild, user_id: string): Member | Promise<Member> {
+export function get_member_cached(guild: Guild, user_id: string): Member | Promise<Member> {
 	return guild.members.get(user_id) ?? client.rest.guilds.getMember(guild.id, user_id);
 }
 
-export function create_dm_cached(client: Client, user_id: string): PrivateChannel | Promise<PrivateChannel> {
+export function create_dm_cached(user_id: string): PrivateChannel | Promise<PrivateChannel> {
 	return client.privateChannels.find(channel => channel.recipient.id === user_id) ?? client.rest.users.createDM(user_id);
 }

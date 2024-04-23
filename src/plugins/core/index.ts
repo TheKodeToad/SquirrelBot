@@ -1,4 +1,4 @@
-import { define_plugin } from "../../plugin/types";
+import { define_plugin } from "../../plugin";
 import { ping_command } from "./ping";
 import { prefix_listener } from "./prefix_engine";
 import { register_slash_commands, slash_listener } from "./slash_engine";

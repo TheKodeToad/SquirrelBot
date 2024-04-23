@@ -1,6 +1,7 @@
 import { Permissions } from "oceanic.js";
+import { client } from "../../..";
 import { format_user } from "../../../common/user";
-import { FlagType, define_command } from "../../../plugin/types";
+import { FlagType, define_command } from "../../../plugin/command";
 import { CASE_TYPE_NAME, get_case } from "../common/case";
 
 export const case_command = define_command({
@@ -17,7 +18,7 @@ export const case_command = define_command({
 		if (!context.guild)
 			return;
 
-		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
+		if (!context.member?.permissions.has(Permissions.KICK_MEMBERS))
 			return;
 
 		const info = await get_case(context.guild.id, number);
@@ -32,8 +33,8 @@ export const case_command = define_command({
 Type: ${CASE_TYPE_NAME[info.type]}
 Created at: ${info.created_at}
 
-Actor: ${await format_user(context.client, info.actor_id)}
-Target: ${await format_user(context.client, info.target_id)}
+Actor: ${await format_user(client, info.actor_id)}
+Target: ${await format_user(client, info.target_id)}
 
 Reason: ${info.reason !== null ? `"${info.reason}"` : "Not provided"}
 			`
