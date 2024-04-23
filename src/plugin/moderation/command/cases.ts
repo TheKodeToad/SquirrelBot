@@ -1,6 +1,6 @@
 import { Permissions } from "oceanic.js";
 import { format_user } from "../../../common/user";
-import { FlagType, define_command } from "../../../plugin/command";
+import { FlagType, define_command } from "../../../core/types/command";
 import { CaseType, get_cases } from "../common/case";
 
 export const CASE_ICON: { [T in CaseType]: string } = {
@@ -45,7 +45,7 @@ export const cases_command = define_command({
 		if (context.guild === null)
 			return;
 
-		if (context.member?.permissions.has(Permissions.KICK_MEMBERS))
+		if (!context.member?.permissions.has(Permissions.KICK_MEMBERS))
 			return;
 
 		const cases = await get_cases(

@@ -1,72 +1,34 @@
-import { Client, ClientEvents } from "oceanic.js";
-import { Plugin } from ".";
+import { ClientEvents } from "oceanic.js";
+import { bot } from "..";
 import { ALLOWED_GUILDS } from "../config";
-import { Command } from "./command";
 
-const plugins: Plugin[] = [];
-const command_lookup: Map<string, Command[]> = new Map;
-const all_commands: Command[] = [];
+export function wrap_listener<E extends keyof ClientEvents>(
+	event: E,
+	listener: (...args: ClientEvents[E]) => void
+) {
+	return (...args: ClientEvents[E]) => {
+		let guild: string | null = null;
 
-export function register_plugin(plugin: Plugin): void {
-	plugins.push(plugin);
+		if (event in EVENT_TO_GUILD)
+			guild ??= EVENT_TO_GUILD[event](...args);
 
-	if (plugin.commands) {
-		for (const command of plugin.commands) {
-			if (typeof command.id === "string")
-				add_command(command.id, command);
-			else
-				command.id.forEach(id => add_command(id, command));
+		if (guild !== null && !ALLOWED_GUILDS.has(guild))
+			return;
 
-			all_commands.push(command);
-		}
-	}
+		listener(...args);
+	};
 }
 
-export function get_plugins(): Plugin[] {
-	return plugins;
+export function install_wrapped_listener<E extends keyof ClientEvents>(
+	event: E,
+	listener: (...args: ClientEvents[E]) => void
+): void {
+	bot.on(event, wrap_listener(event, listener));
 }
 
-export function get_commands(name: string): Command[] {
-	return command_lookup.get(name) ?? [];
-}
-
-export function get_all_commands(): Command[] {
-	return all_commands;
-}
-
-function add_command(id: string, command: Command): void {
-	if (!command_lookup.has(id))
-		command_lookup.set(id, []);
-
-	const list = command_lookup.get(id)!;
-	list.push(command);
-}
-
-export async function apply_plugins(client: Client): Promise<void> {
-	for (const plugin of get_plugins()) {
-		if (!plugin.listeners)
-			continue;
-
-		for (const listener of plugin.listeners) {
-			client.on(listener.type, (...args) => {
-				let guild: string | null = null;
-				if (listener.type in EVENT_TO_GUILD)
-					guild ??= EVENT_TO_GUILD[listener.type](...args);
-
-				if (guild !== null && !ALLOWED_GUILDS.has(guild))
-					return;
-
-				listener.listener(...args);
-			});
-		}
-
-		if (plugin.apply)
-			await plugin.apply(client);
-	}
-}
-
-
-const EVENT_TO_GUILD = define_event_mapping({
+const EVENT_TO_GUILD: {
+	[E in keyof ClientEvents]: (...args: ClientEvents[E]) => string | null;
+} = {
 	applicationCommandPermissionsUpdate: guild => guild.id,
 	autoModerationActionExecution: guild => guild.id,
 	autoModerationRuleCreate: rule => rule.guildID,
@@ -138,12 +100,20 @@ const EVENT_TO_GUILD = define_event_mapping({
 	voiceChannelStatusUpdate: channel => "guildID" in channel ? channel.guildID : null,
 	voiceChannelSwitch: member => member.guildID,
 	voiceStateUpdate: member => member.guildID,
-	webhooksUpdate: guild => guild.id
-});
+	webhooksUpdate: guild => guild.id,
 
-function define_event_mapping<E extends {
-	[E in keyof ClientEvents]?: (...args: ClientEvents[E]) => string | null;
-}>(mapping: E) {
-	return mapping;
-}
-
+	connect: () => null,
+	debug: () => null,
+	disconnect: () => null,
+	error: () => null,
+	hello: () => null,
+	packet: () => null,
+	ready: () => null,
+	request: () => null,
+	shardDisconnect: () => null,
+	shardPreReady: () => null,
+	shardReady: () => null,
+	shardResume: () => null,
+	userUpdate: () => null,
+	warn: () => null
+};

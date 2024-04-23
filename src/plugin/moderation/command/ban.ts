@@ -1,9 +1,9 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
-import { client } from "../../..";
+import { bot } from "../../..";
 import { escape_all } from "../../../common/markdown";
 import { create_dm_cached, format_rest_error, get_member_cached, get_user_cached } from "../../../common/rest";
 import { get_highest_role } from "../../../common/user";
-import { FlagType, define_command } from "../../../plugin/command";
+import { FlagType, define_command } from "../../../core/types/command";
 import { CaseType, create_case } from "../common/case";
 
 export const ban_command = define_command({
@@ -42,16 +42,16 @@ export const ban_command = define_command({
 		for (const id of args.user) {
 			let name: string;
 			let in_guild: boolean;
-			let bot: boolean;
+			let is_bot: boolean;
 
 			try {
 				const target_member = await get_member_cached(context.guild, id);
 				name = target_member.user.tag;
 				in_guild = true;
-				bot = target_member.bot;
+				is_bot = target_member.bot;
 
 				try {
-					var bot_member = await get_member_cached(context.guild, client.user.id);
+					var bot_member = await get_member_cached(context.guild, bot.user.id);
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
@@ -69,7 +69,7 @@ export const ban_command = define_command({
 					continue;
 				}
 
-				if (context.guild.ownerID !== client.user.id
+				if (context.guild.ownerID !== bot.user.id
 					&& (context.guild.ownerID === id
 						|| get_highest_role(bot_member).position <= target_position)
 				) {
@@ -89,7 +89,7 @@ export const ban_command = define_command({
 					const user = await get_user_cached(id);
 					name = user.tag;
 					in_guild = false;
-					bot = user.bot;
+					is_bot = user.bot;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
@@ -101,7 +101,7 @@ export const ban_command = define_command({
 
 			let dm_sent = false;
 
-			if (in_guild && !bot && !args.no_dm) {
+			if (in_guild && !is_bot && !args.no_dm) {
 				try {
 					const dm = await create_dm_cached(id);
 					await dm.createMessage({ content: "You were banned :regional_indicator_l:" });

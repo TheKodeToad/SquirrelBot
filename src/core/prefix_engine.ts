@@ -1,10 +1,12 @@
 import { CreateMessageOptions, EditMessageOptions, Guild, Member, Message, User } from "oceanic.js";
-import { client } from "../..";
-import { Command, Context, Flag, FlagType, FlagTypeValue, Reply } from "../../plugin/command";
-import { define_event_listener } from "../../plugin/event_listener";
-import { get_commands } from "../../plugin/registry";
+import { bot } from "..";
+import { install_wrapped_listener } from "./event_filter";
+import { get_commands } from "./plugin_registry";
+import { Command, Context, Flag, FlagType, FlagTypeValue, Reply } from "./types/command";
 
-export const prefix_listener = define_event_listener("messageCreate", message_create);
+export function install_prefix_engine() {
+	install_wrapped_listener("messageCreate", message_create);
+}
 
 class ParseError extends Error {
 	constructor(message: string) {
@@ -368,7 +370,7 @@ class PrefixContext implements Context {
 			typeof reply === "string" ? { content: reply } : reply;
 
 		if (this._response === null)
-			this._response = await client.rest.channels.createMessage(this.channel_id, content);
+			this._response = await bot.rest.channels.createMessage(this.channel_id, content);
 		else
 			await this._response.edit(content);
 	}

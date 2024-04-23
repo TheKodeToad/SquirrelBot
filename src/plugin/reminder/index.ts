@@ -1,6 +1,6 @@
-import { client } from "../..";
-import { define_plugin } from "../../plugin";
-import { FlagType, define_command } from "../../plugin/command";
+import { bot } from "../..";
+import { define_plugin } from "../../core/types";
+import { FlagType, define_command } from "../../core/types/command";
 
 export const reminder_plugin = define_plugin({
 	id: "reminder",
@@ -23,7 +23,7 @@ export const reminder_plugin = define_plugin({
 			async run(context, { seconds, message }) {
 				await context.respond(`:white_check_mark: Reminder set for <t:${Math.floor(Date.now() / 1000 + seconds)}:R>: '${message}'!`);
 				setTimeout(async () => {
-					await client.rest.channels.createMessage(
+					await bot.rest.channels.createMessage(
 						context.channel_id,
 						{
 							content: `:bell: Reminder for <@${context.user.id}>: ${message}`,

@@ -1,11 +1,11 @@
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, User } from "oceanic.js";
-import { Command, Context, Flag, FlagType, Reply } from "../../plugin/command";
-import { define_event_listener } from "../../plugin/event_listener";
-import { get_commands, get_plugins } from "../../plugin/registry";
+import { Context } from "vm";
+import { bot } from "..";
+import { install_wrapped_listener } from "./event_filter";
+import { get_commands, get_plugins } from "./plugin_registry";
+import { Command, Flag, FlagType, Reply } from "./types/command";
 
-export const slash_listener = define_event_listener("interactionCreate", interaction_create);
-
-export async function register_slash_commands(client: Client): Promise<void> {
+export async function install_slash_engine(): Promise<void> {
 	const commands = get_plugins().filter(plugin => plugin.commands !== undefined).map(plugin => (
 		{
 			type: ApplicationCommandTypes.CHAT_INPUT,
@@ -28,7 +28,9 @@ export async function register_slash_commands(client: Client): Promise<void> {
 			)),
 		} as CreateApplicationCommandOptions
 	));
-	await client.application.bulkEditGlobalCommands(commands);
+	await bot.application.bulkEditGlobalCommands(commands);
+
+	install_wrapped_listener("interactionCreate", interaction_create);
 }
 
 function map_flag_type(type: FlagType): ApplicationCommandOptionTypes {
@@ -60,10 +62,10 @@ class SlashContext implements Context {
 	member: Member | null;
 	guild: Guild | null;
 	channel_id: string;
-	private _interaction: CommandInteraction;
-	private _responded: boolean;
-	private _defer_timeout: NodeJS.Timeout | null;
-	private _defer_promise: Promise<void> | null;
+	_interaction: CommandInteraction;
+	_responded: boolean;
+	_defer_timeout: NodeJS.Timeout | null;
+	_defer_promise: Promise<void> | null;
 
 	constructor(command: Command, interaction: CommandInteraction) {
 		this.command = command;
@@ -79,8 +81,7 @@ class SlashContext implements Context {
 			this._defer_timeout = null;
 			this._responded = true;
 			this._defer_promise = interaction.defer();
-		}, 1000);
-		this._defer_timeout.unref();
+		}, 1000).unref();
 	}
 
 	async respond(reply: Reply): Promise<void> {
@@ -98,7 +99,7 @@ class SlashContext implements Context {
 		}
 	}
 
-	private _remove_timeout() {
+	_remove_timeout() {
 		if (this._defer_timeout !== null) {
 			clearTimeout(this._defer_timeout);
 			this._defer_timeout = null;
@@ -153,6 +154,6 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		await context.respond(`:boom: Failed to execute /${command.id}`);
 		throw error;
 	} finally {
-		context["_remove_timeout"](); // wink
+		context._remove_timeout();
 	}
 }

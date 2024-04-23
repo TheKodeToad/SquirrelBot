@@ -1,4 +1,4 @@
-import { define_command } from "../../plugin/command";
+import { define_command } from "../../../core/types/command";
 
 export const ping_command = define_command({
 	id: "ping",

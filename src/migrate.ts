@@ -1,11 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
-import { pg } from "./index";
+import { database } from "./index";
 
 async function migrate() {
 	console.log("Running migrations");
 
-	await pg.query(`
+	await database.query(`
 		CREATE TABLE IF NOT EXISTS "migration_dirs" (
 			"path" TEXT NOT NULL PRIMARY KEY,
 			"last_run" INT NOT NULL
@@ -13,7 +13,7 @@ async function migrate() {
 	`);
 
 	await process("migrations", true);
-	await pg.end();
+	await database.end();
 }
 
 async function process(dir: string, include_subdirs: boolean) {
@@ -42,7 +42,7 @@ async function process(dir: string, include_subdirs: boolean) {
 		}
 	}
 
-	const last_run: number = (await pg.query(
+	const last_run: number = (await database.query(
 		`
 			SELECT "last_run"
 			FROM "migration_dirs"
@@ -63,7 +63,7 @@ async function process(dir: string, include_subdirs: boolean) {
 		console.log(`Running file '${file}'`);
 
 		const sql = await fs.readFile(file, "utf-8");
-		const client = await pg.connect();
+		const client = await database.connect();
 
 		let done = false;
 		try {

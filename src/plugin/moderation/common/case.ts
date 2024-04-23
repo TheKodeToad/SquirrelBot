@@ -1,5 +1,5 @@
 import AsyncLock from "async-lock";
-import { pg } from "../../..";
+import { database } from "../../..";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -60,7 +60,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 	options.created_at ??= new Date;
 
 	return await create_case_lock.acquire(guild_id, async () => {
-		let number = (await pg.query(
+		let number = (await database.query(
 			`
 				SELECT "number"
 				FROM "moderation_cases"
@@ -72,7 +72,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 		)).rows[0]?.number ?? 0;
 		++number;
 
-		await pg.query(
+		await database.query(
 			`
 				INSERT INTO "moderation_cases" (
 					"guild_id",
@@ -106,7 +106,7 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await pg.query(
+	const result = await database.query(
 		`
 			SELECT
 				"guild_id",
@@ -128,7 +128,7 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 }
 
 export async function get_cases(guild_id: string, actor_id?: string, target_id?: string, limit?: number): Promise<CaseInfo[]> {
-	const result = await pg.query(
+	const result = await database.query(
 		`
 			SELECT
 				"guild_id",

@@ -1,4 +1,4 @@
-import { define_plugin } from "../../plugin";
+import { define_plugin } from "../../core/types";
 import { ban_command } from "./command/ban";
 import { case_command } from "./command/case";
 import { cases_command } from "./command/cases";

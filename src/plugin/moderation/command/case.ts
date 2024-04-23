@@ -1,6 +1,6 @@
 import { Permissions } from "oceanic.js";
 import { format_user } from "../../../common/user";
-import { FlagType, define_command } from "../../../plugin/command";
+import { FlagType, define_command } from "../../../core/types/command";
 import { CASE_TYPE_NAME, get_case } from "../common/case";
 
 export const case_command = define_command({
