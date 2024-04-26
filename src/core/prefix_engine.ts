@@ -61,7 +61,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	try {
 		await command.run(context, args);
 
-		if (command.track_edits)
+		if (command.track_updates)
 			tracked_messages.set(message.id, context);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
@@ -155,7 +155,7 @@ class Parser {
 			}
 		}
 
-		if (!this.is_end() && this.peek(2) !== "--") {
+		if (!this.is_end() && !this.is_flag()) {
 			if (!flag_lookup.has(""))
 				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
 
@@ -166,14 +166,18 @@ class Parser {
 		}
 
 		while (!this.is_end()) {
-			if (this.peek(2) !== "--")
+			if (!this.is_flag())
 				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
 
-			const flag_id = this.read_word().slice(2);
+			let flag_id = this.read_word().slice(1);
+			// allow --flag-name
+			// also conviniently turns "--" into ""
+			if (flag_id.startsWith("-"))
+				flag_id = flag_id.slice(1);
 
 			if (!flag_lookup.has(flag_id)) {
 				if (flag_id.length === 0)
-					throw new ParseError("Expected flag name after '--'");
+					throw new ParseError("Expected flag name after -");
 				else
 					throw new ParseError(`Cannot find flag '${flag_id}'`);
 			}
@@ -204,6 +208,11 @@ class Parser {
 		}
 
 		return result;
+	}
+
+	is_flag(): boolean {
+		const next = this.peek(2);
+		return next.length === 2 && next[0] === "-" && next[1] !== " ";
 	}
 
 	read_value(type: FlagType) {
@@ -255,7 +264,7 @@ class Parser {
 	read_sequence<T>(reader: () => T): T[] {
 		const result: T[] = [];
 
-		while (!(this.is_end() || this.peek(2) === "--"))
+		while (!(this.is_end() || this.is_flag()))
 			result.push(reader());
 
 		return result;
@@ -365,7 +374,7 @@ class Parser {
 			while (!this.is_end()) {
 				this.read();
 
-				if (this.peek_prev() === " " && (limited || this.peek(2) === "--"))
+				if (this.peek_prev() === " " && (limited || this.is_flag()))
 					break;
 
 				result += this.peek_prev();
@@ -431,7 +440,7 @@ class Parser {
 		if (count < 0)
 			return this.input.slice(Math.max(this.next + count, 0), this.next);
 
-		return this.input.slice(this.next, Math.min(this.next + count, this.input.length - 1));
+		return this.input.slice(this.next, Math.min(this.next + count, this.input.length));
 	}
 
 	read_word(): string {

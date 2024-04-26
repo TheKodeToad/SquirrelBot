@@ -2,6 +2,7 @@ import { define_command } from "../../../core/types/command";
 
 export const ping_command = define_command({
 	id: "ping",
+	track_updates: true, // allow deleting
 	async run(context) {
 		if (!context.guild)
 			return;

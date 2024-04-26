@@ -14,7 +14,7 @@ export interface Command<F extends Record<string, Flag> = Record<string, Flag>> 
 	flags?: F;
 	support_prefix?: boolean;
 	support_slash?: boolean;
-	track_edits?: boolean;
+	track_updates?: boolean;
 	run(context: Context, args: { [K in keyof F]: FlagValue<F[K]> }): Promise<void> | void;
 }
 

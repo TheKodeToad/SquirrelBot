@@ -13,7 +13,7 @@ export const case_command = define_command({
 			required: true,
 		},
 	},
-	track_edits: true,
+	track_updates: true,
 	async run(context, { number }) {
 		if (!context.guild)
 			return;
