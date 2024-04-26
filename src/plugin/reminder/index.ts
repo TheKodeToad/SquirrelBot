@@ -1,6 +1,6 @@
 import { bot } from "../..";
-import { define_plugin } from "../../core/types";
 import { FlagType, define_command } from "../../core/types/command";
+import { define_plugin } from "../../core/types/plugin";
 
 export const reminder_plugin = define_plugin({
 	id: "reminder",

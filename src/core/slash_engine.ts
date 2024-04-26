@@ -132,7 +132,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		for (const [key, flag] of Object.entries(command.flags)) {
 			args[key] = flag.array ? [] : null;
 
-			const id = typeof flag.id === "string" ? flag.id : flag.id[0];
+			const id = Array.isArray(flag.id) ? flag.id[0] : flag.id;
 			flag_lookup.set(id, [key, flag]);
 		}
 

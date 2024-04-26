@@ -41,6 +41,7 @@ export const cases_command = define_command({
 			type: FlagType.USER,
 		},
 	},
+	track_edits: true,
 	async run(context, args) {
 		if (context.guild === null)
 			return;

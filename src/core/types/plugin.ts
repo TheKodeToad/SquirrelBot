@@ -11,3 +11,4 @@ export interface Plugin {
 export function define_plugin(plugin: Plugin): Plugin {
 	return plugin;
 }
+

@@ -13,6 +13,7 @@ export const case_command = define_command({
 			required: true,
 		},
 	},
+	track_edits: true,
 	async run(context, { number }) {
 		if (!context.guild)
 			return;
@@ -28,7 +29,8 @@ export const case_command = define_command({
 
 		await context.respond(
 			`
-:closed_book: Case #${info.number}:
+**:closed_book: Case #${info.number}**
+
 Type: ${CASE_TYPE_NAME[info.type]}
 Created at: ${info.created_at}
 

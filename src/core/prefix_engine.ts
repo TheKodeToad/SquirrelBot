@@ -1,28 +1,126 @@
-import { CreateMessageOptions, EditMessageOptions, Guild, Member, Message, User } from "oceanic.js";
+import { CreateMessageOptions, EditMessageOptions, Guild, Member, Message, PossiblyUncachedMessage, User } from "oceanic.js";
 import { bot } from "..";
+import { TTLMap } from "../common/ttl_map";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands } from "./plugin_registry";
-import { Command, Context, Flag, FlagType, FlagTypeValue, Reply } from "./types/command";
+import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, default_id } from "./types/command";
 
 export function install_prefix_engine() {
-	install_wrapped_listener("messageCreate", message_create);
-}
-
-class ParseError extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "ParseError";
-	}
+	install_wrapped_listener("messageCreate", handle);
+	install_wrapped_listener("messageUpdate", handle_edit);
+	install_wrapped_listener("messageDelete", handle_delete);
 }
 
 // 17 - length of Jason Citron's ID
 // 20 - length of 64-bit integer limit
 const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
 const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
-const format_flag_name = (flag: Flag) => typeof flag.id === "string" ? flag.id : flag.id[0];
+
+const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(1000 * 60 * 30);
+setInterval(() => tracked_messages.cleanup(), 1000 * 60);
 
 function is_snowflake(id: string) {
 	return SNOWFLAKE_REGEX.test(id) && BigInt(id) <= MAX_SNOWFLAKE_VALUE;
+}
+
+async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
+	const prefix = "!";
+
+	if (!message.content.startsWith(prefix))
+		return;
+
+	const unprefixed = message.content.slice(1);
+
+	const name = unprefixed.split(" ", 1)[0]!;
+	const matches = get_commands(name).filter(command => command.support_prefix ?? true);
+
+	if (matches.length !== 1)
+		return;
+
+	const command = matches[0]!;
+
+	if (prev_context && prev_context.command !== command)
+		return;
+
+	const context = prev_context ?? new PrefixContext(command, message);
+
+	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
+	const parser = new Parser(context, input);
+
+	try {
+		var args = parser.parse();
+	} catch (error) {
+		if (error instanceof ParseError) {
+			await context.respond(error.message);
+			tracked_messages.set(message.id, context);
+		}
+
+		return;
+	}
+
+	try {
+		await command.run(context, args);
+
+		if (command.track_edits)
+			tracked_messages.set(message.id, context);
+	} catch (error) {
+		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
+		throw error;
+	}
+}
+
+function handle_edit(message: Message) {
+	const tracked = tracked_messages.get(message.id);
+
+	if (!tracked)
+		return;
+
+	tracked_messages.delete(message.id);
+	handle(message, tracked);
+}
+
+async function handle_delete(message: PossiblyUncachedMessage) {
+	const tracked = tracked_messages.get(message.id);
+
+	if (!tracked)
+		return;
+
+	tracked_messages.delete(message.id);
+	await tracked._delete();
+}
+
+class PrefixContext implements Context {
+	command: Command;
+	guild: Guild | null;
+	user: User;
+	member: Member | null;
+	channel_id: string;
+	message: Message;
+	_response: Message | null;
+
+	constructor(command: Command, message: Message) {
+		this.command = command;
+		this.guild = message.guild;
+		this.message = message;
+		this.user = message.author;
+		this.member = message.member ?? null;
+		this.channel_id = message.channelID;
+		this._response = null;
+	}
+
+	async respond(reply: Reply): Promise<void> {
+		const content: CreateMessageOptions | EditMessageOptions =
+			typeof reply === "string" ? { content: reply } : reply;
+
+		if (this._response === null)
+			this._response = await bot.rest.channels.createMessage(this.channel_id, content);
+		else
+			await this._response.edit(content);
+	}
+
+	async _delete(): Promise<void> {
+		await this._response?.delete();
+	}
 }
 
 class Parser {
@@ -49,10 +147,11 @@ class Parser {
 					continue;
 				}
 
-				if (typeof flag.id === "string")
+				if (Array.isArray(flag.id)) {
+					for (const id of flag.id)
+						flag_lookup.set(id, [key, flag]);
+				} else
 					flag_lookup.set(flag.id, [key, flag]);
-				else
-					flag.id.forEach(id => flag_lookup.set(id, [key, flag]));
 			}
 		}
 
@@ -97,7 +196,7 @@ class Parser {
 
 			if (missing_flags.length !== 0) {
 				const missing_flag_names = missing_flags
-					.map(([_, flag]) => format_flag_name(flag))
+					.map(([_, flag]) => default_id(flag.id))
 					.join(", ");
 
 				throw new ParseError(`Missing ${missing_flag_names}`);
@@ -346,72 +445,9 @@ class Parser {
 
 }
 
-class PrefixContext implements Context {
-	command: Command;
-	guild: Guild | null;
-	user: User;
-	member: Member | null;
-	channel_id: string;
-	message: Message;
-	private _response: Message | null;
-
-	constructor(command: Command, message: Message) {
-		this.command = command;
-		this.guild = message.guild;
-		this.message = message;
-		this.user = message.author;
-		this.member = message.member ?? null;
-		this.channel_id = message.channelID;
-		this._response = null;
-	}
-
-	async respond(reply: Reply): Promise<void> {
-		const content: CreateMessageOptions | EditMessageOptions =
-			typeof reply === "string" ? { content: reply } : reply;
-
-		if (this._response === null)
-			this._response = await bot.rest.channels.createMessage(this.channel_id, content);
-		else
-			await this._response.edit(content);
-	}
-}
-
-async function message_create(message: Message): Promise<void> {
-	if (!message.inCachedGuildChannel())
-		return;
-
-	const prefix = "!";
-
-	if (!message.content.startsWith(prefix))
-		return;
-
-	const unprefixed = message.content.slice(1);
-
-	const name = unprefixed.split(" ", 1)[0]!;
-	const matches = get_commands(name).filter(command => command.support_prefix ?? true);
-
-	if (matches.length !== 1)
-		return;
-
-	const command = matches[0]!;
-	const context = new PrefixContext(command, message);
-
-	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
-	const parser = new Parser(context, input);
-
-	try {
-		var args = parser.parse();
-	} catch (error) {
-		if (error instanceof ParseError)
-			await context.respond(error.message);
-
-		return;
-	}
-
-	try {
-		await command.run(context, args);
-	} catch (error) {
-		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
-		throw error;
+class ParseError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "ParseError";
 	}
 }

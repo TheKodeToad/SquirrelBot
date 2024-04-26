@@ -2,11 +2,19 @@ import { CreateMessageOptions, Guild, Member, Message, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
 
+export function default_id(id: Id): string {
+	if (Array.isArray(id))
+		return id[0];
+	else
+		return id;
+}
+
 export interface Command<F extends Record<string, Flag> = Record<string, Flag>> {
 	id: Id;
 	flags?: F;
 	support_prefix?: boolean;
 	support_slash?: boolean;
+	track_edits?: boolean;
 	run(context: Context, args: { [K in keyof F]: FlagValue<F[K]> }): Promise<void> | void;
 }
 

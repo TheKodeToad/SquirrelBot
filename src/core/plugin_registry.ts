@@ -2,8 +2,8 @@ import { bot } from "..";
 import { wrap_listener } from "./event_filter";
 import { install_prefix_engine } from "./prefix_engine";
 import { install_slash_engine } from "./slash_engine";
-import { Plugin } from "./types";
 import { Command } from "./types/command";
+import { Plugin } from "./types/plugin";
 
 const plugins: Plugin[] = [];
 const command_lookup: Map<string, Command[]> = new Map;
@@ -14,10 +14,11 @@ export function register_plugin(plugin: Plugin): void {
 
 	if (plugin.commands) {
 		for (const command of plugin.commands) {
-			if (typeof command.id === "string")
+			if (Array.isArray(command.id)) {
+				for (const id of command.id)
+					add_command(id, command);
+			} else
 				add_command(command.id, command);
-			else
-				command.id.forEach(id => add_command(id, command));
 
 			all_commands.push(command);
 		}
