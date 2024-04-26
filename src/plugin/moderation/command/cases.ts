@@ -53,7 +53,7 @@ export const cases_command = define_command({
 			context.guild.id,
 			args.actor ?? undefined,
 			args.target ?? undefined,
-			8
+			6
 		);
 
 		let filter = "";
