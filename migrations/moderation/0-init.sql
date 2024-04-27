@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS "moderation_cases" (
 
 	"reason" TEXT,
 
+	"delete_message_seconds" INT,
+	"dm_sent" BOOLEAN,
+
 	PRIMARY KEY ("guild_id", "number")
 );
 

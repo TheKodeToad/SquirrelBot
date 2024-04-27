@@ -40,6 +40,9 @@ export interface CaseInfo {
 	target_id: string;
 
 	reason: string | null;
+
+	delete_message_seconds: number | null;
+	dm_sent: boolean | null;
 }
 
 export interface CreateCaseOptions {
@@ -51,6 +54,9 @@ export interface CreateCaseOptions {
 	target_id: string;
 
 	reason?: string;
+
+	delete_message_seconds?: number;
+	dm_sent?: boolean;
 }
 
 // ensure number incrementation is atomic
@@ -82,9 +88,11 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 					"expires_at",
 					"actor_id",
 					"target_id",
-					"reason"
+					"reason",
+					"delete_message_seconds"
+					"dm_sent"
 				)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 			`,
 			[
 				guild_id,
@@ -94,7 +102,9 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 				options.expires_at ?? null,
 				options.actor_id,
 				options.target_id,
-				options.reason ?? null
+				options.reason ?? null,
+				options.delete_message_seconds ?? null,
+				options.dm_sent ?? null,
 			]
 		);
 
@@ -116,7 +126,9 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 				"expires_at",
 				"actor_id",
 				"target_id",
-				"reason"
+				"reason",
+				"delete_message_seconds"
+				"dm_sent"
 			FROM "moderation_cases"
 			WHERE "guild_id" = $1
 			AND "number" = $2
@@ -138,7 +150,9 @@ export async function get_cases(guild_id: string, actor_id?: string, target_id?:
 				"expires_at",
 				"actor_id",
 				"target_id",
-				"reason"
+				"reason",
+				"delete_message_seconds"
+				"dm_sent"
 			FROM "moderation_cases"
 			WHERE "guild_id" = $1
 			AND ("actor_id" = $2 OR $2 IS NULL)

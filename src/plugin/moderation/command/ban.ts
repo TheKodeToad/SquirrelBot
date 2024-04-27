@@ -28,6 +28,10 @@ export const ban_command = define_command({
 			type: FlagType.VOID,
 			id: ["no-dm", "!dm"],
 		},
+		delete: {
+			type: FlagType.NUMBER,
+			id: ["purge"]
+		},
 	},
 	async run(context, args) {
 		if (context.guild === null)
@@ -35,6 +39,8 @@ export const ban_command = define_command({
 
 		if (!context.member?.permissions.has(Permissions.BAN_MEMBERS))
 			return;
+
+		const delete_message_seconds = (args.delete ?? 0) * (1000 * 60 * 60 * 24);
 
 		let successful_bans: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_bans: { id: string, name: string, error: string; }[] = [];
@@ -113,7 +119,10 @@ export const ban_command = define_command({
 			}
 
 			try {
-				await context.guild.createBan(id, { reason: args.reason ?? undefined });
+				await context.guild.createBan(id, {
+					reason: args.reason ?? undefined,
+					deleteMessageSeconds: delete_message_seconds,
+				});
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
@@ -125,7 +134,9 @@ export const ban_command = define_command({
 				type: CaseType.BAN,
 				actor_id: context.user.id,
 				target_id: id,
-				reason: args.reason ?? undefined
+				reason: args.reason ?? undefined,
+				delete_message_seconds,
+				dm_sent,
 			});
 
 			successful_bans.push({ case_number, id, name, dm_sent });
