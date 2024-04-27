@@ -39,8 +39,10 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 
 	const command = matches[0]!;
 
-	if (prev_context && prev_context.command !== command)
+	if (prev_context && prev_context.command !== command) {
+		tracked_messages.set(message.id, prev_context);
 		return;
+	}
 
 	const context = prev_context ?? new PrefixContext(command, message);
 
