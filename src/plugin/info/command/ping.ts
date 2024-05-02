@@ -4,15 +4,10 @@ export const ping_command = define_command({
 	id: "ping",
 	track_updates: true, // allow deleting
 	async run(context) {
-		if (!context.guild)
-			return;
-
+		const base_response = `:information: Gateway: ${context.shard.latency}ms`;
 		const pre_respond = Date.now();
-		await context.respond("...");
 
-		const rest_ping = Date.now() - pre_respond;
-		const shard = context.guild!.shard;
-
-		await context.respond(`:information: REST: ${rest_ping}ms, Gateway: ${shard.latency}ms`);
+		await context.respond(base_response);
+		await context.respond(base_response + `; REST: ${Date.now() - pre_respond}ms`);
 	},
 });

@@ -1,4 +1,5 @@
-import { AnyTextableChannel, Channel, CreateMessageOptions, EditMessageOptions, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, User } from "oceanic.js";
+import { AnyTextableChannel, Channel, CreateMessageOptions, EditMessageOptions, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { bot } from "..";
 import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
 import { install_wrapped_listener } from "./event_filter";
@@ -51,7 +52,11 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		return;
 	}
 
-	const context = prev_context ?? new PrefixContext(command, message as Message<AnyTextableChannel>);
+	const context = prev_context ?? new PrefixContext(
+		command,
+		message as Message<AnyTextableChannel>,
+		message.guild?.shard ?? bot.shards.get(0)!
+	);
 
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
 	const parser = new Parser(context, input);
@@ -100,6 +105,7 @@ async function handle_delete(message: PossiblyUncachedMessage) {
 
 class PrefixContext implements Context {
 	command: Command;
+	shard: Shard;
 	guild: Guild | null;
 	user: User;
 	member: Member | null;
@@ -107,8 +113,9 @@ class PrefixContext implements Context {
 	message: Message<AnyTextableChannel>;
 	_response: Message | null;
 
-	constructor(command: Command, message: Message<AnyTextableChannel>) {
+	constructor(command: Command, message: Message<AnyTextableChannel>, shard: Shard) {
 		this.command = command;
+		this.shard = shard;
 		this.guild = message.guild;
 		this.message = message;
 		this.user = message.author;

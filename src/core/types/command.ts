@@ -1,4 +1,4 @@
-import { AnyTextableChannel, CreateMessageOptions, Guild, Member, Message, User } from "oceanic.js";
+import { AnyTextableChannel, CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
 
@@ -24,6 +24,7 @@ export function define_command<F extends Record<string, Flag>>(command: Command<
 
 export interface Context {
 	command: Command;
+	shard: Shard;
 	guild: Guild | null;
 	user: User;
 	member: Member | null;

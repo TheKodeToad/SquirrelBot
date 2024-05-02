@@ -1,9 +1,8 @@
-import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, TextableChannel, User } from "oceanic.js";
-import { Context } from "vm";
+import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, Shard, TextableChannel, User } from "oceanic.js";
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands, get_plugins } from "./plugin_registry";
-import { Command, Flag, FlagType, Reply } from "./types/command";
+import { Command, Context, Flag, FlagType, Reply } from "./types/command";
 
 export async function install_slash_engine(): Promise<void> {
 	const commands = get_plugins().filter(plugin => plugin.commands !== undefined).map(plugin => (
@@ -73,7 +72,11 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		return;
 
 	const command = matches[0]!;
-	const context = new SlashContext(command, interaction as CommandInteraction<AnyTextableChannel>);
+	const context = new SlashContext(
+		command,
+		interaction as CommandInteraction<AnyTextableChannel>,
+		interaction.guild?.shard ?? bot.shards.get(0)!
+	);
 
 	const args: Record<string, any> = {};
 
@@ -111,23 +114,24 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 
 class SlashContext implements Context {
 	command: Command;
-	client: Client;
+	shard: Shard;
+	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	guild: Guild | null;
 	channel: AnyTextableChannel;
 	_interaction: CommandInteraction;
 	_responded: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
 	_defer_promise: Promise<void> | null;
 
-	constructor(command: Command, interaction: CommandInteraction<AnyTextableChannel>) {
+	constructor(command: Command, interaction: CommandInteraction<AnyTextableChannel>, shard: Shard) {
 		this.command = command;
-		this.client = interaction.client;
+		this.shard = shard;
 		this.user = interaction.user;
 		this.member = interaction.member ?? null;
 		this.guild = interaction.guild;
 		this.channel = interaction.channel;
+
 		this._interaction = interaction;
 		this._responded = false;
 		this._defer_promise = null;
