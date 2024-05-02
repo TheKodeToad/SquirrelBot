@@ -78,7 +78,7 @@ export class TTLMap<K, V> implements Map<K, V> {
 		return this;
 	}
 
-	* entries(): IterableIterator<[K, V]> {
+	*entries(): IterableIterator<[K, V]> {
 		const now = Date.now();
 
 		for (const [key, [value, date]] of this._map)
@@ -104,7 +104,7 @@ export class TTLMap<K, V> implements Map<K, V> {
 		for (const [key, [value, date]] of this._map)
 			if (!this._is_expired(now, date))
 				yield [key, value];
-	};
+	}
 
 	get [Symbol.toStringTag](): string {
 		return "Object";

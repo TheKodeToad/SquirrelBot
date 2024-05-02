@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, User } from "oceanic.js";
+import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, Client, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, TextableChannel, User } from "oceanic.js";
 import { Context } from "vm";
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_filter";
@@ -55,60 +55,11 @@ function map_flag_type(type: FlagType): ApplicationCommandOptionTypes {
 	}
 }
 
-class SlashContext implements Context {
-	command: Command;
-	client: Client;
-	user: User;
-	member: Member | null;
-	guild: Guild | null;
-	channel_id: string;
-	_interaction: CommandInteraction;
-	_responded: boolean;
-	_defer_timeout: NodeJS.Timeout | null;
-	_defer_promise: Promise<void> | null;
-
-	constructor(command: Command, interaction: CommandInteraction) {
-		this.command = command;
-		this.client = interaction.client;
-		this.user = interaction.user;
-		this.member = interaction.member ?? null;
-		this.guild = interaction.guild;
-		this.channel_id = interaction.channelID;
-		this._interaction = interaction;
-		this._responded = false;
-		this._defer_promise = null;
-		this._defer_timeout = setTimeout(() => {
-			this._defer_timeout = null;
-			this._responded = true;
-			this._defer_promise = interaction.defer();
-		}, 1000).unref();
-	}
-
-	async respond(reply: Reply): Promise<void> {
-		const content: InteractionContent = typeof reply === "string" ? { content: reply } : reply;
-
-		if (this._responded) {
-			if (this._defer_promise !== null)
-				await this._defer_promise;
-
-			await this._interaction.editOriginal(content);
-		} else {
-			this._remove_timeout();
-			await this._interaction.reply(content);
-			this._responded = true;
-		}
-	}
-
-	_remove_timeout() {
-		if (this._defer_timeout !== null) {
-			clearTimeout(this._defer_timeout);
-			this._defer_timeout = null;
-		}
-	}
-}
-
 async function interaction_create(interaction: Interaction): Promise<void> {
 	if (!interaction.isCommandInteraction())
+		return;
+
+	if (!(interaction.channel instanceof TextableChannel))
 		return;
 
 	const [data] = interaction.data.options.raw;
@@ -122,7 +73,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		return;
 
 	const command = matches[0]!;
-	const context = new SlashContext(command, interaction);
+	const context = new SlashContext(command, interaction as CommandInteraction<AnyTextableChannel>);
 
 	const args: Record<string, any> = {};
 
@@ -157,3 +108,56 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		context._remove_timeout();
 	}
 }
+
+class SlashContext implements Context {
+	command: Command;
+	client: Client;
+	user: User;
+	member: Member | null;
+	guild: Guild | null;
+	channel: AnyTextableChannel;
+	_interaction: CommandInteraction;
+	_responded: boolean;
+	_defer_timeout: NodeJS.Timeout | null;
+	_defer_promise: Promise<void> | null;
+
+	constructor(command: Command, interaction: CommandInteraction<AnyTextableChannel>) {
+		this.command = command;
+		this.client = interaction.client;
+		this.user = interaction.user;
+		this.member = interaction.member ?? null;
+		this.guild = interaction.guild;
+		this.channel = interaction.channel;
+		this._interaction = interaction;
+		this._responded = false;
+		this._defer_promise = null;
+		this._defer_timeout = setTimeout(() => {
+			this._defer_timeout = null;
+			this._responded = true;
+			this._defer_promise = interaction.defer();
+		}, 1000).unref();
+	}
+
+	async respond(reply: Reply): Promise<void> {
+		const content: InteractionContent = typeof reply === "string" ? { content: reply } : reply;
+
+		if (this._responded) {
+			if (this._defer_promise !== null)
+				await this._defer_promise;
+
+			await this._interaction.editOriginal(content);
+		} else {
+			this._remove_timeout();
+			await this._interaction.reply(content);
+			this._responded = true;
+		}
+	}
+
+	_remove_timeout() {
+		if (this._defer_timeout !== null) {
+			clearTimeout(this._defer_timeout);
+			this._defer_timeout = null;
+		}
+	}
+}
+

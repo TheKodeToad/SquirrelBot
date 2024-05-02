@@ -1,5 +1,5 @@
-import { CreateMessageOptions, EditMessageOptions, Guild, Member, Message, PossiblyUncachedMessage, User } from "oceanic.js";
-import { bot } from "..";
+import { AnyTextableChannel, Channel, CreateMessageOptions, EditMessageOptions, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, User } from "oceanic.js";
+import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands } from "./plugin_registry";
@@ -24,6 +24,13 @@ function is_snowflake(id: string) {
 }
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
+	if (!(message.channel instanceof Channel))
+		return;
+
+	if (message.channel instanceof GuildChannel
+		&& !can_write_in_channel(message.channel, message.channel.guild.clientMember))
+		return;
+
 	const prefix = "!";
 
 	if (!message.content.startsWith(prefix))
@@ -44,7 +51,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		return;
 	}
 
-	const context = prev_context ?? new PrefixContext(command, message);
+	const context = prev_context ?? new PrefixContext(command, message as Message<AnyTextableChannel>);
 
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
 	const parser = new Parser(context, input);
@@ -96,28 +103,35 @@ class PrefixContext implements Context {
 	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	channel_id: string;
-	message: Message;
+	channel: AnyTextableChannel;
+	message: Message<AnyTextableChannel>;
 	_response: Message | null;
 
-	constructor(command: Command, message: Message) {
+	constructor(command: Command, message: Message<AnyTextableChannel>) {
 		this.command = command;
 		this.guild = message.guild;
 		this.message = message;
 		this.user = message.author;
 		this.member = message.member ?? null;
-		this.channel_id = message.channelID;
+		this.channel = message.channel;
 		this._response = null;
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const content: CreateMessageOptions | EditMessageOptions =
+		const message_options: CreateMessageOptions | EditMessageOptions =
 			typeof reply === "string" ? { content: reply } : reply;
 
+		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0)
+			message_options.flags = (message_options.flags ?? 0) | MessageFlags.SUPPRESS_NOTIFICATIONS;
+
+		if (this.channel instanceof GuildChannel
+			&& !can_write_in_channel(this.channel, this.channel.guild.clientMember))
+			return;
+
 		if (this._response === null)
-			this._response = await bot.rest.channels.createMessage(this.channel_id, content);
+			this._response = await this.channel.createMessage(message_options);
 		else
-			await this._response.edit(content);
+			await this._response.edit(message_options);
 	}
 
 	async _delete(): Promise<void> {

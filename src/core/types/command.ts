@@ -1,4 +1,4 @@
-import { CreateMessageOptions, Guild, Member, Message, User } from "oceanic.js";
+import { AnyTextableChannel, CreateMessageOptions, Guild, Member, Message, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
 
@@ -27,8 +27,8 @@ export interface Context {
 	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	channel_id: string;
-	message?: Message;
+	channel: AnyTextableChannel;
+	message?: Message<AnyTextableChannel>;
 	respond(reply: Reply): Promise<void>;
 }
 

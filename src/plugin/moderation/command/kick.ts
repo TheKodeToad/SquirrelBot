@@ -1,8 +1,7 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { bot } from "../../..";
+import { format_rest_error, get_highest_role, get_member_cached, get_user_cached } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
-import { format_rest_error, get_member_cached, get_user_cached } from "../../../common/rest";
-import { get_highest_role } from "../../../common/user";
 import { FlagType, define_command } from "../../../core/types/command";
 import { CaseType, create_case } from "../common/case";
 
@@ -116,6 +115,7 @@ export const kick_command = define_command({
 					throw error;
 
 				unsuccessful_kicks.push({ id, name, error: format_rest_error(error) });
+				continue;
 			}
 
 			const case_number = await create_case(context.guild.id, {

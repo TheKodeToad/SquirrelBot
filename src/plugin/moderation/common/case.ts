@@ -89,7 +89,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 					"actor_id",
 					"target_id",
 					"reason",
-					"delete_message_seconds"
+					"delete_message_seconds",
 					"dm_sent"
 				)
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -127,7 +127,7 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 				"actor_id",
 				"target_id",
 				"reason",
-				"delete_message_seconds"
+				"delete_message_seconds",
 				"dm_sent"
 			FROM "moderation_cases"
 			WHERE "guild_id" = $1
