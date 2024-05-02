@@ -1,6 +1,5 @@
 import { GuildChannel } from "oceanic.js";
-import { bot } from "../..";
-import { are_channel_parents_cached, can_write_in_channel, get_member_cached } from "../../common/discord";
+import { can_write_in_channel } from "../../common/discord";
 import { FlagType, define_command } from "../../core/types/command";
 import { define_plugin } from "../../core/types/plugin";
 
@@ -26,8 +25,7 @@ export const reminder_plugin = define_plugin({
 				await context.respond(`:white_check_mark: Reminder set for <t:${Math.floor(Date.now() / 1000 + seconds)}:R>: '${message}'!`);
 				setTimeout(async () => {
 					if (context.channel instanceof GuildChannel
-						&& !(are_channel_parents_cached(context.channel)
-							&& can_write_in_channel(context.channel, await get_member_cached(context.channel.guild, bot.user.id)))) {
+						&& !can_write_in_channel(context.channel, context.channel.guild.clientMember)) {
 						return;
 					}
 
