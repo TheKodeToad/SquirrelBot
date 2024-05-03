@@ -21,4 +21,5 @@ await esbuild.build({
 	format: "cjs",
 	outdir: "out",
 	logLevel: "warning",
+	sourcemap: true,
 });

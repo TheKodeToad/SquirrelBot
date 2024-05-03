@@ -4,8 +4,8 @@
 	"description": "",
 	"scripts": {
 		"build": "node build.mjs",
-		"start": "npm run build && node out/main.js",
-		"migrate": "npm run build && node out/migrate.js"
+		"start": "npm run build && node --enable-source-maps out/main.js",
+		"migrate": "npm run build && node --enable-source-maps out/migrate.js"
 	},
 	"keywords": [],
 	"author": "",
