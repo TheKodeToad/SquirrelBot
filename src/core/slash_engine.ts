@@ -1,4 +1,4 @@
-import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, InteractionContent, Member, Shard, TextableChannel, User } from "oceanic.js";
+import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, Shard, TextableChannel, User } from "oceanic.js";
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands, get_plugins } from "./plugin_registry";
@@ -143,13 +143,20 @@ class SlashContext implements Context {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const content: InteractionContent = typeof reply === "string" ? { content: reply } : reply;
+		const content = typeof reply === "string" ? { content: reply, flags: 0 } : { ...reply, flags: 0 };
 
 		if (this._responded) {
 			if (this._defer_promise !== null)
 				await this._defer_promise;
 
-			await this._interaction.editOriginal(content);
+			await this._interaction.editOriginal({
+				attachments: [],
+				components: [],
+				content: "",
+				embeds: [],
+				files: [],
+				...content,
+			});
 		} else {
 			this._remove_timeout();
 			await this._interaction.reply(content);

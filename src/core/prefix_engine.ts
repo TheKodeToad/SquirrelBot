@@ -1,4 +1,4 @@
-import { AnyTextableChannel, Channel, CreateMessageOptions, EditMessageOptions, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { AnyTextableChannel, Channel, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { bot } from "..";
 import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
@@ -125,20 +125,27 @@ class PrefixContext implements Context {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const message_options: CreateMessageOptions | EditMessageOptions =
-			typeof reply === "string" ? { content: reply } : reply;
+		const options = typeof reply === "string" ? { content: reply, flags: 0 } : { ...reply, flags: 0 };
 
 		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0)
-			message_options.flags = (message_options.flags ?? 0) | MessageFlags.SUPPRESS_NOTIFICATIONS;
+			options.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
 
 		if (this.channel instanceof GuildChannel
 			&& !can_write_in_channel(this.channel, this.channel.guild.clientMember))
 			return;
 
 		if (this._response === null)
-			this._response = await this.channel.createMessage(message_options);
-		else
-			await this._response.edit(message_options);
+			this._response = await this.channel.createMessage(options);
+		else {
+			await this._response.edit({
+				attachments: [],
+				components: [],
+				content: "",
+				embeds: [],
+				files: [],
+				...options,
+			});
+		}
 	}
 
 	async _delete(): Promise<void> {
