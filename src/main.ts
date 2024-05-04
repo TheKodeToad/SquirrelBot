@@ -19,6 +19,7 @@ function exception_handler(error: unknown) {
 	console.error(error);
 }
 
+bot.on("error", exception_handler);
 process.on("uncaughtException", exception_handler);
 process.on("unhandledRejection", exception_handler);
 
