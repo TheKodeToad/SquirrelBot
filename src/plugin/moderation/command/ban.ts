@@ -29,7 +29,7 @@ export const ban_command = define_command({
 		},
 		delete: {
 			type: FlagType.NUMBER,
-			id: ["purge"]
+			id: ["delete", "purge"]
 		},
 	},
 	async run(context, args) {
