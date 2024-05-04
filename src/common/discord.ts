@@ -1,5 +1,6 @@
 import { AnyGuildChannel, ChannelTypes, DiscordRESTError, Guild, Member, Permissions, PrivateChannel, Role, User } from "oceanic.js";
 import { bot } from "..";
+import { escape_all } from "./markdown";
 
 export function format_rest_error(rest_error: DiscordRESTError) {
 	if (rest_error.resBody !== null
@@ -69,7 +70,7 @@ export async function format_user(user_id: string, quiet = true) {
 			throw error;
 	}
 
-	return `<@${user_id}> (${name})`;
+	return `<@${user_id}> (${escape_all(name)})`;
 }
 
 /**
