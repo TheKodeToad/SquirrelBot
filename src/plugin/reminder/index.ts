@@ -1,4 +1,4 @@
-import { GuildChannel } from "oceanic.js";
+import { bot } from "../..";
 import { can_write_in_channel } from "../../common/discord";
 import { FlagType, define_command } from "../../core/types/command";
 import { define_plugin } from "../../core/types/plugin";
@@ -24,12 +24,14 @@ export const reminder_plugin = define_plugin({
 			async run(context, { seconds, message }) {
 				await context.respond(`:white_check_mark: Reminder set for <t:${Math.floor(Date.now() / 1000 + seconds)}:R>: '${message}'!`);
 				setTimeout(async () => {
-					if (context.channel instanceof GuildChannel
-						&& !can_write_in_channel(context.channel, context.channel.guild.clientMember)) {
-						return;
+					if (context.guild !== null) {
+						const channel = context.guild.channels.get(context.channel_id);
+						if (channel !== undefined && !can_write_in_channel(channel, context.guild.clientMember))
+							return;
 					}
 
-					await context.channel.createMessage(
+					await bot.rest.channels.createMessage(
+						context.channel_id,
 						{
 							content: `:bell: Reminder for <@${context.user.id}>: ${message}`,
 							allowedMentions: { users: [context.user.id] }

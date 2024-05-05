@@ -28,7 +28,7 @@ export interface Context {
 	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	channel: AnyTextableChannel;
+	channel_id: string;
 	message?: Message<AnyTextableChannel>;
 	respond(reply: Reply): Promise<void>;
 }

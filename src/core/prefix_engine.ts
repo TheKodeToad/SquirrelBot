@@ -1,4 +1,4 @@
-import { AnyTextableChannel, Channel, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { bot } from "..";
 import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
@@ -25,9 +25,6 @@ function is_snowflake(id: string) {
 }
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
-	if (!(message.channel instanceof Channel))
-		return;
-
 	if (message.channel instanceof GuildChannel
 		&& !can_write_in_channel(message.channel, message.channel.guild.clientMember))
 		return;
@@ -109,7 +106,7 @@ class PrefixContext implements Context {
 	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	channel: AnyTextableChannel;
+	channel_id: string;
 	message: Message<AnyTextableChannel>;
 	_response: Message | null;
 
@@ -120,7 +117,7 @@ class PrefixContext implements Context {
 		this.message = message;
 		this.user = message.author;
 		this.member = message.member ?? null;
-		this.channel = message.channel;
+		this.channel_id = message.channelID;
 		this._response = null;
 	}
 
@@ -130,12 +127,12 @@ class PrefixContext implements Context {
 		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0)
 			options.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
 
-		if (this.channel instanceof GuildChannel
-			&& !can_write_in_channel(this.channel, this.channel.guild.clientMember))
+		if (this.message.channel instanceof GuildChannel
+			&& !can_write_in_channel(this.message.channel, this.message.channel.guild.clientMember))
 			return;
 
 		if (this._response === null)
-			this._response = await this.channel.createMessage(options);
+			this._response = await bot.rest.channels.createMessage(this.channel_id, options);
 		else {
 			await this._response.edit({
 				attachments: [],

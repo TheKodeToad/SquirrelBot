@@ -1,4 +1,4 @@
-import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, Shard, TextableChannel, User } from "oceanic.js";
+import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, Shard, User } from "oceanic.js";
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands, get_plugins } from "./plugin_registry";
@@ -58,9 +58,6 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 	if (!interaction.isCommandInteraction())
 		return;
 
-	if (!(interaction.channel instanceof TextableChannel))
-		return;
-
 	const [data] = interaction.data.options.raw;
 
 	if (data?.type !== ApplicationCommandOptionTypes.SUB_COMMAND)
@@ -118,7 +115,7 @@ class SlashContext implements Context {
 	guild: Guild | null;
 	user: User;
 	member: Member | null;
-	channel: AnyTextableChannel;
+	channel_id: string;
 	_interaction: CommandInteraction;
 	_responded: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
@@ -130,7 +127,7 @@ class SlashContext implements Context {
 		this.user = interaction.user;
 		this.member = interaction.member ?? null;
 		this.guild = interaction.guild;
-		this.channel = interaction.channel;
+		this.channel_id = interaction.channelID;
 
 		this._interaction = interaction;
 		this._responded = false;
