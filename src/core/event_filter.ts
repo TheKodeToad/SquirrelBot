@@ -77,6 +77,8 @@ const EVENT_TO_GUILD: {
 	messageCreate: message => message.guildID,
 	messageDelete: message => message.guildID ?? null,
 	messageDeleteBulk: messages => messages[0]?.guildID ?? null,
+	messagePollVoteAdd: message => message.guildID ?? null,
+	messagePollVoteRemove: message => message.guildID ?? null,
 	messageReactionAdd: message => message.guildID ?? null,
 	messageReactionRemove: message => message.guildID ?? null,
 	messageReactionRemoveAll: message => message.guildID ?? null,
@@ -87,7 +89,7 @@ const EVENT_TO_GUILD: {
 	stageInstanceDelete: instance => instance.guildID,
 	stageInstanceUpdate: instance => instance.guildID,
 	threadCreate: thread => thread.guildID,
-	threadDelete: thread => thread.guildID,
+	threadDelete: thread => thread.guildID ?? null,
 	threadListSync: threads => threads[0]?.guildID ?? null,
 	threadMemberUpdate: thread => thread.guildID,
 	threadMembersUpdate: thread => thread.guildID,
@@ -115,5 +117,5 @@ const EVENT_TO_GUILD: {
 	shardReady: () => null,
 	shardResume: () => null,
 	userUpdate: () => null,
-	warn: () => null
+	warn: () => null,
 };

@@ -33,7 +33,7 @@ export interface Context {
 	respond(reply: Reply): Promise<void>;
 }
 
-export type Reply = Omit<CreateMessageOptions, "messageReference" | "tts"> | string;
+export type Reply = Omit<CreateMessageOptions, "messageReference" | "tts" | "poll"> | string;
 
 export interface CommandGroup {
 	id: Id;
