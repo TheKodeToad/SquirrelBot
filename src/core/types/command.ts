@@ -62,9 +62,12 @@ export interface Flag {
 };
 
 type FlagValue<F extends Flag> =
-	F["array"] extends true ? FlagTypeValue<F["type"]>[] :
-	F["required"] extends true ? FlagTypeValue<F["type"]> :
+	F["array"] extends true ? ArrayValue<FlagTypeValue<F["type"]>, F["required"]> :
+	F["required"] extends true ? NullableValue<FlagTypeValue<F["type"]>, F["required"]> :
 	FlagTypeValue<F["type"]> | null;
+
+type ArrayValue<F extends any, Required extends boolean | undefined> = Required extends true ? [F, ...F[]] : F[];
+type NullableValue<F extends any, Required extends boolean | undefined> = Required extends true ? F : F | null;
 
 export type FlagTypeValue<F extends FlagType> =
 	F extends FlagType.VOID ? boolean :

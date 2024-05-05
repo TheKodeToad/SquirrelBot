@@ -1,6 +1,6 @@
-import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
+import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
-import { format_rest_error, get_highest_role, get_member_cached, get_user_cached } from "../../../common/discord";
+import { format_rest_error, get_highest_role, get_user_cached, request_members_cached } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
 import { FlagType, define_command } from "../../../core/types/command";
 import { CaseType, create_case } from "../common/case";
@@ -35,71 +35,51 @@ export const kick_command = define_command({
 		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
 			return;
 
+		const members = await request_members_cached(context.guild, args.user);
+
 		let successful_kicks: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_kicks: { id: string, name: string, error: string; }[] = [];
 
-		for (const id of args.user) {
-			let name: string;
-			let is_bot: boolean;
+		for (const target of args.user) {
+			const target_member = members.get(target);
 
-			try {
-				const target_member = await get_member_cached(context.guild, id);
-				name = target_member.user.tag;
-				is_bot = target_member.bot;
-
+			if (target_member === undefined) {
 				try {
-					var bot_member = await get_member_cached(context.guild, bot.user.id);
+					const user = await get_user_cached(target);
+					unsuccessful_kicks.push({ id: target, name: user.tag, error: "User is not in the server" });
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
 						throw error;
 
-					unsuccessful_kicks.push({ id, name, error: `Bot member fetch failed: ${format_rest_error(error)}` });
-					continue;
+					unsuccessful_kicks.push({ id: target, name: "<unknown>", error: "User is not in the server" });
 				}
 
-				const target_position = get_highest_role(target_member).position;
+				continue;
+			}
 
-				if (context.guild.ownerID !== context.user.id
-					&& (context.guild.ownerID === id
-						|| get_highest_role(context.member).position <= target_position)) {
-					unsuccessful_kicks.push({ id, name, error: "Your highest role is not above target's highest role" });
-					continue;
-				}
+			const name = target_member.tag;
+			const target_position = get_highest_role(target_member).position;
 
-				if (context.guild.ownerID !== bot.user.id
-					&& (context.guild.ownerID === id
-						|| get_highest_role(bot_member).position <= target_position)
-				) {
-					unsuccessful_kicks.push({ id, name, error: "Bot's highest role is not above target's highest role" });
-					continue;
-				}
-			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
-					throw error;
+			if (context.guild.ownerID !== context.user.id
+				&& (context.guild.ownerID === target
+					|| get_highest_role(context.member).position <= target_position)) {
+				unsuccessful_kicks.push({ id: target, name, error: "Your highest role is not above target's highest role" });
+				continue;
+			}
 
-				if (error.code !== JSONErrorCodes.UNKNOWN_MEMBER) {
-					unsuccessful_kicks.push({ id, name: "<unknown>", error: `Member fetch failed: ${format_rest_error(error)}` });
-					continue;
-				}
-
-				try {
-					const user = await get_user_cached(id);
-					unsuccessful_kicks.push({ id, name: user.tag, error: "User is not in the server" });
-					continue;
-				} catch (error) {
-					if (!(error instanceof DiscordRESTError))
-						throw error;
-
-					unsuccessful_kicks.push({ id, name: "<unknown>", error: "User is not in the server" });
-					continue;
-				}
+			if (context.guild.ownerID !== bot.user.id
+				&& (context.guild.ownerID === target
+					|| get_highest_role(context.guild.clientMember).position <= target_position)
+			) {
+				unsuccessful_kicks.push({ id: target, name, error: "Bot's highest role is not above target's highest role" });
+				continue;
 			}
 
 			let dm_sent = false;
 
-			if (!is_bot && !args.no_dm) {
+			if (!target_member.bot && !args.no_dm) {
 				try {
-					const dm = await bot.rest.users.createDM(id);
+					const dm = await bot.rest.users.createDM(target);
 					await dm.createMessage({ content: "You were kicked :regional_indicator_l:" });
 					dm_sent = true;
 				} catch (error) {
@@ -109,23 +89,23 @@ export const kick_command = define_command({
 			}
 
 			try {
-				await context.guild.removeMember(id, args.reason ?? undefined);
+				await context.guild.removeMember(target, args.reason ?? undefined);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				unsuccessful_kicks.push({ id, name, error: format_rest_error(error) });
+				unsuccessful_kicks.push({ id: target, name, error: format_rest_error(error) });
 				continue;
 			}
 
 			const case_number = await create_case(context.guild.id, {
 				type: CaseType.KICK,
 				actor_id: context.user.id,
-				target_id: id,
+				target_id: target,
 				reason: args.reason ?? undefined
 			});
 
-			successful_kicks.push({ case_number, id, name, dm_sent });
+			successful_kicks.push({ case_number, id: target, name, dm_sent });
 		}
 
 		if (args.user.length === 1) {
