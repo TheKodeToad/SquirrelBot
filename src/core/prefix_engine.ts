@@ -29,7 +29,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		&& !can_write_in_channel(message.channel, message.channel.guild.clientMember))
 		return;
 
-	const prefix = "!";
+	const prefix = "?";
 
 	if (!message.content.startsWith(prefix))
 		return;
