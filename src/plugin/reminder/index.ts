@@ -14,11 +14,13 @@ export const reminder_plugin = define_plugin({
 					id: "seconds",
 					primary: true,
 					required: true,
+					position: 0,
 				},
 				message: {
 					type: OptionType.STRING,
 					id: "message",
 					required: true,
+					position: 1,
 				}
 			},
 			async run(context, { seconds, message }) {
