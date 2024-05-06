@@ -152,7 +152,7 @@ export const ban_command = define_command({
 				await context.respond(`:x: Could not ban <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}!`);
 			}
 		} else {
-			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}) ${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
+			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
 			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}`).join("\n");
 
 			if (unsuccessful_bans.length === 0) {

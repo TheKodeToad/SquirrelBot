@@ -60,14 +60,14 @@ export const cases_command = define_command({
 
 		if (args.actor !== null || args.target !== null) {
 			if (args.actor)
-				filter += `by ${await format_user(args.actor)} `;
+				filter += ` by ${await format_user(args.actor)}`;
 			if (args.target)
-				filter += `targeting ${await format_user(args.target)} `;
+				filter += ` targeting ${await format_user(args.target)}`;
 		} else
-			filter = "for this server ";
+			filter = " for this server";
 
 		if (cases.length === 0)
-			await context.respond(`:x: No cases found ${filter}!`);
+			await context.respond(`:x: No cases found${filter}!`);
 		else {
 			const items = await Promise.all(cases.map(async (info) => {
 				const icon = CASE_ICON[info.type];
@@ -77,7 +77,7 @@ export const cases_command = define_command({
 				return `${icon} <t:${Math.floor(info.created_at.getTime() / 1000)}:d> [#${info.number}] ${actor} ${CASE_ACTION[info.type]} ${target}`;
 			}));
 
-			await context.respond(`**:closed_book: Cases ${filter}**\n\n${items.join("\n")}`);
+			await context.respond(`**:closed_book: Cases${filter}**\n\n${items.join("\n")}`);
 		}
 	},
 });
