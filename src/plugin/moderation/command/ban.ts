@@ -10,27 +10,27 @@ export const ban_command = define_command({
 	options: {
 		user: {
 			type: OptionType.USER,
-			id: "user",
+			id: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
 			type: OptionType.STRING,
-			id: "reason",
+			id: ["reason", "r"],
 			position: 1,
 		},
 		dm: {
 			type: OptionType.VOID,
-			id: "dm",
+			id: ["dm", "d"],
 		},
 		no_dm: {
 			type: OptionType.VOID,
-			id: ["no-dm", "!dm"],
+			id: ["no-dm", "nd"],
 		},
-		delete: {
+		purge: {
 			type: OptionType.NUMBER,
-			id: ["delete", "purge"]
+			id: ["purge", "p", "delete"],
 		},
 	},
 	async run(context, args) {
@@ -40,7 +40,7 @@ export const ban_command = define_command({
 		if (!context.member?.permissions.has(Permissions.BAN_MEMBERS))
 			return;
 
-		const delete_message_seconds = (args.delete ?? 0) * (1000 * 60 * 60 * 24);
+		const delete_message_seconds = (args.purge ?? 0) * (1000 * 60 * 60 * 24);
 
 		let successful_bans: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_bans: { id: string, name: string, error: string; }[] = [];

@@ -33,11 +33,11 @@ export const cases_command = define_command({
 	id: "cases",
 	options: {
 		actor: {
-			id: ["actor", "moderator", "mod"],
+			id: ["actor", "a", "by", "moderator", "mod"],
 			type: OptionType.USER,
 		},
 		target: {
-			id: ["target", "user"],
+			id: ["target", "t", "for", "user"],
 			type: OptionType.USER,
 		},
 	},

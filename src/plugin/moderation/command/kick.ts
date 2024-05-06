@@ -10,23 +10,23 @@ export const kick_command = define_command({
 	options: {
 		user: {
 			type: OptionType.USER,
-			id: "user",
+			id: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
 			type: OptionType.STRING,
-			id: "reason",
+			id: ["reason", "r"],
 			position: 1,
 		},
 		dm: {
 			type: OptionType.VOID,
-			id: "dm",
+			id: ["dm", "d"],
 		},
 		no_dm: {
 			type: OptionType.VOID,
-			id: ["no-dm", "!dm"],
+			id: ["no-dm", "nd"],
 		},
 	},
 	async run(context, args) {

@@ -7,7 +7,7 @@ export const case_command = define_command({
 	id: "case",
 	options: {
 		number: {
-			id: "number",
+			id: ["number", "n"],
 			type: OptionType.INTEGER,
 			required: true,
 			position: 0,
