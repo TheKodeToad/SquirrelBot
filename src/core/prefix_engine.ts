@@ -162,6 +162,8 @@ class Parser {
 	}
 
 	parse(): Record<string, any> {
+		this.skip_spaces();
+
 		const result: Record<string, any> = {};
 		const option_lookup: Map<string, [string, Option]> = new Map;
 		const positional_options: [string, Option][] = [];
@@ -197,6 +199,8 @@ class Parser {
 		while (!this.is_end()) {
 			if (!this.is_option())
 				throw new ParseError(`Expected option but got '${this.read_word()}'`);
+
+			this.skip_spaces();
 
 			let flag_id = this.read_word().slice(1);
 			// allow --option-name
@@ -245,6 +249,8 @@ class Parser {
 	}
 
 	read_value(type: OptionType) {
+		this.skip_spaces();
+
 		switch (type) {
 			case OptionType.VOID:
 				return true;
@@ -294,6 +300,8 @@ class Parser {
 		const result: T[] = [];
 
 		while (!(this.is_end() || this.is_option())) {
+			this.skip_spaces();
+
 			let prev_position = this.next;
 			try {
 				result.push(reader());
@@ -431,7 +439,7 @@ class Parser {
 		const input = this.read_word();
 		const result = Number(input);
 
-		if (!Number.isInteger(result))
+		if (input === "" || !Number.isInteger(result))
 			throw new ParseError(`Not a integer: '${input}'`);
 
 		return result;
@@ -441,7 +449,7 @@ class Parser {
 		const input = this.read_word();
 		const result = Number(input);
 
-		if (Number.isNaN(result))
+		if (input === "" || Number.isNaN(result))
 			throw new ParseError(`Not a number: '${input}'`);
 
 		return result;
@@ -493,6 +501,17 @@ class Parser {
 			result += this.peek_prev();
 
 		return result;
+	}
+
+	skip_spaces(): number {
+		let count = 0;
+
+		while (!this.is_end() && this.peek_next() === " ") {
+			++count;
+			this.read();
+		}
+
+		return count;
 	}
 
 }
