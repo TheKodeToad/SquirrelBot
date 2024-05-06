@@ -2,33 +2,34 @@ import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { bot } from "../../..";
 import { create_dm_cached, format_rest_error, get_highest_role, get_member_cached, get_user_cached } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
-import { FlagType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../core/types/command";
 import { CaseType, create_case } from "../common/case";
 
 export const ban_command = define_command({
 	id: "ban",
-	flags: {
+	options: {
 		user: {
-			type: FlagType.USER,
+			type: OptionType.USER,
 			id: "user",
 			array: true,
-			primary: true,
 			required: true,
+			position: 0,
 		},
 		reason: {
-			type: FlagType.STRING,
+			type: OptionType.STRING,
 			id: "reason",
+			position: 1,
 		},
 		dm: {
-			type: FlagType.VOID,
+			type: OptionType.VOID,
 			id: "dm",
 		},
 		no_dm: {
-			type: FlagType.VOID,
+			type: OptionType.VOID,
 			id: ["no-dm", "!dm"],
 		},
 		delete: {
-			type: FlagType.NUMBER,
+			type: OptionType.NUMBER,
 			id: ["delete", "purge"]
 		},
 	},

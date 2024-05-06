@@ -9,16 +9,16 @@ export function default_id(id: Id): string {
 		return id;
 }
 
-export interface Command<F extends Record<string, Flag> = Record<string, Flag>> {
+export interface Command<O extends Record<string, Option> = Record<string, Option>> {
 	id: Id;
-	flags?: F;
+	options?: O;
 	support_prefix?: boolean;
 	support_slash?: boolean;
 	track_updates?: boolean;
-	run(context: Context, args: { [K in keyof F]: FlagValue<F[K]> }): Promise<void> | void;
+	run(context: Context, args: { [K in keyof O]: OptionValue<O[K]> }): Promise<void> | void;
 }
 
-export function define_command<F extends Record<string, Flag>>(command: Command<F>): Command<F> {
+export function define_command<F extends Record<string, Option>>(command: Command<F>): Command<F> {
 	return command;
 }
 
@@ -40,7 +40,7 @@ export interface CommandGroup {
 	children: Command<any> | CommandGroup[];
 }
 
-export enum FlagType {
+export enum OptionType {
 	VOID,
 	BOOLEAN,
 	STRING,
@@ -52,31 +52,30 @@ export enum FlagType {
 	SNOWFLAKE
 }
 
-export interface Flag {
-	type: FlagType;
+export interface Option {
+	type: OptionType;
 	id: Id;
 	required?: boolean;
 	array?: boolean;
-	/** with prefix mode, becomes the unnamed flag */
-	primary?: boolean;
-};
+	position?: number;
+}
 
-type FlagValue<F extends Flag> =
-	F["array"] extends true ? ArrayValue<FlagTypeValue<F["type"]>, F["required"]> :
-	F["required"] extends true ? NullableValue<FlagTypeValue<F["type"]>, F["required"]> :
-	FlagTypeValue<F["type"]> | null;
+type OptionValue<F extends Option> =
+	F["array"] extends true ? ArrayValue<OptionTypeValue<F["type"]>, F["required"]> :
+	F["required"] extends true ? NullableValue<OptionTypeValue<F["type"]>, F["required"]> :
+	OptionTypeValue<F["type"]> | null;
 
-type ArrayValue<F extends any, Required extends boolean | undefined> = Required extends true ? [F, ...F[]] : F[];
-type NullableValue<F extends any, Required extends boolean | undefined> = Required extends true ? F : F | null;
+type ArrayValue<O extends any, Required extends boolean | undefined> = Required extends true ? [O, ...O[]] : O[];
+type NullableValue<O extends any, Required extends boolean | undefined> = Required extends true ? O : O | null;
 
-export type FlagTypeValue<F extends FlagType> =
-	F extends FlagType.VOID ? boolean :
-	F extends FlagType.BOOLEAN ? boolean :
-	F extends FlagType.STRING ? string :
-	F extends FlagType.INTEGER ? number :
-	F extends FlagType.NUMBER ? number :
-	F extends FlagType.USER ? string :
-	F extends FlagType.ROLE ? string :
-	F extends FlagType.CHANNEL ? string :
-	F extends FlagType.SNOWFLAKE ? string :
+export type OptionTypeValue<T extends OptionType> =
+	T extends OptionType.VOID ? boolean :
+	T extends OptionType.BOOLEAN ? boolean :
+	T extends OptionType.STRING ? string :
+	T extends OptionType.INTEGER ? number :
+	T extends OptionType.NUMBER ? number :
+	T extends OptionType.USER ? string :
+	T extends OptionType.ROLE ? string :
+	T extends OptionType.CHANNEL ? string :
+	T extends OptionType.SNOWFLAKE ? string :
 	never;

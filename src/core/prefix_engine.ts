@@ -4,7 +4,7 @@ import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands } from "./plugin_registry";
-import { Command, Context, Flag, FlagType, FlagTypeValue, Reply, default_id } from "./types/command";
+import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "./types/command";
 
 export function install_prefix_engine() {
 	install_wrapped_listener("messageCreate", handle);
@@ -61,11 +61,11 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	try {
 		var args = parser.parse();
 	} catch (error) {
-		if (error instanceof ParseError) {
-			await context.respond(error.message);
-			tracked_messages.set(message.id, context);
-		}
+		if (!(error instanceof ParseError))
+			throw error;
 
+		await context.respond(error.message);
+		tracked_messages.set(message.id, context);
 		return;
 	}
 
@@ -163,62 +163,64 @@ class Parser {
 
 	parse(): Record<string, any> {
 		const result: Record<string, any> = {};
-		const flag_lookup = new Map<string, [string, Flag]>;
+		const option_lookup: Map<string, [string, Option]> = new Map;
+		const positional_options: [string, Option][] = [];
 
-		if (this.context.command.flags) {
-			for (const [key, flag] of Object.entries(this.context.command.flags)) {
-				result[key] = flag.array ? [] : null;
+		if (this.context.command.options) {
+			for (const [key, option] of Object.entries(this.context.command.options)) {
+				result[key] = option.array ? [] : null;
 
-				if (flag.primary) {
-					flag_lookup.set("", [key, flag]);
-					continue;
-				}
+				if (option.position !== undefined)
+					positional_options[option.position] = [key, option];
 
-				if (Array.isArray(flag.id)) {
-					for (const id of flag.id)
-						flag_lookup.set(id, [key, flag]);
+				if (Array.isArray(option.id)) {
+					for (const id of option.id)
+						option_lookup.set(id, [key, option]);
 				} else
-					flag_lookup.set(flag.id, [key, flag]);
+					option_lookup.set(option.id, [key, option]);
 			}
 		}
 
-		if (!this.is_end() && !this.is_flag()) {
-			if (!flag_lookup.has(""))
-				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
+		if (!this.is_end() && !this.is_option()) {
+			if (positional_options.length === 0)
+				throw new ParseError(`Expected option but got '${this.read_word()}'`);
 
-			const [key, flag] = flag_lookup.get("")!;
-			const value = flag.array ? this.read_values(flag.type) : this.read_value(flag.type);
+			for (const [key, option] of positional_options) {
+				if (this.is_end())
+					break;
 
-			result[key] = value;
+				const value = option.array ? this.read_values(option.type, true, option.required) : this.read_value(option.type);
+				result[key] = value;
+			}
 		}
 
 		while (!this.is_end()) {
-			if (!this.is_flag())
-				throw new ParseError(`Expected flag but got '${this.read_word()}'`);
+			if (!this.is_option())
+				throw new ParseError(`Expected option but got '${this.read_word()}'`);
 
 			let flag_id = this.read_word().slice(1);
-			// allow --flag-name
+			// allow --option-name
 			// also conviniently turns "--" into ""
 			if (flag_id.startsWith("-"))
 				flag_id = flag_id.slice(1);
 
-			if (!flag_lookup.has(flag_id)) {
+			if (!option_lookup.has(flag_id)) {
 				if (flag_id.length === 0)
-					throw new ParseError("Expected flag name after -");
+					throw new ParseError(`Expected option name after '--'`);
 				else
-					throw new ParseError(`Cannot find flag '${flag_id}'`);
+					throw new ParseError(`Cannot find option '${flag_id}'`);
 			}
 
-			const [key, flag] = flag_lookup.get(flag_id)!;
-			const value = flag.array ? this.read_values(flag.type) : this.read_value(flag.type);
+			const [key, option] = option_lookup.get(flag_id)!;
+			const value = option.array ? this.read_values(option.type) : this.read_value(option.type);
 
 			result[key] = value;
 		}
 
-		if (this.context.command.flags) {
-			const missing_flags = Object.entries(this.context.command.flags)
-				.filter(([key, flag]) => {
-					if (!flag.required)
+		if (this.context.command.options) {
+			const missing_flags = Object.entries(this.context.command.options)
+				.filter(([key, option]) => {
+					if (!option.required)
 						return false;
 
 					const value = result[key];
@@ -227,7 +229,7 @@ class Parser {
 
 			if (missing_flags.length !== 0) {
 				const missing_flag_names = missing_flags
-					.map(([_, flag]) => default_id(flag.id))
+					.map(([_, option]) => default_id(option.id))
 					.join(", ");
 
 				throw new ParseError(`Missing ${missing_flag_names}`);
@@ -237,62 +239,76 @@ class Parser {
 		return result;
 	}
 
-	is_flag(): boolean {
+	is_option(): boolean {
 		const next = this.peek(2);
 		return next.length === 2 && next[0] === "-" && next[1] !== " ";
 	}
 
-	read_value(type: FlagType) {
+	read_value(type: OptionType) {
 		switch (type) {
-			case FlagType.VOID:
+			case OptionType.VOID:
 				return true;
-			case FlagType.BOOLEAN:
+			case OptionType.BOOLEAN:
 				return this.read_boolean();
-			case FlagType.STRING:
+			case OptionType.STRING:
 				return this.read_string();
-			case FlagType.INTEGER:
+			case OptionType.INTEGER:
 				return this.read_integer();
-			case FlagType.NUMBER:
+			case OptionType.NUMBER:
 				return this.read_number();
-			case FlagType.USER:
+			case OptionType.USER:
 				return this.read_user();
-			case FlagType.ROLE:
+			case OptionType.ROLE:
 				return this.read_role();
-			case FlagType.CHANNEL:
+			case OptionType.CHANNEL:
 				return this.read_channel();
-			case FlagType.SNOWFLAKE:
+			case OptionType.SNOWFLAKE:
 				return this.read_snowflake();
 		}
 	}
 
-	read_values(type: FlagType): FlagTypeValue<FlagType>[] {
+	read_values(type: OptionType, stop_at_error = false, require_one = false): OptionTypeValue<OptionType>[] {
 		switch (type) {
-			case FlagType.VOID:
+			case OptionType.VOID:
 				return [];
-			case FlagType.BOOLEAN:
-				return this.read_sequence(this.read_boolean.bind(this));
-			case FlagType.STRING:
-				return this.read_sequence(() => this.read_string(true));
-			case FlagType.INTEGER:
-				return this.read_sequence(this.read_integer.bind(this));
-			case FlagType.NUMBER:
-				return this.read_sequence(this.read_number.bind(this));
-			case FlagType.USER:
-				return this.read_sequence(this.read_user.bind(this));
-			case FlagType.ROLE:
-				return this.read_sequence(this.read_role.bind(this));
-			case FlagType.CHANNEL:
-				return this.read_sequence(this.read_channel.bind(this));
-			case FlagType.SNOWFLAKE:
-				return this.read_sequence(this.read_snowflake.bind(this));
+			case OptionType.BOOLEAN:
+				return this.read_sequence(() => this.read_boolean(), stop_at_error, require_one);
+			case OptionType.STRING:
+				return this.read_sequence(() => this.read_string(true), stop_at_error, require_one);
+			case OptionType.INTEGER:
+				return this.read_sequence(() => this.read_integer(), stop_at_error, require_one);
+			case OptionType.NUMBER:
+				return this.read_sequence(() => this.read_number(), stop_at_error, require_one);
+			case OptionType.USER:
+				return this.read_sequence(() => this.read_user(), stop_at_error, require_one);
+			case OptionType.ROLE:
+				return this.read_sequence(() => this.read_role(), stop_at_error, require_one);
+			case OptionType.CHANNEL:
+				return this.read_sequence(() => this.read_channel(), stop_at_error, require_one);
+			case OptionType.SNOWFLAKE:
+				return this.read_sequence(() => this.read_snowflake(), stop_at_error, require_one);
 		}
 	}
 
-	read_sequence<T>(reader: () => T): T[] {
+	read_sequence<T>(reader: () => T, stop_at_error = false, require_one = false): T[] {
 		const result: T[] = [];
 
-		while (!(this.is_end() || this.is_flag()))
-			result.push(reader());
+		while (!(this.is_end() || this.is_option())) {
+			let prev_position = this.next;
+			try {
+				result.push(reader());
+			} catch (error) {
+				if (!(stop_at_error && error instanceof ParseError))
+					throw error;
+
+				if (require_one && result.length === 0)
+					throw error;
+
+				this.next = prev_position;
+				// return the result without the badly formatted value
+				return result;
+			}
+		}
 
 		return result;
 	}
@@ -401,7 +417,7 @@ class Parser {
 			while (!this.is_end()) {
 				this.read();
 
-				if (this.peek_prev() === " " && (limited || this.is_flag()))
+				if (this.peek_prev() === " " && (limited || this.is_option()))
 					break;
 
 				result += this.peek_prev();

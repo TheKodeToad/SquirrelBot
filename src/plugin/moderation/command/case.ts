@@ -1,16 +1,16 @@
 import { Permissions } from "oceanic.js";
 import { format_user } from "../../../common/discord";
-import { FlagType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../core/types/command";
 import { CASE_TYPE_NAME, get_case } from "../common/case";
 
 export const case_command = define_command({
 	id: "case",
-	flags: {
+	options: {
 		number: {
 			id: "number",
-			type: FlagType.INTEGER,
-			primary: true,
+			type: OptionType.INTEGER,
 			required: true,
+			position: 0,
 		},
 	},
 	track_updates: true,

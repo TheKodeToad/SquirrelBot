@@ -2,7 +2,7 @@ import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTy
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_filter";
 import { get_commands, get_plugins } from "./plugin_registry";
-import { Command, Context, Flag, FlagType, Reply } from "./types/command";
+import { Command, Context, Option, OptionType, Reply } from "./types/command";
 
 export async function install_slash_engine(): Promise<void> {
 	const commands = get_plugins().filter(plugin => plugin.commands !== undefined).map(plugin => (
@@ -15,7 +15,7 @@ export async function install_slash_engine(): Promise<void> {
 					type: ApplicationCommandOptionTypes.SUB_COMMAND,
 					name: typeof command.id === "string" ? command.id : command.id[0],
 					description: "command",
-					options: command.flags ? Object.values(command.flags).map(flag => (
+					options: command.options ? Object.values(command.options).map(flag => (
 						{
 							name: typeof flag.id === "string" ? flag.id : flag.id[0],
 							description: "option",
@@ -32,24 +32,24 @@ export async function install_slash_engine(): Promise<void> {
 	install_wrapped_listener("interactionCreate", interaction_create);
 }
 
-function map_flag_type(type: FlagType): ApplicationCommandOptionTypes {
+function map_flag_type(type: OptionType): ApplicationCommandOptionTypes {
 	switch (type) {
-		case FlagType.VOID:
-		case FlagType.BOOLEAN:
+		case OptionType.VOID:
+		case OptionType.BOOLEAN:
 			return ApplicationCommandOptionTypes.BOOLEAN;
-		case FlagType.STRING:
+		case OptionType.STRING:
 			return ApplicationCommandOptionTypes.STRING;
-		case FlagType.INTEGER:
+		case OptionType.INTEGER:
 			return ApplicationCommandOptionTypes.INTEGER;
-		case FlagType.NUMBER:
+		case OptionType.NUMBER:
 			return ApplicationCommandOptionTypes.NUMBER;
-		case FlagType.USER:
+		case OptionType.USER:
 			return ApplicationCommandOptionTypes.USER;
-		case FlagType.ROLE:
+		case OptionType.ROLE:
 			return ApplicationCommandOptionTypes.ROLE;
-		case FlagType.CHANNEL:
+		case OptionType.CHANNEL:
 			return ApplicationCommandOptionTypes.CHANNEL;
-		case FlagType.SNOWFLAKE:
+		case OptionType.SNOWFLAKE:
 			return ApplicationCommandOptionTypes.INTEGER;
 	}
 }
@@ -77,25 +77,25 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 
 	const args: Record<string, any> = {};
 
-	if (command.flags && data.options) {
-		const flag_lookup = new Map<string, [string, Flag]>;
+	if (command.options && data.options) {
+		const option_lookup = new Map<string, [string, Option]>;
 
-		for (const [key, flag] of Object.entries(command.flags)) {
-			args[key] = flag.array ? [] : null;
+		for (const [key, option] of Object.entries(command.options)) {
+			args[key] = option.array ? [] : null;
 
-			const id = Array.isArray(flag.id) ? flag.id[0] : flag.id;
-			flag_lookup.set(id, [key, flag]);
+			const id = Array.isArray(option.id) ? option.id[0] : option.id;
+			option_lookup.set(id, [key, option]);
 		}
 
-		for (const option of data.options) {
-			if (!("value" in option))
+		for (const slash_option of data.options) {
+			if (!("value" in slash_option))
 				continue;
 
-			if (!flag_lookup.has(option.name))
+			if (!option_lookup.has(slash_option.name))
 				continue;
 
-			const [key, flag] = flag_lookup.get(option.name)!;
-			args[key] = flag.array ? [option.value] : option.value;
+			const [key, option] = option_lookup.get(slash_option.name)!;
+			args[key] = option.array ? [slash_option.value] : slash_option.value;
 		}
 	}
 

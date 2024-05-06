@@ -1,6 +1,6 @@
 import { bot } from "../..";
 import { can_write_in_channel } from "../../common/discord";
-import { FlagType, define_command } from "../../core/types/command";
+import { OptionType, define_command } from "../../core/types/command";
 import { define_plugin } from "../../core/types/plugin";
 
 export const reminder_plugin = define_plugin({
@@ -8,15 +8,15 @@ export const reminder_plugin = define_plugin({
 	commands: [
 		define_command({
 			id: "remind",
-			flags: {
+			options: {
 				seconds: {
-					type: FlagType.NUMBER,
+					type: OptionType.NUMBER,
 					id: "seconds",
 					primary: true,
 					required: true,
 				},
 				message: {
-					type: FlagType.STRING,
+					type: OptionType.STRING,
 					id: "message",
 					required: true,
 				}

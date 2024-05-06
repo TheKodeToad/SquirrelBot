@@ -1,6 +1,6 @@
 import { Permissions } from "oceanic.js";
 import { format_user } from "../../../common/discord";
-import { FlagType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../core/types/command";
 import { CaseType, get_cases } from "../common/case";
 
 export const CASE_ICON: { [T in CaseType]: string } = {
@@ -31,14 +31,14 @@ export const CASE_ACTION: { [T in CaseType]: string } = {
 
 export const cases_command = define_command({
 	id: "cases",
-	flags: {
+	options: {
 		actor: {
 			id: ["actor", "moderator", "mod"],
-			type: FlagType.USER,
+			type: OptionType.USER,
 		},
 		target: {
 			id: ["target", "user"],
-			type: FlagType.USER,
+			type: OptionType.USER,
 		},
 	},
 	track_updates: true,

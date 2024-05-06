@@ -14,7 +14,8 @@
 		"async-lock": "^1.4.1",
 		"dotenv": "^16.4.5",
 		"oceanic.js": "^1.10.2",
-		"pg": "^8.11.5"
+		"pg": "^8.11.5",
+		"typescript": "^5.4.5"
 	},
 	"devDependencies": {
 		"@types/async-lock": "^1.4.2",
