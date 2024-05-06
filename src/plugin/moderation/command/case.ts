@@ -23,7 +23,7 @@ export const case_command = define_command({
 
 		const info = await get_case(context.guild.id, number);
 		if (info === null) {
-			await context.respond(`:x: Case #${number} not found`);
+			await context.respond(`:x: Case #${number} not found!`);
 			return;
 		}
 

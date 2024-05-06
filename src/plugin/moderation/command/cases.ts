@@ -67,7 +67,7 @@ export const cases_command = define_command({
 			filter = "for this server ";
 
 		if (cases.length === 0)
-			await context.respond(`:x: No cases found ${filter}`);
+			await context.respond(`:x: No cases found ${filter}!`);
 		else {
 			const items = await Promise.all(cases.map(async (info) => {
 				const icon = CASE_ICON[info.type];
