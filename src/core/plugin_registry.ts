@@ -47,8 +47,7 @@ function add_command(id: string, command: Command): void {
 
 export async function apply_plugins(): Promise<void> {
 	for (const plugin of get_plugins()) {
-		if (plugin.apply !== undefined)
-			await plugin.apply();
+		await plugin.apply?.();
 
 		if (plugin.listeners !== undefined) {
 			for (const listener of plugin.listeners)
