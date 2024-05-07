@@ -33,7 +33,7 @@ export interface Context {
 	respond(reply: Reply): Promise<void>;
 }
 
-export type Reply = Omit<CreateMessageOptions, "messageReference" | "tts" | "poll"> | string;
+export type Reply = Omit<CreateMessageOptions, "messageReference" | "tts"> | string;
 
 export interface CommandGroup {
 	id: Id;
@@ -61,6 +61,7 @@ export interface Option {
 }
 
 type OptionValue<F extends Option> =
+	F["type"] extends OptionType.VOID ? boolean :
 	F["array"] extends true ? ArrayValue<OptionTypeValue<F["type"]>, F["required"]> :
 	F["required"] extends true ? NullableValue<OptionTypeValue<F["type"]>, F["required"]> :
 	OptionTypeValue<F["type"]> | null;
