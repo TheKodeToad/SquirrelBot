@@ -187,12 +187,16 @@ class Parser {
 			if (positional_options.length === 0)
 				throw new ParseError(`Expected option but got '${this.read_word()}'`);
 
-			for (const [key, option] of positional_options) {
+			for (const [index, [key, option]] of positional_options.entries()) {
 				if (this.is_end())
 					break;
 
-				const value = option.array ? this.read_values(option.type, true, option.required) : this.read_value(option.type);
-				result[key] = value;
+				if (option.array)
+					result[key] = this.read_values(option.type, true, option.required);
+				else if (option.type !== OptionType.STRING)
+					result[key] = this.read_string(index !== positional_options.length - 1);
+				else
+					result[key] = this.read_value(option.type);
 			}
 		}
 
