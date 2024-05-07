@@ -1,5 +1,6 @@
 import { Permissions } from "oceanic.js";
-import { format_user } from "../../../common/discord";
+import { get_tag_or_unknown } from "../../../common/discord";
+import { escape_all } from "../../../common/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
 import { CaseType, get_cases } from "../common/case";
 
@@ -60,9 +61,9 @@ export const cases_command = define_command({
 
 		if (args.actor !== null || args.target !== null) {
 			if (args.actor)
-				filter += ` by ${await format_user(args.actor)}`;
+				filter += ` by <@${args.actor}> (${escape_all(await get_tag_or_unknown(args.actor))})`;
 			if (args.target)
-				filter += ` targeting ${await format_user(args.target)}`;
+				filter += ` targeting <@${args.target}> (${escape_all(await get_tag_or_unknown(args.target))})`;
 		} else
 			filter = " for this server";
 
@@ -71,10 +72,11 @@ export const cases_command = define_command({
 		else {
 			const items = await Promise.all(cases.map(async (info) => {
 				const icon = CASE_ICON[info.type];
-				const actor = await format_user(info.actor_id);
-				const target = await format_user(info.target_id);
+				const date = Math.floor(info.created_at.getTime() / 1000);
+				const actor_tag = escape_all(await get_tag_or_unknown(info.actor_id));
+				const target_tag = escape_all(await get_tag_or_unknown(info.target_id));
 
-				return `${icon} <t:${Math.floor(info.created_at.getTime() / 1000)}:d> [#${info.number}] ${actor} ${CASE_ACTION[info.type]} ${target}`;
+				return `${icon} <t:${date}:d> [#${info.number}] <@${info.actor_id}> (${actor_tag}) ${CASE_ACTION[info.type]} <@${info.target_id}> (${target_tag})`;
 			}));
 
 			await context.respond(`**:closed_book: Cases${filter}**\n\n${items.join("\n")}`);

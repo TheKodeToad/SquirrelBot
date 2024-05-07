@@ -1,5 +1,5 @@
 import { Permissions } from "oceanic.js";
-import { format_user } from "../../../common/discord";
+import { get_tag_or_unknown } from "../../../common/discord";
 import { OptionType, define_command } from "../../../core/types/command";
 import { CASE_TYPE_NAME, get_case } from "../common/case";
 
@@ -36,8 +36,8 @@ export const case_command = define_command({
 **Type:** ${CASE_TYPE_NAME[info.type]}
 **Created at:** <t:${creation_secs}> (<t:${creation_secs}:R>)
 
-**Actor:** ${await format_user(info.actor_id)}
-**Target:** ${await format_user(info.target_id)}
+**Actor:** <@${info.actor_id}> (${await get_tag_or_unknown(info.actor_id)})
+**Target:** <@${info.target_id}> (${await get_tag_or_unknown(info.target_id)})
 
 **Reason:** ${info.reason !== null ? `"${info.reason}"` : "Not provided"}
 			`

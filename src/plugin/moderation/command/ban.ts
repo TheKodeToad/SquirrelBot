@@ -45,41 +45,31 @@ export const ban_command = define_command({
 		let successful_bans: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_bans: { id: string, name: string, error: string; }[] = [];
 
-		for (const id of args.user) {
+		for (const target of args.user) {
 			let name: string;
 			let in_guild: boolean;
 			let is_bot: boolean;
 
 			try {
-				const target_member = await get_member_cached(context.guild, id);
+				const target_member = await get_member_cached(context.guild, target);
 				name = target_member.user.tag;
 				in_guild = true;
 				is_bot = target_member.bot;
 
-				try {
-					var bot_member = await get_member_cached(context.guild, bot.user.id);
-				} catch (error) {
-					if (!(error instanceof DiscordRESTError))
-						throw error;
-
-					unsuccessful_bans.push({ id, name, error: `Bot member fetch failed: ${format_rest_error(error)}` });
-					continue;
-				}
-
 				const target_position = get_highest_role(target_member).position;
 
 				if (context.guild.ownerID !== context.user.id
-					&& (context.guild.ownerID === id
+					&& (context.guild.ownerID === target
 						|| get_highest_role(context.member).position <= target_position)) {
-					unsuccessful_bans.push({ id, name, error: "Your highest role is not above target's highest role" });
+					unsuccessful_bans.push({ id: target, name, error: "Your highest role is not above target's highest role" });
 					continue;
 				}
 
 				if (context.guild.ownerID !== bot.user.id
-					&& (context.guild.ownerID === id
-						|| get_highest_role(bot_member).position <= target_position)
+					&& (context.guild.ownerID === target
+						|| get_highest_role(context.guild.clientMember).position <= target_position)
 				) {
-					unsuccessful_bans.push({ id, name, error: "Bot's highest role is not above target's highest role" });
+					unsuccessful_bans.push({ id: target, name, error: "Bot's highest role is not above target's highest role" });
 					continue;
 				}
 			} catch (error) {
@@ -87,12 +77,12 @@ export const ban_command = define_command({
 					throw error;
 
 				if (error.code !== JSONErrorCodes.UNKNOWN_MEMBER) {
-					unsuccessful_bans.push({ id, name: "<unknown>", error: `Member fetch failed: ${format_rest_error(error)}` });
+					unsuccessful_bans.push({ id: target, name: "<unknown>", error: `Member fetch failed: ${format_rest_error(error)}` });
 					continue;
 				}
 
 				try {
-					const user = await get_user_cached(id);
+					const user = await get_user_cached(target);
 					name = user.tag;
 					in_guild = false;
 					is_bot = user.bot;
@@ -100,7 +90,7 @@ export const ban_command = define_command({
 					if (!(error instanceof DiscordRESTError))
 						throw error;
 
-					unsuccessful_bans.push({ id, name: "<unknown>", error: `User fetch failed: ${format_rest_error(error)}` });
+					unsuccessful_bans.push({ id: target, name: "<unknown>", error: `User fetch failed: ${format_rest_error(error)}` });
 					continue;
 				}
 			}
@@ -109,7 +99,7 @@ export const ban_command = define_command({
 
 			if (in_guild && !is_bot && !args.no_dm) {
 				try {
-					const dm = await create_dm_cached(id);
+					const dm = await create_dm_cached(target);
 					await dm.createMessage({ content: "You were banned :regional_indicator_l:" });
 					dm_sent = true;
 				} catch (error) {
@@ -119,7 +109,7 @@ export const ban_command = define_command({
 			}
 
 			try {
-				await context.guild.createBan(id, {
+				await context.guild.createBan(target, {
 					reason: args.reason ?? undefined,
 					deleteMessageSeconds: delete_message_seconds,
 				});
@@ -127,20 +117,20 @@ export const ban_command = define_command({
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				unsuccessful_bans.push({ id, name, error: format_rest_error(error) });
+				unsuccessful_bans.push({ id: target, name, error: format_rest_error(error) });
 				continue;
 			}
 
 			const case_number = await create_case(context.guild.id, {
 				type: CaseType.BAN,
 				actor_id: context.user.id,
-				target_id: id,
+				target_id: target,
 				reason: args.reason ?? undefined,
 				delete_message_seconds,
 				dm_sent,
 			});
 
-			successful_bans.push({ case_number, id, name, dm_sent });
+			successful_bans.push({ case_number, id: target, name, dm_sent });
 		}
 
 		if (args.user.length === 1) {

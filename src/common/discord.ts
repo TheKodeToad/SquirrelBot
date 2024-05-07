@@ -1,6 +1,5 @@
 import { AnyGuildChannel, ChannelTypes, DiscordRESTError, Guild, Member, Permissions, PrivateChannel, RequestGuildMembersOptions, Role, User } from "oceanic.js";
 import { bot } from "..";
-import { escape_all } from "./markdown";
 
 export function format_rest_error(rest_error: DiscordRESTError) {
 	if (rest_error.resBody !== null
@@ -67,20 +66,15 @@ export async function request_members_cached(
 /**
  * <@id> (name or <unknown>)
  */
-export async function format_user(user_id: string, quiet = true) {
-	let name = "<unknown>";
-
+export async function get_tag_or_unknown(user_id: string) {
 	try {
-		name = (await get_user_cached(user_id)).tag;
+		return (await get_user_cached(user_id)).tag;
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;
 
-		if (!quiet)
-			throw error;
+		return "<unknown>";
 	}
-
-	return `<@${user_id}> (${escape_all(name)})`;
 }
 
 /**
