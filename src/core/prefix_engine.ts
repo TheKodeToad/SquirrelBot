@@ -193,7 +193,7 @@ class Parser {
 
 				if (option.array)
 					result[key] = this.read_values(option.type, true, option.required);
-				else if (option.type !== OptionType.STRING)
+				else if (option.type === OptionType.STRING)
 					result[key] = this.read_string(index !== positional_options.length - 1);
 				else
 					result[key] = this.read_value(option.type);
