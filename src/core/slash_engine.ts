@@ -5,7 +5,7 @@ import { get_all_commands, get_commands } from "./plugin_registry";
 import { Command, Context, Option, OptionType, Reply } from "./types/command";
 
 export async function install_slash_engine(): Promise<void> {
-	const commands = get_all_commands().filter(command => command.support_slash).map(command => (
+	const commands = get_all_commands().filter(command => command.support_slash ?? true).map(command => (
 		{
 			type: ApplicationCommandTypes.CHAT_INPUT,
 			name: typeof command.id === "string" ? command.id : command.id[0],
