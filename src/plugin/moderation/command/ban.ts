@@ -1,6 +1,6 @@
-import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
+import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
-import { create_dm_cached, format_rest_error, get_highest_role, get_member_cached, get_user_cached } from "../../../common/discord";
+import { create_dm_cached, format_rest_error, get_highest_role, get_user_cached, request_members_cached } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
 import { CaseType, create_case } from "../common/case";
@@ -42,6 +42,8 @@ export const ban_command = define_command({
 
 		const delete_message_seconds = (args.purge ?? 0) * (1000 * 60 * 60 * 24);
 
+		const members = await request_members_cached(context.guild, args.user);
+
 		let successful_bans: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
 		let unsuccessful_bans: { id: string, name: string, error: string; }[] = [];
 
@@ -50,9 +52,10 @@ export const ban_command = define_command({
 			let in_guild: boolean;
 			let is_bot: boolean;
 
-			try {
-				const target_member = await get_member_cached(context.guild, target);
-				name = target_member.user.tag;
+			const target_member = members.get(target);
+
+			if (target_member !== undefined) {
+				name = target_member.tag;
 				in_guild = true;
 				is_bot = target_member.bot;
 
@@ -72,15 +75,7 @@ export const ban_command = define_command({
 					unsuccessful_bans.push({ id: target, name, error: "Bot's highest role is not above target's highest role" });
 					continue;
 				}
-			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
-					throw error;
-
-				if (error.code !== JSONErrorCodes.UNKNOWN_MEMBER) {
-					unsuccessful_bans.push({ id: target, name: "<unknown>", error: `Member fetch failed: ${format_rest_error(error)}` });
-					continue;
-				}
-
+			} else {
 				try {
 					const user = await get_user_cached(target);
 					name = user.tag;
