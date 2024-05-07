@@ -31,6 +31,16 @@ export const unban_command = define_command({
 		let unsuccessful_unbans: { id: string, name: string, error: string; }[] = [];
 
 		for (const target of args.user) {
+			const cached_member = context.guild.members.get(target);
+			if (cached_member !== undefined) {
+				unsuccessful_unbans.push({
+					id: target,
+					name: cached_member.tag,
+					error: "User is not banned",
+				});
+				continue;
+			}
+
 			try {
 				var ban = await context.guild.getBan(target);
 			} catch (error) {
@@ -41,13 +51,13 @@ export const unban_command = define_command({
 					unsuccessful_unbans.push({
 						id: target,
 						name: await get_tag_or_unknown(target),
-						error: "User is not banned"
+						error: "User is not banned",
 					});
 				} else {
 					unsuccessful_unbans.push({
 						id: target,
 						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : await get_tag_or_unknown(target),
-						error: `Ban fetch failed: ${format_rest_error(error)}`
+						error: `Ban fetch failed: ${format_rest_error(error)}`,
 					});
 				}
 
