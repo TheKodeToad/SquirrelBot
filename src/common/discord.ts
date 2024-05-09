@@ -99,7 +99,7 @@ export function can_write_in_channel(channel: AnyGuildChannel, member: Member): 
 	if (bot.getChannel(channel.id) === undefined)
 		return false;
 
-	if (member.communicationDisabledUntil === null || member.communicationDisabledUntil.getTime() > Date.now())
+	if (member.communicationDisabledUntil !== null && member.communicationDisabledUntil.getTime() >= Date.now())
 		return false;
 
 	const perms = channel.permissionsOf(member);
