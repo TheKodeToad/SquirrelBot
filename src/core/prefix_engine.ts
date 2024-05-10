@@ -25,6 +25,9 @@ function is_snowflake(id: string) {
 }
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
+	if (message.author.bot)
+		return;
+
 	if (message.channel instanceof GuildChannel
 		&& !can_write_in_channel(message.channel, message.channel.guild.clientMember))
 		return;
