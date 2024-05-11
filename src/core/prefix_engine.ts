@@ -328,6 +328,8 @@ class Parser {
 		return result;
 	}
 
+	// TODO: limit length and newlines when echoing back to avoid abuse
+
 	read_user(): string {
 		const input = this.read_word();
 		let id = input;
