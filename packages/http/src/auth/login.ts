@@ -9,6 +9,6 @@ router.get("/", (request, response) => {
 		return;
 	}
 
-	fetch("");
+	fetch("arghhhh pleeeaase i do not want to implement this i must delay it forever");
 });
 export default router;
