@@ -1,26 +1,7 @@
 {
-	"name": "airplane-bot",
-	"version": "1.0.0",
-	"description": "",
-	"scripts": {
-		"build": "node build.mjs",
-		"start": "npm run build && node --enable-source-maps out/main.js",
-		"migrate": "npm run build && node --enable-source-maps out/migrate.js"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
-	"dependencies": {
-		"async-lock": "^1.4.1",
-		"dotenv": "^16.4.5",
-		"oceanic.js": "^1.10.3",
-		"pg": "^8.11.5",
-		"typescript": "^5.4.5"
-	},
-	"devDependencies": {
-		"@types/async-lock": "^1.4.2",
-		"@types/node": "^20.12.11",
-		"@types/pg": "^8.11.6",
-		"esbuild": "0.20.2"
-	}
+	"name": "squirrel-bot",
+	"workspaces": [
+		"bot",
+		"http"
+	]
 }

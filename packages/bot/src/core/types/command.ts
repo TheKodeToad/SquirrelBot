@@ -49,7 +49,7 @@ export enum OptionType {
 	USER,
 	ROLE,
 	CHANNEL,
-	SNOWFLAKE
+	SNOWFLAKE,
 }
 
 export interface Option {

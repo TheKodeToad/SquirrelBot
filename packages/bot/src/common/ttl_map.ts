@@ -84,7 +84,7 @@ export class TTLMap<K, V> implements Map<K, V> {
 		for (const [key, [value, date]] of this._map)
 			if (!this._is_expired(now, date))
 				yield [key, value];
-	};
+	}
 
 	keys(): IterableIterator<K> {
 		return this._map.keys();

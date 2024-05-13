@@ -1,0 +1,13 @@
+{
+	"name": "http",
+	"scripts": {
+		"build": "node build.mjs",
+		"start": "npm run build && node --enable-source-maps out/main.js"
+	},
+	"dependencies": {
+		"express": "^4.19.2"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.21"
+	}
+}

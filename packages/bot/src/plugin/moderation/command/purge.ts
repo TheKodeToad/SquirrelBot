@@ -35,7 +35,8 @@ export const purge_command = define_command({
 		let purged = 0;
 
 		const iter = bot.rest.channels.getMessagesIterator(context.channel_id, {
-			limit: args.count, before: context.message?.id
+			limit: args.count,
+			before: context.message?.id,
 		});
 
 		for await (const messages of iter) {
