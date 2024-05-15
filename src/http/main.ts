@@ -1,6 +1,5 @@
 import express from "express";
-import auth from "./auth";
 
 const app = express();
-app.use("/auth", auth);
+app.use("/api/v1", require("./api/v1").default);
 app.listen(8080);
