@@ -88,6 +88,6 @@ router.post("/", async (request, response) => {
 	const token_timestamp = (Date.now() - TOKEN_EPOCH).toString(16);
 	const token_secret = crypto.randomBytes(16).toString("hex");
 
-	response.send(`${token_id},${token_timestamp},${token_secret}`);
+	response.send(`${token_id}.${token_timestamp}.${token_secret}`);
 });
 export default router;
