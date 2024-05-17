@@ -1,15 +1,19 @@
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
+import { Button } from "./component/button";
 
 export function App() {
-
-	const [count, set_count] = createSignal(0);
+	const [shown, set_shown] = createSignal(true);
 	return (
-		<button
-			onClick={event => set_count(count() + 1)}
-		>
-			You have pressed this button {count()} times!
-		</button>
+		<>
+			<h1>Stuff</h1>
+			<Button color="secondary" onClick={() => set_shown(false)} disabled={!shown()}>
+				Cancel
+			</Button>
+			<Button color="primary" onClick={() => set_shown(false)} disabled={!shown()}>
+				OK
+			</Button>
+		</>
 	);
 }
 
