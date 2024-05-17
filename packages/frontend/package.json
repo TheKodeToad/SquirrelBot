@@ -1,0 +1,14 @@
+{
+	"name": "frontend",
+	"scripts": {
+		"build": "node build.mjs",
+		"watch": "node build.mjs watch"
+	},
+	"devDependencies": {
+		"esbuild": "^0.21.3",
+		"esbuild-plugin-solid": "^0.6.0"
+	},
+	"dependencies": {
+		"solid-js": "^1.8.17"
+	}
+}

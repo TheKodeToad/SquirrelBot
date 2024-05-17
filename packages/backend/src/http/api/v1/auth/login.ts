@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Router, json } from "express";
+import express from "express";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../config";
 
 const TOKEN_EPOCH = new Date(2024, 0, 1).getTime();
@@ -25,8 +25,8 @@ interface ErrorResponse {
 	error_description: string;
 }
 
-const router = Router();
-router.use(json());
+const router = express.Router();
+router.use(express.json());
 router.post("/", async (request, response) => {
 	const { code } = request.body;
 
@@ -34,7 +34,6 @@ router.post("/", async (request, response) => {
 		response.status(400).send("Missing code");
 		return;
 	}
-
 	const token_response = await fetch("https://discord.com/api/v10/oauth2/token", {
 		method: "POST",
 		headers: {
