@@ -1,6 +1,15 @@
-import { AnyTextableGuildChannel, Permissions } from "oceanic.js";
+import { AnyTextableGuildChannel, MessageTypes, Permissions } from "oceanic.js";
 import { bot } from "../../..";
 import { OptionType, define_command } from "../../../core/types/command";
+
+const UNDELETABLE_MESSAGE_TYPES: MessageTypes[] = [
+	MessageTypes.RECIPIENT_ADD,
+	MessageTypes.RECIPIENT_REMOVE,
+	MessageTypes.CALL,
+	MessageTypes.CHANNEL_NAME_CHANGE,
+	MessageTypes.CHANNEL_ICON_CHANGE,
+	MessageTypes.THREAD_STARTER_MESSAGE,
+];
 
 export const purge_command = define_command({
 	id: "purge",
@@ -50,6 +59,9 @@ export const purge_command = define_command({
 					stop = true;
 					break;
 				}
+
+				if (UNDELETABLE_MESSAGE_TYPES.includes(message.type))
+					continue;
 
 				if (args.match !== null && !message.content.includes(args.match))
 					continue;
