@@ -1,5 +1,7 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import process from "process";
+
+dotenv.config({ path: "../../.env" });
 
 export const CLIENT_ID = process.env["CLIENT_ID"] || "";
 export const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";
