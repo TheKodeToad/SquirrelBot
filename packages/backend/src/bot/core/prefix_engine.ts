@@ -390,16 +390,18 @@ class Parser {
 		const input = this.read_word();
 
 		switch (input.toLowerCase()) {
+			case "f":
 			case "false":
 			case "0":
 				return false;
 
+			case "t":
 			case "true":
 			case "1":
 				return true;
 
 			default:
-				throw new ParseError(`Expected false (0) or true (1) but got '${input}'`);
+				throw new ParseError(`Expected false/f/0 or true/t/1 but got '${input}'`);
 		}
 	}
 
