@@ -1,4 +1,4 @@
-import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { bot } from "..";
 import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
@@ -16,6 +16,7 @@ export function install_prefix_engine() {
 // 20 - length of 64-bit integer limit
 const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
 const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
+const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
 const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(1000 * 60 * 30);
 setInterval(() => tracked_messages.cleanup(), 1000 * 60);
@@ -26,6 +27,9 @@ function is_snowflake(id: string) {
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
 	if (message.author.bot)
+		return;
+
+	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
 		return;
 
 	if (message.channel instanceof GuildChannel
