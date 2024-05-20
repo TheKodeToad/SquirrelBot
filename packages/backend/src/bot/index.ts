@@ -1,5 +1,4 @@
 import { Client, Constants } from "oceanic.js";
-import { Pool } from "pg";
 import { BOT_TOKEN } from "../config";
 
 export const bot = new Client({
@@ -9,4 +8,3 @@ export const bot = new Client({
 	},
 	allowedMentions: {},
 });
-export const database = new Pool;

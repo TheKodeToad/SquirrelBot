@@ -1,9 +1,9 @@
 import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
+import { CaseType, create_case } from "../../../../data/moderation/case";
 import { create_dm_cached, format_rest_error, get_highest_role, get_user_cached, request_members_cached } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
-import { CaseType, create_case } from "../common/case";
 
 export const ban_command = define_command({
 	id: "ban",

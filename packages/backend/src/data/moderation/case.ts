@@ -1,5 +1,5 @@
 import AsyncLock from "async-lock";
-import { database } from "../../..";
+import { database } from "..";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -14,19 +14,6 @@ export enum CaseType {
 	BAN = 8,
 	UNBAN = 9,
 }
-
-export const CASE_TYPE_NAME: { [T in CaseType]: string } = {
-	[CaseType.NOTE]: "Note",
-	[CaseType.WARN]: "Warn",
-	[CaseType.UNWARN]: "Unwarn",
-	[CaseType.VOICE_MUTE]: "Voice Mute",
-	[CaseType.VOICE_UNMUTE]: "Voice Unmute",
-	[CaseType.MUTE]: "Mute",
-	[CaseType.UNMUTE]: "Unmute",
-	[CaseType.KICK]: "Kick",
-	[CaseType.BAN]: "Ban",
-	[CaseType.UNBAN]: "Unban"
-};
 
 export interface CaseInfo {
 	guild_id: string;

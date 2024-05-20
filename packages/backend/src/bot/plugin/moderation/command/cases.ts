@@ -1,10 +1,10 @@
 import { Permissions } from "oceanic.js";
+import { CaseType, get_cases } from "../../../../data/moderation/case";
 import { get_tag_or_unknown } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
-import { CaseType, get_cases } from "../common/case";
 
-export const CASE_ICON: { [T in CaseType]: string } = {
+const CASE_ICON: { [T in CaseType]: string } = {
 	[CaseType.NOTE]: ":pencil:",
 	[CaseType.WARN]: ":warning:",
 	[CaseType.UNWARN]: ":warning:",
@@ -17,7 +17,7 @@ export const CASE_ICON: { [T in CaseType]: string } = {
 	[CaseType.UNBAN]: ":hammer:"
 };
 
-export const CASE_ACTION: { [T in CaseType]: string } = {
+const CASE_ACTION: { [T in CaseType]: string } = {
 	[CaseType.NOTE]: "added note on",
 	[CaseType.WARN]: "warned",
 	[CaseType.UNWARN]: "unwarned",

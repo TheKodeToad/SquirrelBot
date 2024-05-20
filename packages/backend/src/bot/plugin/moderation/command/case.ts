@@ -1,7 +1,20 @@
 import { Permissions } from "oceanic.js";
+import { CaseType, get_case } from "../../../../data/moderation/case";
 import { get_tag_or_unknown } from "../../../common/discord";
 import { OptionType, define_command } from "../../../core/types/command";
-import { CASE_TYPE_NAME, get_case } from "../common/case";
+
+const CASE_TYPE_NAME: { [T in CaseType]: string } = {
+	[CaseType.NOTE]: "Note",
+	[CaseType.WARN]: "Warn",
+	[CaseType.UNWARN]: "Unwarn",
+	[CaseType.VOICE_MUTE]: "Voice Mute",
+	[CaseType.VOICE_UNMUTE]: "Voice Unmute",
+	[CaseType.MUTE]: "Mute",
+	[CaseType.UNMUTE]: "Unmute",
+	[CaseType.KICK]: "Kick",
+	[CaseType.BAN]: "Ban",
+	[CaseType.UNBAN]: "Unban"
+};
 
 export const case_command = define_command({
 	id: "case",

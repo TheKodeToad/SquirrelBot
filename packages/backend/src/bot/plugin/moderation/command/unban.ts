@@ -1,8 +1,8 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
+import { CaseType, create_case } from "../../../../data/moderation/case";
 import { format_rest_error, get_tag_or_unknown } from "../../../common/discord";
 import { escape_all } from "../../../common/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
-import { CaseType, create_case } from "../common/case";
 
 export const unban_command = define_command({
 	id: "unban",
