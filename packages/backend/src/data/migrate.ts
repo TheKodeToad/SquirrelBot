@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
-import { database } from "./index";
+import { database } from ".";
+import "../config";
 
 async function migrate() {
 	console.log("Running migrations");
@@ -17,7 +18,7 @@ async function migrate() {
 }
 
 async function process(dir: string, include_subdirs: boolean) {
-	console.log(`Running from '${dir}'`);
+	console.log(`Scanning "${dir}"`);
 
 	const files: string[] = [];
 	const folders: string[] = [];
@@ -56,11 +57,11 @@ async function process(dir: string, include_subdirs: boolean) {
 			continue;
 
 		if (index <= last_run) {
-			console.log(`Skipping '${file}' as it has already been run`);
+			console.log(`Skipping "${file}" as it has already been run`);
 			continue;
 		}
 
-		console.log(`Running file '${file}'`);
+		console.log(`Running file "${file}"`);
 
 		const sql = await fs.readFile(file, "utf-8");
 		const client = await database.connect();
