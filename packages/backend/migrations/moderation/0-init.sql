@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "moderation_cases" (
+CREATE TABLE "moderation_cases" (
 	"guild_id" NUMERIC(20, 0) NOT NULL,
 	"number" INT NOT NULL,
 
