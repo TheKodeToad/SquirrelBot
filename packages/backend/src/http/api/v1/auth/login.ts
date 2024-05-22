@@ -1,8 +1,6 @@
-import crypto from "crypto";
 import express from "express";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../config";
-
-const TOKEN_EPOCH = new Date(2024, 0, 1).getTime();
+import { generate_token } from "../../../../data/api/token";
 
 interface TokenResponse {
 	token_type: string;
@@ -34,6 +32,7 @@ router.post("/", async (request, response) => {
 		response.status(400).send("Missing code");
 		return;
 	}
+
 	const token_response = await fetch("https://discord.com/api/v10/oauth2/token", {
 		method: "POST",
 		headers: {
@@ -67,7 +66,7 @@ router.post("/", async (request, response) => {
 
 	const user_json: UserResponse = await user_response.json();
 
-	const revoke_response = await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
+	await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
@@ -80,13 +79,7 @@ router.post("/", async (request, response) => {
 		})
 	});
 
-	if (!revoke_response.ok)
-		return;
-
-	const token_id = BigInt(user_json.id).toString(16);
-	const token_timestamp = (Date.now() - TOKEN_EPOCH).toString(16);
-	const token_secret = crypto.randomBytes(16).toString("hex");
-
-	response.send(`${token_id}.${token_timestamp}.${token_secret}`);
+	const token = await generate_token(user_json.id);
+	response.send({ access_token: token[0], expires_at: token[1].getTime() });
 });
 export default router;

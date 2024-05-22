@@ -4,8 +4,6 @@ import { database } from ".";
 import "../config";
 
 async function migrate() {
-	console.log("Running migrations");
-
 	await database.query(`
 		CREATE TABLE IF NOT EXISTS "migration_dirs" (
 			"path" TEXT NOT NULL PRIMARY KEY,
@@ -18,8 +16,6 @@ async function migrate() {
 }
 
 async function process(dir: string, include_subdirs: boolean) {
-	console.log(`Scanning "${dir}"`);
-
 	const files: string[] = [];
 	const folders: string[] = [];
 
