@@ -79,7 +79,7 @@ router.post("/", async (request, response) => {
 		})
 	});
 
-	const token = await generate_token(user_json.id);
-	response.send({ access_token: token[0], expires_at: token[1].getTime() });
+	const [token, expires_at] = await generate_token(user_json.id);
+	response.send({ token, expires_at: expires_at.getTime() });
 });
 export default router;
