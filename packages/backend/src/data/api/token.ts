@@ -39,14 +39,21 @@ export async function validate_token(token: string): Promise<string | null> {
 	if (user_id_part.length === 0 || secret_part.length === 0)
 		return null;
 
-	const user_id = BigInt("0x" + token);
+	try {
+		var user_id = BigInt("0x" + user_id_part);
+	} catch (error) {
+		if (!(error instanceof SyntaxError))
+			throw error;
+
+		throw error;
+	}
 
 	const secret_buffer = Buffer.from(secret_part, "hex");
-	const hash = await crypto.subtle.digest(ALGORITHM, secret_buffer);
+	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret_buffer));
 
 	const result = await database.query(
 		`
-			SELECT "owner", "expires_at"
+			SELECT "user_id", "expires_at"
 			FROM "api_tokens"
 			WHERE "user_id" = $1 AND "hash" = $2
 		`,
