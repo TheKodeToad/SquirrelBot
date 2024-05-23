@@ -45,7 +45,7 @@ export async function validate_token(token: string): Promise<string | null> {
 		if (!(error instanceof SyntaxError))
 			throw error;
 
-		throw error;
+		return null;
 	}
 
 	const secret_buffer = Buffer.from(secret_part, "hex");
