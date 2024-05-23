@@ -136,7 +136,8 @@ class PrefixContext implements Context {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const options = typeof reply === "string" ? { content: reply, flags: 0 } : { ...reply, flags: 0 };
+		const options = typeof reply === "string" ? { flags: 0, content: reply } : { flags: 0, ...reply };
+		options.flags |= MessageFlags.SUPPRESS_EMBEDS;
 
 		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0)
 			options.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;

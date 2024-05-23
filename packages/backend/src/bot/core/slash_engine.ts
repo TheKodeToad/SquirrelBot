@@ -1,4 +1,4 @@
-import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, Shard, User } from "oceanic.js";
+import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, MessageFlags, Shard, User } from "oceanic.js";
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_filter";
 import { get_all_commands, get_commands } from "./plugin_registry";
@@ -128,7 +128,8 @@ class SlashContext implements Context {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const content = typeof reply === "string" ? { content: reply, flags: 0 } : { ...reply, flags: 0 };
+		const options = typeof reply === "string" ? { flags: 0, content: reply } : { flags: 0, ...reply };
+		options.flags |= MessageFlags.SUPPRESS_EMBEDS;
 
 		if (this._responded) {
 			if (this._defer_promise !== null)
@@ -140,11 +141,11 @@ class SlashContext implements Context {
 				content: "",
 				embeds: [],
 				files: [],
-				...content,
+				...options,
 			});
 		} else {
 			this._remove_timeout();
-			await this._interaction.reply(content);
+			await this._interaction.reply(options);
 			this._responded = true;
 		}
 	}
