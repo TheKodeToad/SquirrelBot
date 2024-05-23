@@ -30,7 +30,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		return;
 
 	// yes, non-bot webhook is/has been possible
-	if (message.webhookID !== null)
+	if (message.webhookID !== undefined)
 		return;
 
 	if (message.guild !== null && message.member === undefined)
