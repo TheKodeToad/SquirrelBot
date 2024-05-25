@@ -1,8 +1,10 @@
 import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
 import { CaseType, create_case } from "../../../../data/moderation/case";
-import { format_rest_error, get_highest_role, get_user_cached, request_members_cached } from "../../../common/discord";
-import { escape_all } from "../../../common/markdown";
+import { get_user_cached, request_members_cached } from "../../../common/discord/cache";
+import { format_rest_error } from "../../../common/discord/format";
+import { escape_markdown } from "../../../common/discord/markdown";
+import { get_highest_role } from "../../../common/discord/permissions";
 import { OptionType, define_command } from "../../../core/types/command";
 
 export const kick_command = define_command({
@@ -112,14 +114,14 @@ export const kick_command = define_command({
 		if (args.user.length === 1) {
 			if (successful_kicks.length === 1) {
 				const kick = successful_kicks[0]!;
-				await context.respond(`:white_check_mark: Kicked <@${kick.id}> (${escape_all(kick.name)})${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]!`);
+				await context.respond(`:white_check_mark: Kicked <@${kick.id}> (${escape_markdown(kick.name)})${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]!`);
 			} else if (unsuccessful_kicks.length === 1) {
 				const kick = unsuccessful_kicks[0]!;
-				await context.respond(`:x: Could not kick <@${kick.id}> (${escape_all(kick.name)}): ${kick.error}!`);
+				await context.respond(`:x: Could not kick <@${kick.id}> (${escape_markdown(kick.name)}): ${escape_markdown(kick.error)}!`);
 			}
 		} else {
-			const successful_message = successful_kicks.map(kick => `- <@${kick.id}> (${escape_all(kick.name)}) ${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]`).join("\n");
-			const unsuccessful_message = unsuccessful_kicks.map(kick => `- <@${kick.id}> (${escape_all(kick.name)}): ${kick.error}`).join("\n");
+			const successful_message = successful_kicks.map(kick => `- <@${kick.id}> (${escape_markdown(kick.name)}) ${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]`).join("\n");
+			const unsuccessful_message = unsuccessful_kicks.map(kick => `- <@${kick.id}> (${escape_markdown(kick.name)}): ${escape_markdown(kick.error)}`).join("\n");
 
 			if (unsuccessful_kicks.length === 0) {
 				await context.respond(

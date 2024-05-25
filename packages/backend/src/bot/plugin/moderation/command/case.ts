@@ -1,6 +1,7 @@
 import { Permissions } from "oceanic.js";
 import { CaseType, get_case } from "../../../../data/moderation/case";
-import { get_tag_or_unknown } from "../../../common/discord";
+import { format_user_tag } from "../../../common/discord/format";
+import { escape_markdown } from "../../../common/discord/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
 
 const CASE_TYPE_NAME: { [T in CaseType]: string } = {
@@ -49,8 +50,8 @@ export const case_command = define_command({
 **Type:** ${CASE_TYPE_NAME[info.type]}
 **Created at:** <t:${creation_secs}> (<t:${creation_secs}:R>)
 
-**Actor:** <@${info.actor_id}> (${await get_tag_or_unknown(info.actor_id)})
-**Target:** <@${info.target_id}> (${await get_tag_or_unknown(info.target_id)})
+**Actor:** <@${info.actor_id}> (${escape_markdown(await format_user_tag(info.actor_id))})
+**Target:** <@${info.target_id}> (${escape_markdown(await format_user_tag(info.target_id))})
 
 **Reason:** ${info.reason !== null ? `"${info.reason}"` : "Not provided"}
 			`

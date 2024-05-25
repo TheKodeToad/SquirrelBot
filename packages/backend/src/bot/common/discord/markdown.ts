@@ -6,6 +6,6 @@ const FORMATTING_REGEX = /[\\/*_\-`#@<>.~|:\[\]\(\)]/g;
 /**
  * Escape all characters used for markdown formatting.
  */
-export function escape_all(input: string) {
+export function escape_markdown(input: string) {
 	return input.replace(FORMATTING_REGEX, "\\$&");
 }

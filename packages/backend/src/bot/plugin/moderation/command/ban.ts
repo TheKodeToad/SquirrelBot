@@ -1,8 +1,10 @@
 import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
 import { CaseType, create_case } from "../../../../data/moderation/case";
-import { create_dm_cached, format_rest_error, get_highest_role, get_user_cached, request_members_cached } from "../../../common/discord";
-import { escape_all } from "../../../common/markdown";
+import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache";
+import { format_rest_error } from "../../../common/discord/format";
+import { escape_markdown } from "../../../common/discord/markdown";
+import { get_highest_role } from "../../../common/discord/permissions";
 import { OptionType, define_command } from "../../../core/types/command";
 
 export const ban_command = define_command({
@@ -131,14 +133,14 @@ export const ban_command = define_command({
 		if (args.user.length === 1) {
 			if (successful_bans.length === 1) {
 				const ban = successful_bans[0]!;
-				await context.respond(`:white_check_mark: Banned <@${ban.id}> (${escape_all(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]!`);
+				await context.respond(`:white_check_mark: Banned <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]!`);
 			} else if (unsuccessful_bans.length === 1) {
 				const ban = unsuccessful_bans[0]!;
-				await context.respond(`:x: Could not ban <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}!`);
+				await context.respond(`:x: Could not ban <@${ban.id}> (${escape_markdown(ban.name)}): ${escape_markdown(ban.error)}!`);
 			}
 		} else {
-			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
-			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${escape_all(ban.name)}): ${ban.error}`).join("\n");
+			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
+			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name)}): ${escape_markdown(ban.error)}`).join("\n");
 
 			if (unsuccessful_bans.length === 0) {
 				await context.respond(

@@ -1,7 +1,7 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { CaseType, create_case } from "../../../../data/moderation/case";
-import { format_rest_error, get_tag_or_unknown } from "../../../common/discord";
-import { escape_all } from "../../../common/markdown";
+import { format_rest_error, format_user_tag } from "../../../common/discord/format";
+import { escape_markdown } from "../../../common/discord/markdown";
 import { OptionType, define_command } from "../../../core/types/command";
 
 export const unban_command = define_command({
@@ -50,13 +50,13 @@ export const unban_command = define_command({
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
 					unsuccessful_unbans.push({
 						id: target,
-						name: await get_tag_or_unknown(target),
+						name: await format_user_tag(target),
 						error: "User is not banned",
 					});
 				} else {
 					unsuccessful_unbans.push({
 						id: target,
-						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : await get_tag_or_unknown(target),
+						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : await format_user_tag(target),
 						error: `Ban fetch failed: ${format_rest_error(error)}`,
 					});
 				}
@@ -87,14 +87,14 @@ export const unban_command = define_command({
 		if (args.user.length === 1) {
 			if (successful_unbans.length === 1) {
 				const unban = successful_unbans[0]!;
-				await context.respond(`:white_check_mark: Unbanned <@${unban.id}> (${escape_all(unban.name)}) [#${unban.case_number}]!`);
+				await context.respond(`:white_check_mark: Unbanned <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]!`);
 			} else if (unsuccessful_unbans.length === 1) {
 				const unban = unsuccessful_unbans[0]!;
-				await context.respond(`:x: Could not unban <@${unban.id}> (${escape_all(unban.name)}): ${unban.error}!`);
+				await context.respond(`:x: Could not unban <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(escape_markdown(unban.error))}!`);
 			}
 		} else {
-			const successful_message = successful_unbans.map(unban => `- <@${unban.id}> (${escape_all(unban.name)}) [#${unban.case_number}]`).join("\n");
-			const unsuccessful_message = unsuccessful_unbans.map(unban => `- <@${unban.id}> (${escape_all(unban.name)}): ${unban.error}`).join("\n");
+			const successful_message = successful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]`).join("\n");
+			const unsuccessful_message = unsuccessful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(unban.error)}`).join("\n");
 
 			if (unsuccessful_unbans.length === 0) {
 				await context.respond(
