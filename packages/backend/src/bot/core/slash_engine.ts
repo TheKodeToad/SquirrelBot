@@ -104,7 +104,7 @@ class SlashContext implements Context {
 	user: User;
 	member: Member | null;
 	channel_id: string;
-	_interaction: CommandInteraction;
+	interaction: CommandInteraction;
 	_responded: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
 	_defer_promise: Promise<void> | null;
@@ -116,15 +116,14 @@ class SlashContext implements Context {
 		this.member = interaction.member ?? null;
 		this.guild = interaction.guild;
 		this.channel_id = interaction.channelID;
-
-		this._interaction = interaction;
+		this.interaction = interaction;
 		this._responded = false;
 		this._defer_promise = null;
 		this._defer_timeout = setTimeout(() => {
 			this._defer_timeout = null;
 			this._responded = true;
 			this._defer_promise = interaction.defer();
-		}, 1000).unref();
+		}, Math.max(0, 1000 - (Date.now() - interaction.createdAt.getTime()))).unref();
 	}
 
 	async respond(reply: Reply): Promise<void> {
@@ -135,7 +134,7 @@ class SlashContext implements Context {
 			if (this._defer_promise !== null)
 				await this._defer_promise;
 
-			await this._interaction.editOriginal({
+			await this.interaction.editOriginal({
 				attachments: [],
 				components: [],
 				content: "",
@@ -145,7 +144,7 @@ class SlashContext implements Context {
 			});
 		} else {
 			this._remove_timeout();
-			await this._interaction.reply(options);
+			await this.interaction.reply(options);
 			this._responded = true;
 		}
 	}

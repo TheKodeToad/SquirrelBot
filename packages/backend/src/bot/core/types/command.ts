@@ -1,4 +1,4 @@
-import { AnyTextableChannel, CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
+import { AnyTextableChannel, CommandInteraction, CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
 
@@ -30,6 +30,7 @@ export interface Context {
 	member: Member | null;
 	channel_id: string;
 	message?: Message<AnyTextableChannel>;
+	interaction?: CommandInteraction;
 	respond(reply: Reply): Promise<void>;
 }
 
