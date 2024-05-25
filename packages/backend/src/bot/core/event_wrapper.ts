@@ -15,7 +15,12 @@ export function wrap_listener<E extends keyof ClientEvents>(
 		if (guild !== null && !BOT_ALLOWED_GUILDS.has(guild))
 			return;
 
-		listener(...args);
+		try {
+			listener(...args);
+		} catch (error) {
+			console.error(`Error handling event "${event}":`);
+			console.error(error);
+		}
 	};
 }
 

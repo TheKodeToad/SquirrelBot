@@ -1,6 +1,6 @@
 import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, MessageFlags, Shard, User } from "oceanic.js";
 import { bot } from "..";
-import { install_wrapped_listener } from "./event_filter";
+import { install_wrapped_listener } from "./event_wrapper";
 import { get_all_commands, get_commands } from "./plugin_registry";
 import { Command, Context, Option, OptionType, Reply } from "./types/command";
 
@@ -90,8 +90,9 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 	try {
 		await command.run(context, args);
 	} catch (error) {
-		await context.respond(`:boom: Failed to execute /${command.id}`);
-		throw error;
+		await context.respond(`:boom: Failed to execute command`);
+		console.error(`Error processing slash command "/${interaction.data.name}":`);
+		console.error(error);
 	} finally {
 		context._remove_timeout();
 	}

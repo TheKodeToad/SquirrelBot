@@ -1,8 +1,9 @@
 import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { format } from "util";
 import { bot } from "..";
 import { can_write_in_channel } from "../common/discord";
 import { TTLMap } from "../common/ttl_map";
-import { install_wrapped_listener } from "./event_filter";
+import { install_wrapped_listener } from "./event_wrapper";
 import { get_commands } from "./plugin_registry";
 import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "./types/command";
 
@@ -85,12 +86,13 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 
 	try {
 		await command.run(context, args);
-
+		format;
 		if (command.track_updates)
 			tracked_messages.set(message.id, context);
 	} catch (error) {
-		await context.respond(`:boom: Failed to execute ${prefix}${command.id}`);
-		throw error;
+		await context.respond(`:boom: Failed to execute command`);
+		console.error(`Error processing prefix command "${message.content}":`);
+		console.error(error);
 	}
 }
 

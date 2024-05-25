@@ -11,14 +11,4 @@ bot.once("shardPreReady", async () => {
 	await apply_plugins();
 });
 
-function exception_handler(error: unknown) {
-	// TODO do something cool B)
-	console.error("Unhandled exception!");
-	console.error(error);
-}
-
-bot.on("error", exception_handler);
-process.on("uncaughtException", exception_handler);
-process.on("unhandledRejection", exception_handler);
-
 bot.connect();

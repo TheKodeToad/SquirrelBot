@@ -1,5 +1,5 @@
 import { bot } from "..";
-import { wrap_listener } from "./event_filter";
+import { wrap_listener } from "./event_wrapper";
 import { install_prefix_engine } from "./prefix_engine";
 import { install_slash_engine } from "./slash_engine";
 import { Command } from "./types/command";
