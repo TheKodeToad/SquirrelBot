@@ -1,4 +1,4 @@
-import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, MessageFlags, Shard, User } from "oceanic.js";
+import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, Shard, User } from "oceanic.js";
 import { bot } from "..";
 import { install_wrapped_listener } from "./event_wrapper";
 import { get_all_commands, get_commands } from "./plugin_registry";
@@ -129,7 +129,6 @@ class SlashContext implements Context {
 
 	async respond(reply: Reply): Promise<void> {
 		const options = typeof reply === "string" ? { flags: 0, content: reply } : { flags: 0, ...reply };
-		options.flags |= MessageFlags.SUPPRESS_EMBEDS;
 
 		if (this._responded) {
 			if (this._defer_promise !== null)
