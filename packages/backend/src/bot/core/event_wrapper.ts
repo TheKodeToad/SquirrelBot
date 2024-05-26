@@ -4,9 +4,9 @@ import { BOT_ALLOWED_GUILDS } from "../../config";
 
 export function wrap_listener<E extends keyof ClientEvents>(
 	event: E,
-	listener: (...args: ClientEvents[E]) => void
+	listener: (...args: ClientEvents[E]) => void | Promise<void>
 ) {
-	return (...args: ClientEvents[E]) => {
+	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
 
 		if (event in EVENT_TO_GUILD)
@@ -16,7 +16,7 @@ export function wrap_listener<E extends keyof ClientEvents>(
 			return;
 
 		try {
-			listener(...args);
+			await listener(...args);
 		} catch (error) {
 			console.error(`Error handling event "${event}":`);
 			console.error(error);
@@ -26,7 +26,7 @@ export function wrap_listener<E extends keyof ClientEvents>(
 
 export function install_wrapped_listener<E extends keyof ClientEvents>(
 	event: E,
-	listener: (...args: ClientEvents[E]) => void
+	listener: (...args: ClientEvents[E]) => void | Promise<void>
 ): void {
 	bot.on(event, wrap_listener(event, listener));
 }
