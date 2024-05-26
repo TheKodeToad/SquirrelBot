@@ -5,6 +5,7 @@ import { get_user_cached, request_members_cached } from "../../../common/discord
 import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { get_highest_role } from "../../../common/discord/permissions";
+import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
 
 export const kick_command = define_command({
@@ -114,10 +115,10 @@ export const kick_command = define_command({
 		if (args.user.length === 1) {
 			if (successful_kicks.length === 1) {
 				const kick = successful_kicks[0]!;
-				await context.respond(`:white_check_mark: Kicked <@${kick.id}> (${escape_markdown(kick.name)})${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]!`);
+				await context.respond(`${Icons.success} Kicked <@${kick.id}> (${escape_markdown(kick.name)})${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]!`);
 			} else if (unsuccessful_kicks.length === 1) {
 				const kick = unsuccessful_kicks[0]!;
-				await context.respond(`:x: Could not kick <@${kick.id}> (${escape_markdown(kick.name)}): ${escape_markdown(kick.error)}!`);
+				await context.respond(`${Icons.error} Could not kick <@${kick.id}> (${escape_markdown(kick.name)}): ${escape_markdown(kick.error)}!`);
 			}
 		} else {
 			const successful_message = successful_kicks.map(kick => `- <@${kick.id}> (${escape_markdown(kick.name)}) ${kick.dm_sent ? " with direct message" : ""} [#${kick.case_number}]`).join("\n");
@@ -125,15 +126,15 @@ export const kick_command = define_command({
 
 			if (unsuccessful_kicks.length === 0) {
 				await context.respond(
-					`:white_check_mark: Kicked all ${args.user.length} users:\n${successful_message}`
+					`${Icons.success} Kicked all ${args.user.length} users:\n${successful_message}`
 				);
 			} else if (successful_kicks.length === 0) {
 				await context.respond(
-					`:x: None of ${args.user.length} users were kicked:\n${unsuccessful_message}`
+					`${Icons.error} None of ${args.user.length} users were kicked:\n${unsuccessful_message}`
 				);
 			} else {
 				await context.respond(
-					`:warning: Only ${successful_kicks.length} of ${args.user.length} kicks were successful!\n`
+					`${Icons.warning} Only ${successful_kicks.length} of ${args.user.length} kicks were successful!\n`
 					+ `Successful kicks:\n${successful_message}\n`
 					+ `Unsuccessful kicks:\n${unsuccessful_message}`
 				);

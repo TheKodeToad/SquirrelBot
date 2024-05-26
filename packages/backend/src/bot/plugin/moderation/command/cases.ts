@@ -2,12 +2,13 @@ import { Permissions } from "oceanic.js";
 import { CaseType, get_cases } from "../../../../data/moderation/case";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
+import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
 
 const CASE_ICON: { [T in CaseType]: string } = {
 	[CaseType.NOTE]: ":pencil:",
-	[CaseType.WARN]: ":warning:",
-	[CaseType.UNWARN]: ":warning:",
+	[CaseType.WARN]: "${Icons.warning}",
+	[CaseType.UNWARN]: "${Icons.warning}",
 	[CaseType.VOICE_MUTE]: ":microphone:",
 	[CaseType.VOICE_UNMUTE]: ":microphone:",
 	[CaseType.MUTE]: ":mute:",
@@ -68,7 +69,7 @@ export const cases_command = define_command({
 			filter = " for this server";
 
 		if (cases.length === 0)
-			await context.respond(`:x: No cases found${filter}!`);
+			await context.respond(`${Icons.error} No cases found${filter}!`);
 		else {
 			const items = await Promise.all(cases.map(async (info) => {
 				const icon = CASE_ICON[info.type];

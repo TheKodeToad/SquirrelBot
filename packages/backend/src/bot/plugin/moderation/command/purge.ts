@@ -1,5 +1,6 @@
 import { AnyTextableGuildChannel, MessageTypes, Permissions } from "oceanic.js";
 import { bot } from "../../..";
+import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
 
 const UNDELETABLE_MESSAGE_TYPES: MessageTypes[] = [
@@ -77,8 +78,8 @@ export const purge_command = define_command({
 		}
 
 		if (purged === 0)
-			await context.respond(":x: No messages were purged!");
+			await context.respond(`${Icons.error} No messages were purged!`);
 		else
-			await context.respond(`:white_check_mark: Purged ${purged} messages!`);
+			await context.respond(`${Icons.success} Purged ${purged} messages!`);
 	},
 });

@@ -2,6 +2,7 @@ import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
 import { CaseType, create_case } from "../../../../data/moderation/case";
 import { format_rest_error, format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
+import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
 
 export const unban_command = define_command({
@@ -87,10 +88,10 @@ export const unban_command = define_command({
 		if (args.user.length === 1) {
 			if (successful_unbans.length === 1) {
 				const unban = successful_unbans[0]!;
-				await context.respond(`:white_check_mark: Unbanned <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]!`);
+				await context.respond(`${Icons.success} Unbanned <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]!`);
 			} else if (unsuccessful_unbans.length === 1) {
 				const unban = unsuccessful_unbans[0]!;
-				await context.respond(`:x: Could not unban <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(escape_markdown(unban.error))}!`);
+				await context.respond(`${Icons.error} Could not unban <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(escape_markdown(unban.error))}!`);
 			}
 		} else {
 			const successful_message = successful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]`).join("\n");
@@ -98,15 +99,15 @@ export const unban_command = define_command({
 
 			if (unsuccessful_unbans.length === 0) {
 				await context.respond(
-					`:white_check_mark: Unbanned all ${args.user.length} users:\n${successful_message}`
+					`${Icons.success} Unbanned all ${args.user.length} users:\n${successful_message}`
 				);
 			} else if (successful_unbans.length === 0) {
 				await context.respond(
-					`:x: None of ${args.user.length} users were unbanned:\n${unsuccessful_message}`
+					`${Icons.error} None of ${args.user.length} users were unbanned:\n${unsuccessful_message}`
 				);
 			} else {
 				await context.respond(
-					`:warning: Only ${successful_unbans.length} of ${args.user.length} unbans were successful!\n`
+					`${Icons.warning} Only ${successful_unbans.length} of ${args.user.length} unbans were successful!\n`
 					+ `Successful unbans:\n${successful_message}\n`
 					+ `Unsuccessful unbans:\n${unsuccessful_message}`
 				);
