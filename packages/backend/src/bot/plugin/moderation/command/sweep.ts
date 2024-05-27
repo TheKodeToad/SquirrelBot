@@ -12,8 +12,8 @@ const UNDELETABLE_MESSAGE_TYPES: MessageTypes[] = [
 	MessageTypes.THREAD_STARTER_MESSAGE,
 ];
 
-export const purge_command = define_command({
-	id: ["purge", "prune", "clear", "clean"],
+export const sweep_command = define_command({
+	id: ["sweep", "purge", "clear"],
 	options: {
 		count: {
 			id: ["count", "c"],
@@ -42,7 +42,7 @@ export const purge_command = define_command({
 		if (!channel.permissionsOf(context.member).has(Permissions.MANAGE_MESSAGES))
 			return;
 
-		let purged = 0;
+		let sweeped = 0;
 
 		const iter = bot.rest.channels.getMessagesIterator(context.channel_id, {
 			limit: args.count,
@@ -71,15 +71,15 @@ export const purge_command = define_command({
 			}
 
 			await channel.deleteMessages(to_delete);
-			purged += to_delete.length;
+			sweeped += to_delete.length;
 
 			if (stop)
 				break;
 		}
 
-		if (purged === 0)
-			await context.respond(`${Icons.error} No messages were purged!`);
+		if (sweeped === 0)
+			await context.respond(`${Icons.error} No messages were sweeped!`);
 		else
-			await context.respond(`${Icons.success} Purged ${purged} messages!`);
+			await context.respond(`${Icons.success} Sweeped ${sweeped} messages!`);
 	},
 });
