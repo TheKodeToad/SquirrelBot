@@ -13,7 +13,7 @@ const UNDELETABLE_MESSAGE_TYPES: MessageTypes[] = [
 ];
 
 export const purge_command = define_command({
-	id: "purge",
+	id: ["purge", "prune", "clear", "clean"],
 	options: {
 		count: {
 			id: ["count", "c"],
