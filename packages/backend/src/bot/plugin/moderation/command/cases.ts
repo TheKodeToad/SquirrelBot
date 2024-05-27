@@ -1,35 +1,11 @@
-import { Permissions } from "oceanic.js";
-import { CaseType, get_cases } from "../../../../data/moderation/case";
+import { EmbedField, Permissions } from "oceanic.js";
+import { CASE_TYPE_NAME } from "..";
+import { get_cases } from "../../../../data/moderation/case";
+import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
-
-const CASE_ICON: { [T in CaseType]: string } = {
-	[CaseType.NOTE]: ":pencil:",
-	[CaseType.WARN]: "${Icons.warning}",
-	[CaseType.UNWARN]: "${Icons.warning}",
-	[CaseType.VOICE_MUTE]: ":microphone:",
-	[CaseType.VOICE_UNMUTE]: ":microphone:",
-	[CaseType.MUTE]: ":mute:",
-	[CaseType.UNMUTE]: ":mute:",
-	[CaseType.KICK]: ":boot:",
-	[CaseType.BAN]: ":hammer:",
-	[CaseType.UNBAN]: ":hammer:"
-};
-
-const CASE_ACTION: { [T in CaseType]: string } = {
-	[CaseType.NOTE]: "added note on",
-	[CaseType.WARN]: "warned",
-	[CaseType.UNWARN]: "unwarned",
-	[CaseType.VOICE_MUTE]: "voice muted",
-	[CaseType.VOICE_UNMUTE]: "voice unmuted",
-	[CaseType.MUTE]: "muted",
-	[CaseType.UNMUTE]: "unmuted",
-	[CaseType.KICK]: "kicked",
-	[CaseType.BAN]: "banned",
-	[CaseType.UNBAN]: "unbanned"
-};
 
 export const cases_command = define_command({
 	id: "cases",
@@ -55,7 +31,7 @@ export const cases_command = define_command({
 			context.guild.id,
 			args.actor ?? undefined,
 			args.target ?? undefined,
-			6
+			4
 		);
 
 		let filter = "";
@@ -69,18 +45,37 @@ export const cases_command = define_command({
 			filter = " for this server";
 
 		if (cases.length === 0)
-			await context.respond(`${Icons.error} No cases found${filter}!`);
+			await context.respond(`${Icons.error} No cases${filter} found!`);
 		else {
-			const items = await Promise.all(cases.map(async (info) => {
-				const icon = CASE_ICON[info.type];
-				const date = Math.floor(info.created_at.getTime() / 1000);
+			let fields: EmbedField[] = [];
+
+			for (const info of cases) {
 				const actor_tag = escape_markdown(await format_user_tag(info.actor_id));
 				const target_tag = escape_markdown(await format_user_tag(info.target_id));
+				const creation_secs = Math.floor(info.created_at.getTime() / 1000);
 
-				return `${icon} <t:${date}:d> [#${info.number}] <@${info.actor_id}> (${actor_tag}) ${CASE_ACTION[info.type]} <@${info.target_id}> (${target_tag})`;
-			}));
+				const subfields: [string, string][] = [];
+				subfields.push(["Created at", `<t:${creation_secs}> (<t:${creation_secs}:R>)`]);
+				subfields.push(["Type", CASE_TYPE_NAME[info.type]]);
+				if (args.actor === null)
+					subfields.push(["Actor", `<@${info.actor_id}> (${actor_tag})`]);
+				if (args.target === null)
+					subfields.push(["Target", `<@${info.target_id}> (${target_tag})`]);
+				subfields.push(["Reason", info.reason ?? "*None provided*"]);
 
-			await context.respond(`**:closed_book: Cases${filter}**\n\n${items.join("\n")}`);
+				fields.push({
+					name: "Case #" + info.number,
+					value: subfields.map(([name, value]) => `${name}: ${value}`).join("\n")
+				});
+			}
+
+			await context.respond({
+				embeds: [{
+					color: Colors.blurple,
+					description: "### Cases" + filter,
+					fields
+				}],
+			});
 		}
 	},
 });
