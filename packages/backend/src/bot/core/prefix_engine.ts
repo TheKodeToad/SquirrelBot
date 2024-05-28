@@ -1,5 +1,4 @@
 import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
-import { format } from "util";
 import { bot } from "..";
 import { can_write_in_channel } from "../common/discord/permissions";
 import { TTLMap } from "../common/ttl_map";
@@ -86,7 +85,6 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 
 	try {
 		await command.run(context, args);
-		format;
 		if (command.track_updates)
 			tracked_messages.set(message.id, context);
 	} catch (error) {
