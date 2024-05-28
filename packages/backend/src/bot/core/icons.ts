@@ -17,6 +17,13 @@ export function install_icon_listener() {
 	bot.on("guildAvailable", guild => load_icons(guild));
 	bot.on("guildDelete", guild => unload_icons(guild.id));
 	bot.on("guildUnavailable", guild => unload_icons(guild.id));
+	bot.on("guildEmojisUpdate", guild => {
+		if (!(guild instanceof Guild))
+			return;
+
+		unload_icons(guild.id);
+		load_icons(guild);
+	});
 }
 
 function load_icons(guild: Guild) {
