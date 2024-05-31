@@ -22,4 +22,15 @@ await esbuild.build({
 	outdir: "out",
 	logLevel: "warning",
 	sourcemap: true,
+	plugins: [
+		{
+			name: "clean",
+			setup(options) {
+				options.onStart(() => {
+					if (options.initialOptions.outdir)
+						fs.rmSync(options.initialOptions.outdir, { recursive: true });
+				});
+			}
+		}
+	]
 });
