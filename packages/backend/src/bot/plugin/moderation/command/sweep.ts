@@ -1,16 +1,7 @@
-import { AnyTextableGuildChannel, MessageTypes, Permissions } from "oceanic.js";
+import { AnyTextableGuildChannel, Permissions, UndeletableMessageTypes } from "oceanic.js";
 import { bot } from "../../..";
 import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
-
-const UNDELETABLE_MESSAGE_TYPES: MessageTypes[] = [
-	MessageTypes.RECIPIENT_ADD,
-	MessageTypes.RECIPIENT_REMOVE,
-	MessageTypes.CALL,
-	MessageTypes.CHANNEL_NAME_CHANGE,
-	MessageTypes.CHANNEL_ICON_CHANGE,
-	MessageTypes.THREAD_STARTER_MESSAGE,
-];
 
 export const sweep_command = define_command({
 	id: ["sweep", "purge", "clear"],
@@ -61,7 +52,7 @@ export const sweep_command = define_command({
 					break;
 				}
 
-				if (UNDELETABLE_MESSAGE_TYPES.includes(message.type))
+				if (UndeletableMessageTypes.some(type => type === message.type))
 					continue;
 
 				if (args.match !== null && !message.content.includes(args.match))
