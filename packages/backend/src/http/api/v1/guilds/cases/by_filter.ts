@@ -14,13 +14,13 @@ router.get("/", async_request_handler(async (request, response) => {
 		before,
 		after,
 		type,
-		created_before,
-		created_after,
+		"created-before": created_before,
+		"created-after": created_after,
 		actor,
 		target,
-		delete_message_seconds_less_than,
-		delete_message_seconds_greater_than,
-		dm_sent,
+		"delete-message-seconds-lt": delete_message_seconds_less_than,
+		"delete-message-seconds-gt": delete_message_seconds_greater_than,
+		"dm-sent": dm_sent,
 		order,
 		limit
 	} = request.query;
