@@ -91,8 +91,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 		await command.run(context, args);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
-		console.error(`Error processing slash command "/${interaction.data.name}":`);
-		console.error(error);
+		throw error;
 	} finally {
 		context._remove_timeout();
 	}

@@ -11,8 +11,8 @@ const default_icons = {
 
 export const Icons = { ...default_icons };
 
-export function install_icon_listener() {
-	bot.once("ready", () => bot.guilds.forEach(load_icons));
+export function install_icon_sync() {
+	bot.guilds.forEach(load_icons);
 	bot.on("guildCreate", guild => load_icons(guild));
 	bot.on("guildAvailable", guild => load_icons(guild));
 	bot.on("guildDelete", guild => unload_icons(guild.id));

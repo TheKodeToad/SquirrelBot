@@ -1,6 +1,5 @@
-import express from "express";
+import { Router } from "express";
 
-const router = express.Router();
+const router = Router();
 router.use("/login", require("./login").default);
-router.use("/token", require("./token").default);
 export default router;

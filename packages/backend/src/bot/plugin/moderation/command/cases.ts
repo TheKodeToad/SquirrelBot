@@ -1,6 +1,6 @@
 import { EmbedField, Permissions } from "oceanic.js";
 import { CASE_TYPE_NAME } from "..";
-import { get_cases } from "../../../../data/moderation/case";
+import { get_cases } from "../../../../data/moderation/cases";
 import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
@@ -29,9 +29,12 @@ export const cases_command = define_command({
 
 		const cases = await get_cases(
 			context.guild.id,
-			args.actor ?? undefined,
-			args.target ?? undefined,
-			4
+			{
+				actor_ids: args.actor !== null ? [args.actor] : undefined,
+				target_ids: args.target !== null ? [args.target] : undefined,
+				limit: 4,
+				reversed: true,
+			}
 		);
 
 		let filter = "";

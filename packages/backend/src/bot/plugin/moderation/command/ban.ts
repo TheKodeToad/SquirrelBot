@@ -1,6 +1,6 @@
 import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
-import { CaseType, create_case } from "../../../../data/moderation/case";
+import { CaseType, create_case } from "../../../../data/moderation/cases";
 import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache";
 import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
@@ -120,7 +120,7 @@ export const ban_command = define_command({
 			}
 
 			const case_number = await create_case(context.guild.id, {
-				type: CaseType.BAN,
+				type: CaseType.Ban,
 				actor_id: context.user.id,
 				target_id: target,
 				reason: args.reason ?? undefined,

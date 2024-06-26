@@ -1,5 +1,6 @@
 import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { bot } from "..";
+import { is_snowflake } from "../../common/snowflake";
 import { can_write_in_channel } from "../common/discord/permissions";
 import { TTLMap } from "../common/ttl_map";
 import { install_wrapped_listener } from "./event_wrapper";
@@ -12,18 +13,10 @@ export function install_prefix_engine() {
 	install_wrapped_listener("messageDelete", handle_delete);
 }
 
-// 17 - length of Jason Citron's ID
-// 20 - length of 64-bit integer limit
-const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
-const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
 const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(1000 * 60 * 30);
 setInterval(() => tracked_messages.cleanup(), 1000 * 60);
-
-function is_snowflake(id: string) {
-	return SNOWFLAKE_REGEX.test(id) && BigInt(id) <= MAX_SNOWFLAKE_VALUE;
-}
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
 	if (message.author.bot)
@@ -89,8 +82,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 			tracked_messages.set(message.id, context);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
-		console.error(`Error processing prefix command "${message.content}":`);
-		console.error(error);
+		throw error;
 	}
 }
 
@@ -461,7 +453,7 @@ class Parser {
 		const input = this.read_word();
 		const result = Number(input);
 
-		if (input === "" || !Number.isInteger(result))
+		if (input.length === 0 || !Number.isInteger(result))
 			throw new ParseError(`Not a integer: '${input}'`);
 
 		return result;

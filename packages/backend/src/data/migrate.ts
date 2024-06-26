@@ -71,8 +71,8 @@ async function process(dir: string, include_subdirs: boolean) {
 				`
 					INSERT INTO "migration_dirs" ("path", "last_run")
 					VALUES ($1, $2)
-					ON CONFLICT ("path") DO UPDATE
-					SET "last_run" = $2
+					ON CONFLICT ("path")
+					DO UPDATE SET "last_run" = $2
 				`,
 				[dir, index]
 			);

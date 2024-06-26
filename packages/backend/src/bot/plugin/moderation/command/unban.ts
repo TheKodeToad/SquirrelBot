@@ -1,5 +1,5 @@
 import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
-import { CaseType, create_case } from "../../../../data/moderation/case";
+import { CaseType, create_case } from "../../../../data/moderation/cases";
 import { format_rest_error, format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { Icons } from "../../../core/icons";
@@ -76,7 +76,7 @@ export const unban_command = define_command({
 			}
 
 			const case_number = await create_case(context.guild.id, {
-				type: CaseType.UNBAN,
+				type: CaseType.Unban,
 				actor_id: context.user.id,
 				target_id: target,
 				reason: args.reason ?? undefined,

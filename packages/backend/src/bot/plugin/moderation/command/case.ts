@@ -1,6 +1,6 @@
 import { Permissions } from "oceanic.js";
 import { CASE_TYPE_NAME } from "..";
-import { get_case } from "../../../../data/moderation/case";
+import { get_case } from "../../../../data/moderation/cases";
 import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";

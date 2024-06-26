@@ -7,7 +7,6 @@ export const ping_command = define_command({
 	async run(context) {
 		const base_response = `${Icons.info} Gateway: ${context.shard.latency}ms`;
 		const pre_respond = Date.now();
-
 		await context.respond(base_response);
 		await context.respond(base_response + `; REST: ${Date.now() - pre_respond}ms`);
 	},

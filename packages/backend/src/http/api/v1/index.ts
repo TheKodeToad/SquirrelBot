@@ -1,5 +1,7 @@
-import express from "express";
+import express, { Router } from "express";
 
-const router = express.Router();
+const router = Router();
+router.use(express.json());
 router.use("/auth", require("./auth").default);
+router.use("/guilds", require("./guilds").default);
 export default router;

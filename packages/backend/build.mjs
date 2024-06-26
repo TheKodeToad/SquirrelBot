@@ -28,7 +28,7 @@ await esbuild.build({
 			setup(options) {
 				options.onStart(() => {
 					if (options.initialOptions.outdir)
-						fs.rmSync(options.initialOptions.outdir, { recursive: true });
+						fs.rmSync(options.initialOptions.outdir, { recursive: true, force: true });
 				});
 			}
 		}

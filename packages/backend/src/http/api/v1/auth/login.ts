@@ -1,6 +1,7 @@
-import express from "express";
+import { Router } from "express";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../config";
-import { generate_token } from "../../../../data/api/token";
+import { generate_token } from "../../../../data/api/tokens";
+import { async_request_handler } from "../../../handler";
 
 interface TokenResponse {
 	token_type: string;
@@ -23,9 +24,8 @@ interface ErrorResponse {
 	error_description: string;
 }
 
-const router = express.Router();
-router.use(express.json());
-router.post("/", async (request, response) => {
+const router = Router();
+router.post("/", async_request_handler(async (request, response) => {
 	const { code } = request.body;
 
 	if (typeof code !== "string") {
@@ -81,5 +81,5 @@ router.post("/", async (request, response) => {
 
 	const [token, expires_at] = await generate_token(user_json.id);
 	response.send({ token, expires_at: expires_at.getTime() });
-});
+}));
 export default router;

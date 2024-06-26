@@ -1,4 +1,4 @@
-import { CaseType } from "../../../data/moderation/case";
+import { CaseType } from "../../../data/moderation/cases";
 import { define_plugin } from "../../core/types/plugin";
 import { ban_command } from "./command/ban";
 import { case_command } from "./command/case";
@@ -8,29 +8,29 @@ import { sweep_command } from "./command/sweep";
 import { unban_command } from "./command/unban";
 
 export const CASE_ICON: { [T in CaseType]: string } = {
-	[CaseType.NOTE]: ":pencil:",
-	[CaseType.WARN]: ":warning:",
-	[CaseType.UNWARN]: ":warning:",
-	[CaseType.VOICE_MUTE]: ":microphone:",
-	[CaseType.VOICE_UNMUTE]: ":microphone:",
-	[CaseType.MUTE]: ":mute:",
-	[CaseType.UNMUTE]: ":mute:",
-	[CaseType.KICK]: ":boot:",
-	[CaseType.BAN]: ":hammer:",
-	[CaseType.UNBAN]: ":hammer:"
+	[CaseType.Note]: ":pencil:",
+	[CaseType.Warn]: ":warning:",
+	[CaseType.Unwarn]: ":warning:",
+	[CaseType.VoiceMute]: ":microphone:",
+	[CaseType.VoiceUnmute]: ":microphone:",
+	[CaseType.Mute]: ":mute:",
+	[CaseType.Unmute]: ":mute:",
+	[CaseType.Kick]: ":boot:",
+	[CaseType.Ban]: ":hammer:",
+	[CaseType.Unban]: ":hammer:"
 };
 
 export const CASE_TYPE_NAME: { [T in CaseType]: string } = {
-	[CaseType.NOTE]: "Note",
-	[CaseType.WARN]: "Warn",
-	[CaseType.UNWARN]: "Unwarn",
-	[CaseType.VOICE_MUTE]: "Voice Mute",
-	[CaseType.VOICE_UNMUTE]: "Voice Unmute",
-	[CaseType.MUTE]: "Mute",
-	[CaseType.UNMUTE]: "Unmute",
-	[CaseType.KICK]: "Kick",
-	[CaseType.BAN]: "Ban",
-	[CaseType.UNBAN]: "Unban"
+	[CaseType.Note]: "Note",
+	[CaseType.Warn]: "Warn",
+	[CaseType.Unwarn]: "Unwarn",
+	[CaseType.VoiceMute]: "Voice Mute",
+	[CaseType.VoiceUnmute]: "Voice Unmute",
+	[CaseType.Mute]: "Mute",
+	[CaseType.Unmute]: "Unmute",
+	[CaseType.Kick]: "Kick",
+	[CaseType.Ban]: "Ban",
+	[CaseType.Unban]: "Unban"
 };
 
 export const moderation_plugin = define_plugin({
