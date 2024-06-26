@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { CASE_TYPE_ID_TO_NAME, get_case } from "../../../../../data/moderation/cases";
+import { serialise_case_object } from ".";
+import { get_case } from "../../../../../data/moderation/cases";
 import { async_request_handler } from "../../../../handler";
 
 const router = Router();
@@ -22,16 +23,7 @@ router.get("/:number(\\d+)", async_request_handler(async (request, response) => 
 		return;
 	}
 
-	response.send({
-		type: CASE_TYPE_ID_TO_NAME[info.type],
-		created_at: info.created_at.getTime(),
-		expires_at: info.expires_at?.getTime(),
-		actor_id: info.actor_id,
-		target_id: info.target_id,
-		reason: info.reason,
-		delete_message_seconds: info.delete_message_seconds,
-		dm_sent: info.dm_sent,
-	});
+	response.send(serialise_case_object(info));
 }));
 
 export default router;

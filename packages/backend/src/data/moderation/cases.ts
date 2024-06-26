@@ -183,7 +183,7 @@ export async function get_cases(guild_id: string, query: CaseQuery): Promise<Cas
 			FROM "moderation_cases"
 			WHERE "guild_id" = $1
 			AND (
-					("number" < $2 OR $2 IS NULL)
+				("number" < $2 OR $2 IS NULL)
 				AND ("number" > $3 OR $3 IS NULL)
 				AND ("type" = ANY($4) OR $4 IS NULL)
 				AND ("created_at" < $5 OR $5 IS NULL)
