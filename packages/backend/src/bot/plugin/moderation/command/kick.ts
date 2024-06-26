@@ -106,7 +106,8 @@ export const kick_command = define_command({
 				type: CaseType.Kick,
 				actor_id: context.user.id,
 				target_id: target,
-				reason: args.reason ?? undefined
+				reason: args.reason ?? undefined,
+				dm_sent,
 			});
 
 			successful_kicks.push({ case_number, id: target, name, dm_sent });
