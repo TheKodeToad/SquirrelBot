@@ -3,8 +3,8 @@ import { bot } from "../../..";
 import { Icons } from "../../../core/icons";
 import { OptionType, define_command } from "../../../core/types/command";
 
-export const sweep_command = define_command({
-	id: ["sweep", "purge", "clear"],
+export const purge_command = define_command({
+	id: ["purge", "sweep", "clear"],
 	options: {
 		count: {
 			id: ["count", "c"],
@@ -33,7 +33,7 @@ export const sweep_command = define_command({
 		if (!channel.permissionsOf(context.member).has(Permissions.MANAGE_MESSAGES))
 			return;
 
-		let sweeped = 0;
+		let purged = 0;
 
 		const iter = bot.rest.channels.getMessagesIterator(context.channel_id, {
 			limit: args.count,
@@ -62,15 +62,15 @@ export const sweep_command = define_command({
 			}
 
 			await channel.deleteMessages(to_delete);
-			sweeped += to_delete.length;
+			purged += to_delete.length;
 
 			if (stop)
 				break;
 		}
 
-		if (sweeped === 0)
-			await context.respond(`${Icons.error} No messages were sweeped!`);
+		if (purged === 0)
+			await context.respond(`${Icons.error} No messages were purged!`);
 		else
-			await context.respond(`${Icons.success} Sweeped ${sweeped} messages!`);
+			await context.respond(`${Icons.success} Purged ${purged} messages!`);
 	},
 });
