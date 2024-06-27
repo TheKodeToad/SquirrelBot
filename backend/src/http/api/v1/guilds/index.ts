@@ -5,7 +5,7 @@ import { auth_middleware } from "../../../handler/auth";
 import { guild_auth_middleware } from "../../../handler/guild_auth";
 
 const guild_router = Router();
-guild_router.use("/cases", require("./cases").default);
+guild_router.use("/moderation", require("./moderation").default);
 
 const router = Router();
 router.use(

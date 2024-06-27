@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CASE_TYPE_ID_TO_NAME, CaseInfo } from "../../../../../data/moderation/cases";
+import { CASE_TYPE_ID_TO_NAME, CaseInfo } from "../../../../../../data/moderation/cases";
 
 export function serialise_case_object(info: CaseInfo) {
 	return {
