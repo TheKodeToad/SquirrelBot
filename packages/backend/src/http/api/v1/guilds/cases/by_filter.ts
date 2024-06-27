@@ -206,7 +206,7 @@ router.get("/", async_request_handler(async (request, response) => {
 		if (limit_number > 0)
 			query.limit = limit_number;
 	} else
-		query.limit = 1000;
+		query.limit = 20;
 
 	response.send((await get_cases(request.discord_guild_id, query)).map(serialise_case_object));
 }));
