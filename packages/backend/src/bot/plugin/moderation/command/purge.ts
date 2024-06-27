@@ -71,7 +71,7 @@ export const purge_command = define_command({
 				if (args.match !== null && !message.content.includes(args.match))
 					continue;
 
-				const by_bot = message.author.bot || message.webhookID !== undefined;
+				const by_bot = message.author.bot || message.webhookID !== undefined; // TODO: maybe slightly annoying with PluralKit/Tupperbox?
 
 				if (args.bots && !by_bot)
 					continue;
