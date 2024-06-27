@@ -1,7 +1,0 @@
-{
-	"name": "squirrel",
-	"workspaces": [
-		"backend",
-		"frontend"
-	]
-}
