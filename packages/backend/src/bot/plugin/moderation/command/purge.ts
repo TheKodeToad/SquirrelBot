@@ -17,6 +17,19 @@ export const purge_command = define_command({
 			type: OptionType.STRING,
 			position: 1,
 		},
+		bots: {
+			id: "bots",
+			type: OptionType.VOID,
+		},
+		humans: {
+			id: "humans",
+			type: OptionType.VOID,
+		},
+		author: {
+			id: ["author", "a", "by", "from"],
+			type: OptionType.USER,
+			array: true,
+		}
 	},
 	async run(context, args) {
 		if (context.guild === null || context.member === null)
@@ -56,6 +69,17 @@ export const purge_command = define_command({
 					continue;
 
 				if (args.match !== null && !message.content.includes(args.match))
+					continue;
+
+				const by_bot = message.author.bot || message.webhookID !== undefined;
+
+				if (args.bots && !by_bot)
+					continue;
+
+				if (args.humans && by_bot)
+					continue;
+
+				if (args.author.length !== 0 && !args.author.includes(message.author.id))
 					continue;
 
 				to_delete.push(message.id);
