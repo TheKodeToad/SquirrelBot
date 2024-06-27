@@ -10,7 +10,7 @@ export function serialise_case_object(info: CaseInfo) {
 		actor_id: info.actor_id,
 		target_id: info.target_id,
 		reason: info.reason,
-		delete_mescasesage_seconds: info.delete_message_seconds,
+		delete_message_seconds: info.delete_message_seconds,
 		dm_sent: info.dm_sent,
 	};
 }
