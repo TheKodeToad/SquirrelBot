@@ -24,7 +24,6 @@ export async function get_guild_info(id: string): Promise<GuildInfo | null> {
 	return result.rows[0] ?? null;
 }
 
-
 export async function get_guild_owner_id(id: string): Promise<string | null> {
 	const result = await database.query(
 		`
@@ -36,6 +35,22 @@ export async function get_guild_owner_id(id: string): Promise<string | null> {
 	);
 
 	return result.rows[0]?.owner_id ?? null;
+}
+
+export async function get_guild_info_by_owner(owner_id: string): Promise<GuildInfo[]> {
+	const result = await database.query(
+		`
+			SELECT
+				"id",
+				"name",
+				"icon_hash"
+			FROM "core_guild_info"
+			WHERE "owner_id" = $1
+		`,
+		[owner_id]
+	);
+
+	return result.rows;
 }
 
 export async function delete_guild_info(id: string): Promise<void> {

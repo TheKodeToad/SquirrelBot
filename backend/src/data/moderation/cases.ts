@@ -114,56 +114,6 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 	return result.rows[0] ?? null;
 }
 
-export async function create_case(guild_id: string, options: CreateCaseOptions): Promise<number> {
-	options.created_at ??= new Date;
-
-	return await create_case_lock.acquire(guild_id, async () => {
-		let number = (await database.query(
-			`
-				SELECT "number"
-				FROM "moderation_cases"
-				WHERE "guild_id" = $1
-				ORDER BY "number" DESC
-				LIMIT 1
-			`,
-			[guild_id]
-		)).rows[0]?.number ?? 0;
-		++number;
-
-		await database.query(
-			`
-				INSERT INTO "moderation_cases" (
-					"guild_id",
-					"number",
-					"type",
-					"created_at",
-					"expires_at",
-					"actor_id",
-					"target_id",
-					"reason",
-					"delete_message_seconds",
-					"dm_sent"
-				)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-			`,
-			[
-				guild_id,
-				number,
-				options.type,
-				options.created_at ?? null,
-				options.expires_at ?? null,
-				options.actor_id,
-				options.target_id,
-				options.reason ?? null,
-				options.delete_message_seconds ?? null,
-				options.dm_sent ?? null,
-			]
-		);
-
-		return number;
-	});
-}
-
 export async function get_cases(guild_id: string, query: CaseQuery): Promise<CaseInfo[]> {
 	query.reversed ??= false;
 
@@ -220,3 +170,54 @@ export async function get_cases(guild_id: string, query: CaseQuery): Promise<Cas
 
 	return result.rows;
 }
+
+export async function create_case(guild_id: string, options: CreateCaseOptions): Promise<number> {
+	options.created_at ??= new Date;
+
+	return await create_case_lock.acquire(guild_id, async () => {
+		let number = (await database.query(
+			`
+				SELECT "number"
+				FROM "moderation_cases"
+				WHERE "guild_id" = $1
+				ORDER BY "number" DESC
+				LIMIT 1
+			`,
+			[guild_id]
+		)).rows[0]?.number ?? 0;
+		++number;
+
+		await database.query(
+			`
+				INSERT INTO "moderation_cases" (
+					"guild_id",
+					"number",
+					"type",
+					"created_at",
+					"expires_at",
+					"actor_id",
+					"target_id",
+					"reason",
+					"delete_message_seconds",
+					"dm_sent"
+				)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			`,
+			[
+				guild_id,
+				number,
+				options.type,
+				options.created_at ?? null,
+				options.expires_at ?? null,
+				options.actor_id,
+				options.target_id,
+				options.reason ?? null,
+				options.delete_message_seconds ?? null,
+				options.dm_sent ?? null,
+			]
+		);
+
+		return number;
+	});
+}
+
