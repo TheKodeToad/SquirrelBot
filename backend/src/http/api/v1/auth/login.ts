@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../config";
-import { generate_token } from "../../../../data/api/tokens";
+import { generate_token } from "../../../../db/api/tokens";
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment";
 import { async_request_handler } from "../../../handler";
 
 interface TokenResponse {

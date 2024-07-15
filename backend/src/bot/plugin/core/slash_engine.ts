@@ -1,28 +1,24 @@
-import { AnyTextableChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Interaction, Member, Shard, User } from "oceanic.js";
-import { bot } from "..";
-import { install_wrapped_listener } from "./event_wrapper";
-import { get_all_commands, get_commands } from "./plugin_registry";
-import { Command, Context, Option, OptionType, Reply } from "./types/command";
+import { AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
+import { bot } from "../..";
+import { get_all_commands, get_commands } from "../../plugin_registry";
+import { Command, Context, Option, OptionType, Reply } from "../../types/command";
+import { define_event_listener } from "../../types/event_listener";
 
-export async function install_slash_engine(): Promise<void> {
-	const commands = get_all_commands().filter(command => command.support_slash ?? true).map(command => (
-		{
-			type: ApplicationCommandTypes.CHAT_INPUT,
-			name: typeof command.id === "string" ? command.id : command.id[0],
-			description: "command",
-			options: command.options ? Object.values(command.options).map(flag => (
-				{
-					name: typeof flag.id === "string" ? flag.id : flag.id[0],
-					description: "option",
-					required: flag.required && !("default" in flag && flag.default),
-					type: map_flag_type(flag.type),
-				}
-			)) : [],
-		}
-	)) as CreateApplicationCommandOptions[];
+export async function sync_slash_commands(): Promise<void> {
+	const commands = get_all_commands().filter(command => command.support_slash ?? true).map(command => ({
+		type: ApplicationCommandTypes.CHAT_INPUT,
+		name: typeof command.id === "string" ? command.id : command.id[0],
+		description: "command",
+		options: command.options ? Object.values(command.options).map(flag => (
+			{
+				name: typeof flag.id === "string" ? flag.id : flag.id[0],
+				description: "option",
+				required: flag.required && !("default" in flag && flag.default),
+				type: map_flag_type(flag.type),
+			}
+		)) : [],
+	})) as CreateApplicationCommandOptions[];
 	await bot.application.bulkEditGlobalCommands(commands);
-
-	install_wrapped_listener("interactionCreate", interaction_create);
 }
 
 function map_flag_type(type: OptionType): ApplicationCommandOptionTypes {
@@ -47,7 +43,10 @@ function map_flag_type(type: OptionType): ApplicationCommandOptionTypes {
 	}
 }
 
-async function interaction_create(interaction: Interaction): Promise<void> {
+export const slash_run_handler = define_event_listener("interactionCreate", async interaction => {
+	if (!interaction.inCachedGuildChannel())
+		return;
+
 	if (!interaction.isCommandInteraction())
 		return;
 
@@ -59,7 +58,7 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 	const command = matches[0]!;
 	const context = new SlashContext(
 		command,
-		interaction as CommandInteraction<AnyTextableChannel>,
+		interaction,
 		interaction.guild?.shard ?? bot.shards.get(0)!
 	);
 
@@ -95,25 +94,25 @@ async function interaction_create(interaction: Interaction): Promise<void> {
 	} finally {
 		context._remove_timeout();
 	}
-}
+});
 
 class SlashContext implements Context {
 	command: Command;
 	shard: Shard;
-	guild: Guild | null;
+	guild: Guild;
 	user: User;
-	member: Member | null;
+	member: Member;
 	channel_id: string;
 	interaction: CommandInteraction;
 	_responded: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
 	_defer_promise: Promise<void> | null;
 
-	constructor(command: Command, interaction: CommandInteraction<AnyTextableChannel>, shard: Shard) {
+	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, shard: Shard) {
 		this.command = command;
 		this.shard = shard;
 		this.user = interaction.user;
-		this.member = interaction.member ?? null;
+		this.member = interaction.member;
 		this.guild = interaction.guild;
 		this.channel_id = interaction.channelID;
 		this.interaction = interaction;

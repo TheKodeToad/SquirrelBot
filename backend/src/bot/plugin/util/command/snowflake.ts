@@ -1,4 +1,4 @@
-import { OptionType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../types/command";
 
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 

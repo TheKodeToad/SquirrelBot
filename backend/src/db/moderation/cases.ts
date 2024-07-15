@@ -1,5 +1,5 @@
 import AsyncLock from "async-lock";
-import { database } from "..";
+import { pool } from "..";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -15,23 +15,23 @@ export enum CaseType {
 	Unban = 9,
 }
 
-export const CASE_TYPE_ID_TO_NAME: Record<CaseType, string> = {
-	[CaseType.Note]: "note",
-	[CaseType.Warn]: "warn",
-	[CaseType.Unwarn]: "unwarn",
-	[CaseType.VoiceMute]: "voice_mute",
-	[CaseType.VoiceUnmute]: "voice_unmute",
-	[CaseType.Mute]: "mute",
-	[CaseType.Unmute]: "unmute",
-	[CaseType.Kick]: "kick",
-	[CaseType.Ban]: "ban",
-	[CaseType.Unban]: "unban"
+export const CASE_TYPE_NAME_TO_ID: Record<string, CaseType> = {
+	note: CaseType.Note,
+	warn: CaseType.Warn,
+	unwarn: CaseType.Unwarn,
+	voice_mute: CaseType.VoiceMute,
+	voice_unmute: CaseType.VoiceUnmute,
+	mute: CaseType.Mute,
+	unmute: CaseType.Unmute,
+	kick: CaseType.Kick,
+	ban: CaseType.Ban,
+	unban: CaseType.Unban,
 };
 
-export const CASE_TYPE_NAME_TO_ID: Record<string, CaseType> = {};
-
-for (const [type, name] of Object.entries(CASE_TYPE_ID_TO_NAME))
-	CASE_TYPE_NAME_TO_ID[name] = Number(type); // we don't talk about it
+export const CASE_TYPE_ID_TO_NAME: Record<CaseType, string> = Object.entries(CASE_TYPE_NAME_TO_ID).reduce((result, [name, type]) => {
+	result[name] = type;
+	return result;
+}, {}) as any;
 
 export interface CaseInfo {
 	guild_id: string;
@@ -91,7 +91,7 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await database.query(
+	const result = await pool.query(
 		`
 			SELECT
 				"guild_id",
@@ -117,7 +117,7 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 export async function get_cases(guild_id: string, query: CaseQuery): Promise<CaseInfo[]> {
 	query.reversed ??= false;
 
-	const result = await database.query(
+	const result = await pool.query(
 		`
 			SELECT
 				"guild_id",
@@ -175,7 +175,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 	options.created_at ??= new Date;
 
 	return await create_case_lock.acquire(guild_id, async () => {
-		let number = (await database.query(
+		let number = (await pool.query(
 			`
 				SELECT "number"
 				FROM "moderation_cases"
@@ -187,7 +187,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 		)).rows[0]?.number ?? 0;
 		++number;
 
-		await database.query(
+		await pool.query(
 			`
 				INSERT INTO "moderation_cases" (
 					"guild_id",

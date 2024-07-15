@@ -1,10 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import { database } from ".";
-import "../config";
+import { pool } from ".";
+import "../environment";
 
 async function migrate() {
-	await database.query(`
+	await pool.query(`
 		CREATE TABLE IF NOT EXISTS "migration_dirs" (
 			"path" TEXT NOT NULL PRIMARY KEY,
 			"last_run" INT NOT NULL
@@ -12,7 +12,7 @@ async function migrate() {
 	`);
 
 	await process("migrations", true);
-	await database.end();
+	await pool.end();
 }
 
 async function process(dir: string, include_subdirs: boolean) {
@@ -39,7 +39,7 @@ async function process(dir: string, include_subdirs: boolean) {
 		}
 	}
 
-	const last_run: number = (await database.query(
+	const last_run: number = (await pool.query(
 		`
 			SELECT "last_run"
 			FROM "migration_dirs"
@@ -60,7 +60,7 @@ async function process(dir: string, include_subdirs: boolean) {
 		console.log(`Running file "${file}"`);
 
 		const sql = await fs.readFile(file, "utf-8");
-		const client = await database.connect();
+		const client = await pool.connect();
 
 		let done = false;
 		try {

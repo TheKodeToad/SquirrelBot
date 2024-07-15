@@ -1,5 +1,5 @@
-import { CaseType } from "../../../data/moderation/cases";
-import { define_plugin } from "../../core/types/plugin";
+import { CaseType } from "../../../db/moderation/cases";
+import { define_plugin } from "../../types/plugin";
 import { ban_command } from "./command/ban";
 import { case_command } from "./command/case";
 import { cases_command } from "./command/cases";

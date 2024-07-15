@@ -1,12 +1,12 @@
 import { DiscordRESTError, Permissions } from "oceanic.js";
 import { bot } from "../../..";
-import { CaseType, create_case } from "../../../../data/moderation/cases";
+import { CaseType, create_case } from "../../../../db/moderation/cases";
 import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache";
 import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { get_highest_role } from "../../../common/discord/permissions";
-import { Icons } from "../../../core/icons";
-import { OptionType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../types/command";
+import { icons } from "../../core/api/icons";
 
 export const ban_command = define_command({
 	id: "ban",
@@ -134,10 +134,10 @@ export const ban_command = define_command({
 		if (args.user.length === 1) {
 			if (successful_bans.length === 1) {
 				const ban = successful_bans[0]!;
-				await context.respond(`${Icons.success} Banned <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]!`);
+				await context.respond(`${icons.success} Banned <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]!`);
 			} else if (unsuccessful_bans.length === 1) {
 				const ban = unsuccessful_bans[0]!;
-				await context.respond(`${Icons.error} Could not ban <@${ban.id}> (${escape_markdown(ban.name)}): ${escape_markdown(ban.error)}!`);
+				await context.respond(`${icons.error} Could not ban <@${ban.id}> (${escape_markdown(ban.name)}): ${escape_markdown(ban.error)}!`);
 			}
 		} else {
 			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
@@ -145,15 +145,15 @@ export const ban_command = define_command({
 
 			if (unsuccessful_bans.length === 0) {
 				await context.respond(
-					`${Icons.success} Banned all ${args.user.length} users:\n${successful_message}`
+					`${icons.success} Banned all ${args.user.length} users:\n${successful_message}`
 				);
 			} else if (successful_bans.length === 0) {
 				await context.respond(
-					`${Icons.error} None of ${args.user.length} users were banned:\n${unsuccessful_message}`
+					`${icons.error} None of ${args.user.length} users were banned:\n${unsuccessful_message}`
 				);
 			} else {
 				await context.respond(
-					`${Icons.warning} Only ${successful_bans.length} of ${args.user.length} bans were successful!\n`
+					`${icons.warning} Only ${successful_bans.length} of ${args.user.length} bans were successful!\n`
 					+ `Successful bans:\n${successful_message}\n`
 					+ `Unsuccessful bans:\n${unsuccessful_message}`
 				);

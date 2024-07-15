@@ -1,7 +1,3 @@
-import { bot } from "..";
-import { wrap_listener } from "./event_wrapper";
-import { install_prefix_engine } from "./prefix_engine";
-import { install_slash_engine } from "./slash_engine";
 import { Command } from "./types/command";
 import { Plugin } from "./types/plugin";
 
@@ -46,15 +42,6 @@ function add_command(id: string, command: Command): void {
 }
 
 export async function apply_plugins(): Promise<void> {
-	for (const plugin of get_plugins()) {
+	for (const plugin of get_plugins())
 		await plugin.apply?.();
-
-		if (plugin.listeners !== undefined) {
-			for (const listener of plugin.listeners)
-				bot.on(listener.type, wrap_listener(listener.type, listener.listener));
-		}
-	}
-
-	install_prefix_engine();
-	await install_slash_engine();
 }

@@ -1,4 +1,4 @@
-import { database } from "..";
+import { pool } from "..";
 
 export interface GuildInfo {
 	id: string;
@@ -8,7 +8,7 @@ export interface GuildInfo {
 }
 
 export async function get_guild_info(id: string): Promise<GuildInfo | null> {
-	const result = await database.query(
+	const result = await pool.query(
 		`
 			SELECT
 				"id",
@@ -25,7 +25,7 @@ export async function get_guild_info(id: string): Promise<GuildInfo | null> {
 }
 
 export async function get_guild_owner_id(id: string): Promise<string | null> {
-	const result = await database.query(
+	const result = await pool.query(
 		`
 			SELECT "owner_id"
 			FROM "core_guild_info"
@@ -38,7 +38,7 @@ export async function get_guild_owner_id(id: string): Promise<string | null> {
 }
 
 export async function get_guild_info_by_owner(owner_id: string): Promise<GuildInfo[]> {
-	const result = await database.query(
+	const result = await pool.query(
 		`
 			SELECT
 				"id",
@@ -54,7 +54,7 @@ export async function get_guild_info_by_owner(owner_id: string): Promise<GuildIn
 }
 
 export async function delete_guild_info(id: string): Promise<void> {
-	await database.query(
+	await pool.query(
 		`
 			DELETE FROM "core_guild_info"
 			WHERE "id" = $1
@@ -64,7 +64,7 @@ export async function delete_guild_info(id: string): Promise<void> {
 }
 
 export async function upsert_guild_info(id: string, name: string, icon_hash: string | null, owner_id: string | null): Promise<void> {
-	await database.query(
+	await pool.query(
 		`
 			INSERT INTO "core_guild_info" (
 				"id",

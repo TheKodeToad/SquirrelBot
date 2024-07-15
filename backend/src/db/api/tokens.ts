@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { database } from "..";
+import { pool } from "..";
 
 const ALGORITHM = "sha-256";
 
@@ -9,7 +9,7 @@ export async function generate_token(user_id: string): Promise<[token: string, e
 
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret));
 
-	database.query(
+	pool.query(
 		`
 			INSERT INTO "api_tokens" (
 				"user_id",
@@ -51,7 +51,7 @@ export async function validate_token(token: string): Promise<string | null> {
 	const secret_buffer = Buffer.from(secret_part, "hex");
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret_buffer));
 
-	const result = await database.query(
+	const result = await pool.query(
 		`
 			SELECT "user_id", "expires_at"
 			FROM "api_tokens"

@@ -1,6 +1,6 @@
 import { async_request_handler } from ".";
 import { is_snowflake } from "../../common/snowflake";
-import { get_guild_owner_id } from "../../data/core/guild_info";
+import { get_guild_owner_id } from "../../db/core/guild_info";
 
 declare global {
 	namespace Express {

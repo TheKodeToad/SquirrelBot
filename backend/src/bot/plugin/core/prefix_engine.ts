@@ -1,17 +1,16 @@
-import { AnyTextableChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
-import { bot } from "..";
-import { is_snowflake } from "../../common/snowflake";
-import { can_write_in_channel } from "../common/discord/permissions";
-import { TTLMap } from "../common/ttl_map";
-import { install_wrapped_listener } from "./event_wrapper";
-import { get_commands } from "./plugin_registry";
-import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "./types/command";
+import { AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { core_config } from ".";
+import { bot } from "../..";
+import { is_snowflake } from "../../../common/snowflake";
+import { can_write_in_channel } from "../../common/discord/permissions";
+import { TTLMap } from "../../common/ttl_map";
+import { get_commands } from "../../plugin_registry";
+import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "../../types/command";
+import { define_event_listener } from "../../types/event_listener";
 
-export function install_prefix_engine() {
-	install_wrapped_listener("messageCreate", handle);
-	install_wrapped_listener("messageUpdate", handle_edit);
-	install_wrapped_listener("messageDelete", handle_delete);
-}
+export const prefix_send_handler = define_event_listener("messageCreate", handle);
+export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
+export const prefix_delete_handler = define_event_listener("messageDelete", handle_delete);
 
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
@@ -19,29 +18,30 @@ const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(1000 * 60 * 3
 setInterval(() => tracked_messages.cleanup(), 1000 * 60);
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
-	if (message.author.bot)
+	if (!message.inCachedGuildChannel())
 		return;
 
 	// yes, non-bot webhook is/has been possible
-	if (message.webhookID !== undefined)
-		return;
-
-	if (message.guild !== null && message.member === undefined)
+	if (message.author.bot || message.webhookID !== undefined)
 		return;
 
 	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
 		return;
 
-	if (message.channel instanceof GuildChannel
-		&& !can_write_in_channel(message.channel, message.channel.guild.clientMember))
+	if (!can_write_in_channel(message.channel, message.channel.guild.clientMember))
 		return;
 
-	const prefix = "?";
+	const config = await core_config.get(message.guildID);
 
-	if (!message.content.startsWith(prefix))
+	if (config === null)
 		return;
 
-	const unprefixed = message.content.slice(1);
+	const { enabled, prefix } = config.prefix_commands;
+
+	if (!enabled || !message.content.startsWith(prefix))
+		return;
+
+	const unprefixed = message.content.slice(prefix.length);
 
 	const name = unprefixed.split(" ", 1)[0]!;
 	const matches = get_commands(name).filter(command => command.support_prefix ?? true);
@@ -58,7 +58,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 
 	const context = prev_context ?? new PrefixContext(
 		command,
-		message as Message<AnyTextableChannel>,
+		message,
 		message.guild?.shard ?? bot.shards.get(0)!
 	);
 
@@ -109,20 +109,20 @@ async function handle_delete(message: PossiblyUncachedMessage) {
 class PrefixContext implements Context {
 	command: Command;
 	shard: Shard;
-	guild: Guild | null;
+	guild: Guild;
 	user: User;
-	member: Member | null;
+	member: Member;
 	channel_id: string;
-	message: Message<AnyTextableChannel>;
+	message: Message<AnyTextableGuildChannel>;
 	_response: Message | null;
 
-	constructor(command: Command, message: Message<AnyTextableChannel>, shard: Shard) {
+	constructor(command: Command, message: Message<AnyTextableGuildChannel>, shard: Shard) {
 		this.command = command;
 		this.shard = shard;
 		this.guild = message.guild;
 		this.message = message;
 		this.user = message.author;
-		this.member = message.member ?? null;
+		this.member = message.member;
 		this.channel_id = message.channelID;
 		this._response = null;
 	}

@@ -25,9 +25,9 @@ export function define_command<F extends Record<string, Option>>(command: Comman
 export interface Context {
 	command: Command;
 	shard: Shard;
-	guild: Guild | null;
+	guild: Guild;
 	user: User;
-	member: Member | null;
+	member: Member;
 	channel_id: string;
 	message?: Message<AnyTextableChannel>;
 	interaction?: CommandInteraction;

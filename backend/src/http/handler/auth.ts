@@ -1,5 +1,5 @@
 import { async_request_handler } from ".";
-import { validate_token } from "../../data/api/tokens";
+import { validate_token } from "../../db/api/tokens";
 
 declare global {
 	namespace Express {

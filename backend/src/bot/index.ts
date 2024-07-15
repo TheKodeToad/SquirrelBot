@@ -1,5 +1,5 @@
 import { Client, Constants } from "oceanic.js";
-import { BOT_TOKEN } from "../config";
+import { BOT_TOKEN } from "../environment";
 
 export const bot = new Client({
 	auth: `Bot ${BOT_TOKEN}`,

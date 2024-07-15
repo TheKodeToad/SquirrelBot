@@ -1,7 +1,7 @@
 import { AnyTextableGuildChannel, Permissions, UndeletableMessageTypes } from "oceanic.js";
 import { bot } from "../../..";
-import { Icons } from "../../../core/icons";
-import { OptionType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../types/command";
+import { icons } from "../../core/api/icons";
 
 export const purge_command = define_command({
 	id: ["purge", "sweep", "clear"],
@@ -93,8 +93,8 @@ export const purge_command = define_command({
 		}
 
 		if (purged === 0)
-			await context.respond(`${Icons.error} No messages were purged!`);
+			await context.respond(`${icons.error} No messages were purged!`);
 		else
-			await context.respond(`${Icons.success} Purged ${purged} messages!`);
+			await context.respond(`${icons.success} Purged ${purged} messages!`);
 	},
 });

@@ -1,11 +1,12 @@
 import { ClientEvents } from "oceanic.js";
-import { bot } from "..";
-import { BOT_ALLOWED_GUILDS } from "../../config";
+import { bot } from "../..";
+import { BOT_ALLOWED_GUILDS } from "../../../environment";
 
 export function wrap_listener<E extends keyof ClientEvents>(
 	event: E,
 	listener: (...args: ClientEvents[E]) => void | Promise<void>
 ) {
+	console.trace("");
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
 

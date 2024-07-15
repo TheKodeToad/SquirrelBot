@@ -12,7 +12,9 @@
 		"express": "^4.19.2",
 		"oceanic.js": "^1.11.0",
 		"pg": "^8.12.0",
-		"typescript": "^5.4.5"
+		"smol-toml": "^1.2.2",
+		"typescript": "^5.4.5",
+		"valibot": "^0.36.0"
 	},
 	"devDependencies": {
 		"@types/async-lock": "^1.4.2",

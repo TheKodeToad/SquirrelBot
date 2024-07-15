@@ -1,11 +1,11 @@
 import { Permissions } from "oceanic.js";
 import { CASE_TYPE_NAME } from "..";
-import { get_case } from "../../../../data/moderation/cases";
+import { get_case } from "../../../../db/moderation/cases";
 import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
-import { Icons } from "../../../core/icons";
-import { OptionType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../types/command";
+import { icons } from "../../core/api/icons";
 
 export const case_command = define_command({
 	id: "case",
@@ -27,7 +27,7 @@ export const case_command = define_command({
 
 		const info = await get_case(context.guild.id, number);
 		if (info === null) {
-			await context.respond(`${Icons.error} Case #${number} not found!`);
+			await context.respond(`${icons.error} Case #${number} not found!`);
 			return;
 		}
 

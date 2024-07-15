@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { get_guild_info_by_owner } from "../../../../data/core/guild_info";
+import { get_guild_info_by_owner } from "../../../../db/core/guild_info";
 import { async_request_handler } from "../../../handler";
 import { auth_middleware } from "../../../handler/auth";
 import { guild_auth_middleware } from "../../../handler/guild_auth";

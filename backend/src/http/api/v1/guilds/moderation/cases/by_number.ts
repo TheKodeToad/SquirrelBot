@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { serialise_case_object } from ".";
-import { get_case } from "../../../../../../data/moderation/cases";
+import { get_case } from "../../../../../../db/moderation/cases";
 import { async_request_handler } from "../../../../../handler";
 
 const router = Router();

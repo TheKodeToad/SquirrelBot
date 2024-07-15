@@ -1,11 +1,11 @@
 import { EmbedField, Permissions } from "oceanic.js";
 import { CASE_TYPE_NAME } from "..";
-import { get_cases } from "../../../../data/moderation/cases";
+import { get_cases } from "../../../../db/moderation/cases";
 import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
-import { Icons } from "../../../core/icons";
-import { OptionType, define_command } from "../../../core/types/command";
+import { OptionType, define_command } from "../../../types/command";
+import { icons } from "../../core/api/icons";
 
 export const cases_command = define_command({
 	id: "cases",
@@ -48,7 +48,7 @@ export const cases_command = define_command({
 			filter = " for this server";
 
 		if (cases.length === 0)
-			await context.respond(`${Icons.error} No cases${filter} found!`);
+			await context.respond(`${icons.error} No cases${filter} found!`);
 		else {
 			let fields: EmbedField[] = [];
 
