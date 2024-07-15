@@ -1,0 +1,24 @@
+name: 'Check types'
+
+on:
+- 'push'
+- 'pull_request'
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v4'
+    - name: 'Install pnpm'
+      uses: 'pnpm/action-setup@v4'
+      with:
+        version: 9
+    - name: 'Use Node'
+      uses: 'actions/setup-node@v4'
+      with:
+        node-version: 20
+        cache: 'pnpm'
+        cache-dependency-path: '**/pnpm-lock.yaml'
+    - name: 'Check types'
+      working-directory: ./backend
+      run: pnpm install && pnpm check
