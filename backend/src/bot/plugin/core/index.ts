@@ -28,9 +28,8 @@ export const core_plugin = define_plugin({
 
 		for (const plugin of get_plugins()) {
 			if (plugin.listeners !== undefined) {
-				for (const listener of plugin.listeners) {
+				for (const listener of plugin.listeners)
 					install_wrapped_listener(listener.type, listener.listener);
-				}
 			}
 		}
 	},

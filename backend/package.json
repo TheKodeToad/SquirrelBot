@@ -2,6 +2,7 @@
 	"name": "backend",
 	"scripts": {
 		"build": "node build.mjs",
+		"check": "tsc --noEmit",
 		"bot": "npm run build && node --enable-source-maps out/bot/main.js",
 		"http": "npm run build && node --enable-source-maps out/http/main.js",
 		"migrate": "npm run build && node --enable-source-maps out/data/migrate.js"

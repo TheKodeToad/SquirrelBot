@@ -6,7 +6,6 @@ export function wrap_listener<E extends keyof ClientEvents>(
 	event: E,
 	listener: (...args: ClientEvents[E]) => void | Promise<void>
 ) {
-	console.trace("");
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
 
