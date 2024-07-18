@@ -7,7 +7,7 @@ import { apply_plugins, register_plugin } from "./plugin_registry";
 
 async function main() {
 	bot.once("ready", async () => {
-		console.log("I'm ready :O");
+		console.log("Guilds ready :O");
 
 		register_plugin(core_plugin);
 		register_plugin(moderation_plugin);

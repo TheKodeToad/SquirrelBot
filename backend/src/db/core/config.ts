@@ -22,6 +22,7 @@ export async function insert_guild_config(guild_id: string, key: string, value: 
 				"value"
 			)
 			VALUES ($1, $2, $3)
+			ON CONFLICT ("guild_id", "key") DO NOTHING
 		`,
 		[guild_id, key, value]
 	);
