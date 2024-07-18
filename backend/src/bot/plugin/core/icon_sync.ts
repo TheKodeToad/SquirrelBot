@@ -13,6 +13,7 @@ const default_icons = {
 
 export function init_icons() {
 	Object.assign(icons, default_icons);
+	console.log(icons);
 	bot.guilds.forEach(guild => update(guild));
 }
 
