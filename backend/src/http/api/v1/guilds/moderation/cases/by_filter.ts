@@ -1,12 +1,11 @@
-import { Router } from "express";
+import PromiseRouter from "express-promise-router";
 import { serialise_case_object } from ".";
 import { is_snowflake } from "../../../../../../common/snowflake";
 import { CASE_TYPE_NAME_TO_ID, CaseQuery, get_cases } from "../../../../../../db/moderation/cases";
-import { async_request_handler } from "../../../../../handler";
 
-const router = Router();
+const router = PromiseRouter();
 
-router.get("/", async_request_handler(async (request, response) => {
+router.get("/", async (request, response) => {
 	if (request.discord_guild_id === undefined)
 		throw new Error("Missing guild ID");
 
@@ -209,6 +208,6 @@ router.get("/", async_request_handler(async (request, response) => {
 		query.limit = 20;
 
 	response.send((await get_cases(request.discord_guild_id, query)).map(serialise_case_object));
-}));
+});
 
 export default router;

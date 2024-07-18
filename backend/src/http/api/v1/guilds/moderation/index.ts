@@ -1,5 +1,5 @@
-import { Router } from "express";
+import PromiseRouter from "express-promise-router";
 
-const router = Router();
+const router = PromiseRouter();
 router.use("/cases", require("./cases").default);
 export default router;

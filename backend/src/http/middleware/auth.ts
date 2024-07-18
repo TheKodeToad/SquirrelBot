@@ -1,4 +1,4 @@
-import { async_request_handler } from ".";
+import { RequestHandler } from "express";
 import { validate_token } from "../../db/api/tokens";
 
 declare global {
@@ -9,7 +9,7 @@ declare global {
 	}
 }
 
-export const auth_middleware = async_request_handler(async (request, response, next) => {
+export const auth_middleware: RequestHandler = async (request, response, next) => {
 	const { authorization } = request.headers;
 
 	if (authorization === undefined) {
@@ -26,4 +26,4 @@ export const auth_middleware = async_request_handler(async (request, response, n
 
 	request.discord_user_id = user;
 	next();
-});
+};

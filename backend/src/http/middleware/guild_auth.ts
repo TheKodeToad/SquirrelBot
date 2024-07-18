@@ -1,4 +1,4 @@
-import { async_request_handler } from ".";
+import { RequestHandler } from "express";
 import { is_snowflake } from "../../common/snowflake";
 import { get_guild_owner_id } from "../../db/core/guild_info";
 
@@ -10,7 +10,7 @@ declare global {
 	}
 }
 
-export const guild_auth_middleware = async_request_handler(async (request, response, next) => {
+export const guild_auth_middleware: RequestHandler = async (request, response, next) => {
 	const { discord_user_id } = request;
 	const { guild_id } = request.params;
 
@@ -34,4 +34,4 @@ export const guild_auth_middleware = async_request_handler(async (request, respo
 
 	request.discord_guild_id = guild_id;
 	next();
-});
+};

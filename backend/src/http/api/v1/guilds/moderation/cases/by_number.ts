@@ -1,11 +1,9 @@
-import { Router } from "express";
+import PromiseRouter from "express-promise-router";
 import { serialise_case_object } from ".";
 import { get_case } from "../../../../../../db/moderation/cases";
-import { async_request_handler } from "../../../../../handler";
 
-const router = Router();
-
-router.get("/:number(\\d+)", async_request_handler(async (request, response) => {
+const router = PromiseRouter();
+router.get("/:number(\\d+)", async (request, response) => {
 	if (request.discord_guild_id === undefined)
 		throw new Error("Missing guild ID");
 
@@ -24,6 +22,5 @@ router.get("/:number(\\d+)", async_request_handler(async (request, response) => 
 	}
 
 	response.send(serialise_case_object(info));
-}));
-
+});
 export default router;

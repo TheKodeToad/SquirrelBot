@@ -1,4 +1,4 @@
-import { Router } from "express";
+import PromiseRouter from "express-promise-router";
 import { CASE_TYPE_ID_TO_NAME, CaseInfo } from "../../../../../../db/moderation/cases";
 
 export function serialise_case_object(info: CaseInfo) {
@@ -15,7 +15,7 @@ export function serialise_case_object(info: CaseInfo) {
 	};
 }
 
-const router = Router();
+const router = PromiseRouter();
 router.use("/", require("./by_number").default);
 router.use("/", require("./by_filter").default);
 export default router;
