@@ -4,8 +4,8 @@ import { get_case } from "../../../../db/moderation/cases";
 import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
+import { icons } from "../../../icons";
 import { OptionType, define_command } from "../../../types/command";
-import { icons } from "../../core/api/icons";
 
 export const case_command = define_command({
 	id: "case",

@@ -4,7 +4,7 @@ import { bot } from "../..";
 import { is_snowflake } from "../../../common/snowflake";
 import { can_write_in_channel } from "../../common/discord/permissions";
 import { TTLMap } from "../../common/ttl_map";
-import { get_commands } from "../../plugin_registry";
+import { get_commands_named } from "../../plugin_registry";
 import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "../../types/command";
 import { define_event_listener } from "../../types/event_listener";
 
@@ -31,9 +31,9 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	if (!can_write_in_channel(message.channel, message.channel.guild.clientMember))
 		return;
 
-	const config = await core_config.get(message.guildID);
+	const config = core_config.get(message.guildID);
 
-	if (config === null)
+	if (config === undefined)
 		return;
 
 	const { enabled, prefix } = config.prefix_commands;
@@ -44,7 +44,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	const unprefixed = message.content.slice(prefix.length);
 
 	const name = unprefixed.split(" ", 1)[0]!;
-	const matches = get_commands(name).filter(command => command.support_prefix ?? true);
+	const matches = get_commands_named(name).filter(command => command.support_prefix ?? true);
 
 	if (matches.length !== 1)
 		return;

@@ -5,8 +5,8 @@ import { create_dm_cached, get_user_cached, request_members_cached } from "../..
 import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { get_highest_role } from "../../../common/discord/permissions";
+import { icons } from "../../../icons";
 import { OptionType, define_command } from "../../../types/command";
-import { icons } from "../../core/api/icons";
 
 export const ban_command = define_command({
 	id: "ban",

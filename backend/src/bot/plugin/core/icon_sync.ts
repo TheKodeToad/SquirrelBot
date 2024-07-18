@@ -1,8 +1,8 @@
 import { Guild } from "oceanic.js";
 import { bot } from "../..";
 import { BOT_ICON_GUILD } from "../../../environment";
+import { icons } from "../../icons";
 import { define_event_listener } from "../../types/event_listener";
-import { icons } from "./api/icons";
 
 const default_icons = {
 	success: "\u2705", // :white_check_mark:

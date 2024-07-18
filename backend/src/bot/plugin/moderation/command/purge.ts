@@ -1,7 +1,7 @@
 import { AnyTextableGuildChannel, Permissions, UndeletableMessageTypes } from "oceanic.js";
 import { bot } from "../../..";
+import { icons } from "../../../icons";
 import { OptionType, define_command } from "../../../types/command";
-import { icons } from "../../core/api/icons";
 
 export const purge_command = define_command({
 	id: ["purge", "sweep", "clear"],

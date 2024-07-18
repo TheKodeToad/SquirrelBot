@@ -1,11 +1,11 @@
 import { AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { bot } from "../..";
-import { get_all_commands, get_commands } from "../../plugin_registry";
+import { get_commands, get_commands_named } from "../../plugin_registry";
 import { Command, Context, Option, OptionType, Reply } from "../../types/command";
 import { define_event_listener } from "../../types/event_listener";
 
 export async function sync_slash_commands(): Promise<void> {
-	const commands = get_all_commands().filter(command => command.support_slash ?? true).map(command => ({
+	const commands = get_commands().filter(command => command.support_slash ?? true).map(command => ({
 		type: ApplicationCommandTypes.CHAT_INPUT,
 		name: typeof command.id === "string" ? command.id : command.id[0],
 		description: "command",
@@ -50,7 +50,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	if (!interaction.isCommandInteraction())
 		return;
 
-	const matches = get_commands(interaction.data.name).filter(command => command.support_slash ?? true);
+	const matches = get_commands_named(interaction.data.name).filter(command => command.support_slash ?? true);
 
 	if (matches.length !== 1)
 		return;

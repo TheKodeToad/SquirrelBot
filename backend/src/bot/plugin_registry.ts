@@ -1,12 +1,15 @@
 import { Command } from "./types/command";
 import { Plugin } from "./types/plugin";
 
-const plugins: Plugin[] = [];
-const command_lookup: Map<string, Command[]> = new Map;
-const all_commands: Command[] = [];
+const plugins: Map<string, Plugin> = new Map;
+const commands: Map<string, Command[]> = new Map;
+const unique_commands: Command[] = [];
 
 export function register_plugin(plugin: Plugin): void {
-	plugins.push(plugin);
+	if (plugins.has(plugin.id))
+		throw new Error(`Duplicate registration of plugin #'${plugin.id}'`);
+
+	plugins.set(plugin.id, plugin);
 
 	if (plugin.commands) {
 		for (const command of plugin.commands) {
@@ -16,32 +19,39 @@ export function register_plugin(plugin: Plugin): void {
 			} else
 				add_command(command.id, command);
 
-			all_commands.push(command);
+			unique_commands.push(command);
 		}
 	}
 }
 
-export function get_plugins(): Plugin[] {
-	return plugins;
+export function get_plugins(): IterableIterator<Plugin> {
+	return plugins.values();
 }
 
-export function get_commands(name: string): Command[] {
-	return command_lookup.get(name) ?? [];
+export function get_plugin(id: string): Plugin | undefined {
+	return plugins.get(id);
 }
 
-export function get_all_commands(): Command[] {
-	return all_commands;
+export function get_commands(): Command[] {
+	return unique_commands;
+}
+
+export function get_commands_named(name: string): Command[] {
+	return commands.get(name) ?? [];
 }
 
 function add_command(id: string, command: Command): void {
-	if (!command_lookup.has(id))
-		command_lookup.set(id, []);
+	let list = commands.get(id);
 
-	const list = command_lookup.get(id)!;
+	if (list === undefined) {
+		list = [];
+		commands.set(id, list);
+	}
+
 	list.push(command);
 }
 
 export async function apply_plugins(): Promise<void> {
-	for (const plugin of get_plugins())
+	for (const plugin of plugins.values())
 		await plugin.apply?.();
 }
