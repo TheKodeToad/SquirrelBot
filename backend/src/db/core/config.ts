@@ -34,8 +34,8 @@ export async function update_guild_config(guild_id: string, key: string, value: 
 	const result = await pool.query(
 		`
 			UPDATE "core_guild_configs"
-			WHERE "guild_id" = $1 AND "key" = $2
 			SET "value" = $3
+			WHERE "guild_id" = $1 AND "key" = $2
 		`,
 		[guild_id, key, value]
 	);

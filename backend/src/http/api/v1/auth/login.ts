@@ -1,3 +1,4 @@
+import express from "express";
 import PromiseRouter from "express-promise-router";
 import { generate_token } from "../../../../db/api/tokens";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment";
@@ -24,7 +25,7 @@ interface ErrorResponse {
 }
 
 const router = PromiseRouter();
-router.post("/", async (request, response) => {
+router.post("/", express.json(), async (request, response) => {
 	const { code } = request.body;
 
 	if (typeof code !== "string") {

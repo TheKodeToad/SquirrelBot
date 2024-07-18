@@ -5,6 +5,7 @@ import { guild_auth_middleware } from "../../../middleware/guild_auth";
 
 const guild_router = PromiseRouter();
 guild_router.use("/moderation", require("./moderation").default);
+guild_router.use("/config", require("./config").default);
 
 const router = PromiseRouter();
 router.use(

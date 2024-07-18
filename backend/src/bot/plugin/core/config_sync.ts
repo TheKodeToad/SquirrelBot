@@ -38,14 +38,16 @@ export async function install_config_change_listener(): Promise<void> {
 			if (!(error instanceof SyntaxError))
 				throw error;
 
-			// TODO: log warning
+			console.warn("Malformed JSON in config_update payload", error);
 			return;
 		}
 
-		if (key === undefined || guild_id === undefined)
+		if (!(typeof key === "string" && typeof guild_id === "string")) {
+			console.warn("config_update payload does not conform to { key: string, guild_id: string; }");
 			return;
+		}
 
-		config_update_lock.acquire([key, guild_id], async () => {
+		config_update_lock.acquire([guild_id, key], async () => {
 			const plugin = get_plugin(key);
 
 			if (plugin === undefined || plugin.config === undefined)
@@ -70,6 +72,7 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 	try {
 		var table = parseToml(raw_value);
 	} catch (error) {
+		// TODO: dos?
 		if (!(error instanceof TomlError))
 			throw error;
 
@@ -79,7 +82,7 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 
 	const result = safeParse(plugin.config.schema, table);
 
-	if (!result.typed) {
+	if (!result.success || !result.typed) {
 		plugin.config.delete(guild_id);
 		return;
 	}
