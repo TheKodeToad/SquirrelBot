@@ -68,3 +68,13 @@ export async function validate_token(token: string): Promise<string | null> {
 
 	return result.rows[0].user_id;
 }
+
+export async function delete_expired_tokens(): Promise<void> {
+	await pool.query(
+		`
+			DELETE FROM "api_tokens"
+			WHERE "expires_at" <= $1
+		`,
+		[new Date]
+	);
+}
