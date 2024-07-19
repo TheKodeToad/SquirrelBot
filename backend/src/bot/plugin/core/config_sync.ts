@@ -2,7 +2,7 @@ import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { safeParse } from "valibot";
 import { bot } from "../..";
-import { get_guild_config, insert_guild_config } from "../../../db/core/config";
+import { get_guild_config, insert_guild_config } from "../../../db/core/configs";
 import { add_channel_listener } from "../../../db/notification";
 import { get_plugin, get_plugins } from "../../plugin_registry";
 import { Plugin } from "../../types/plugin";

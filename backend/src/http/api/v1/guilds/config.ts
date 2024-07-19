@@ -1,6 +1,6 @@
 import express from "express";
 import PromiseRouter from "express-promise-router";
-import { get_guild_config, update_guild_config } from "../../../../db/core/config";
+import { get_guild_config, update_guild_config } from "../../../../db/core/configs";
 import { notify_channel } from "../../../../db/notification";
 
 const router = PromiseRouter();
