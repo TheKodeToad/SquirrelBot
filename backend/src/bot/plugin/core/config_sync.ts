@@ -8,8 +8,6 @@ import { get_plugin, get_plugins } from "../../plugin_registry";
 import { Plugin } from "../../types/plugin";
 
 export async function load_configs() {
-	console.log("Loading configs...");
-
 	await Promise.all(bot.guilds.map(async guild => {
 		for (const plugin of get_plugins()) {
 			if (plugin.config === undefined)
@@ -20,9 +18,6 @@ export async function load_configs() {
 			await load_config(guild.id, plugin);
 		}
 	}));
-
-
-	console.log("Loaded configs!");
 }
 
 const config_update_lock = new AsyncLock;
