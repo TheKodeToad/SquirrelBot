@@ -6,6 +6,6 @@ export async function init_icons() {
 	for (const emoji of emojis.items) {
 
 		if (emoji.name in icons)
-			icons[emoji.name] = `<${emoji.animated ? "" : "a"}:${emoji.name}:${emoji.id}>`;
+			icons[emoji.name] = `<${emoji.animated ? "a" : ""}:${emoji.name}:${emoji.id}>`;
 	}
 }
