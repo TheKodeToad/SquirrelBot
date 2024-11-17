@@ -67,9 +67,11 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 	try {
 		var table = parseToml(raw_value);
 	} catch (error) {
-		// TODO: dos?
-		if (!(error instanceof TomlError))
-			throw error;
+		// it's not documented what this will throw - so avoid bringing down the entire bot
+		if (!(error instanceof TomlError)) {
+			console.error("Error parsing TOML");
+			console.error(error);
+		}
 
 		plugin.config.delete(guild_id);
 		return;
