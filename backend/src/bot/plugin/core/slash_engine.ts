@@ -56,7 +56,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	if (config === undefined)
 		return;
 
-	const { enabled } = config.slash_commands;
+	const enabled = true;
 
 	if (!enabled)
 		return;
@@ -113,7 +113,7 @@ class SlashContext implements Context {
 	guild: Guild;
 	user: User;
 	member: Member;
-	channel_id: string;
+	channel: AnyTextableGuildChannel;
 	interaction: CommandInteraction;
 	_responded: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
@@ -125,7 +125,7 @@ class SlashContext implements Context {
 		this.user = interaction.user;
 		this.member = interaction.member;
 		this.guild = interaction.guild;
-		this.channel_id = interaction.channelID;
+		this.channel = interaction.channel;
 		this.interaction = interaction;
 		this._responded = false;
 		this._defer_promise = null;

@@ -1,4 +1,4 @@
-import { AnyTextableChannel, CommandInteraction, CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
+import { AnyTextableGuildChannel, CommandInteraction, CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
 
@@ -15,7 +15,7 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 	support_prefix?: boolean;
 	support_slash?: boolean;
 	track_updates?: boolean;
-	run(context: Context, args: { [K in keyof O]: OptionValue<O[K]> }): Promise<void> | void;
+	run(context: Context, args: { readonly [K in keyof O]: OptionValue<O[K]> }): Promise<void> | void;
 }
 
 export function define_command<F extends Record<string, Option>>(command: Command<F>): Command<F> {
@@ -28,8 +28,8 @@ export interface Context {
 	guild: Guild;
 	user: User;
 	member: Member;
-	channel_id: string;
-	message?: Message<AnyTextableChannel>;
+	channel: AnyTextableGuildChannel;
+	message?: Message<AnyTextableGuildChannel>;
 	interaction?: CommandInteraction;
 	respond(reply: Reply): Promise<void>;
 }

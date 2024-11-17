@@ -36,7 +36,8 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	if (config === undefined)
 		return;
 
-	const { enabled, prefix } = config.prefix_commands;
+	const enabled = true;
+	const { prefix } = config;
 
 	if (!enabled || !message.content.startsWith(prefix))
 		return;
@@ -112,7 +113,7 @@ class PrefixContext implements Context {
 	guild: Guild;
 	user: User;
 	member: Member;
-	channel_id: string;
+	channel: AnyTextableGuildChannel;
 	message: Message<AnyTextableGuildChannel>;
 	_response: Message | null;
 
@@ -123,7 +124,7 @@ class PrefixContext implements Context {
 		this.message = message;
 		this.user = message.author;
 		this.member = message.member;
-		this.channel_id = message.channelID;
+		this.channel = message.channel;
 		this._response = null;
 	}
 
@@ -138,7 +139,7 @@ class PrefixContext implements Context {
 			return;
 
 		if (this._response === null)
-			this._response = await bot.rest.channels.createMessage(this.channel_id, options);
+			this._response = await this.channel.createMessage(options);
 		else {
 			await this._response.edit({
 				attachments: [],

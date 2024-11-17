@@ -1,4 +1,4 @@
-import { AnyTextableGuildChannel, Permissions, UndeletableMessageTypes } from "oceanic.js";
+import { Permissions, UndeletableMessageTypes } from "oceanic.js";
 import { bot } from "../../..";
 import { icons } from "../../../icons";
 import { OptionType, define_command } from "../../../types/command";
@@ -35,20 +35,12 @@ export const purge_command = define_command({
 		if (context.guild === null || context.member === null)
 			return;
 
-		const channel = (
-			context.guild.channels.get(context.channel_id)
-			?? context.guild.threads.get(context.channel_id)
-		) as AnyTextableGuildChannel | undefined;
-
-		if (channel === undefined)
-			return;
-
-		if (!channel.permissionsOf(context.member).has(Permissions.MANAGE_MESSAGES))
+		if (!context.channel.permissionsOf(context.member).has(Permissions.MANAGE_MESSAGES))
 			return;
 
 		let purged = 0;
 
-		const iter = bot.rest.channels.getMessagesIterator(context.channel_id, {
+		const iter = bot.rest.channels.getMessagesIterator(context.channel.id, {
 			limit: args.count,
 			before: context.message?.id,
 		});
@@ -85,7 +77,7 @@ export const purge_command = define_command({
 				to_delete.push(message.id);
 			}
 
-			await channel.deleteMessages(to_delete);
+			await context.channel.deleteMessages(to_delete);
 			purged += to_delete.length;
 
 			if (stop)
