@@ -68,7 +68,7 @@ export const groups_command = define_command({
 
 		if (groups.length !== 0) {
 			let formatted = groups.map(([key, _]) => format_group(core_config.groups, key)).join("\n");
-			await context.respond(`**${icons.info} Groups for <@${member.id}> (${escape_markdown(member.tag)}) in <#${channel.id}>**\n\`\`\`${formatted}\`\`\``);
+			await context.respond(`**Groups for <@${member.id}> (${escape_markdown(member.tag)}) in <#${channel.id}>**\n\`\`\`${formatted}\`\`\``);
 		} else {
 			await context.respond(`${icons.error} No groups for <@${member.id}> (${escape_markdown(member.tag)}) in <#${context.channel}!`);
 		}
