@@ -14,7 +14,7 @@ export async function format_user_tag(id: string) {
 	try {
 		return (await get_user_cached(id)).tag;
 	} catch (error) {
-		if (!(error instanceof Error))
+		if (!(error instanceof DiscordRESTError))
 			throw error;
 
 		return "<unknown>";
