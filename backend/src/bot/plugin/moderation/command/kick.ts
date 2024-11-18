@@ -33,9 +33,6 @@ export const kick_command = define_command({
 		},
 	},
 	async run(context, args) {
-		if (context.guild === null)
-			return;
-
 		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
 			return;
 

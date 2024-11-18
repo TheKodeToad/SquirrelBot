@@ -22,9 +22,6 @@ export const unban_command = define_command({
 		},
 	},
 	async run(context, args) {
-		if (context.guild === null)
-			return;
-
 		if (!context.member?.permissions.has(Permissions.BAN_MEMBERS))
 			return;
 

@@ -19,9 +19,6 @@ export const case_command = define_command({
 	},
 	track_updates: true,
 	async run(context, { number }) {
-		if (!context.guild)
-			return;
-
 		if (!context.member?.permissions.has(Permissions.KICK_MEMBERS))
 			return;
 

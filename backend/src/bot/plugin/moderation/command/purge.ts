@@ -32,9 +32,6 @@ export const purge_command = define_command({
 		}
 	},
 	async run(context, args) {
-		if (context.guild === null || context.member === null)
-			return;
-
 		if (!context.channel.permissionsOf(context.member).has(Permissions.MANAGE_MESSAGES))
 			return;
 
