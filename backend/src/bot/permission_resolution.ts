@@ -1,4 +1,4 @@
-import { AnyGuildChannel, ChannelTypes, GuildChannel, Member, ThreadChannel, User } from "oceanic.js";
+import { AnyGuildChannel, CategoryChannel, Member, ThreadChannel, User } from "oceanic.js";
 import { CoreConfig, CoreGroup } from "../schema/core/config";
 import { core_config } from "./plugin/core";
 
@@ -33,12 +33,19 @@ export function resolve_groups(member: Member, channel: AnyGuildChannel): Set<Co
 }
 
 export function test_group(group: CoreGroup, user: User, roles: Set<string>, channel: AnyGuildChannel): boolean {
-	let base_channel: AnyGuildChannel;
+	let base_channel: AnyGuildChannel | null = null;
 
 	if (channel instanceof ThreadChannel)
 		base_channel = channel.parent!;
-	else
+	else if (!(channel instanceof CategoryChannel))
 		base_channel = channel;
+
+	let category_channel: CategoryChannel | null = null;
+
+	if (channel instanceof CategoryChannel)
+		category_channel = channel;
+	else if (base_channel !== null && base_channel.parent instanceof CategoryChannel)
+		category_channel = base_channel.parent;
 
 	if (group.users.includes(user.id))
 		return true;
@@ -46,15 +53,13 @@ export function test_group(group: CoreGroup, user: User, roles: Set<string>, cha
 	if (group.roles.some(role => roles.has(role)))
 		return true;
 
-	if (group.channels.includes(base_channel.id))
+	if (base_channel !== null && group.channels.includes(base_channel.id))
 		return true;
 
 	if (channel instanceof ThreadChannel && group.threads.includes(channel.id))
 		return true;
 
-	if (channel instanceof GuildChannel
-		&& base_channel.parent?.type === ChannelTypes.GUILD_CATEGORY
-		&& group.channel_categories.includes(base_channel.parent.id)) {
+	if (category_channel !== null && group.channel_categories.includes(category_channel.id)) {
 		return true;
 	}
 
