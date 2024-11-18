@@ -2,7 +2,7 @@ import { core_config_schema } from "../../../schema/core/config";
 import { ConfigCache } from "../../config";
 import { get_plugins } from "../../plugin_registry";
 import { define_plugin } from "../../types/plugin";
-import { ping_command } from "./command/ping";
+import { about_command } from "./command/about";
 import { install_config_change_listener, load_configs } from "./config_sync";
 import { install_wrapped_listener } from "./event_wrapper";
 import { init_icons } from "./icon_sync";
@@ -13,7 +13,7 @@ export const core_config = new ConfigCache(core_config_schema);
 
 export const core_plugin = define_plugin({
 	id: "core",
-	commands: [ping_command],
+	commands: [about_command],
 	config: core_config,
 	listeners: [
 		prefix_send_handler,
