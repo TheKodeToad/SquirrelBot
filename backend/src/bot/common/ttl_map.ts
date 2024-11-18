@@ -2,7 +2,7 @@
  * A map where keys expire!
  * A slight catch: every value must last for the same duration
  */
-export class TTLMap<K, V> implements Map<K, V> {
+export class TTLMap<K, V> {
 	private readonly _map: Map<K, [V, number]>;
 	private readonly _ttl: number;
 
