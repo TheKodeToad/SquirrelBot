@@ -4,7 +4,6 @@
 		"module": "NodeNext",
 		"strict": true,
 		"noImplicitAny": false,
-		"noUncheckedIndexedAccess": true,
-		"skipLibCheck": true
+		"noUncheckedIndexedAccess": true
 	}
 }

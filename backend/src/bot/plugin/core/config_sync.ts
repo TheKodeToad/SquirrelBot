@@ -1,5 +1,4 @@
 import AsyncLock from "async-lock";
-import { parse as parseToml, TomlError } from "smol-toml";
 import { safeParse } from "valibot";
 import { bot } from "../..";
 import { get_guild_config, insert_guild_config } from "../../../db/core/configs";
@@ -54,6 +53,8 @@ export async function install_config_change_listener(): Promise<void> {
 }
 
 async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
+	const { parse: parseToml, TomlError } = await import("smol-toml");
+
 	if (plugin.config === undefined)
 		return;
 
