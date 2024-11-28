@@ -68,9 +68,8 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 	try {
 		var table = parseToml(raw_value);
 	} catch (error) {
-		// it's not documented what this will throw - so avoid bringing down the entire bot
 		if (!(error instanceof TomlError)) {
-			console.error("Error parsing TOML");
+			console.error("Unexpected error parsing TOML (bug)");
 			console.error(error);
 		}
 
@@ -78,7 +77,16 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 		return;
 	}
 
-	const result = safeParse(plugin.config.schema, table);
+	try {
+		var result = safeParse(plugin.config.schema, table);
+	} catch (error) {
+		// if our code is broken it might throw
+		console.error("Unexpected error in valibot safeParse (bug)");
+		console.error(error);
+
+		plugin.config.delete(guild_id);
+		return;
+	}
 
 	if (!result.success || !result.typed) {
 		plugin.config.delete(guild_id);

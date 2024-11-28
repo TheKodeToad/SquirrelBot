@@ -2,8 +2,8 @@ import { AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageF
 import { core_config } from ".";
 import { bot } from "../..";
 import { is_snowflake } from "../../../common/snowflake";
+import { TTLMap } from "../../../common/ttl_map";
 import { can_write_in_channel } from "../../common/discord/permissions";
-import { TTLMap } from "../../common/ttl_map";
 import { get_commands_named } from "../../plugin_registry";
 import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "../../types/command";
 import { define_event_listener } from "../../types/event_listener";
