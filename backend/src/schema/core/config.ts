@@ -1,6 +1,7 @@
-import { InferOutput, array, number, object, optional, pipe, rawTransform, record, regex, string } from "valibot";
+import { InferOutput, array, boolean, number, object, optional, pipe, rawTransform, record, regex, string } from "valibot";
 import { SNOWFLAKE_REGEX } from "../../common/snowflake";
 import { RawTransformContext } from "../../common/types";
+import { permissions_filter_schema } from "../common/permissions_filter";
 
 const core_group_schema = object({
 	users: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid user ID"))), []),
@@ -22,22 +23,29 @@ export interface CoreGroups extends InferOutput<typeof core_groups_schema> { }
 export const core_config_schema = object({
 	groups: optional(pipe(core_groups_schema, rawTransform(transform_core_groups)), {}),
 
-	prefix: optional(string(), "?"),
+	prefix_commands: optional(object({
+		prefix: optional(string(), "?"),
+	}), {}),
 
-	// permissions: optional(array(object({
-	// 	prefix_commands: optional(boolean()),
-	// 	slash_commands: optional(boolean()),
-	// 	...permissions_filter_schema.entries,
-	// })), []),
+	default_permissions: optional(object({
+		prefix_commands: optional(boolean(), true),
+		slash_commands: optional(boolean(), true),
+	}), {}),
+	permission_overrides: optional(array(object({
+		prefix_commands: optional(boolean()),
+		slash_commands: optional(boolean()),
+		...permissions_filter_schema.entries
+	})), []),
 });
 export interface CoreConfig extends InferOutput<typeof core_config_schema> { }
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
-function transform_core_groups({ dataset, addIssue }: RawTransformContext<CoreGroups, CoreGroups>) {
+function transform_core_groups({ dataset, addIssue, NEVER }: RawTransformContext<CoreGroups, CoreGroups>) {
 	if (!dataset.typed)
-		return dataset.value;
+		return NEVER;
 
+	// show all errors for invalid inherits references at once
 	let has_issues = false;
 
 	for (const key in dataset.value) {
@@ -47,23 +55,22 @@ function transform_core_groups({ dataset, addIssue }: RawTransformContext<CoreGr
 		const value = dataset.value[key]!;
 
 		value.inherits?.forEach((reference, index) => {
-			if (Object.hasOwn(dataset.value, reference))
-				return;
-
-			addIssue({
-				message: `No group named '${reference}' exists`,
-				path: [
-					{ type: "object", origin: "value", input: dataset.value, key, value },
-					{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
-					{ type: "array", origin: "value", input: value.inherits!, key: index, value: reference }
-				]
-			});
-			has_issues = true;
+			if (!Object.hasOwn(dataset.value, reference)) {
+				addIssue({
+					message: `Invalid group reference: Received ${reference}`,
+					path: [
+						{ type: "object", origin: "value", input: dataset.value, key, value },
+						{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
+						{ type: "array", origin: "value", input: value.inherits!, key: index, value: reference }
+					]
+				});
+				has_issues = true;
+			}
 		});
 	}
 
 	if (has_issues)
-		return dataset.value;
+		return NEVER;
 
 	let result: CoreGroups = {};
 
@@ -77,20 +84,17 @@ function transform_core_groups({ dataset, addIssue }: RawTransformContext<CoreGr
 
 		if (inherits === null) {
 			addIssue({
-				message: `Max inheritance depth reached (${MAX_INHERITANCE_DEPTH})`,
+				message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
 				path: [
 					{ type: "object", origin: "value", input: dataset.value, key, value },
 					{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
 				]
 			});
-			return dataset.value;
+			return NEVER;
 		}
 
 		result[key] = { ...value, inherits };
 	}
-
-	if (has_issues)
-		return dataset.value;
 
 	return result;
 }
@@ -105,7 +109,7 @@ function flatten_inheritance(input: CoreGroup, key: string, groups: CoreGroups):
 }
 
 function _flatten_inheritance(input: CoreGroup, output: string[], root: string, groups: CoreGroups, depth: number): boolean {
-	if (depth >= MAX_INHERITANCE_DEPTH)
+	if (depth > MAX_INHERITANCE_DEPTH)
 		return false;
 
 	for (const reference of input.inherits) {

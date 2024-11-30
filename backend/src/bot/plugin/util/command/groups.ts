@@ -66,6 +66,6 @@ export const groups_command = define_command({
 
 		let group_list = groups.map(make_inline_codeblock).join(", ");
 
-		await context.respond(`Groups: ${group_list}\nPermission Level: ${result.level}`);
+		await context.respond(`**Groups:** ${group_list}\n**Permission Level:** ${result.level}`);
 	},
 });

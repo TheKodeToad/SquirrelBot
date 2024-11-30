@@ -18,7 +18,7 @@ router.get("/:key", async (request, response) => {
 
 	response.type("application/toml").send(config);
 });
-router.put("/:key", express.text(), async (request, response) => {
+router.put("/:key", express.text({ type: "application/toml" }), async (request, response) => {
 	if (request.discord_guild_id === undefined)
 		throw new Error("Missing guild ID");
 

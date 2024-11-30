@@ -1,11 +1,8 @@
 import { AnyGuildChannel, CategoryChannel, Member, ThreadChannel, User } from "oceanic.js";
+import { test_number_filter } from "../schema/common/number_filter";
+import { PermissionsFilter } from "../schema/common/permissions_filter";
 import { CoreConfig, CoreGroup } from "../schema/core/config";
 import { core_config } from "./plugin/core";
-
-interface GroupsResult {
-	groups: Set<string>;
-	level: number;
-}
 
 export function resolve_groups(member: Member, channel: AnyGuildChannel): GroupsResult {
 	const config: CoreConfig | undefined = core_config.get(member.guildID);
@@ -51,6 +48,11 @@ export function resolve_groups(member: Member, channel: AnyGuildChannel): Groups
 	return { groups, level };
 }
 
+interface GroupsResult {
+	groups: Set<string>;
+	level: number;
+}
+
 function group_level(group: CoreGroup) {
 	return group.level ?? 0;
 }
@@ -89,6 +91,51 @@ function test_group(group: CoreGroup, user: User, roles: Set<string>, channel: A
 		return true;
 
 	if (category !== null && group.channel_categories.includes(category.id))
+		return true;
+
+	return false;
+}
+
+export function resolve_permissions<P extends Record<string, boolean>>(
+	config: {
+		default_permissions: P,
+		permission_overrides: (Partial<P> & PermissionsFilter)[];
+	},
+	member: Member,
+	channel: AnyGuildChannel
+): P {
+	const groups = resolve_groups(member, channel);
+
+	const result: Record<string, boolean> = {};
+
+	for (const key in config.default_permissions)
+		Object.defineProperty(result, key, {
+			value: config.default_permissions[key]!,
+			configurable: true,
+			enumerable: true,
+			writable: true
+		});
+
+	for (const override of config.permission_overrides) {
+		if (!test_filter(override, groups))
+			continue;
+
+		for (const key in override) {
+			if (!Object.hasOwn(result, key))
+				continue;
+
+			result[key] = override[key]!;
+		}
+	}
+
+	return result as any;
+}
+
+export function test_filter(filter: PermissionsFilter, groups: GroupsResult) {
+	if (filter.in_group !== undefined && groups.groups.has(filter.in_group))
+		return true;
+
+	if (filter.level !== undefined && test_number_filter(filter.level, groups.level))
 		return true;
 
 	return false;

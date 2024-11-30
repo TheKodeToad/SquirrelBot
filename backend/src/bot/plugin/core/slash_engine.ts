@@ -1,6 +1,7 @@
 import { AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { core_config } from ".";
 import { bot } from "../..";
+import { resolve_permissions } from "../../permission_resolution";
 import { get_commands, get_commands_named } from "../../plugin_registry";
 import { Command, Context, Option, OptionType, Reply } from "../../types/command";
 import { define_event_listener } from "../../types/event_listener";
@@ -56,9 +57,9 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	if (config === undefined)
 		return;
 
-	const enabled = true;
+	const permissions = resolve_permissions(config, interaction.member, interaction.channel);
 
-	if (!enabled)
+	if (!permissions.slash_commands)
 		return;
 
 	const matches = get_commands_named(interaction.data.name).filter(command => command.support_slash ?? true);

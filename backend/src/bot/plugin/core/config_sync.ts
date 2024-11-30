@@ -1,5 +1,6 @@
 import AsyncLock from "async-lock";
-import { safeParse } from "valibot";
+import { inspect } from "util";
+import { flatten, safeParse } from "valibot";
 import { bot } from "../..";
 import { get_guild_config, insert_guild_config } from "../../../db/core/configs";
 import { add_channel_listener } from "../../../db/notification";
@@ -89,6 +90,7 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 	}
 
 	if (!result.success || !result.typed) {
+		console.log("error " + inspect(flatten(result.issues)));
 		plugin.config.delete(guild_id);
 		return;
 	}
