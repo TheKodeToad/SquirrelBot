@@ -25,6 +25,7 @@ export const core_config_schema = object({
 
 	prefix_commands: optional(object({
 		prefix: optional(string(), "?"),
+		reply: optional(boolean(), true),
 	}), {}),
 
 	default_permissions: optional(object({

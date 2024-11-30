@@ -103,7 +103,7 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 	},
 	member: Member,
 	channel: AnyGuildChannel
-): P {
+): Record<keyof P, boolean> {
 	const groups = resolve_groups(member, channel);
 
 	const result: Record<string, boolean> = {};

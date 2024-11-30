@@ -13,6 +13,7 @@ export const prefix_send_handler = define_event_listener("messageCreate", handle
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
 export const prefix_delete_handler = define_event_listener("messageDelete", handle_delete);
 
+// if anything is added here, make sure the message type can be replied to
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
 const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(1000 * 60 * 30);
@@ -37,7 +38,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	if (config === undefined)
 		return;
 
-	const { prefix } = config;
+	const { prefix } = config.prefix_commands;
 	const permissions = resolve_permissions(config, message.member, message.channel);
 
 	if (!(permissions.prefix_commands && message.content.startsWith(prefix)))
@@ -130,7 +131,9 @@ class PrefixContext implements Context {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const options = typeof reply === "string" ? { flags: 0, content: reply } : { flags: 0, ...reply };
+		const options = typeof reply === "string" ? { content: reply } : reply;
+
+		options.flags ??= 0;
 
 		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0)
 			options.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
@@ -139,16 +142,32 @@ class PrefixContext implements Context {
 			&& !can_write_in_channel(this.message.channel, this.message.channel.guild.clientMember))
 			return;
 
-		if (this._response === null)
-			this._response = await this.channel.createMessage(options);
-		else {
+		if (this._response === null) {
+			const config = core_config.get(this.guild.id);
+
+			if (config === undefined)
+				return;
+
+			if (config.prefix_commands.reply) {
+				this._response = await this.channel.createMessage({
+					messageReference: {
+						guildID: this.guild.id,
+						channelID: this.channel.id,
+						messageID: this.message.id,
+						failIfNotExists: false,
+					},
+					...options
+				});
+			} else
+				this._response = await this.channel.createMessage(options);
+		} else {
 			await this._response.edit({
 				attachments: [],
 				components: [],
 				content: "",
 				embeds: [],
 				files: [],
-				...options,
+				...options
 			});
 		}
 	}
