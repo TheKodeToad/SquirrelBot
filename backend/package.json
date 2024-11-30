@@ -3,9 +3,10 @@
 	"scripts": {
 		"build": "node build.mjs",
 		"check": "tsc --noEmit",
-		"bot": "npm run build && node --enable-source-maps out/bot/main.js",
-		"http": "npm run build && node --enable-source-maps out/http/main.js",
-		"migrate": "npm run build && node --enable-source-maps out/data/migrate.js"
+		"bot": "npm run build && npm run _node out/bot/main.js",
+		"http": "npm run build && npm run _node out/http/main.js",
+		"migrate": "npm run build && npm run _node out/data/migrate.js",
+		"_node": "node --enable-source-maps --disable-proto=delete"
 	},
 	"dependencies": {
 		"async-lock": "^1.4.1",
