@@ -24,10 +24,8 @@ interface ErrorResponse {
 	error_description: string;
 }
 
-// TODO: strict limit for body
-
 const router = PromiseRouter();
-router.post("/", express.json(), async (request, response) => {
+router.post("/", express.json({ limit: 64 }), async (request, response) => {
 	const { code } = request.body;
 
 	if (typeof code !== "string") {
