@@ -5,7 +5,7 @@
 		"check": "tsc --noEmit",
 		"bot": "npm run build && npm run _node out/bot/main.js",
 		"http": "npm run build && npm run _node out/http/main.js",
-		"migrate": "npm run build && npm run _node out/data/migrate.js",
+		"migrate": "npm run build && npm run _node out/db/migrate.js",
 		"_node": "node --enable-source-maps --disable-proto=delete"
 	},
 	"dependencies": {
