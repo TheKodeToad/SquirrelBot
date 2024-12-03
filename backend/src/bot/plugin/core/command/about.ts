@@ -1,5 +1,7 @@
+import { core_config } from "..";
 import { bot } from "../../..";
 import { Colors } from "../../../common/discord/colors";
+import { resolve_permissions } from "../../../permission_resolution";
 import { define_command } from "../../../types/command";
 
 const DESCRIPTION = `
@@ -24,6 +26,16 @@ export const about_command = define_command({
 	id: "about",
 	track_updates: true,
 	async run(context) {
+		const config = core_config.get(context.guild.id);
+
+		if (config === undefined)
+			return;
+
+		const perms = resolve_permissions(config, context.member, context.channel);
+
+		if (!perms.about_command)
+			return;
+
 		const uptime = Math.floor(process.uptime());
 		let uptime_string = "";
 

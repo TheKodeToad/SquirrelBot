@@ -57,9 +57,9 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	if (config === undefined)
 		return;
 
-	const permissions = resolve_permissions(config, interaction.member, interaction.channel);
+	const perms = resolve_permissions(config, interaction.member, interaction.channel);
 
-	if (!permissions.slash_commands)
+	if (!perms.slash_commands)
 		return;
 
 	const matches = get_commands_named(interaction.data.name).filter(command => command.support_slash ?? true);
