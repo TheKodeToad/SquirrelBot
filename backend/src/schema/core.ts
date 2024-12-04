@@ -1,8 +1,9 @@
 import { InferOutput, array, boolean, number, object, optional, pipe, rawTransform, record, regex, string } from "valibot";
-import { SNOWFLAKE_REGEX } from "../../common/snowflake";
-import { RawTransformContext } from "../../common/types";
-import { permissions_filter_schema } from "../common/permissions_filter";
+import { SNOWFLAKE_REGEX } from "../common/snowflake";
+import { RawTransformContext } from "../common/types";
+import { permissions_filter_schema } from "./common/permissions_filter";
 
+// TODO just use a Map
 const core_group_schema = object({
 	users: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid user ID"))), []),
 	roles: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid role ID"))), []),

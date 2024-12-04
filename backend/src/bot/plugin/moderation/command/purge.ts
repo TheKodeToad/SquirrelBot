@@ -1,6 +1,8 @@
-import { Permissions, UndeletableMessageTypes } from "oceanic.js";
+import { UndeletableMessageTypes } from "oceanic.js";
+import { moderation_config } from "..";
 import { bot } from "../../..";
 import { icons } from "../../../icons";
+import { resolve_permissions } from "../../../permission_resolution";
 import { OptionType, define_command } from "../../../types/command";
 
 export const purge_command = define_command({
@@ -32,7 +34,14 @@ export const purge_command = define_command({
 		}
 	},
 	async run(context, args) {
-		if (!context.channel.permissionsOf(context.member).has(Permissions.MANAGE_MESSAGES))
+		const config = moderation_config.get(context.guild.id);
+
+		if (config === undefined)
+			return;
+
+		const perms = resolve_permissions(config, context.member, context.channel);
+
+		if (!perms.purge)
 			return;
 
 		let purged = 0;

@@ -1,10 +1,11 @@
-import { EmbedField, Permissions } from "oceanic.js";
-import { CASE_TYPE_NAME } from "..";
+import { EmbedField } from "oceanic.js";
+import { CASE_TYPE_NAME, moderation_config } from "..";
 import { get_cases } from "../../../../db/moderation/cases";
 import { Colors } from "../../../common/discord/colors";
 import { format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { icons } from "../../../icons";
+import { resolve_permissions } from "../../../permission_resolution";
 import { OptionType, define_command } from "../../../types/command";
 
 export const cases_command = define_command({
@@ -21,7 +22,14 @@ export const cases_command = define_command({
 	},
 	track_updates: true,
 	async run(context, args) {
-		if (!context.member?.permissions.has(Permissions.KICK_MEMBERS))
+		const config = moderation_config.get(context.guild.id);
+
+		if (config === undefined)
+			return;
+
+		const perms = resolve_permissions(config, context.member, context.channel);
+
+		if (!perms.case_read)
 			return;
 
 		const cases = await get_cases(

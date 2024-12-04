@@ -1,7 +1,7 @@
 import { AnyGuildChannel, CategoryChannel, Member, ThreadChannel, User } from "oceanic.js";
 import { test_number_filter } from "../schema/common/number_filter";
 import { PermissionsFilter } from "../schema/common/permissions_filter";
-import { CoreConfig, CoreGroup } from "../schema/core/config";
+import { CoreConfig, CoreGroup } from "../schema/core";
 import { core_config } from "./plugin/core";
 
 export function resolve_groups(member: Member, channel: AnyGuildChannel): GroupsResult {
@@ -108,13 +108,14 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 
 	const result: Record<string, boolean> = {};
 
-	for (const key in config.default_permissions)
+	for (const key in config.default_permissions) {
 		Object.defineProperty(result, key, {
 			value: config.default_permissions[key]!,
 			configurable: true,
 			enumerable: true,
 			writable: true
 		});
+	}
 
 	for (const override of config.permission_overrides) {
 		if (!test_filter(override, groups))

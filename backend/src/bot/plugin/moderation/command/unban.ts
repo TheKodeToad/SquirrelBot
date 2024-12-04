@@ -1,8 +1,10 @@
-import { DiscordRESTError, JSONErrorCodes, Permissions } from "oceanic.js";
+import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
+import { moderation_config } from "..";
 import { CaseType, create_case } from "../../../../db/moderation/cases";
 import { format_rest_error, format_user_tag } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { icons } from "../../../icons";
+import { resolve_permissions } from "../../../permission_resolution";
 import { OptionType, define_command } from "../../../types/command";
 
 export const unban_command = define_command({
@@ -22,7 +24,14 @@ export const unban_command = define_command({
 		},
 	},
 	async run(context, args) {
-		if (!context.member?.permissions.has(Permissions.BAN_MEMBERS))
+		const config = moderation_config.get(context.guild.id);
+
+		if (config === undefined)
+			return;
+
+		const perms = resolve_permissions(config, context.member, context.channel);
+
+		if (!perms.ban)
 			return;
 
 		let successful_unbans: { case_number: number, id: string, name: string; }[] = [];

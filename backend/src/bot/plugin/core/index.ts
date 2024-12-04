@@ -1,4 +1,4 @@
-import { core_config_schema } from "../../../schema/core/config";
+import { core_config_schema } from "../../../schema/core";
 import { ConfigCache } from "../../config";
 import { get_plugins } from "../../plugin_registry";
 import { define_plugin } from "../../types/plugin";
@@ -14,8 +14,8 @@ export const core_config = new ConfigCache(core_config_schema);
 
 export const core_plugin = define_plugin({
 	id: "core",
-	commands: [about_command],
 	config: core_config,
+	commands: [about_command],
 	listeners: [
 		prefix_send_handler,
 		prefix_edit_handler,

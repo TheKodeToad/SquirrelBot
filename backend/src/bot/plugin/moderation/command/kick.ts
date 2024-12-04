@@ -1,4 +1,5 @@
-import { DiscordRESTError, Permissions } from "oceanic.js";
+import { DiscordRESTError } from "oceanic.js";
+import { moderation_config } from "..";
 import { bot } from "../../..";
 import { CaseType, create_case } from "../../../../db/moderation/cases";
 import { get_user_cached, request_members_cached } from "../../../common/discord/cache";
@@ -6,6 +7,7 @@ import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { get_highest_role } from "../../../common/discord/permissions";
 import { icons } from "../../../icons";
+import { resolve_permissions } from "../../../permission_resolution";
 import { OptionType, define_command } from "../../../types/command";
 
 export const kick_command = define_command({
@@ -25,16 +27,33 @@ export const kick_command = define_command({
 		},
 		dm: {
 			type: OptionType.VOID,
-			id: ["dm", "d"],
+			id: ["dm", "d", "direct-message"],
 		},
 		no_dm: {
 			type: OptionType.VOID,
-			id: ["no-dm", "nd"],
+			id: ["no-dm", "nd", "no-direct-message"],
 		},
 	},
 	async run(context, args) {
-		if (!context.member?.permissions?.has(Permissions.KICK_MEMBERS))
+		const config = moderation_config.get(context.guild.id);
+
+		if (config === undefined)
 			return;
+
+		const perms = resolve_permissions(config, context.member, context.channel);
+
+		if (!perms.kick)
+			return;
+
+		let send_dm = config.ban.send_direct_message;
+
+		if (args.dm)
+			send_dm = true;
+
+		if (args.no_dm)
+			send_dm = false;
+
+		const direct_message = config.kick.direct_message ?? `You were kicked from ${escape_markdown(context.guild.name)}.`;
 
 		const members = await request_members_cached(context.guild, args.user);
 
@@ -78,10 +97,10 @@ export const kick_command = define_command({
 
 			let dm_sent = false;
 
-			if (!target_member.bot && !args.no_dm) {
+			if (!target_member.bot && send_dm) {
 				try {
 					const dm = await bot.rest.users.createDM(target);
-					await dm.createMessage({ content: "You were kicked :regional_indicator_l:" });
+					await dm.createMessage({ content: direct_message });
 					dm_sent = true;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))

@@ -1,4 +1,6 @@
 import { CaseType } from "../../../db/moderation/cases";
+import { moderation_config_schema } from "../../../schema/moderation";
+import { ConfigCache } from "../../config";
 import { define_plugin } from "../../types/plugin";
 import { ban_command } from "./command/ban";
 import { case_command } from "./command/case";
@@ -6,6 +8,14 @@ import { cases_command } from "./command/cases";
 import { kick_command } from "./command/kick";
 import { purge_command } from "./command/purge";
 import { unban_command } from "./command/unban";
+
+export const moderation_config = new ConfigCache(moderation_config_schema);
+
+export const moderation_plugin = define_plugin({
+	id: "moderation",
+	config: moderation_config,
+	commands: [ban_command, unban_command, kick_command, case_command, cases_command, purge_command],
+});
 
 export const CASE_ICON: { [T in CaseType]: string } = {
 	[CaseType.Note]: ":pencil:",
@@ -32,8 +42,3 @@ export const CASE_TYPE_NAME: { [T in CaseType]: string } = {
 	[CaseType.Ban]: "Ban",
 	[CaseType.Unban]: "Unban"
 };
-
-export const moderation_plugin = define_plugin({
-	id: "moderation",
-	commands: [ban_command, unban_command, kick_command, case_command, cases_command, purge_command],
-});

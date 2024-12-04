@@ -39,9 +39,9 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		return;
 
 	const { prefix } = config.prefix_commands;
-	const permissions = resolve_permissions(config, message.member, message.channel);
+	const perms = resolve_permissions(config, message.member, message.channel);
 
-	if (!(permissions.prefix_commands && message.content.startsWith(prefix)))
+	if (!(perms.prefix_commands && message.content.startsWith(prefix)))
 		return;
 
 	const unprefixed = message.content.slice(prefix.length);

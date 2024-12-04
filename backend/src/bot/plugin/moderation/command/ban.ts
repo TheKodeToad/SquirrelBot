@@ -1,4 +1,5 @@
-import { DiscordRESTError, Permissions } from "oceanic.js";
+import { DiscordRESTError } from "oceanic.js";
+import { moderation_config } from "..";
 import { bot } from "../../..";
 import { CaseType, create_case } from "../../../../db/moderation/cases";
 import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache";
@@ -6,6 +7,7 @@ import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown } from "../../../common/discord/markdown";
 import { get_highest_role } from "../../../common/discord/permissions";
 import { icons } from "../../../icons";
+import { resolve_permissions } from "../../../permission_resolution";
 import { OptionType, define_command } from "../../../types/command";
 
 export const ban_command = define_command({
@@ -25,11 +27,11 @@ export const ban_command = define_command({
 		},
 		dm: {
 			type: OptionType.VOID,
-			id: ["dm", "d"],
+			id: ["dm", "d", "direct-message"],
 		},
 		no_dm: {
 			type: OptionType.VOID,
-			id: ["no-dm", "nd"],
+			id: ["no-dm", "nd", "no-direct-message"],
 		},
 		purge: {
 			type: OptionType.NUMBER,
@@ -37,10 +39,26 @@ export const ban_command = define_command({
 		},
 	},
 	async run(context, args) {
-		if (!context.member?.permissions.has(Permissions.BAN_MEMBERS))
+		const config = moderation_config.get(context.guild.id);
+
+		if (config === undefined)
 			return;
 
-		const delete_message_seconds = (args.purge ?? 0) * (1000 * 60 * 60 * 24);
+		const perms = resolve_permissions(config, context.member, context.channel);
+
+		if (!perms.ban)
+			return;
+
+		let send_dm = config.ban.send_direct_message;
+
+		if (args.dm)
+			send_dm = true;
+
+		if (args.no_dm)
+			send_dm = false;
+
+		const direct_message = config.ban.direct_message ?? `You are permanently banned from ${escape_markdown(context.guild.name)}.`;
+		const delete_message_seconds = (args.purge ?? config.ban.purge_messages) * (1000 * 60 * 60 * 24);
 
 		const members = await request_members_cached(context.guild, args.user);
 
@@ -92,10 +110,10 @@ export const ban_command = define_command({
 
 			let dm_sent = false;
 
-			if (in_guild && !is_bot && !args.no_dm) {
+			if (in_guild && !is_bot && send_dm) {
 				try {
 					const dm = await create_dm_cached(target);
-					await dm.createMessage({ content: "You were banned :regional_indicator_l:" });
+					await dm.createMessage({ content: direct_message });
 					dm_sent = true;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
