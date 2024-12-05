@@ -1,4 +1,4 @@
-import { AnyGuildChannel, DiscordRESTError, JSONErrorCodes } from "oceanic.js";
+import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { get_member_cached } from "../../../common/discord/cache";
 import { format_rest_error } from "../../../common/discord/format";
 import { escape_markdown, make_inline_codeblock } from "../../../common/discord/markdown";
@@ -15,11 +15,6 @@ export const groups_command = define_command({
 			type: OptionType.USER,
 			id: ["user", "u"],
 			position: 0,
-		},
-		channel: {
-			type: OptionType.CHANNEL,
-			id: ["channel", "c"],
-			position: 1
 		}
 	},
 	async run(context, args) {
@@ -29,7 +24,6 @@ export const groups_command = define_command({
 			return;
 
 		let member = context.member;
-		let channel: AnyGuildChannel = context.channel;
 
 		if (args.user !== null) {
 			try {
@@ -46,17 +40,6 @@ export const groups_command = define_command({
 				await context.respond(`${icons.error} User fetch failed: ${escape_markdown(format_rest_error(error))}!`);
 				return;
 			}
-		}
-
-		if (args.channel !== null) {
-			const cached_channel = context.guild.channels.get(args.channel) ?? context.guild.threads.get(args.channel);
-
-			if (cached_channel === undefined) {
-				await context.respond(`${icons.error} The specified channel is not available in the server!`);
-				return;
-			}
-
-			channel = cached_channel;
 		}
 
 		const result = resolve_groups(member);
