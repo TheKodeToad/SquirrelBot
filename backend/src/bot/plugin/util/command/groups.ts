@@ -46,8 +46,8 @@ export const groups_command = define_command({
 
 		if (result.groups.size !== 0) {
 			const groups = Array.from(result.groups).toSorted().map(make_inline_codeblock);
-			await context.respond(`${icons.info} ${groups} (permission level ${result.level})`);
+			await context.respond(`${icons.info} Groups for <@${member.id}> (${escape_markdown(member.tag)}): ${groups} (permission level ${result.level})`);
 		} else
-			await context.respond(`${icons.info} No groups found!`);
+			await context.respond(`${icons.info} <@${member.id}> (${escape_markdown(member.tag)}) is not in any groups!`);
 	},
 });
