@@ -53,7 +53,7 @@ export const cases_command = define_command({
 			filter = " for this server";
 
 		if (cases.length === 0)
-			await context.respond(`${icons.error} No cases${filter} found!`);
+			await context.respond(`${icons.info} No cases${filter} found!`);
 		else {
 			let fields: EmbedField[] = [];
 
@@ -80,7 +80,7 @@ export const cases_command = define_command({
 			await context.respond({
 				embeds: [{
 					color: Colors.blurple,
-					description: "### Cases" + filter,
+					description: `### Cases` + filter,
 					fields
 				}],
 			});

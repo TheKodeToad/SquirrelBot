@@ -1,3 +1,4 @@
+import { icons } from "../../../icons";
 import { OptionType, define_command } from "../../../types/command";
 
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
@@ -16,6 +17,6 @@ export const snowflake_command = define_command({
 	async run(context, args) {
 		const snowflake = BigInt(args.input);
 		const timestamp = DISCORD_EPOCH + (snowflake >> 22n);
-		await context.respond(`<t:${timestamp / 1000n}> (${timestamp} unix time)`);
+		await context.respond(`${icons.info} <t:${timestamp / 1000n}> (${timestamp} unix time)`);
 	},
 });
