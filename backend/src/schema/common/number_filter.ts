@@ -23,16 +23,16 @@ export const number_filter_schema = pipe(
 		else if (number_string.startsWith("!=")) {
 			mode = NumberFilterMode.NOT_EQUALS;
 			number_string = number_string.substring(2);
-		} else if (number_string.startsWith(">")) {
+		} else if (number_string.startsWith("<")) {
 			mode = NumberFilterMode.LESS_THAN;
 			number_string = number_string.substring(1);
-		} else if (number_string.startsWith(">=")) {
+		} else if (number_string.startsWith("<=")) {
 			mode = NumberFilterMode.LESS_THAN_OR_EQUAL;
 			number_string = number_string.substring(2);
-		} else if (number_string.startsWith("<")) {
+		} else if (number_string.startsWith(">")) {
 			mode = NumberFilterMode.GREATER_THAN;
 			number_string = number_string.substring(1);
-		} else if (number_string.startsWith("<=")) {
+		} else if (number_string.startsWith(">=")) {
 			mode = NumberFilterMode.GREATER_THAN_OR_EQUAL;
 			number_string = number_string.substring(2);
 		}
@@ -52,16 +52,16 @@ export interface NumberFilter extends InferOutput<typeof number_filter_schema> {
 export function test_number_filter(filter: NumberFilter, number: number): boolean {
 	switch (filter.mode) {
 		case NumberFilterMode.EQUALS:
-			return filter.number === number;
+			return number === filter.number;
 		case NumberFilterMode.NOT_EQUALS:
-			return filter.number !== number;
+			return number !== filter.number;
 		case NumberFilterMode.LESS_THAN:
-			return filter.number > number;
+			return number < filter.number;
 		case NumberFilterMode.LESS_THAN_OR_EQUAL:
-			return filter.number >= number;
+			return number <= filter.number;
 		case NumberFilterMode.GREATER_THAN:
-			return filter.number < number;
+			return number > filter.number;
 		case NumberFilterMode.GREATER_THAN_OR_EQUAL:
-			return filter.number <= number;
+			return number >= filter.number;
 	}
 }

@@ -7,9 +7,6 @@ import { permissions_filter_schema } from "./common/permissions_filter";
 const core_group_schema = object({
 	users: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid user ID"))), []),
 	roles: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid role ID"))), []),
-	channels: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid channel ID"))), []),
-	threads: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid thread ID"))), []),
-	channel_categories: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid channel category ID"))), []),
 	inherits: optional(array(string()), []),
 	level: optional(number())
 });

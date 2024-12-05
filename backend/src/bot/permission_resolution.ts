@@ -1,10 +1,15 @@
-import { AnyGuildChannel, CategoryChannel, Member, ThreadChannel, User } from "oceanic.js";
+import { AnyGuildChannel, CategoryChannel, Member, ThreadChannel } from "oceanic.js";
 import { test_number_filter } from "../schema/common/number_filter";
 import { PermissionsFilter } from "../schema/common/permissions_filter";
 import { CoreConfig, CoreGroup } from "../schema/core";
 import { core_config } from "./plugin/core";
 
-export function resolve_groups(member: Member, channel: AnyGuildChannel): GroupsResult {
+interface GroupsResult {
+	groups: Set<string>;
+	level: number;
+}
+
+export function resolve_groups(member: Member): GroupsResult {
 	const config: CoreConfig | undefined = core_config.get(member.guildID);
 
 	const groups: Set<string> = new Set;
@@ -12,8 +17,6 @@ export function resolve_groups(member: Member, channel: AnyGuildChannel): Groups
 
 	if (config === undefined)
 		return { groups, level };
-
-	const roles: Set<string> = new Set(member.roles);
 
 	for (const id in config.groups) {
 		if (!Object.hasOwn(config.groups, id))
@@ -24,7 +27,7 @@ export function resolve_groups(member: Member, channel: AnyGuildChannel): Groups
 
 		const group = config.groups[id]!;
 
-		if (!test_group(group, member.user, roles, channel))
+		if (!test_group(group, member))
 			continue;
 
 		groups.add(id);
@@ -48,49 +51,15 @@ export function resolve_groups(member: Member, channel: AnyGuildChannel): Groups
 	return { groups, level };
 }
 
-interface GroupsResult {
-	groups: Set<string>;
-	level: number;
-}
-
 function group_level(group: CoreGroup) {
 	return group.level ?? 0;
 }
 
-function test_group(group: CoreGroup, user: User, roles: Set<string>, channel: AnyGuildChannel): boolean {
-	// child of thread
-	let base_channel: AnyGuildChannel | null = null;
-	// category holding channel, or supplied channel if it is a category
-	let category: CategoryChannel | null = null;
-
-	if (channel instanceof CategoryChannel)
-		category = channel;
-	else {
-		base_channel = channel;
-
-		while (base_channel.parent !== null) {
-			if (base_channel.parent instanceof CategoryChannel) {
-				category = base_channel.parent;
-				break;
-			}
-
-			base_channel = base_channel.parent!;
-		}
-	}
-
-	if (group.users.includes(user.id))
+function test_group(group: CoreGroup, member: Member): boolean {
+	if (group.users.includes(member.id))
 		return true;
 
-	if (group.roles.some(role => roles.has(role)))
-		return true;
-
-	if (base_channel !== null && group.channels.includes(base_channel.id))
-		return true;
-
-	if (channel instanceof ThreadChannel && group.threads.includes(channel.id))
-		return true;
-
-	if (category !== null && group.channel_categories.includes(category.id))
+	if (group.roles.some(role => member.roles.includes(role)))
 		return true;
 
 	return false;
@@ -102,9 +71,9 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 		permission_overrides: (Partial<P> & PermissionsFilter)[];
 	},
 	member: Member,
-	channel: AnyGuildChannel
+	channel: Exclude<AnyGuildChannel, CategoryChannel>
 ): Record<keyof P, boolean> {
-	const groups = resolve_groups(member, channel);
+	const groups = resolve_groups(member);
 
 	const result: Record<string, boolean> = {};
 
@@ -118,7 +87,7 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 	}
 
 	for (const override of config.permission_overrides) {
-		if (!test_filter(override, groups))
+		if (!test_filter(override, groups, channel))
 			continue;
 
 		for (const key in override) {
@@ -132,8 +101,20 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 	return result as any;
 }
 
-export function test_filter(filter: PermissionsFilter, groups: GroupsResult) {
-	if (filter.in_group !== undefined && groups.groups.has(filter.in_group))
+function test_filter(filter: PermissionsFilter, groups: GroupsResult, channel: Exclude<AnyGuildChannel, CategoryChannel>) {
+	const base_channel = channel instanceof ThreadChannel ? channel.parent! : channel;
+	const category_channel = base_channel.parent ?? null;
+
+	if (filter.in_group !== undefined && filter.in_group.some(group => groups.groups.has(group)))
+		return true;
+
+	if (filter.in_channel && filter.in_channel.includes(base_channel.id))
+		return true;
+
+	if (category_channel !== null && filter.in_channel_category && filter.in_channel_category.includes(category_channel.id))
+		return true;
+
+	if (channel instanceof ThreadChannel && filter.in_thread && filter.in_thread.includes(channel.id))
 		return true;
 
 	if (filter.level !== undefined && test_number_filter(filter.level, groups.level))

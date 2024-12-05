@@ -29,8 +29,8 @@ export const moderation_config_schema = object({
 		preset_reasons: optional(array(preset_reason_schema), [])
 	}), {}),
 	kick: optional(object({
-		send_dm: optional(boolean(), false),
-		dm: optional(string()),
+		send_direct_message: optional(boolean(), false),
+		direct_message: optional(string()),
 		preset_reasons: optional(array(preset_reason_schema), discord_reasons), // TODO
 	}), {}),
 

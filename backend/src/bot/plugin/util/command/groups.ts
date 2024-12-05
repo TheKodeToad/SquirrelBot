@@ -59,13 +59,12 @@ export const groups_command = define_command({
 			channel = cached_channel;
 		}
 
-		const result = resolve_groups(member, channel);
+		const result = resolve_groups(member);
 
-		const groups = Array.from(result.groups);
-		groups.sort();
-
-		let group_list = groups.map(make_inline_codeblock).join(", ");
-
-		await context.respond(`**Groups:** ${group_list}\n**Permission Level:** ${result.level}`);
+		if (result.groups.size !== 0) {
+			const groups = Array.from(result.groups).toSorted().map(make_inline_codeblock);
+			await context.respond(`${groups} (permission level ${result.level})`);
+		} else
+			await context.respond("No groups found!");
 	},
 });
