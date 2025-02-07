@@ -1,29 +1,22 @@
-import { RequestHandler } from "express";
+import { createMiddleware } from "hono/factory";
+import { HTTPException } from "hono/http-exception";
 import { validate_token } from "../../db/api/tokens";
 
-declare global {
-	namespace Express {
-		interface Request {
-			discord_user_id?: string;
-		}
-	}
-}
+export type AuthVars = {
+	discord_user_id: string;
+};
 
-export const auth_middleware: RequestHandler = async (request, response, next) => {
-	const { authorization } = request.headers;
+export const auth_middleware = createMiddleware<{ Variables: AuthVars; }>(async (context, next) => {
+	const authorization = context.req.header("Authorization");
 
-	if (authorization === undefined) {
-		response.sendStatus(401);
-		return;
-	}
+	if (authorization === undefined)
+		throw new HTTPException(401, { message: "No Authorization header provided" });
 
 	const user = await validate_token(authorization);
 
-	if (user === null) {
-		response.sendStatus(401);
-		return;
-	}
+	if (user === null)
+		throw new HTTPException(401, { message: "Invalid or expired token" });
 
-	request.discord_user_id = user;
-	next();
-};
+	context.set("discord_user_id", user);
+	await next();
+});

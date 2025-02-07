@@ -1,6 +1,8 @@
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
+import auth from "./auth";
+import guilds from "./guilds";
 
-const router = PromiseRouter();
-router.use("/auth", require("./auth").default);
-router.use("/guilds", require("./guilds").default);
+const router = new Hono;
+router.route("/auth", auth);
+router.route("/guilds", guilds);
 export default router;

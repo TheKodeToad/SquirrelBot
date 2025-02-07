@@ -1,5 +1,6 @@
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
+import login from "./login";
 
-const router = PromiseRouter();
-router.use("/login", require("./login").default);
-export default router;
+const hono = new Hono;
+hono.route("/login", login);
+export default hono;

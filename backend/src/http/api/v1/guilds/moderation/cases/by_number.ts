@@ -1,26 +1,24 @@
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { serialise_case_object } from ".";
 import { get_case } from "../../../../../../db/moderation/cases";
+import { GuildAuthVars } from "../../../../../middleware/guild_auth";
 
-const router = PromiseRouter();
-router.get("/:number(\\d+)", async (request, response) => {
-	if (request.discord_guild_id === undefined)
+const router = new Hono<{ Variables: GuildAuthVars; }>;
+router.get("/:number{\\d+}", async context => {
+	if (context.var.discord_guild_id === undefined)
 		throw new Error("Missing guild ID");
 
-	const number = Number(request.params.number);
+	const number = Number(context.req.param("number"));
 
-	if (!Number.isSafeInteger(number)) {
-		response.sendStatus(400);
-		return;
-	}
+	if (!Number.isSafeInteger(number))
+		throw new HTTPException(400);
 
-	const info = await get_case(request.discord_guild_id, number);
+	const info = await get_case(context.var.discord_guild_id, number);
 
-	if (info === null) {
-		response.sendStatus(404);
-		return;
-	}
+	if (info === null)
+		throw new HTTPException(400);
 
-	response.send(serialise_case_object(info));
+	return context.json(serialise_case_object(info));
 });
 export default router;

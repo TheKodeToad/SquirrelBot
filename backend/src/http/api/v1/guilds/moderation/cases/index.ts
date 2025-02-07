@@ -1,5 +1,7 @@
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
 import { CASE_TYPE_ID_TO_NAME, CaseInfo } from "../../../../../../db/moderation/cases";
+import by_filter from "./by_filter";
+import by_number from "./by_number";
 
 export function serialise_case_object(info: CaseInfo) {
 	return {
@@ -15,7 +17,7 @@ export function serialise_case_object(info: CaseInfo) {
 	};
 }
 
-const router = PromiseRouter();
-router.use("/", require("./by_number").default);
-router.use("/", require("./by_filter").default);
+const router = new Hono;
+router.route("/", by_number);
+router.route("/", by_filter);
 export default router;

@@ -1,5 +1,6 @@
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
+import cases from "./cases";
 
-const router = PromiseRouter();
-router.use("/cases", require("./cases").default);
+const router = new Hono;
+router.route("/cases", cases);
 export default router;

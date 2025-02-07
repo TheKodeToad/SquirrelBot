@@ -1,5 +1,7 @@
-import express from "express";
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
+import { HTTPException } from "hono/http-exception";
+import { validator } from "hono/validator";
 import { generate_token } from "../../../../db/api/tokens";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment";
 
@@ -24,14 +26,12 @@ interface ErrorResponse {
 	error_description: string;
 }
 
-const router = PromiseRouter();
-router.post("/", express.json({ limit: 64 }), async (request, response) => {
-	const { code } = request.body;
+const router = new Hono;
+router.post("/", bodyLimit({ maxSize: 64 }), validator("json", value => value), async context => {
+	const { code } = context.req.valid("json");
 
-	if (typeof code !== "string") {
-		response.status(400).send("Missing code");
-		return;
-	}
+	if (typeof code !== "string")
+		throw new HTTPException(400, { message: "Missing code" });
 
 	const token_response = await fetch("https://discord.com/api/v10/oauth2/token", {
 		method: "POST",
@@ -49,20 +49,18 @@ router.post("/", express.json({ limit: 64 }), async (request, response) => {
 	});
 
 	if (!token_response.ok)
-		return; // TODO
+		throw new HTTPException(500, { message: "Failed fetching OAuth token" });
 
 	const token_json: TokenResponse = await token_response.json();
 	const auth = token_json.token_type + " " + token_json.access_token;
 
 	const user_response = await fetch("https://discord.com/api/v10/users/@me", { headers: { "Authorization": auth } });
 
-	if (user_response.status === 401) {
-		response.status(500).send("Application deauthorized");
-		return;
-	}
+	if (user_response.status === 401)
+		throw new HTTPException(500, { message: "Application deauthorized" });
 
 	if (!user_response.ok)
-		return;
+		throw new HTTPException(500, { message: "Failed fetching Discord user" });
 
 	const user_json: UserResponse = await user_response.json();
 
@@ -80,6 +78,6 @@ router.post("/", express.json({ limit: 64 }), async (request, response) => {
 	});
 
 	const [token, expires_at] = await generate_token(user_json.id);
-	response.send({ token, expires_at: expires_at.getTime() });
+	return context.json({ token, expires_at: expires_at.getTime() });
 });
 export default router;

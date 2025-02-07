@@ -1,12 +1,14 @@
-import PromiseRouter from "express-promise-router";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { serialise_case_object } from ".";
 import { is_snowflake } from "../../../../../../common/snowflake";
 import { CASE_TYPE_NAME_TO_ID, CaseQuery, get_cases } from "../../../../../../db/moderation/cases";
+import { GuildAuthVars } from "../../../../../middleware/guild_auth";
 
-const router = PromiseRouter();
+const router = new Hono<{ Variables: GuildAuthVars; }>;
 
-router.get("/", async (request, response) => {
-	if (request.discord_guild_id === undefined)
+router.get("/", async context => {
+	if (context.var.discord_guild_id === undefined)
 		throw new Error("Missing guild ID");
 
 	const {
@@ -22,17 +24,15 @@ router.get("/", async (request, response) => {
 		"dm-sent": dm_sent,
 		order,
 		limit
-	} = request.query;
+	} = context.req.query();
 
 	const query: CaseQuery = {};
 
 	if (typeof before === "string") {
 		const before_number = Number(before);
 
-		if (!Number.isSafeInteger(before_number)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(before_number))
+			throw new HTTPException(400);
 
 		query.number_less_than = before_number;
 	}
@@ -40,10 +40,8 @@ router.get("/", async (request, response) => {
 	if (typeof after === "string") {
 		const parsed = Number(after);
 
-		if (!Number.isSafeInteger(parsed)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(parsed))
+			throw new HTTPException(400);
 
 		query.number_greater_than = parsed;
 	}
@@ -53,17 +51,13 @@ router.get("/", async (request, response) => {
 
 		const types = Array.isArray(type) ? type : [type];
 		for (const item of types) {
-			if (typeof item !== "string") {
-				response.sendStatus(400);
-				return;
-			}
+			if (typeof item !== "string")
+				throw new HTTPException(400);
 
 			const parsed = CASE_TYPE_NAME_TO_ID[item];
 
-			if (parsed === undefined) {
-				response.sendStatus(400);
-				return;
-			}
+			if (parsed === undefined)
+				throw new HTTPException(400);
 
 			query.types.push(parsed);
 		}
@@ -72,10 +66,8 @@ router.get("/", async (request, response) => {
 	if (typeof created_before === "string") {
 		const parsed = Number(created_before);
 
-		if (!Number.isSafeInteger(parsed)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(parsed))
+			throw new HTTPException(400);
 
 		query.created_before = new Date(parsed);
 	}
@@ -83,10 +75,8 @@ router.get("/", async (request, response) => {
 	if (typeof created_after === "string") {
 		const parsed = Number(created_after);
 
-		if (!Number.isSafeInteger(parsed)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(parsed))
+			throw new HTTPException(400);
 
 		query.created_before = new Date(parsed);
 	}
@@ -96,15 +86,11 @@ router.get("/", async (request, response) => {
 
 		const actors = Array.isArray(actor) ? actor : [actor];
 		for (const item of actors) {
-			if (typeof item !== "string") {
-				response.sendStatus(400);
-				return;
-			}
+			if (typeof item !== "string")
+				throw new HTTPException(400);
 
-			if (!is_snowflake(item)) {
-				response.sendStatus(400);
-				return;
-			}
+			if (!is_snowflake(item))
+				throw new HTTPException(400);
 
 			query.actor_ids.push(item);
 		}
@@ -115,15 +101,11 @@ router.get("/", async (request, response) => {
 
 		const targets = Array.isArray(target) ? target : [target];
 		for (const item of targets) {
-			if (typeof item !== "string") {
-				response.sendStatus(400);
-				return;
-			}
+			if (typeof item !== "string")
+				throw new HTTPException(400);
 
-			if (!is_snowflake(item)) {
-				response.sendStatus(400);
-				return;
-			}
+			if (!is_snowflake(item))
+				throw new HTTPException(400);
 
 			query.target_ids.push(item);
 		}
@@ -132,30 +114,22 @@ router.get("/", async (request, response) => {
 	if (typeof delete_message_seconds_less_than === "string") {
 		const parsed = Number(delete_message_seconds_less_than);
 
-		if (!Number.isSafeInteger(parsed)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(parsed))
+			throw new HTTPException(400);
 
 		query.delete_message_seconds_less_than = parsed;
-	} else if (delete_message_seconds_less_than !== undefined) {
-		response.sendStatus(400);
-		return;
-	}
+	} else if (delete_message_seconds_less_than !== undefined)
+		throw new HTTPException(400);
 
 	if (typeof delete_message_seconds_greater_than === "string") {
 		const parsed = Number(delete_message_seconds_greater_than);
 
-		if (!Number.isSafeInteger(parsed)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(parsed))
+			throw new HTTPException(400);
 
 		query.delete_message_seconds_greater_than = parsed;
-	} else if (delete_message_seconds_greater_than !== undefined) {
-		response.sendStatus(400);
-		return;
-	}
+	} else if (delete_message_seconds_greater_than !== undefined)
+		throw new HTTPException(400);
 
 	if (typeof dm_sent === "string") {
 		switch (dm_sent) {
@@ -166,13 +140,10 @@ router.get("/", async (request, response) => {
 				query.dm_sent = false;
 				break;
 			default:
-				response.sendStatus(400);
-				return;
+				throw new HTTPException(400);
 		}
-	} else if (dm_sent !== undefined) {
-		response.sendStatus(400);
-		return;
-	}
+	} else if (dm_sent !== undefined)
+		throw new HTTPException(400);
 
 	if (typeof order === "string") {
 		switch (order) {
@@ -185,21 +156,16 @@ router.get("/", async (request, response) => {
 				query.reversed = true;
 				break;
 			default:
-				response.sendStatus(400);
-				return;
+				throw new HTTPException(400);
 		}
-	} else if (order !== undefined) {
-		response.sendStatus(400);
-		return;
-	}
+	} else if (order !== undefined)
+		throw new HTTPException(400);
 
 	if (typeof limit === "string") {
 		const limit_number = Number(limit);
 
-		if (!Number.isSafeInteger(limit_number)) {
-			response.sendStatus(400);
-			return;
-		}
+		if (!Number.isSafeInteger(limit_number))
+			throw new HTTPException(400);
 
 		// if limit is specified explicitly, 0 can be used to fetch all
 		if (limit_number > 0)
@@ -207,7 +173,7 @@ router.get("/", async (request, response) => {
 	} else
 		query.limit = 20;
 
-	response.send((await get_cases(request.discord_guild_id, query)).map(serialise_case_object));
+	return context.json((await get_cases(context.var.discord_guild_id, query)).map(serialise_case_object));
 });
 
 export default router;

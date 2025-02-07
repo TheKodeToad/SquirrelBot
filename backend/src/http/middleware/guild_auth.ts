@@ -1,37 +1,31 @@
-import { RequestHandler } from "express";
+import { createMiddleware } from "hono/factory";
+import { HTTPException } from "hono/http-exception";
 import { is_snowflake } from "../../common/snowflake";
 import { get_guild_owner_id } from "../../db/core/guild_info";
 
-declare global {
-	namespace Express {
-		interface Request {
-			discord_guild_id?: string;
-		}
-	}
-}
+export type GuildAuthVars = {
+	discord_guild_id: string;
+	discord_user_id: string;
+};
 
-export const guild_auth_middleware: RequestHandler = async (request, response, next) => {
-	const { discord_user_id } = request;
-	const { guild_id } = request.params;
+export const guild_auth_middleware = createMiddleware<{ Variables: GuildAuthVars; }>(async (context, next) => {
+	const { discord_user_id } = context.var;
+	const guild_id = context.req.param("guild_id");
 
-	if (discord_user_id === undefined)
+	if (typeof discord_user_id !== "string")
 		throw new Error("Missing auth middleware");
 
-	if (guild_id === undefined)
+	if (typeof guild_id !== "string")
 		throw new Error("Missing guild_id path parameter");
 
-	if (!is_snowflake(guild_id)) {
-		response.sendStatus(400);
-		return;
-	}
+	if (!is_snowflake(guild_id))
+		throw new HTTPException(400, { message: "Malformed guild id" });
 
 	const owner = await get_guild_owner_id(guild_id);
 
-	if (owner === null || owner !== discord_user_id) {
-		response.sendStatus(403);
-		return;
-	}
+	if (owner === null || owner !== discord_user_id)
+		throw new HTTPException(403, { message: "Missing permission" });
 
-	request.discord_guild_id = guild_id;
-	next();
-};
+	context.set("discord_guild_id", guild_id);
+	await next();
+});
