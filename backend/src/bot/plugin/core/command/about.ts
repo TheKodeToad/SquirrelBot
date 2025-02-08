@@ -9,6 +9,8 @@ Advanced moderation and management bot created by TheKodeToad.
 
 Made in England with [Oceanic.js](https://oceanic.ws/) and love!
 Some inspiration taken from [Zepplin](https://zeppelin.gg/).
+
+Icons from [Tabler](https://tabler.io/icons).
 `.replaceAll("\t", "");
 
 const LIBRARIES = `
@@ -16,7 +18,7 @@ const LIBRARIES = `
  [TypeScript](https://www.typescriptlang.org/),
  [Oceanic.js](https://oceanic.ws/),
  [PostgreSQL](https://www.postgresql.org/) with [node-postgres](https://node-postgres.com/),
- [Express](https://expressjs.com/),
+ [Hono](https://hono.dev/),
  [smol-toml](https://github.com/squirrelchat/smol-toml),
  [Valibot](https://valibot.dev/),
  and [more](https://github.com/TheKodeToad/SquirrelBot/blob/develop/backend/package.json)
