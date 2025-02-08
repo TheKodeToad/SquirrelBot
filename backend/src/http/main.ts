@@ -7,7 +7,7 @@ import api_v1 from "./api/v1";
 async function main() {
 	const app = new Hono;
 	app.route("/api/v1", api_v1);
-	app.use("/", serveStatic({ root: "../frontend/static" })); // yea
+	app.use("/*", serveStatic({ root: "../frontend/static" })); // yea
 	serve({
 		fetch: app.fetch,
 		port: 8080,
