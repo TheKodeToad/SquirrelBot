@@ -5,7 +5,7 @@
 		"watch": "node build.mjs watch"
 	},
 	"devDependencies": {
-		"esbuild": "^0.24.2",
+		"esbuild": "^0.25.0",
 		"esbuild-plugin-solid": "^0.6.0"
 	},
 	"dependencies": {
