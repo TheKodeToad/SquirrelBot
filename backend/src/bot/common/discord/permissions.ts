@@ -46,4 +46,9 @@ export function can_write_in_channel(channel: AnyGuildChannel, member: Member): 
 		case ChannelTypes.GUILD_MEDIA:
 			return false;
 	}
+
+	const fixThisCodeForDiscordUpdate = (_: never) => { };
+	fixThisCodeForDiscordUpdate(channel);
+
+	return false;
 }
