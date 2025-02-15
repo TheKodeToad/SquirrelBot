@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { bodyLimit } from "hono/body-limit";
 import { HTTPException } from "hono/http-exception";
 import { validator } from "hono/validator";
 import { generate_token } from "../../../../db/api/tokens";
@@ -27,7 +26,7 @@ interface ErrorResponse {
 }
 
 const router = new Hono;
-router.post("/", bodyLimit({ maxSize: 64 }), validator("json", value => value), async context => {
+router.post("/", validator("json", value => value), async context => {
 	const { code } = context.req.valid("json");
 
 	if (typeof code !== "string")
@@ -66,9 +65,7 @@ router.post("/", bodyLimit({ maxSize: 64 }), validator("json", value => value), 
 
 	await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
+		headers: { "Content-Type": "application/x-www-form-urlencoded" },
 		body: new URLSearchParams({
 			client_id: CLIENT_ID,
 			client_secret: CLIENT_SECRET,
@@ -78,6 +75,11 @@ router.post("/", bodyLimit({ maxSize: 64 }), validator("json", value => value), 
 	});
 
 	const [token, expires_at] = await generate_token(user_json.id);
-	return context.json({ token, expires_at: expires_at.getTime() });
+	return context.json({
+		token,
+		expires_at: expires_at.getTime(),
+		username: user_json.username,
+		avatar: user_json.avatar
+	});
 });
 export default router;

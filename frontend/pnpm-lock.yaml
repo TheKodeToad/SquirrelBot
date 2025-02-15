@@ -8,6 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@solid-primitives/deep':
+        specifier: ^0.3.0
+        version: 0.3.0(solid-js@1.9.4)
+      '@solidjs/router':
+        specifier: ^0.15.3
+        version: 0.15.3(solid-js@1.9.4)
+      '@tabler/icons-solidjs':
+        specifier: ^3.30.0
+        version: 3.30.0(solid-js@1.9.4)
       solid-js:
         specifier: ^1.9.4
         version: 1.9.4
@@ -345,6 +354,39 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@solid-primitives/deep@0.3.0':
+    resolution: {integrity: sha512-v+B8OYCSqGpjQdj9SyJxydlyb+px4/i834ksTtPhv13OsLtibKreY5raOxelYuh/sX2MNFW8NTSsrWt+xo6D+Q==}
+    peerDependencies:
+      solid-js: ^1.6.12
+
+  '@solid-primitives/memo@1.4.0':
+    resolution: {integrity: sha512-Q0eSnGnhzbUPUNES2OOcEj6qF/9YZntoq04nmQEAIp6QhKdpAsH9mNFrVQtB1by41H/QndNui7Yd2wjI7PUpPA==}
+    peerDependencies:
+      solid-js: ^1.6.12
+
+  '@solid-primitives/scheduled@1.5.0':
+    resolution: {integrity: sha512-RVw24IRNh1FQ4DCMb3OahB70tXIwc5vH8nhR4nNPsXwUPQeuOkLsDI5BlxaPk0vyZgqw9lDpufgI3HnPwplgDw==}
+    peerDependencies:
+      solid-js: ^1.6.12
+
+  '@solid-primitives/utils@6.3.0':
+    resolution: {integrity: sha512-e7hTlJ1Ywh2+g/Qug+n4L1mpfxsikoIS4/sHE2EK9WatQt8UJqop/vE6bsLnXlU1xuhb/jo94Ah5Y27rd4wP7A==}
+    peerDependencies:
+      solid-js: ^1.6.12
+
+  '@solidjs/router@0.15.3':
+    resolution: {integrity: sha512-iEbW8UKok2Oio7o6Y4VTzLj+KFCmQPGEpm1fS3xixwFBdclFVBvaQVeibl1jys4cujfAK5Kn6+uG2uBm3lxOMw==}
+    peerDependencies:
+      solid-js: ^1.8.6
+
+  '@tabler/icons-solidjs@3.30.0':
+    resolution: {integrity: sha512-tBtwAVw5Hc/3ESC7Zyr2sUPPU1JOvqlGrt8PuEATcjb5u2hogEm0aFwDvjUtYxKerswJA6ICckohDGYuJM9o/Q==}
+    peerDependencies:
+      solid-js: ^1.4.7
+
+  '@tabler/icons@3.30.0':
+    resolution: {integrity: sha512-c8OKLM48l00u9TFbh2qhSODMONIzML8ajtCyq95rW8vzkWcBrKRPM61tdkThz2j4kd5u17srPGIjqdeRUZdfdw==}
 
   ansi-styles@3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}
@@ -792,6 +834,36 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
+
+  '@solid-primitives/deep@0.3.0(solid-js@1.9.4)':
+    dependencies:
+      '@solid-primitives/memo': 1.4.0(solid-js@1.9.4)
+      solid-js: 1.9.4
+
+  '@solid-primitives/memo@1.4.0(solid-js@1.9.4)':
+    dependencies:
+      '@solid-primitives/scheduled': 1.5.0(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.3.0(solid-js@1.9.4)
+      solid-js: 1.9.4
+
+  '@solid-primitives/scheduled@1.5.0(solid-js@1.9.4)':
+    dependencies:
+      solid-js: 1.9.4
+
+  '@solid-primitives/utils@6.3.0(solid-js@1.9.4)':
+    dependencies:
+      solid-js: 1.9.4
+
+  '@solidjs/router@0.15.3(solid-js@1.9.4)':
+    dependencies:
+      solid-js: 1.9.4
+
+  '@tabler/icons-solidjs@3.30.0(solid-js@1.9.4)':
+    dependencies:
+      '@tabler/icons': 3.30.0
+      solid-js: 1.9.4
+
+  '@tabler/icons@3.30.0': {}
 
   ansi-styles@3.2.1:
     dependencies:

@@ -37,13 +37,14 @@ export async function get_guild_owner_id(id: string): Promise<string | null> {
 	return result.rows[0]?.owner_id ?? null;
 }
 
-export async function get_guild_info_by_owner(owner_id: string): Promise<GuildInfo[]> {
+export async function get_guild_info_by_owner(owner_id: string): Promise<Omit<GuildInfo, "owner_id">[]> {
 	const result = await pool.query(
 		`
 			SELECT
 				"id",
 				"name",
-				"icon_hash"
+				"icon_hash",
+				"owner_id"
 			FROM "core_guild_info"
 			WHERE "owner_id" = $1
 		`,

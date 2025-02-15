@@ -9,6 +9,9 @@
 		"esbuild-plugin-solid": "^0.6.0"
 	},
 	"dependencies": {
+		"@solid-primitives/deep": "^0.3.0",
+		"@solidjs/router": "^0.15.3",
+		"@tabler/icons-solidjs": "^3.30.0",
 		"solid-js": "^1.9.4"
 	}
 }

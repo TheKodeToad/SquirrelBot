@@ -28,6 +28,47 @@ export async function generate_token(user_id: string): Promise<[token: string, e
  * @returns user ID if valid
  */
 export async function validate_token(token: string): Promise<string | null> {
+	const key = await token_key(token);
+
+	if (key === null)
+		return null;
+
+	const result = await pool.query(
+		`
+			SELECT "user_id", "expires_at"
+			FROM "api_tokens"
+			WHERE "user_id" = $1 AND "hash" = $2
+		`,
+		key
+	);
+
+	if (result.rowCount !== 1)
+		return null;
+
+	if (Date.now() >= result.rows[0].expires_at)
+		return null;
+
+	return result.rows[0].user_id;
+}
+
+export async function delete_token(token: string): Promise<boolean> {
+	const key = await token_key(token);
+
+	if (key === null)
+		return false;
+
+	const result = await pool.query(
+		`
+			DELETE FROM "api_tokens"
+			WHERE "user_id" = $1 AND "hash" = $2
+		`,
+		key
+	);
+
+	return result.rowCount === 1;
+}
+
+async function token_key(token: string): Promise<[bigint, Buffer] | null> {
 	const split_index = token.indexOf(".");
 
 	if (split_index === -1)
@@ -51,22 +92,7 @@ export async function validate_token(token: string): Promise<string | null> {
 	const secret_buffer = Buffer.from(secret_part, "hex");
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret_buffer));
 
-	const result = await pool.query(
-		`
-			SELECT "user_id", "expires_at"
-			FROM "api_tokens"
-			WHERE "user_id" = $1 AND "hash" = $2
-		`,
-		[user_id, hash]
-	);
-
-	if (result.rowCount !== 1)
-		return null;
-
-	if (Date.now() >= result.rows[0].expires_at)
-		return null;
-
-	return result.rows[0].user_id;
+	return [user_id, hash];
 }
 
 export async function delete_expired_tokens(): Promise<void> {

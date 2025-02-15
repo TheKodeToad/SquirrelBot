@@ -14,6 +14,7 @@ router.get("/:key", async context => {
 
 	return context.body(config, 200, { "Content-Type": "application/toml" });
 });
+
 router.put("/:key", async context => {
 	if (context.req.header("Content-Type") !== "application/toml")
 		throw new HTTPException(400, { message: "Content-Type is not application/toml" });

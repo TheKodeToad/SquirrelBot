@@ -1,19 +1,15 @@
-import { createSignal } from "solid-js";
+import { Route, Router } from "@solidjs/router";
 import { render } from "solid-js/web";
-import { Button } from "./component/button";
+import { HeaderBarComponent } from "./component/header_bar";
+import { NotFound } from "./route/not_found";
+import { Servers } from "./route/servers";
 
 export function App() {
-	const [shown, set_shown] = createSignal(true);
 	return (
-		<>
-			<h1>Stuff</h1>
-			<Button color="secondary" onClick={() => set_shown(false)} disabled={!shown()}>
-				Cancel
-			</Button>
-			<Button color="primary" onClick={() => set_shown(false)} disabled={!shown()}>
-				OK
-			</Button>
-		</>
+		<Router root={HeaderBarComponent}>
+			<Route path="/" component={Servers} />
+			<Route path="*" component={NotFound} />
+		</Router>
 	);
 }
 

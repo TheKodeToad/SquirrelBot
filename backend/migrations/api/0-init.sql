@@ -2,7 +2,7 @@ CREATE TABLE "api_users" (
 	"id" NUMERIC(20, 0) NOT NULL,
 	"username" TEXT NOT NULL,
 	"avatar_hash" TEXT NOT NULL
-);
+); -- TODO: remove this
 
 CREATE TABLE "api_tokens" (
 	"user_id" NUMERIC(20, 0) NOT NULL,
