@@ -1,0 +1,21 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Bot",
+			"runtimeExecutable": "pnpm",
+			"cwd": "${workspaceRoot}/backend",
+			"runtimeArgs": ["run", "bot"]
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "HTTP API",
+			"runtimeExecutable": "pnpm",
+			"cwd": "${workspaceRoot}/backend",
+			"runtimeArgs": ["run", "http"]
+		}
+	]
+}
