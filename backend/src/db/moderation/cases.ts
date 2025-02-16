@@ -135,7 +135,7 @@ export async function get_cases(guild_id: string, query: CaseQuery): Promise<Cas
 				"actor_id",
 				"target_id",
 				"reason",
-				"delete_message_seconds"
+				"delete_message_seconds",
 				"dm_sent"
 			FROM "moderation_cases"
 			WHERE "guild_id" = $1
