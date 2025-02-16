@@ -53,7 +53,7 @@ export async function validate_token(token: string): Promise<string | null> {
 
 	const { expires_at, user_id } = db_parse(token_info_schema, result.rows[0]);
 
-	if (Date.now() >= expires_at.getDate())
+	if (Date.now() >= expires_at.getTime())
 		return null;
 
 	return user_id;
