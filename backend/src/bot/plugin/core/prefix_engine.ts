@@ -1,4 +1,4 @@
-import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { is_snowflake } from "../../../common/snowflake.ts";
 import { TTLMap } from "../../../common/ttl_map.ts";
 import { can_write_in_channel } from "../../common/discord/permissions.ts";
@@ -148,7 +148,10 @@ class PrefixContext implements Context {
 			if (config === undefined)
 				return;
 
-			if (config.prefix_commands.reply) {
+			if (
+				config.prefix_commands.reply
+				&& this.message.channel.permissionsOf(this.message.channel.guild.clientMember).has(Permissions.READ_MESSAGE_HISTORY)
+			) {
 				this._response = await this.channel.createMessage({
 					messageReference: {
 						guildID: this.guild.id,
