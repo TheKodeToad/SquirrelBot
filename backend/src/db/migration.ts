@@ -11,6 +11,17 @@ export async function check_migrations() {
 	return await process_all(true);
 }
 
+export async function check_migrations_or_exit() {
+	const migrations_needed = await check_migrations();
+
+	if (migrations_needed > 0) {
+		console.error(`${migrations_needed} migrations needed!`);
+		console.error("Run pnpm migrate!");
+		console.error("Note: this cannot be reversed! Backups are *your* responsibility!");
+		process.exit(1);
+	}
+}
+
 async function process_all(check_only: boolean): Promise<number> {
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS "migration_dirs" (
@@ -29,13 +40,13 @@ async function process_all(check_only: boolean): Promise<number> {
 		if (!(await fs.stat(directory_path)).isDirectory())
 			continue;
 
-		total += await process(directory_path, check_only);
+		total += await process_in(directory_path, check_only);
 	}
 
 	return total;
 }
 
-async function process(dir: string, check_only: boolean): Promise<number> {
+async function process_in(dir: string, check_only: boolean): Promise<number> {
 	let run_count = 0;
 	const files: string[] = [];
 
@@ -82,7 +93,7 @@ async function process(dir: string, check_only: boolean): Promise<number> {
 		++run_count;
 
 		if (check_only) {
-			console.log(`File "${file}" needs run!`);
+			console.error(`File "${file}" needs run!`);
 			continue;
 		}
 
