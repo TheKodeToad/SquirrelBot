@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { is_snowflake } from "../../common/snowflake";
-import { get_guild_owner_id } from "../../db/core/guild_info";
+import { is_snowflake } from "../../common/snowflake.ts";
+import { get_guild_owner_id } from "../../db/core/guild_info.ts";
 
 export type GuildAuthVars = {
 	discord_guild_id: string;

@@ -1,4 +1,4 @@
-import { AnyTextableGuildChannel, CommandInteraction, CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, CommandInteraction, type CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
 

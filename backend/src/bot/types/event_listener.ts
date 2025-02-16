@@ -1,4 +1,4 @@
-import { ClientEvents } from "oceanic.js";
+import type { ClientEvents } from "oceanic.js";
 
 export interface EventListener<E extends keyof ClientEvents = keyof ClientEvents> {
 	type: E;

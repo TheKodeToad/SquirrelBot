@@ -1,6 +1,6 @@
-import { ConfigCache } from "../config";
-import { Command } from "./command";
-import { EventListener } from "./event_listener";
+import type { ConfigCache } from "../config.ts";
+import type { Command } from "./command.ts";
+import type { EventListener } from "./event_listener.ts";
 
 export interface Plugin {
 	id: string;

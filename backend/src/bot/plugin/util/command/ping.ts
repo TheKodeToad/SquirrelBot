@@ -1,5 +1,5 @@
-import { icons } from "../../../icons";
-import { define_command } from "../../../types/command";
+import { icons } from "../../../icons.ts";
+import { define_command } from "../../../types/command.ts";
 
 export const ping_command = define_command({
 	id: "ping",

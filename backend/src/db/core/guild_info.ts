@@ -1,4 +1,4 @@
-import { pool } from "..";
+import { pool } from "../index.ts";
 
 export interface GuildInfo {
 	id: string;

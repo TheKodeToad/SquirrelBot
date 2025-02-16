@@ -2,8 +2,11 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "NodeNext",
+		"rewriteRelativeImportExtensions": true,
+		"verbatimModuleSyntax": true,
 		"strict": true,
 		"noImplicitAny": false,
-		"noUncheckedIndexedAccess": true
+		"noUncheckedIndexedAccess": true,
+		"isolatedModules": true
 	}
 }

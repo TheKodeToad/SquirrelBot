@@ -1,9 +1,9 @@
 import { UndeletableMessageTypes } from "oceanic.js";
-import { moderation_config } from "..";
-import { bot } from "../../..";
-import { icons } from "../../../icons";
-import { resolve_permissions } from "../../../permission_resolution";
-import { OptionType, define_command } from "../../../types/command";
+import { icons } from "../../../icons.ts";
+import { bot } from "../../../index.ts";
+import { resolve_permissions } from "../../../permission_resolution.ts";
+import { OptionType, define_command } from "../../../types/command.ts";
+import { moderation_config } from "../index.ts";
 
 export const purge_command = define_command({
 	id: ["purge", "sweep", "clear"],

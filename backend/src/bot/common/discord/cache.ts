@@ -1,5 +1,5 @@
-import { Guild, Member, PrivateChannel, RequestGuildMembersOptions, User } from "oceanic.js";
-import { bot } from "../..";
+import { Guild, Member, PrivateChannel, type RequestGuildMembersOptions, User } from "oceanic.js";
+import { bot } from "../../index.ts";
 
 export function get_user_cached(user_id: string): User | Promise<User> {
 	return bot.users.get(user_id) ?? bot.rest.users.get(user_id);

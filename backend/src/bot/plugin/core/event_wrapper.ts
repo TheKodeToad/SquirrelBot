@@ -1,6 +1,6 @@
-import { ClientEvents } from "oceanic.js";
-import { bot } from "../..";
-import { BOT_ALLOWED_GUILDS } from "../../../environment";
+import type { ClientEvents } from "oceanic.js";
+import { BOT_ALLOWED_GUILDS } from "../../../environment.ts";
+import { bot } from "../../index.ts";
 
 export function wrap_listener<E extends keyof ClientEvents>(
 	event: E,

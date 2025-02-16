@@ -1,10 +1,11 @@
 import AsyncLock from "async-lock";
+import { parse as parseToml, TomlError } from "smol-toml";
 import { safeParse } from "valibot";
-import { bot } from "../..";
-import { get_guild_config, insert_guild_config } from "../../../db/core/configs";
-import { add_channel_listener } from "../../../db/notification";
-import { get_plugin, get_plugins } from "../../plugin_registry";
-import { Plugin } from "../../types/plugin";
+import { get_guild_config, insert_guild_config } from "../../../db/core/configs.ts";
+import { add_channel_listener } from "../../../db/notification.ts";
+import { bot } from "../../index.ts";
+import { get_plugin, get_plugins } from "../../plugin_registry.ts";
+import type { Plugin } from "../../types/plugin.ts";
 
 export async function load_configs() {
 	await Promise.all(bot.guilds.map(async guild => {
@@ -53,8 +54,6 @@ export async function install_config_change_listener(): Promise<void> {
 }
 
 async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
-	const { parse: parseToml, TomlError } = await import("smol-toml");
-
 	if (plugin.config === undefined)
 		return;
 

@@ -1,14 +1,14 @@
 import { DiscordRESTError } from "oceanic.js";
-import { moderation_config } from "..";
-import { bot } from "../../..";
-import { CaseType, create_case } from "../../../../db/moderation/cases";
-import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache";
-import { format_rest_error } from "../../../common/discord/format";
-import { escape_markdown } from "../../../common/discord/markdown";
-import { get_highest_role } from "../../../common/discord/permissions";
-import { icons } from "../../../icons";
-import { resolve_permissions } from "../../../permission_resolution";
-import { OptionType, define_command } from "../../../types/command";
+import { CaseType, create_case } from "../../../../db/moderation/cases.ts";
+import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache.ts";
+import { format_rest_error } from "../../../common/discord/format.ts";
+import { escape_markdown } from "../../../common/discord/markdown.ts";
+import { get_highest_role } from "../../../common/discord/permissions.ts";
+import { icons } from "../../../icons.ts";
+import { bot } from "../../../index.ts";
+import { resolve_permissions } from "../../../permission_resolution.ts";
+import { OptionType, define_command } from "../../../types/command.ts";
+import { moderation_config } from "../index.ts";
 
 export const ban_command = define_command({
 	id: "ban",

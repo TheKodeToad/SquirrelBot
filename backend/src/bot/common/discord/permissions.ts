@@ -1,5 +1,5 @@
-import { AnyGuildChannel, ChannelTypes, Member, Permissions, Role } from "oceanic.js";
-import { bot } from "../..";
+import { type AnyGuildChannel, ChannelTypes, Member, Permissions, Role } from "oceanic.js";
+import { bot } from "../../index.ts";
 
 /**
  * Resolve member roles from cached guild.

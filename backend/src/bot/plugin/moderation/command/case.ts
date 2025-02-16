@@ -1,11 +1,11 @@
-import { CASE_TYPE_NAME, moderation_config } from "..";
-import { get_case } from "../../../../db/moderation/cases";
-import { Colors } from "../../../common/discord/colors";
-import { format_user_tag } from "../../../common/discord/format";
-import { escape_markdown } from "../../../common/discord/markdown";
-import { icons } from "../../../icons";
-import { resolve_permissions } from "../../../permission_resolution";
-import { OptionType, define_command } from "../../../types/command";
+import { get_case } from "../../../../db/moderation/cases.ts";
+import { Colors } from "../../../common/discord/colors.ts";
+import { format_user_tag } from "../../../common/discord/format.ts";
+import { escape_markdown } from "../../../common/discord/markdown.ts";
+import { icons } from "../../../icons.ts";
+import { resolve_permissions } from "../../../permission_resolution.ts";
+import { OptionType, define_command } from "../../../types/command.ts";
+import { CASE_TYPE_NAME, moderation_config } from "../index.ts";
 
 export const case_command = define_command({
 	id: "case",

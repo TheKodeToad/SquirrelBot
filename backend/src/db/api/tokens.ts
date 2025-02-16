@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { pool } from "..";
+import { pool } from "../index.ts";
 
 const ALGORITHM = "sha-256";
 

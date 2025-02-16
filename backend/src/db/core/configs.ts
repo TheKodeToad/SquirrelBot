@@ -1,4 +1,4 @@
-import { pool } from "..";
+import { pool } from "../index.ts";
 
 export async function get_guild_config(guild_id: string, key: string): Promise<string | null> {
 	const result = await pool.query(

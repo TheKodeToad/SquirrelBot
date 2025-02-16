@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
-import { pool } from ".";
 import "../environment";
+import { pool } from "./index.ts";
 
 async function migrate() {
 	await pool.query(`

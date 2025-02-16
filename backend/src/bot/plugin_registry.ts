@@ -1,5 +1,5 @@
-import { Command } from "./types/command";
-import { Plugin } from "./types/plugin";
+import type { Command } from "./types/command.ts";
+import type { Plugin } from "./types/plugin.ts";
 
 const plugins: Map<string, Plugin> = new Map;
 const commands: Map<string, Command[]> = new Map;

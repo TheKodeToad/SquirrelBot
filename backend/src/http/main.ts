@@ -4,9 +4,9 @@ import fs from "fs/promises";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import path from "path";
-import { delete_expired_tokens } from "../db/api/tokens";
-import { CLIENT_ID, REDIRECT_URI } from "../environment";
-import api_v1 from "./api/v1";
+import { delete_expired_tokens } from "../db/api/tokens.ts";
+import { CLIENT_ID, REDIRECT_URI } from "../environment.ts";
+import api_v1 from "./api/v1/index.ts";
 
 async function main() {
 	const app = new Hono;

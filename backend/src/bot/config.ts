@@ -1,4 +1,4 @@
-import { BaseIssue, BaseSchema, InferOutput } from "valibot";
+import type { BaseIssue, BaseSchema, InferOutput } from "valibot";
 
 export class ConfigCache<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>> = BaseSchema<unknown, unknown, BaseIssue<unknown>>> implements ConfigCache<S> {
 	private _cache: Map<string, InferOutput<S>>;

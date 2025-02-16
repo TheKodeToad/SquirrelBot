@@ -1,8 +1,8 @@
-import { core_config } from "..";
-import { bot } from "../../..";
-import { Colors } from "../../../common/discord/colors";
-import { resolve_permissions } from "../../../permission_resolution";
-import { define_command } from "../../../types/command";
+import { Colors } from "../../../common/discord/colors.ts";
+import { bot } from "../../../index.ts";
+import { resolve_permissions } from "../../../permission_resolution.ts";
+import { define_command } from "../../../types/command.ts";
+import { core_config } from "../index.ts";
 
 const DESCRIPTION = `
 Advanced moderation and management bot created by TheKodeToad.

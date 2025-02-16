@@ -1,13 +1,13 @@
-import { CaseType } from "../../../db/moderation/cases";
-import { moderation_config_schema } from "../../../schema/moderation";
-import { ConfigCache } from "../../config";
-import { define_plugin } from "../../types/plugin";
-import { ban_command } from "./command/ban";
-import { case_command } from "./command/case";
-import { cases_command } from "./command/cases";
-import { kick_command } from "./command/kick";
-import { purge_command } from "./command/purge";
-import { unban_command } from "./command/unban";
+import { CaseType } from "../../../db/moderation/cases.ts";
+import { moderation_config_schema } from "../../../schema/moderation.ts";
+import { ConfigCache } from "../../config.ts";
+import { define_plugin } from "../../types/plugin.ts";
+import { ban_command } from "./command/ban.ts";
+import { case_command } from "./command/case.ts";
+import { cases_command } from "./command/cases.ts";
+import { kick_command } from "./command/kick.ts";
+import { purge_command } from "./command/purge.ts";
+import { unban_command } from "./command/unban.ts";
 
 export const moderation_config = new ConfigCache(moderation_config_schema);
 

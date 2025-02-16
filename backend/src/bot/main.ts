@@ -1,9 +1,9 @@
-import { connect_listener } from "../db/notification";
-import { bot } from "./index";
-import { core_plugin } from "./plugin/core";
-import { moderation_plugin } from "./plugin/moderation";
-import { util_plugin } from "./plugin/util";
-import { apply_plugins, register_plugin } from "./plugin_registry";
+import { connect_listener } from "../db/notification.ts";
+import { bot } from "./index.ts";
+import { core_plugin } from "./plugin/core/index.ts";
+import { moderation_plugin } from "./plugin/moderation/index.ts";
+import { util_plugin } from "./plugin/util/index.ts";
+import { apply_plugins, register_plugin } from "./plugin_registry.ts";
 
 async function main() {
 	bot.once("ready", async () => {

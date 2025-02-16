@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { CASE_TYPE_ID_TO_NAME, CaseInfo } from "../../../../../../db/moderation/cases";
-import by_filter from "./by_filter";
-import by_number from "./by_number";
+import { CASE_TYPE_ID_TO_NAME, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
+import by_filter from "./by_filter.ts";
+import by_number from "./by_number.ts";
 
 export function serialise_case_object(info: CaseInfo) {
 	return {

@@ -1,13 +1,13 @@
-import { AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, PossiblyUncachedMessage, Shard, User } from "oceanic.js";
-import { core_config } from ".";
-import { bot } from "../..";
-import { is_snowflake } from "../../../common/snowflake";
-import { TTLMap } from "../../../common/ttl_map";
-import { can_write_in_channel } from "../../common/discord/permissions";
-import { resolve_permissions } from "../../permission_resolution";
-import { get_commands_named } from "../../plugin_registry";
-import { Command, Context, Option, OptionType, OptionTypeValue, Reply, default_id } from "../../types/command";
-import { define_event_listener } from "../../types/event_listener";
+import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { is_snowflake } from "../../../common/snowflake.ts";
+import { TTLMap } from "../../../common/ttl_map.ts";
+import { can_write_in_channel } from "../../common/discord/permissions.ts";
+import { bot } from "../../index.ts";
+import { resolve_permissions } from "../../permission_resolution.ts";
+import { get_commands_named } from "../../plugin_registry.ts";
+import { type Command, type Context, type Option, OptionType, type OptionTypeValue, type Reply, default_id } from "../../types/command.ts";
+import { define_event_listener } from "../../types/event_listener.ts";
+import { core_config } from "./index.ts";
 
 export const prefix_send_handler = define_event_listener("messageCreate", handle);
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);

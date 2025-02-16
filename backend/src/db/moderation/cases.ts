@@ -1,5 +1,5 @@
 import AsyncLock from "async-lock";
-import { pool } from "..";
+import { pool } from "../index.ts";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage

@@ -1,5 +1,5 @@
 import { DiscordRESTError } from "oceanic.js";
-import { get_user_cached } from "./cache";
+import { get_user_cached } from "./cache.ts";
 
 export function format_rest_error(rest_error: DiscordRESTError) {
 	if (rest_error.resBody !== null

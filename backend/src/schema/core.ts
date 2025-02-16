@@ -1,7 +1,7 @@
-import { InferOutput, array, boolean, number, object, optional, pipe, rawTransform, record, regex, string } from "valibot";
-import { SNOWFLAKE_REGEX } from "../common/snowflake";
-import { RawTransformContext } from "../common/types";
-import { permissions_filter_schema } from "./common/permissions_filter";
+import type { InferOutput } from "valibot";
+import { array, boolean, number, object, optional, pipe, rawTransform, record, regex, string } from "valibot";
+import { SNOWFLAKE_REGEX } from "../common/snowflake.ts";
+import { permissions_filter_schema } from "./common/permissions_filter.ts";
 
 // TODO just use a Map
 const core_group_schema = object({
@@ -19,7 +19,7 @@ const core_groups_schema = record(
 export interface CoreGroups extends InferOutput<typeof core_groups_schema> { }
 
 export const core_config_schema = object({
-	groups: optional(pipe(core_groups_schema, rawTransform(transform_core_groups)), {}),
+	groups: optional(pipe(core_groups_schema, transform_core_groups()), {}),
 
 	prefix_commands: optional(object({
 		prefix: optional(string(), "?"),
@@ -42,62 +42,64 @@ export interface CoreConfig extends InferOutput<typeof core_config_schema> { }
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
-function transform_core_groups({ dataset, addIssue, NEVER }: RawTransformContext<CoreGroups, CoreGroups>) {
-	if (!dataset.typed)
-		return NEVER;
+function transform_core_groups() {
+	return rawTransform<CoreGroups, CoreGroups>(({ dataset, addIssue, NEVER }) => {
+		if (!dataset.typed)
+			return NEVER;
 
-	// show all errors for invalid inherits references at once
-	let has_issues = false;
+		// show all errors for invalid inherits references at once
+		let has_issues = false;
 
-	for (const key in dataset.value) {
-		if (!Object.hasOwn(dataset.value, key))
-			continue;
+		for (const key in dataset.value) {
+			if (!Object.hasOwn(dataset.value, key))
+				continue;
 
-		const value = dataset.value[key]!;
+			const value = dataset.value[key]!;
 
-		value.inherits?.forEach((reference, index) => {
-			if (!Object.hasOwn(dataset.value, reference)) {
+			value.inherits?.forEach((reference, index) => {
+				if (!Object.hasOwn(dataset.value, reference)) {
+					addIssue({
+						message: `Invalid group reference: Received ${reference}`,
+						path: [
+							{ type: "object", origin: "value", input: dataset.value, key, value },
+							{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
+							{ type: "array", origin: "value", input: value.inherits!, key: index, value: reference }
+						]
+					});
+					has_issues = true;
+				}
+			});
+		}
+
+		if (has_issues)
+			return NEVER;
+
+		let result: CoreGroups = {};
+
+		for (const key in dataset.value) {
+			if (!Object.hasOwn(dataset.value, key))
+				continue;
+
+			const value = dataset.value[key]!;
+
+			const inherits = flatten_inheritance(value, key, dataset.value);
+
+			if (inherits === null) {
 				addIssue({
-					message: `Invalid group reference: Received ${reference}`,
+					message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
 					path: [
 						{ type: "object", origin: "value", input: dataset.value, key, value },
 						{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
-						{ type: "array", origin: "value", input: value.inherits!, key: index, value: reference }
 					]
 				});
-				has_issues = true;
+				return NEVER;
 			}
-		});
-	}
 
-	if (has_issues)
-		return NEVER;
-
-	let result: CoreGroups = {};
-
-	for (const key in dataset.value) {
-		if (!Object.hasOwn(dataset.value, key))
-			continue;
-
-		const value = dataset.value[key]!;
-
-		const inherits = flatten_inheritance(value, key, dataset.value);
-
-		if (inherits === null) {
-			addIssue({
-				message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
-				path: [
-					{ type: "object", origin: "value", input: dataset.value, key, value },
-					{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
-				]
-			});
-			return NEVER;
+			result[key] = { ...value, inherits };
 		}
 
-		result[key] = { ...value, inherits };
-	}
-
-	return result;
+		return result;
+	});
 }
 
 function flatten_inheritance(input: CoreGroup, key: string, groups: CoreGroups): string[] | null {

@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { get_guild_info_by_owner } from "../../../../db/core/guild_info";
-import { auth_middleware } from "../../../middleware/auth";
-import { guild_auth_middleware } from "../../../middleware/guild_auth";
-import config from "./config";
-import moderation from "./moderation";
+import { get_guild_info_by_owner } from "../../../../db/core/guild_info.ts";
+import { auth_middleware } from "../../../middleware/auth.ts";
+import { guild_auth_middleware } from "../../../middleware/guild_auth.ts";
+import config from "./config.ts";
+import moderation from "./moderation/index.ts";
 
 const guild_router = new Hono;
 guild_router.use(auth_middleware);

@@ -1,11 +1,11 @@
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
-import { get_member_cached } from "../../../common/discord/cache";
-import { format_rest_error } from "../../../common/discord/format";
-import { escape_markdown, make_inline_codeblock } from "../../../common/discord/markdown";
-import { icons } from "../../../icons";
-import { resolve_groups } from "../../../permission_resolution";
-import { define_command, OptionType } from "../../../types/command";
-import { core_config as core_config_cache } from "../../core";
+import { get_member_cached } from "../../../common/discord/cache.ts";
+import { format_rest_error } from "../../../common/discord/format.ts";
+import { escape_markdown, make_inline_codeblock } from "../../../common/discord/markdown.ts";
+import { icons } from "../../../icons.ts";
+import { resolve_groups } from "../../../permission_resolution.ts";
+import { define_command, OptionType } from "../../../types/command.ts";
+import { core_config as core_config_cache } from "../../core/index.ts";
 
 export const groups_command = define_command({
 	id: "groups",

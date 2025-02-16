@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { validator } from "hono/validator";
-import { generate_token } from "../../../../db/api/tokens";
-import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment";
+import { generate_token } from "../../../../db/api/tokens.ts";
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment.ts";
 
 interface TokenResponse {
 	token_type: string;

@@ -1,5 +1,5 @@
-import { array, boolean, InferOutput, number, object, optional, string } from "valibot";
-import { permissions_filter_schema } from "./common/permissions_filter";
+import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
+import { permissions_filter_schema } from "./common/permissions_filter.ts";
 
 export const preset_reason_schema = object({
 	name: string(),

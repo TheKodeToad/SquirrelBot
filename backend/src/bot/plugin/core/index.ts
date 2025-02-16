@@ -1,14 +1,14 @@
-import { core_config_schema } from "../../../schema/core";
-import { ConfigCache } from "../../config";
-import { get_plugins } from "../../plugin_registry";
-import { define_plugin } from "../../types/plugin";
-import { about_command } from "./command/about";
-import { install_config_change_listener, load_configs } from "./config_sync";
-import { install_wrapped_listener } from "./event_wrapper";
-import { init_guild_info } from "./guild_info_sync";
-import { init_icons } from "./icon_sync";
-import { prefix_delete_handler, prefix_edit_handler, prefix_send_handler } from "./prefix_engine";
-import { slash_run_handler, sync_slash_commands } from "./slash_engine";
+import { core_config_schema } from "../../../schema/core.ts";
+import { ConfigCache } from "../../config.ts";
+import { get_plugins } from "../../plugin_registry.ts";
+import { define_plugin } from "../../types/plugin.ts";
+import { about_command } from "./command/about.ts";
+import { install_config_change_listener, load_configs } from "./config_sync.ts";
+import { install_wrapped_listener } from "./event_wrapper.ts";
+import { init_guild_info } from "./guild_info_sync.ts";
+import { init_icons } from "./icon_sync.ts";
+import { prefix_delete_handler, prefix_edit_handler, prefix_send_handler } from "./prefix_engine.ts";
+import { slash_run_handler, sync_slash_commands } from "./slash_engine.ts";
 
 export const core_config = new ConfigCache(core_config_schema);
 

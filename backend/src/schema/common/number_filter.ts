@@ -1,4 +1,5 @@
-import { InferOutput, pipe, rawTransform, string } from "valibot";
+import type { InferOutput } from "valibot";
+import { pipe, rawTransform, string } from "valibot";
 
 export enum NumberFilterMode {
 	EQUALS,
