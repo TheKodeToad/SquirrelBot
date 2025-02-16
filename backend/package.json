@@ -5,7 +5,8 @@
 		"check": "tsc --noEmit",
 		"bot": "npm run _node src/bot/main.ts",
 		"http": "npm run _node src/http/main.ts",
-		"migrate": "npm run _node src/db/migrate.js",
+		"migrate": "npm run _node src/db/main.ts migrate",
+		"check-migrations": "npm run _node src/db/main.ts check",
 		"_node": "node --disable-proto=delete --experimental-transform-types"
 	},
 	"dependencies": {

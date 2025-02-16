@@ -1,9 +1,17 @@
 import fs from "fs/promises";
 import path from "path";
-import "../environment";
+import "../environment.ts";
 import { pool } from "./index.ts";
 
-async function migrate() {
+export async function migrate() {
+	return await process_all(false);
+}
+
+export async function check_migrations() {
+	return await process_all(true);
+}
+
+async function process_all(check_only: boolean): Promise<number> {
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS "migration_dirs" (
 			"path" TEXT NOT NULL PRIMARY KEY,
@@ -11,32 +19,44 @@ async function migrate() {
 		)
 	`);
 
-	await process("migrations", true);
-	await pool.end();
+	let total = 0;
+
+	const base = "migrations";
+
+	for (const directory of await fs.readdir(base)) {
+		const directory_path = path.join(base, directory);
+
+		if (!(await fs.stat(directory_path)).isDirectory())
+			continue;
+
+		total += await process(directory_path, check_only);
+	}
+
+	return total;
 }
 
-async function process(dir: string, include_subdirs: boolean) {
+async function process(dir: string, check_only: boolean): Promise<number> {
+	let run_count = 0;
 	const files: string[] = [];
-	const folders: string[] = [];
 
 	for (const name of await fs.readdir(dir)) {
 		const item_path = path.join(dir, name);
 
-		if ((await fs.stat(item_path)).isDirectory()) {
-			if (include_subdirs)
-				folders.push(item_path);
-		} else {
-			const pattern = /^([0-9]+)-\w+\.sql$/;
-			const matches = pattern.exec(name);
-			if (!matches)
-				continue;
+		if ((await fs.stat(item_path)).isDirectory())
+			continue;
 
-			const index = Number(matches[1]);
-			if (Number.isNaN(index))
-				continue;
+		const pattern = /^([0-9]+)-\w+\.sql$/;
+		const matches = pattern.exec(name);
 
-			files[index] = item_path;
-		}
+		if (!matches)
+			continue;
+
+		const index = Number(matches[1]);
+
+		if (Number.isNaN(index))
+			continue;
+
+		files[index] = item_path;
 	}
 
 	const last_run: number = (await pool.query(
@@ -53,7 +73,16 @@ async function process(dir: string, include_subdirs: boolean) {
 			continue;
 
 		if (index <= last_run) {
-			console.log(`Skipping "${file}" as it has already been run`);
+			if (!check_only)
+				console.log(`Skipping "${file}" as it has already been run`);
+
+			continue;
+		}
+
+		++run_count;
+
+		if (check_only) {
+			console.log(`File "${file}" needs run!`);
 			continue;
 		}
 
@@ -87,9 +116,5 @@ async function process(dir: string, include_subdirs: boolean) {
 		}
 	}
 
-	if (include_subdirs)
-		for (const subdir of folders)
-			await process(subdir, false);
+	return run_count;
 }
-
-migrate();
