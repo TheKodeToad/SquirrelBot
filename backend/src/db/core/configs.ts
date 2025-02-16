@@ -1,4 +1,5 @@
-import { pool } from "../index.ts";
+import { string } from "valibot";
+import { db_parse, pool } from "../index.ts";
 
 export async function get_guild_config(guild_id: string, key: string): Promise<string | null> {
 	const result = await pool.query(
@@ -10,7 +11,10 @@ export async function get_guild_config(guild_id: string, key: string): Promise<s
 		[guild_id, key]
 	);
 
-	return result.rows[0]?.value ?? null;
+	if (result.rowCount !== 1)
+		return null;
+
+	return db_parse(string(), result.rows[0]?.value);
 }
 
 export async function insert_guild_config(guild_id: string, key: string, value: string): Promise<boolean> {

@@ -1,5 +1,6 @@
 import AsyncLock from "async-lock";
-import { pool } from "../index.ts";
+import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
+import { db_parse, pool } from "../index.ts";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -33,22 +34,25 @@ export const CASE_TYPE_ID_TO_NAME: Record<CaseType, string> = Object.entries(CAS
 	return result;
 }, {}) as any;
 
-export interface CaseInfo {
-	guild_id: string;
-	number: number;
+export const case_info_schema = object({
+	guild_id: string(),
+	number: number(),
 
-	type: CaseType;
-	created_at: Date;
-	expires_at: Date | null;
+	type: enum_(CaseType),
+	created_at: date(),
+	expires_at: nullable(date()),
 
-	actor_id: string;
-	target_id: string;
+	actor_id: string(),
+	target_id: string(),
 
-	reason: string | null;
+	reason: nullable(string()),
 
-	delete_message_seconds: number | null;
-	dm_sent: boolean | null;
-}
+	delete_message_seconds: nullable(number()),
+	dm_sent: nullable(boolean())
+});
+export const case_info_array_schema = array(case_info_schema);
+
+export interface CaseInfo extends InferOutput<typeof case_info_schema> { }
 
 export interface CreateCaseOptions {
 	type: CaseType;
@@ -111,7 +115,10 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 		[guild_id, number]
 	);
 
-	return result.rows[0] ?? null;
+	if (result.rowCount !== 1)
+		return null;
+
+	return db_parse(case_info_schema, result.rows[0]);
 }
 
 export async function get_cases(guild_id: string, query: CaseQuery): Promise<CaseInfo[]> {
@@ -168,7 +175,7 @@ export async function get_cases(guild_id: string, query: CaseQuery): Promise<Cas
 		]
 	);
 
-	return result.rows;
+	return db_parse(case_info_array_schema, result.rows);
 }
 
 export async function create_case(guild_id: string, options: CreateCaseOptions): Promise<number> {

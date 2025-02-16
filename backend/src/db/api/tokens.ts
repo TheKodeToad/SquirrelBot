@@ -1,7 +1,13 @@
 import crypto from "crypto";
-import { pool } from "../index.ts";
+import { date, object, string } from "valibot";
+import { db_parse, pool } from "../index.ts";
 
 const ALGORITHM = "sha-256";
+
+const token_info_schema = object({
+	user_id: string(),
+	expires_at: date()
+});
 
 export async function generate_token(user_id: string): Promise<[token: string, expiry: Date]> {
 	const secret = crypto.randomBytes(16);
@@ -45,10 +51,12 @@ export async function validate_token(token: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	if (Date.now() >= result.rows[0].expires_at)
+	const { expires_at, user_id } = db_parse(token_info_schema, result.rows[0]);
+
+	if (Date.now() >= expires_at.getDate())
 		return null;
 
-	return result.rows[0].user_id;
+	return user_id;
 }
 
 export async function delete_token(token: string): Promise<boolean> {

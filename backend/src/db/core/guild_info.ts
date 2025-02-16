@@ -1,11 +1,16 @@
-import { pool } from "../index.ts";
+import { array, object, string, type InferOutput } from "valibot";
+import { db_parse, pool } from "../index.ts";
 
-export interface GuildInfo {
-	id: string;
-	name: string;
-	icon_hash: string;
-	owner_id: string;
-}
+const guild_info_schema = object({
+	id: string(),
+	name: string(),
+	icon_hash: string(),
+	owner_id: string()
+});
+
+const guild_info_array_schema = array(guild_info_schema);
+
+export interface GuildInfo extends InferOutput<typeof guild_info_schema> { }
 
 export async function get_guild_info(id: string): Promise<GuildInfo | null> {
 	const result = await pool.query(
@@ -21,7 +26,10 @@ export async function get_guild_info(id: string): Promise<GuildInfo | null> {
 		[id]
 	);
 
-	return result.rows[0] ?? null;
+	if (result.rowCount !== 1)
+		return null;
+
+	return db_parse(guild_info_schema, result.rows[0]);
 }
 
 export async function get_guild_owner_id(id: string): Promise<string | null> {
@@ -34,10 +42,13 @@ export async function get_guild_owner_id(id: string): Promise<string | null> {
 		[id]
 	);
 
-	return result.rows[0]?.owner_id ?? null;
+	if (result.rowCount !== 1)
+		return null;
+
+	return db_parse(string(), result.rows[0].owner_id);
 }
 
-export async function get_guild_info_by_owner(owner_id: string): Promise<Omit<GuildInfo, "owner_id">[]> {
+export async function get_guild_info_by_owner(owner_id: string): Promise<GuildInfo[]> {
 	const result = await pool.query(
 		`
 			SELECT
@@ -51,7 +62,7 @@ export async function get_guild_info_by_owner(owner_id: string): Promise<Omit<Gu
 		[owner_id]
 	);
 
-	return result.rows;
+	return db_parse(guild_info_array_schema, result.rows);
 }
 
 export async function delete_guild_info(id: string): Promise<void> {
