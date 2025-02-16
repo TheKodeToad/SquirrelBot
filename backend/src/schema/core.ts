@@ -3,7 +3,6 @@ import { array, boolean, number, object, optional, pipe, rawTransform, record, r
 import { SNOWFLAKE_REGEX } from "../common/snowflake.ts";
 import { permissions_filter_schema } from "./common/permissions_filter.ts";
 
-// TODO just use a Map
 const core_group_schema = object({
 	users: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid user ID"))), []),
 	roles: optional(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid role ID"))), []),
@@ -12,14 +11,17 @@ const core_group_schema = object({
 });
 export interface CoreGroup extends InferOutput<typeof core_group_schema> { }
 
-const core_groups_schema = record(
-	string(),
-	core_group_schema
+const core_groups_schema = pipe(
+	record(
+		string(),
+		core_group_schema
+	),
+	transform_core_groups()
 );
 export interface CoreGroups extends InferOutput<typeof core_groups_schema> { }
 
 export const core_config_schema = object({
-	groups: optional(pipe(core_groups_schema, transform_core_groups()), {}),
+	groups: optional(core_groups_schema, {}),
 
 	prefix_commands: optional(object({
 		prefix: optional(string(), "?"),
@@ -43,7 +45,7 @@ export interface CoreConfig extends InferOutput<typeof core_config_schema> { }
 const MAX_INHERITANCE_DEPTH = 1000;
 
 function transform_core_groups() {
-	return rawTransform<CoreGroups, CoreGroups>(({ dataset, addIssue, NEVER }) => {
+	return rawTransform<Record<string, CoreGroup>, Map<string, CoreGroup>>(({ dataset, addIssue, NEVER }) => {
 		if (!dataset.typed)
 			return NEVER;
 
@@ -74,7 +76,7 @@ function transform_core_groups() {
 		if (has_issues)
 			return NEVER;
 
-		let result: CoreGroups = {};
+		let result: Map<string, CoreGroup> = new Map;
 
 		for (const key in dataset.value) {
 			if (!Object.hasOwn(dataset.value, key))
@@ -95,14 +97,14 @@ function transform_core_groups() {
 				return NEVER;
 			}
 
-			result[key] = { ...value, inherits };
+			result.set(key, { ...value, inherits });
 		}
 
 		return result;
 	});
 }
 
-function flatten_inheritance(input: CoreGroup, key: string, groups: CoreGroups): string[] | null {
+function flatten_inheritance(input: CoreGroup, key: string, groups: Record<string, CoreGroup>): string[] | null {
 	const output: string[] = [];
 
 	if (!_flatten_inheritance(input, output, key, groups, 0))
@@ -111,7 +113,7 @@ function flatten_inheritance(input: CoreGroup, key: string, groups: CoreGroups):
 	return output;
 }
 
-function _flatten_inheritance(input: CoreGroup, output: string[], root: string, groups: CoreGroups, depth: number): boolean {
+function _flatten_inheritance(input: CoreGroup, output: string[], root: string, groups: Record<string, CoreGroup>, depth: number): boolean {
 	if (depth > MAX_INHERITANCE_DEPTH)
 		return false;
 

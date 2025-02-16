@@ -18,17 +18,9 @@ export function resolve_groups(member: Member): GroupsResult {
 	if (config === undefined)
 		return { groups, level };
 
-	for (const id in config.groups) {
-		if (!Object.hasOwn(config.groups, id))
-			continue;
-
-		if (groups.has(id))
-			continue;
-
-		const group = config.groups[id]!;
-
+	config.groups.forEach((group, id) => {
 		if (!test_group(group, member))
-			continue;
+			return;
 
 		groups.add(id);
 
@@ -36,17 +28,17 @@ export function resolve_groups(member: Member): GroupsResult {
 			level = group_level(group);
 
 		for (const reference of group.inherits) {
-			if (!Object.hasOwn(config.groups, id))
+			const referenced_group = config.groups.get(reference);
+
+			if (referenced_group === undefined)
 				continue;
 
 			groups.add(reference);
 
-			const referenced_group = config.groups[id]!;
-
 			if (group_level(referenced_group) > level)
 				level = group_level(referenced_group);
 		}
-	}
+	});
 
 	return { groups, level };
 }
