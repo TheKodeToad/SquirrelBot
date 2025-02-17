@@ -1,13 +1,13 @@
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
-import { is_snowflake } from "../../../common/snowflake.ts";
-import { TTLMap } from "../../../common/ttl_map.ts";
-import { can_write_in_channel } from "../../common/discord/permissions.ts";
-import { bot } from "../../index.ts";
-import { type Command, type Context, type Option, OptionType, type OptionTypeValue, type Reply, default_id } from "../../loader/command.ts";
-import { define_event_listener } from "../../loader/event_listener.ts";
-import { get_commands_named } from "../../loader/index.ts";
-import { core_config } from "./index.ts";
-import { resolve_permissions } from "./public/permission_resolution.ts";
+import { is_snowflake } from "../../../../common/snowflake.ts";
+import { TTLMap } from "../../../../common/ttl_map.ts";
+import { can_write_in_channel } from "../../../common/discord/permissions.ts";
+import { bot } from "../../../index.ts";
+import { core_config } from "../index.ts";
+import { type Command, type Context, type Option, OptionType, type OptionTypeValue, type Reply, default_id } from "../public/command.ts";
+import { define_event_listener } from "../public/event_listener.ts";
+import { resolve_permissions } from "../public/permission_resolution.ts";
+import { get_commands_by_name } from "./command_cache.ts";
 
 export const prefix_send_handler = define_event_listener("messageCreate", handle);
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
@@ -47,7 +47,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	const unprefixed = message.content.slice(prefix.length);
 
 	const name = unprefixed.split(" ", 1)[0]!;
-	const matches = get_commands_named(name).filter(command => command.support_prefix ?? true);
+	const matches = get_commands_by_name(name).filter(command => command.support_prefix ?? true);
 
 	if (matches.length !== 1)
 		return;

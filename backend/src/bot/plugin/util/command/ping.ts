@@ -1,4 +1,4 @@
-import { define_command } from "../../../loader/command.ts";
+import { define_command } from "../../core/public/command.ts";
 import { icons } from "../../core/public/icons.ts";
 
 export const ping_command = define_command({

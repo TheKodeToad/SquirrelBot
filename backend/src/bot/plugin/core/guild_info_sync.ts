@@ -1,7 +1,7 @@
 import { Guild } from "oceanic.js";
 import { upsert_guild_info } from "../../../db/core/guild_info.ts";
 import { bot } from "../../index.ts";
-import { define_event_listener } from "../../loader/event_listener.ts";
+import { define_event_listener } from "./public/event_listener.ts";
 
 export async function init_guild_info() {
 	await Promise.all(bot.guilds.map(guild => update_guild(guild)));

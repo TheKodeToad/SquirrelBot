@@ -1,7 +1,7 @@
 import { Colors } from "../../../common/discord/colors.ts";
 import { bot } from "../../../index.ts";
-import { define_command } from "../../../loader/command.ts";
 import { core_config } from "../index.ts";
+import { define_command } from "../public/command.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 
 const DESCRIPTION = `
