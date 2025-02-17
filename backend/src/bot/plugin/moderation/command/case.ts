@@ -2,7 +2,7 @@ import { get_case } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { format_user_tag } from "../../../common/discord/format.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
-import { OptionType, define_command } from "../../../loader/types/command.ts";
+import { OptionType, define_command } from "../../../loader/command.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { CASE_TYPE_NAME, moderation_config } from "../index.ts";

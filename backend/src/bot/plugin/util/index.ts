@@ -1,4 +1,4 @@
-import { define_plugin } from "../../loader/types/plugin.ts";
+import { define_plugin } from "../../loader/plugin.ts";
 import { groups_command } from "./command/groups.ts";
 import { ping_command } from "./command/ping.ts";
 import { snowflake_command } from "./command/snowflake.ts";

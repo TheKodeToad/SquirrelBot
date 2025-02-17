@@ -1,6 +1,6 @@
 import { core_config_schema } from "../../../schema/core.ts";
 import { get_plugins } from "../../loader/index.ts";
-import { define_plugin } from "../../loader/types/plugin.ts";
+import { define_plugin } from "../../loader/plugin.ts";
 import { about_command } from "./command/about.ts";
 import { install_config_change_listener, load_configs } from "./config_sync.ts";
 import { install_wrapped_listener } from "./event_wrapper.ts";

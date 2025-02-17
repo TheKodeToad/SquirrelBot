@@ -1,8 +1,8 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { bot } from "../../index.ts";
+import { type Command, type Context, type Option, OptionType, type Reply } from "../../loader/command.ts";
+import { define_event_listener } from "../../loader/event_listener.ts";
 import { get_commands, get_commands_named } from "../../loader/index.ts";
-import { type Command, type Context, type Option, OptionType, type Reply } from "../../loader/types/command.ts";
-import { define_event_listener } from "../../loader/types/event_listener.ts";
 import { core_config } from "./index.ts";
 import { resolve_permissions } from "./public/permission_resolution.ts";
 

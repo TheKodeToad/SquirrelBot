@@ -3,9 +3,9 @@ import { is_snowflake } from "../../../common/snowflake.ts";
 import { TTLMap } from "../../../common/ttl_map.ts";
 import { can_write_in_channel } from "../../common/discord/permissions.ts";
 import { bot } from "../../index.ts";
+import { type Command, type Context, type Option, OptionType, type OptionTypeValue, type Reply, default_id } from "../../loader/command.ts";
+import { define_event_listener } from "../../loader/event_listener.ts";
 import { get_commands_named } from "../../loader/index.ts";
-import { type Command, type Context, type Option, OptionType, type OptionTypeValue, type Reply, default_id } from "../../loader/types/command.ts";
-import { define_event_listener } from "../../loader/types/event_listener.ts";
 import { core_config } from "./index.ts";
 import { resolve_permissions } from "./public/permission_resolution.ts";
 

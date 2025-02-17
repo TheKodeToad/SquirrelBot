@@ -1,6 +1,6 @@
 import { UndeletableMessageTypes } from "oceanic.js";
 import { bot } from "../../../index.ts";
-import { OptionType, define_command } from "../../../loader/types/command.ts";
+import { OptionType, define_command } from "../../../loader/command.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { moderation_config } from "../index.ts";

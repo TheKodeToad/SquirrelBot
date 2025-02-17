@@ -5,7 +5,7 @@ import { get_guild_config, insert_guild_config } from "../../../db/core/configs.
 import { add_channel_listener } from "../../../db/notification.ts";
 import { bot } from "../../index.ts";
 import { get_plugin, get_plugins } from "../../loader/index.ts";
-import type { Plugin } from "../../loader/types/plugin.ts";
+import type { Plugin } from "../../loader/plugin.ts";
 
 export async function load_configs() {
 	await Promise.all(bot.guilds.map(async guild => {

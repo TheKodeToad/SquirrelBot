@@ -1,8 +1,8 @@
 import { core_plugin } from "../plugin/core/index.ts";
 import { moderation_plugin } from "../plugin/moderation/index.ts";
 import { util_plugin } from "../plugin/util/index.ts";
-import type { Command } from "./types/command.ts";
-import type { Plugin } from "./types/plugin.ts";
+import type { Command } from "./command.ts";
+import type { Plugin } from "./plugin.ts";
 
 const plugins: Map<string, Plugin> = new Map;
 const commands: Map<string, Command[]> = new Map;
