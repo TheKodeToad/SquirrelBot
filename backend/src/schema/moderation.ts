@@ -1,4 +1,5 @@
 import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
+import { message_schema } from "./common/message.ts";
 import { permissions_filter_schema } from "./common/permissions_filter.ts";
 
 export const preset_reason_schema = object({
@@ -21,7 +22,7 @@ export const moderation_config_schema = object({
 
 	ban: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(string()),
+		direct_message: optional(message_schema),
 		purge_messages: optional(number(), 0),
 		preset_reasons: optional(array(preset_reason_schema), discord_reasons) // TODO
 	}), {}),
@@ -30,7 +31,7 @@ export const moderation_config_schema = object({
 	}), {}),
 	kick: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(string()),
+		direct_message: optional(message_schema),
 		preset_reasons: optional(array(preset_reason_schema), discord_reasons), // TODO
 	}), {}),
 

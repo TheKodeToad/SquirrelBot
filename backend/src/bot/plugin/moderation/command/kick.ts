@@ -45,7 +45,7 @@ export const kick_command = define_command({
 		if (!perms.kick)
 			return;
 
-		let send_dm = config.ban.send_direct_message;
+		let send_dm = config.kick.send_direct_message;
 
 		if (args.dm)
 			send_dm = true;
@@ -53,7 +53,7 @@ export const kick_command = define_command({
 		if (args.no_dm)
 			send_dm = false;
 
-		const direct_message = config.kick.direct_message ?? `You were kicked from ${escape_markdown(context.guild.name)}.`;
+		const direct_message = config.kick.direct_message ?? { content: `You were kicked from ${escape_markdown(context.guild.name)}.` };
 
 		const members = await request_members_cached(context.guild, args.user);
 
@@ -100,7 +100,7 @@ export const kick_command = define_command({
 			if (!target_member.bot && send_dm) {
 				try {
 					const dm = await bot.rest.users.createDM(target);
-					await dm.createMessage({ content: direct_message });
+					await dm.createMessage(direct_message);
 					dm_sent = true;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))

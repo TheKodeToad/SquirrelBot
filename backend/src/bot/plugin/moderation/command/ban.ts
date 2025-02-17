@@ -57,7 +57,7 @@ export const ban_command = define_command({
 		if (args.no_dm)
 			send_dm = false;
 
-		const direct_message = config.ban.direct_message ?? `You are permanently banned from ${escape_markdown(context.guild.name)}.`;
+		const direct_message = config.ban.direct_message ?? { content: `You are permanently banned from ${escape_markdown(context.guild.name)}.` };
 		const delete_message_seconds = (args.purge ?? config.ban.purge_messages) * (1000 * 60 * 60 * 24);
 
 		const members = await request_members_cached(context.guild, args.user);
@@ -113,7 +113,7 @@ export const ban_command = define_command({
 			if (in_guild && !is_bot && send_dm) {
 				try {
 					const dm = await create_dm_cached(target);
-					await dm.createMessage({ content: direct_message });
+					await dm.createMessage(direct_message);
 					dm_sent = true;
 				} catch (error) {
 					if (!(error instanceof DiscordRESTError))
