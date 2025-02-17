@@ -1,5 +1,5 @@
-import { icons } from "../../../icons.ts";
-import { OptionType, define_command } from "../../../types/command.ts";
+import { OptionType, define_command } from "../../../loader/types/command.ts";
+import { icons } from "../../core/public/icons.ts";
 
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 

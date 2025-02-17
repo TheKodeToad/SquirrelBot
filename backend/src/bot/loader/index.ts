@@ -1,3 +1,6 @@
+import { core_plugin } from "../plugin/core/index.ts";
+import { moderation_plugin } from "../plugin/moderation/index.ts";
+import { util_plugin } from "../plugin/util/index.ts";
 import type { Command } from "./types/command.ts";
 import type { Plugin } from "./types/plugin.ts";
 
@@ -49,6 +52,13 @@ function add_command(id: string, command: Command): void {
 	}
 
 	list.push(command);
+}
+
+export function load_plugins() {
+	// only support first-party plugins for now :)
+	register_plugin(core_plugin);
+	register_plugin(moderation_plugin);
+	register_plugin(util_plugin);
 }
 
 export async function apply_plugins(): Promise<void> {

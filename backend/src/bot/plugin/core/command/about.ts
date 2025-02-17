@@ -1,8 +1,8 @@
 import { Colors } from "../../../common/discord/colors.ts";
 import { bot } from "../../../index.ts";
-import { resolve_permissions } from "../../../permission_resolution.ts";
-import { define_command } from "../../../types/command.ts";
+import { define_command } from "../../../loader/types/command.ts";
 import { core_config } from "../index.ts";
+import { resolve_permissions } from "../public/permission_resolution.ts";
 
 const DESCRIPTION = `
 Advanced moderation and management bot created by TheKodeToad.

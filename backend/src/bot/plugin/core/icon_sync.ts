@@ -1,5 +1,5 @@
-import { icons } from "../../icons.ts";
 import { bot } from "../../index.ts";
+import { icons } from "./public/icons.ts";
 
 export async function init_icons() {
 	const emojis = await bot.application.getEmojis();

@@ -1,8 +1,8 @@
 import { type AnyGuildChannel, CategoryChannel, Member, ThreadChannel } from "oceanic.js";
-import { test_number_filter } from "../schema/common/number_filter.ts";
-import type { PermissionsFilter } from "../schema/common/permissions_filter.ts";
-import type { CoreConfig, CoreGroup } from "../schema/core.ts";
-import { core_config } from "./plugin/core/index.ts";
+import { test_number_filter } from "../../../../schema/common/number_filter.ts";
+import type { PermissionsFilter } from "../../../../schema/common/permissions_filter.ts";
+import type { CoreConfig, CoreGroup } from "../../../../schema/core.ts";
+import { core_config } from "../index.ts";
 
 interface GroupsResult {
 	groups: Set<string>;

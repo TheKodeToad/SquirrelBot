@@ -1,10 +1,10 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { bot } from "../../index.ts";
-import { resolve_permissions } from "../../permission_resolution.ts";
-import { get_commands, get_commands_named } from "../../plugin_registry.ts";
-import { type Command, type Context, type Option, OptionType, type Reply } from "../../types/command.ts";
-import { define_event_listener } from "../../types/event_listener.ts";
+import { get_commands, get_commands_named } from "../../loader/index.ts";
+import { type Command, type Context, type Option, OptionType, type Reply } from "../../loader/types/command.ts";
+import { define_event_listener } from "../../loader/types/event_listener.ts";
 import { core_config } from "./index.ts";
+import { resolve_permissions } from "./public/permission_resolution.ts";
 
 export async function sync_slash_commands(): Promise<void> {
 	const commands = get_commands().filter(command => command.support_slash ?? true).map(command => ({

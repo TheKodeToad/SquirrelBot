@@ -1,7 +1,7 @@
 import { CaseType } from "../../../db/moderation/cases.ts";
 import { moderation_config_schema } from "../../../schema/moderation.ts";
-import { ConfigCache } from "../../config.ts";
-import { define_plugin } from "../../types/plugin.ts";
+import { define_plugin } from "../../loader/types/plugin.ts";
+import { ConfigCache } from "../core/public/config.ts";
 import { ban_command } from "./command/ban.ts";
 import { case_command } from "./command/case.ts";
 import { cases_command } from "./command/cases.ts";

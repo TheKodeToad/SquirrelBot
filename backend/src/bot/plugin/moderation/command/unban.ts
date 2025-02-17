@@ -2,9 +2,9 @@ import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { CaseType, create_case } from "../../../../db/moderation/cases.ts";
 import { format_rest_error, format_user_tag } from "../../../common/discord/format.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
-import { icons } from "../../../icons.ts";
-import { resolve_permissions } from "../../../permission_resolution.ts";
-import { OptionType, define_command } from "../../../types/command.ts";
+import { OptionType, define_command } from "../../../loader/types/command.ts";
+import { icons } from "../../core/public/icons.ts";
+import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { moderation_config } from "../index.ts";
 
 export const unban_command = define_command({

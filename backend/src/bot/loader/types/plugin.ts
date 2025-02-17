@@ -1,4 +1,4 @@
-import type { ConfigCache } from "../config.ts";
+import type { ConfigCache } from "../../plugin/core/public/config.ts";
 import type { Command } from "./command.ts";
 import type { EventListener } from "./event_listener.ts";
 

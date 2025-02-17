@@ -4,8 +4,8 @@ import { safeParse } from "valibot";
 import { get_guild_config, insert_guild_config } from "../../../db/core/configs.ts";
 import { add_channel_listener } from "../../../db/notification.ts";
 import { bot } from "../../index.ts";
-import { get_plugin, get_plugins } from "../../plugin_registry.ts";
-import type { Plugin } from "../../types/plugin.ts";
+import { get_plugin, get_plugins } from "../../loader/index.ts";
+import type { Plugin } from "../../loader/types/plugin.ts";
 
 export async function load_configs() {
 	await Promise.all(bot.guilds.map(async guild => {
