@@ -23,6 +23,9 @@ export function can_write_in_channel(channel: AnyGuildChannel, member: Member): 
 	if (bot.getChannel(channel.id) === undefined)
 		return false;
 
+	if (member.permissions.has(Permissions.ADMINISTRATOR))
+		return true;
+
 	if (member.communicationDisabledUntil !== null && member.communicationDisabledUntil.getTime() >= Date.now())
 		return false;
 
@@ -47,8 +50,8 @@ export function can_write_in_channel(channel: AnyGuildChannel, member: Member): 
 			return false;
 	}
 
-	const fixThisCodeForDiscordUpdate = (_: never) => { };
-	fixThisCodeForDiscordUpdate(channel);
+	const fix_this_code_for_discord_update = (_: never) => { };
+	fix_this_code_for_discord_update(channel);
 
 	return false;
 }
