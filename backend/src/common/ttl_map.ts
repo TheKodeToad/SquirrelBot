@@ -7,13 +7,10 @@ export class TTLMap<K, V> {
 	private readonly _ttl: number;
 
 	constructor(ttl: number) {
-		this._map = new Map();
+		this._map = new Map;
 		this._ttl = ttl;
 	}
 
-	/**
-	 * Reclaim memory!
-	 */
 	cleanup() {
 		const now = Date.now();
 
@@ -26,7 +23,7 @@ export class TTLMap<K, V> {
 	}
 
 	private _is_expired(now: number, date: number) {
-		return now - date > this._ttl;
+		return (now - date) > this._ttl;
 	}
 
 	get size(): number {
@@ -35,7 +32,6 @@ export class TTLMap<K, V> {
 
 		for (const [_, date] of this._map.values())
 			if (!this._is_expired(now, date))
-
 				++count;
 
 		return count;
@@ -49,14 +45,12 @@ export class TTLMap<K, V> {
 		return this._map.delete(key);
 	}
 
-	forEach(
-		callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void,
-		thisArg?: any,
-	): void {
+	forEach(callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void, thisArg?: any): void {
 		if (thisArg !== undefined && thisArg !== null)
 			callbackfn = callbackfn.bind(thisArg);
 
-		for (const entry of this) callbackfn(entry[1], entry[0], this);
+		for (const entry of this)
+			callbackfn(entry[1], entry[0], this);
 	}
 
 	get(key: K): V | undefined {
@@ -84,15 +78,6 @@ export class TTLMap<K, V> {
 		return this;
 	}
 
-	multi_set(keys: K[], value: V) {
-		const now = Date.now();
-
-		for (const key of keys)
-			this._map.set(key, [value, now]);
-
-		return this;
-	}
-
 	*entries(): IterableIterator<[K, V]> {
 		const now = Date.now();
 
@@ -109,7 +94,8 @@ export class TTLMap<K, V> {
 		const now = Date.now();
 
 		for (const [value, date] of this._map.values())
-			if (!this._is_expired(now, date)) yield value;
+			if (!this._is_expired(now, date))
+				yield value;
 	}
 
 	*[Symbol.iterator](): IterableIterator<[K, V]> {
