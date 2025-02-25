@@ -11,7 +11,7 @@ import { get_commands_by_name } from "./command_cache.ts";
 import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
 import { default_id, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "./index.ts";
 
-export const prefix_send_handler = define_event_listener("messageCreate", handle);
+export const prefix_send_handler = define_event_listener("messageCreate", message => void handle(message));
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
 export const prefix_delete_handler = define_event_listener("messageDelete", handle_delete);
 
@@ -21,30 +21,30 @@ const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => tracked_messages.cleanup(), STATE_CLEANUP_INTERVAL);
 
-async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
+async function handle(message: Message, prev_context?: PrefixContext): Promise<boolean> {
 	if (!message.inCachedGuildChannel())
-		return;
+		return false;
 
 	// yes, non-bot webhook is/has been possible
 	if (message.author.bot || message.webhookID !== undefined)
-		return;
+		return false;
 
 	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
-		return;
+		return false;
 
 	if (!can_write_in_channel(message.channel, message.channel.guild.clientMember))
-		return;
+		return false;
 
 	const config = core_config.get(message.guildID);
 
 	if (config === undefined)
-		return;
+		return false;
 
 	const { prefix } = config.prefix_commands;
 	const perms = resolve_permissions(config, message.member, message.channel);
 
 	if (!(perms.prefix_commands && message.content.startsWith(prefix)))
-		return;
+		return false;
 
 	const unprefixed = message.content.slice(prefix.length);
 
@@ -52,9 +52,12 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 	const matches = get_commands_by_name(name).filter(command => command.support_prefix ?? true);
 
 	if (matches.length !== 1)
-		return;
+		return false;
 
 	const command = matches[0]!;
+
+	if (prev_context !== undefined && command !== prev_context.command)
+		return false;
 
 	const context = prev_context ?? new PrefixContext(
 		command,
@@ -73,7 +76,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 
 		await context.respond(error.message);
 		tracked_messages.set(message.id, context);
-		return;
+		return true;
 	}
 
 	try {
@@ -84,9 +87,11 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;
 	}
+
+	return true;
 }
 
-function handle_edit(message: Message) {
+async function handle_edit(message: Message) {
 	const tracked = tracked_messages.get(message.id);
 
 	if (!tracked)
@@ -96,7 +101,9 @@ function handle_edit(message: Message) {
 		unlisten_for_interactions(tracked._response.id);
 
 	tracked_messages.delete(message.id);
-	handle(message, tracked);
+
+	if (!(await handle(message, tracked)))
+		await tracked._delete();
 }
 
 async function handle_delete(message: PossiblyUncachedMessage) {
