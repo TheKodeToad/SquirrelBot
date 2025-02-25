@@ -35,7 +35,7 @@ export const component_interaction_handler = define_event_listener("interactionC
 		return;
 	}
 
-	const context = new ComponentContextImpl(interaction);
+	const context = new ComponentContextImpl(interaction, component_data.invoker_id);
 
 	try {
 		await callback.callback(context);
@@ -46,6 +46,7 @@ export const component_interaction_handler = define_event_listener("interactionC
 		});
 		// HACK for now
 		context["_acked"] = true;
+		throw error;
 	} finally {
 		await context._abandon();
 	}
@@ -73,12 +74,14 @@ export function unlisten_for_interactions(message_id: string): void {
 
 class ComponentContextImpl implements ComponentContext {
 	private _interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
+	private _original_invoker: string;
 	private _acked: boolean;
 	private _ack_promise: Promise<void> | null;
 	private _ack_timeout: NodeJS.Timeout | null;
 
-	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>) {
+	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, original_invoker: string) {
 		this._interaction = interaction;
+		this._original_invoker = original_invoker;
 		this._acked = false;
 		this._ack_timeout = setTimeout(() => {
 			this._ack_timeout = null;
@@ -104,7 +107,7 @@ class ComponentContextImpl implements ComponentContext {
 		}
 
 		if (typeof reply !== "string" && reply.components !== undefined)
-			listen_for_interactions(this._interaction.message.id, this._interaction.message.author.id, reply.components);
+			listen_for_interactions(this._interaction.message.id, this._original_invoker, reply.components);
 	}
 
 	_remove_timeout() {

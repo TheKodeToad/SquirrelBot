@@ -11,7 +11,7 @@ import { get_commands_by_name } from "./command_cache.ts";
 import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
 import { default_id, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "./index.ts";
 
-export const prefix_send_handler = define_event_listener("messageCreate", message => void handle(message));
+export const prefix_send_handler = define_event_listener("messageCreate", async message => void await handle(message));
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
 export const prefix_delete_handler = define_event_listener("messageDelete", handle_delete);
 

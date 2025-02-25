@@ -1,7 +1,6 @@
 import { get_case } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
-import { format_user_tag } from "../../../common/discord/format.ts";
-import { escape_markdown } from "../../../common/discord/markdown.ts";
+import { format_user } from "../../../common/discord/format.ts";
 import { OptionType, define_command } from "../../core/public/command.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
@@ -35,8 +34,6 @@ export const case_command = define_command({
 			return;
 		}
 
-		const actor_tag = escape_markdown(await format_user_tag(info.actor_id));
-		const target_tag = escape_markdown(await format_user_tag(info.target_id));
 		const creation_secs = Math.floor(info.created_at.getTime() / 1000);
 
 		await context.respond({
@@ -54,11 +51,11 @@ export const case_command = define_command({
 					},
 					{
 						name: "Actor",
-						value: `<@${info.actor_id}> (${actor_tag})`
+						value: await format_user(info.actor_id)
 					},
 					{
 						name: "Target",
-						value: `<@${info.target_id}> (${target_tag})`
+						value: await format_user(info.target_id)
 					},
 					{
 						name: "Reason",
