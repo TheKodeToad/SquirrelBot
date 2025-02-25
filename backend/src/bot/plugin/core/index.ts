@@ -3,6 +3,7 @@ import { get_plugins } from "../../loader/index.ts";
 import { define_plugin } from "../../loader/plugin.ts";
 import { about_command } from "./command/about.ts";
 import { init_cache as init_command_cache } from "./command_engine/command_cache.ts";
+import { component_interaction_handler } from "./command_engine/component_engine.ts";
 import { prefix_delete_handler, prefix_edit_handler, prefix_send_handler } from "./command_engine/prefix_engine.ts";
 import { slash_run_handler, sync_slash_commands } from "./command_engine/slash_engine.ts";
 import { install_config_change_listener, load_configs } from "./config_sync.ts";
@@ -22,14 +23,16 @@ export const core_plugin = define_plugin({
 		prefix_edit_handler,
 		prefix_delete_handler,
 		slash_run_handler,
+		component_interaction_handler,
 	],
 	async apply() {
+		init_command_cache();
+
 		await init_guild_info();
 		await load_configs();
 		await install_config_change_listener();
 		await sync_slash_commands();
 		await init_icons();
-		init_command_cache();
 
 		// TODO: is it a good idea to add listeners before the plugin is applied (no)
 		for (const plugin of get_plugins())

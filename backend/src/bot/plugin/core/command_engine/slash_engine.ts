@@ -1,10 +1,11 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { bot } from "../../../index.ts";
 import { core_config } from "../index.ts";
-import { type Command, type Context, type Option, OptionType, type Reply } from "../public/command.ts";
+import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../public/command.ts";
 import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands, get_commands_by_name } from "./command_cache.ts";
+import { AUTO_DEFER_AFTER, transform_reply } from "./index.ts";
 
 export async function sync_slash_commands(): Promise<void> {
 	const commands = get_commands().filter(command => command.support_slash ?? true).map(command => ({
@@ -68,11 +69,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 		return;
 
 	const command = matches[0]!;
-	const context = new SlashContext(
-		command,
-		interaction,
-		interaction.guild?.shard ?? bot.shards.get(0)!
-	);
+	const context = new SlashContext(command, interaction);
 
 	const args: Record<string, any> = {};
 
@@ -108,53 +105,41 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	}
 });
 
-class SlashContext implements Context {
+class SlashContext implements CommandContext {
 	command: Command;
-	shard: Shard;
-	guild: Guild;
-	user: User;
-	member: Member;
-	channel: AnyTextableGuildChannel;
-	interaction: CommandInteraction;
+	get shard(): Shard { return this._interaction.guild.shard; }
+	get guild(): Guild { return this._interaction.guild; }
+	get user(): User { return this._interaction.user; }
+	get member(): Member { return this._interaction.member; }
+	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
+	_interaction: CommandInteraction<AnyTextableGuildChannel>;
 	_responded: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
 	_defer_promise: Promise<void> | null;
 
-	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, shard: Shard) {
+	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>) {
 		this.command = command;
-		this.shard = shard;
-		this.user = interaction.user;
-		this.member = interaction.member;
-		this.guild = interaction.guild;
-		this.channel = interaction.channel;
-		this.interaction = interaction;
+		this._interaction = interaction;
 		this._responded = false;
 		this._defer_promise = null;
 		this._defer_timeout = setTimeout(() => {
 			this._defer_timeout = null;
 			this._responded = true;
 			this._defer_promise = interaction.defer();
-		}, Math.max(0, 1000 - (Date.now() - interaction.createdAt.getTime()))).unref();
+		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const options = typeof reply === "string" ? { flags: 0, content: reply } : { flags: 0, ...reply };
+		const message_options = transform_reply(reply);
 
 		if (this._responded) {
 			if (this._defer_promise !== null)
 				await this._defer_promise;
 
-			await this.interaction.editOriginal({
-				attachments: [],
-				components: [],
-				content: "",
-				embeds: [],
-				files: [],
-				...options,
-			});
+			await this._interaction.editOriginal(message_options);
 		} else {
 			this._remove_timeout();
-			await this.interaction.reply(options);
+			await this._interaction.reply(message_options);
 			this._responded = true;
 		}
 	}

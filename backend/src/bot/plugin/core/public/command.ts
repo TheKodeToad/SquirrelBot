@@ -1,13 +1,6 @@
-import { type AnyTextableGuildChannel, CommandInteraction, type CreateMessageOptions, Guild, Member, Message, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, type SelectMenuComponent, Shard, type TextButton, User } from "oceanic.js";
 
 type Id = string | [string, ...string[]];
-
-export function default_id(id: Id): string {
-	if (Array.isArray(id))
-		return id[0];
-	else
-		return id;
-}
 
 export interface Command<O extends Record<string, Option> = Record<string, Option>> {
 	id: Id;
@@ -15,14 +8,14 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 	support_prefix?: boolean;
 	support_slash?: boolean;
 	track_updates?: boolean;
-	run(context: Context, args: { readonly [K in keyof O]: OptionValue<O[K]> }): Promise<void> | void;
+	run(context: CommandContext, args: { readonly [K in keyof O]: OptionValue<O[K]> }): Promise<void> | void;
 }
 
 export function define_command<F extends Record<string, Option>>(command: Command<F>): Command<F> {
 	return command;
 }
 
-export interface Context {
+export interface CommandContext {
 	command: Command;
 	shard: Shard;
 	guild: Guild;
@@ -30,15 +23,20 @@ export interface Context {
 	member: Member;
 	channel: AnyTextableGuildChannel;
 	message?: Message<AnyTextableGuildChannel>;
-	interaction?: CommandInteraction;
 	respond(reply: Reply): Promise<void>;
 }
 
-export type Reply = Omit<CreateMessageOptions, "messageReference" | "tts"> | string;
+export interface ComponentContext {
+	edit(reply: Reply): Promise<void>;
+}
 
-export interface CommandGroup {
-	id: Id;
-	children: Command<any> | CommandGroup[];
+export type Reply = (Omit<CreateMessageOptions, "messageReference" | "tts" | "components"> & { components?: Component[][]; }) | string;
+
+export type Component = ((TextButton | SelectMenuComponent) & ComponentCallback) | MessageComponent;
+
+export interface ComponentCallback {
+	callback: (context: ComponentContext) => Promise<void>;
+	invoker_only?: boolean;
 }
 
 export enum OptionType {

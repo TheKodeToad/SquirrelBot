@@ -1,13 +1,15 @@
-import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { is_snowflake } from "../../../../common/snowflake.ts";
 import { TTLMap } from "../../../../common/ttl_map.ts";
 import { can_write_in_channel } from "../../../common/discord/permissions.ts";
 import { bot } from "../../../index.ts";
 import { core_config } from "../index.ts";
-import { type Command, type Context, type Option, OptionType, type OptionTypeValue, type Reply, default_id } from "../public/command.ts";
+import { type Command, type CommandContext, type Option, OptionType, type OptionTypeValue, type Reply } from "../public/command.ts";
 import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands_by_name } from "./command_cache.ts";
+import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
+import { default_id, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "./index.ts";
 
 export const prefix_send_handler = define_event_listener("messageCreate", handle);
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
@@ -16,8 +18,8 @@ export const prefix_delete_handler = define_event_listener("messageDelete", hand
 // if anything is added here, make sure the message type can be replied to
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
-const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(1000 * 60 * 30);
-setInterval(() => tracked_messages.cleanup(), 1000 * 60);
+const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(STATE_EXPIRE_AFTER);
+setInterval(() => tracked_messages.cleanup(), STATE_CLEANUP_INTERVAL);
 
 async function handle(message: Message, prev_context?: PrefixContext): Promise<void> {
 	if (!message.inCachedGuildChannel())
@@ -53,11 +55,6 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<v
 		return;
 
 	const command = matches[0]!;
-
-	if (prev_context && prev_context.command !== command) {
-		tracked_messages.set(message.id, prev_context);
-		return;
-	}
 
 	const context = prev_context ?? new PrefixContext(
 		command,
@@ -95,6 +92,9 @@ function handle_edit(message: Message) {
 	if (!tracked)
 		return;
 
+	if (tracked._response !== null)
+		unlisten_for_interactions(tracked._response.id);
+
 	tracked_messages.delete(message.id);
 	handle(message, tracked);
 }
@@ -105,38 +105,32 @@ async function handle_delete(message: PossiblyUncachedMessage) {
 	if (!tracked)
 		return;
 
+	if (tracked._response !== null)
+		unlisten_for_interactions(tracked._response.id);
+
 	tracked_messages.delete(message.id);
 	await tracked._delete();
 }
 
-class PrefixContext implements Context {
+
+class PrefixContext implements CommandContext {
 	command: Command;
-	shard: Shard;
-	guild: Guild;
-	user: User;
-	member: Member;
-	channel: AnyTextableGuildChannel;
+	get shard(): Shard { return this.message.guild.shard; }
+	get guild(): Guild { return this.message.guild; }
+	get user(): User { return this.message.author; }
+	get member(): Member { return this.message.member; }
+	get channel(): AnyTextableGuildChannel { return this.message.channel; }
 	message: Message<AnyTextableGuildChannel>;
 	_response: Message | null;
 
 	constructor(command: Command, message: Message<AnyTextableGuildChannel>, shard: Shard) {
 		this.command = command;
-		this.shard = shard;
-		this.guild = message.guild;
 		this.message = message;
-		this.user = message.author;
-		this.member = message.member;
-		this.channel = message.channel;
 		this._response = null;
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const options = typeof reply === "string" ? { content: reply } : reply;
-
-		options.flags ??= 0;
-
-		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0)
-			options.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
+		const message_options = transform_reply(reply);
 
 		if (this.message.channel instanceof GuildChannel
 			&& !can_write_in_channel(this.message.channel, this.message.channel.guild.clientMember))
@@ -159,20 +153,17 @@ class PrefixContext implements Context {
 						messageID: this.message.id,
 						failIfNotExists: false,
 					},
-					...options
+					...message_options
 				});
 			} else
-				this._response = await this.channel.createMessage(options);
+				this._response = await this.channel.createMessage(message_options);
 		} else {
-			await this._response.edit({
-				attachments: [],
-				components: [],
-				content: "",
-				embeds: [],
-				files: [],
-				...options
-			});
+			unlisten_for_interactions(this._response.id);
+			await this._response.edit(message_options);
 		}
+
+		if (typeof reply !== "string" && reply.components !== undefined)
+			listen_for_interactions(this._response.id, this.message.author.id, reply.components);
 	}
 
 	async _delete(): Promise<void> {
