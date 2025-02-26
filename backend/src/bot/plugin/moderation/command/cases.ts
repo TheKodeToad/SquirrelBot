@@ -53,7 +53,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 		{
 			actor_ids: filter.actor_id !== null ? [] : undefined,
 			target_ids: filter.target_id !== null ? [filter.target_id] : undefined,
-			limit: 4,
+			limit: 3,
 			reversed: !state.reversed,
 			number_greater_than: state.before,
 			number_less_than: state.after,
