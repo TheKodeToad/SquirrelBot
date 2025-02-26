@@ -51,10 +51,10 @@ router.get("/", async context => {
 
 		const types = Array.isArray(type) ? type : [type];
 		for (const item of types) {
-			if (typeof item !== "string")
+			if (typeof item !== "string" || !(item in CASE_TYPE_NAME_TO_ID))
 				throw new HTTPException(400);
 
-			const parsed = CASE_TYPE_NAME_TO_ID[item];
+			const parsed = CASE_TYPE_NAME_TO_ID[item as keyof typeof CASE_TYPE_NAME_TO_ID];
 
 			if (parsed === undefined)
 				throw new HTTPException(400);
