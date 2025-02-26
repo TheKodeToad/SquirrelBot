@@ -67,16 +67,9 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 ): Record<keyof P, boolean> {
 	const groups = resolve_groups(member);
 
-	const result: Record<string, boolean> = {};
+	const result = { ...config.default_permissions };
 
-	for (const key in config.default_permissions) {
-		Object.defineProperty(result, key, {
-			value: config.default_permissions[key]!,
-			configurable: true,
-			enumerable: true,
-			writable: true
-		});
-	}
+	Object.setPrototypeOf(result, Object.prototype);
 
 	for (const override of config.permission_overrides) {
 		if (!test_filter(override, groups, channel))
@@ -86,11 +79,11 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 			if (!Object.hasOwn(result, key))
 				continue;
 
-			result[key] = override[key]!;
+			result[key as keyof typeof result] = override[key]!;
 		}
 	}
 
-	return result as any;
+	return result;
 }
 
 function test_filter(filter: PermissionsFilter, groups: GroupsResult, channel: Exclude<AnyGuildChannel, CategoryChannel>) {

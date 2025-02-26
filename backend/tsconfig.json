@@ -5,7 +5,6 @@
 		"rewriteRelativeImportExtensions": true,
 		"verbatimModuleSyntax": true,
 		"strict": true,
-		"noImplicitAny": false,
 		"noUncheckedIndexedAccess": true,
 		"isolatedModules": true
 	}

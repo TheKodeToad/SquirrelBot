@@ -16,7 +16,7 @@ export enum CaseType {
 	Unban = 9,
 }
 
-export const CASE_TYPE_NAME_TO_ID: Record<string, CaseType> = {
+export const CASE_TYPE_NAME_TO_ID = {
 	note: CaseType.Note,
 	warn: CaseType.Warn,
 	unwarn: CaseType.Unwarn,
@@ -29,10 +29,18 @@ export const CASE_TYPE_NAME_TO_ID: Record<string, CaseType> = {
 	unban: CaseType.Unban,
 };
 
-export const CASE_TYPE_ID_TO_NAME: Record<CaseType, string> = Object.entries(CASE_TYPE_NAME_TO_ID).reduce((result, [name, type]) => {
-	result[name] = type;
-	return result;
-}, {}) as any;
+export const CASE_TYPE_ID_TO_NAME: Record<CaseType, keyof typeof CASE_TYPE_NAME_TO_ID> = {
+	[CaseType.Note]: "note",
+	[CaseType.Warn]: "warn",
+	[CaseType.Unwarn]: "unwarn",
+	[CaseType.VoiceMute]: "voice_mute",
+	[CaseType.VoiceUnmute]: "voice_unmute",
+	[CaseType.Mute]: "mute",
+	[CaseType.Unmute]: "unmute",
+	[CaseType.Kick]: "kick",
+	[CaseType.Ban]: "ban",
+	[CaseType.Unban]: "unban",
+};
 
 export const case_info_schema = object({
 	guild_id: string(),
