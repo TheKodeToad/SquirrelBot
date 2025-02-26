@@ -12,5 +12,10 @@ bot.once("ready", async () => {
 	console.log("I'm ready :O");
 });
 
+process.on("unhandledRejection", error => {
+	console.error("Unhandled rejection:");
+	console.error(error);
+});
+
 await connect_listener();
 await bot.connect();
