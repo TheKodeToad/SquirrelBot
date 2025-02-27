@@ -48,12 +48,14 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	if (!perms.case_read)
 		return;
 
+	const limit = 3;
+
 	const cases = await get_cases(
 		member.guildID,
 		{
 			actor_ids: filter.actor_id !== null ? [] : undefined,
 			target_ids: filter.target_id !== null ? [filter.target_id] : undefined,
-			limit: 3,
+			limit: limit + 1,
 			reversed: !state.reversed,
 			number_greater_than: state.before,
 			number_less_than: state.after,
@@ -64,6 +66,11 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 		await callback(`${icons.info} No cases found!`);
 		return;
 	}
+
+	const has_more = cases.length === limit + 1;
+
+	if (has_more)
+		cases.splice(cases.length - 1, 1);
 
 	if (state.reversed)
 		cases.reverse();
@@ -99,22 +106,31 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 		fields.push({ name: "Case #" + info.number, value });
 	}
 
-	const components: Component[][] = [[
-		{
-			type: ComponentTypes.BUTTON,
-			style: ButtonStyles.SECONDARY,
-			customID: "prev",
-			label: "←",
-			callback: component_context => run(reply => component_context.edit(reply), member, channel, filter, { before: cases[0]?.number, reversed: true }),
-		},
-		{
-			type: ComponentTypes.BUTTON,
-			style: ButtonStyles.SECONDARY,
-			customID: "next",
-			label: "→",
-			callback: component_context => run(reply => component_context.edit(reply), member, channel, filter, { after: cases[cases.length - 1]?.number }),
-		},
-	]];
+	const components: Component[][] = [];
+
+	const prev_disabled = state.after === undefined && (!has_more || state.before === undefined);
+	const next_disabled = state.before === undefined && !has_more;
+
+	if (!(prev_disabled && next_disabled)) {
+		components.push([
+			{
+				type: ComponentTypes.BUTTON,
+				style: ButtonStyles.SECONDARY,
+				customID: "prev",
+				label: "←",
+				disabled: prev_disabled,
+				callback: component_context => run(reply => component_context.edit(reply), member, channel, filter, { before: cases[0]?.number, reversed: true }),
+			},
+			{
+				type: ComponentTypes.BUTTON,
+				style: ButtonStyles.SECONDARY,
+				customID: "next",
+				label: "→",
+				disabled: next_disabled,
+				callback: component_context => run(reply => component_context.edit(reply), member, channel, filter, { after: cases[cases.length - 1]?.number }),
+			}
+		]);
+	}
 
 	await callback({
 		embeds: [{
