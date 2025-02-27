@@ -2,7 +2,6 @@ import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, Mes
 import { is_snowflake } from "../../../../common/snowflake.ts";
 import { TTLMap } from "../../../../common/ttl_map.ts";
 import { can_write_in_channel } from "../../../common/discord/permissions.ts";
-import { bot } from "../../../index.ts";
 import { core_config } from "../index.ts";
 import { type Command, type CommandContext, type Option, OptionType, type OptionTypeValue, type Reply } from "../public/command.ts";
 import { define_event_listener } from "../public/event_listener.ts";
@@ -18,10 +17,10 @@ export const prefix_delete_handler = define_event_listener("messageDelete", hand
 // if anything is added here, make sure the message type can be replied to
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
-const tracked_messages: TTLMap<string, PrefixContext> = new TTLMap(STATE_EXPIRE_AFTER);
+const tracked_messages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => tracked_messages.cleanup(), STATE_CLEANUP_INTERVAL);
 
-async function handle(message: Message, prev_context?: PrefixContext): Promise<boolean> {
+async function handle(message: Message, prev_response?: Message): Promise<boolean> {
 	if (!message.inCachedGuildChannel())
 		return false;
 
@@ -56,14 +55,7 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<b
 
 	const command = matches[0]!;
 
-	if (prev_context !== undefined && command !== prev_context.command)
-		return false;
-
-	const context = prev_context ?? new PrefixContext(
-		command,
-		message,
-		message.guild?.shard ?? bot.shards.get(0)!
-	);
+	const context = new PrefixContext(command, message, prev_response);
 
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
 	const parser = new Parser(context, input);
@@ -75,14 +67,17 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<b
 			throw error;
 
 		await context.respond(error.message);
-		tracked_messages.set(message.id, context);
+
+		if (context._response !== null)
+			tracked_messages.set(message.id, context._response);
+
 		return true;
 	}
 
 	try {
 		await command.run(context, args);
-		if (command.track_updates)
-			tracked_messages.set(message.id, context);
+		if (command.track_updates && context._response !== null)
+			tracked_messages.set(message.id, context._response);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;
@@ -92,31 +87,29 @@ async function handle(message: Message, prev_context?: PrefixContext): Promise<b
 }
 
 async function handle_edit(message: Message) {
-	const tracked = tracked_messages.get(message.id);
+	const response = tracked_messages.get(message.id);
 
-	if (!tracked)
+	if (!response)
 		return;
 
-	if (tracked._response !== null)
-		unlisten_for_interactions(tracked._response.id);
+	if (response !== null)
+		unlisten_for_interactions(response.id);
 
 	tracked_messages.delete(message.id);
 
-	if (!(await handle(message, tracked)))
-		await tracked._delete();
+	if (!(await handle(message, response)))
+		await response.delete();
 }
 
 async function handle_delete(message: PossiblyUncachedMessage) {
-	const tracked = tracked_messages.get(message.id);
+	const response = tracked_messages.get(message.id);
 
-	if (!tracked)
+	if (!response)
 		return;
 
-	if (tracked._response !== null)
-		unlisten_for_interactions(tracked._response.id);
-
 	tracked_messages.delete(message.id);
-	await tracked._delete();
+	unlisten_for_interactions(response.id);
+	await response.delete();
 }
 
 
@@ -130,10 +123,10 @@ class PrefixContext implements CommandContext {
 	message: Message<AnyTextableGuildChannel>;
 	_response: Message | null;
 
-	constructor(command: Command, message: Message<AnyTextableGuildChannel>, shard: Shard) {
+	constructor(command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
 		this.command = command;
 		this.message = message;
-		this._response = null;
+		this._response = response ?? null;
 	}
 
 	async respond(reply: Reply): Promise<void> {
