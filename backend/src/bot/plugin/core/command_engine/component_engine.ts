@@ -60,6 +60,9 @@ export function listen_for_interactions(message_id: string, invoker_id: string, 
 			if (!("callback" in component))
 				continue;
 
+			if (component.disabled)
+				continue;
+
 			const { customID, callback, invoker_only } = component;
 			callbacks.set(customID, { callback, invoker_only: invoker_only ?? true });
 		}
@@ -103,7 +106,8 @@ class ComponentContextImpl implements ComponentContext {
 			await this._interaction.message.edit(message_options);
 		} else {
 			this._remove_timeout();
-			this._interaction.editOriginal(message_options);
+			await this._interaction.editParent(message_options);
+			this._acked = true;
 		}
 
 		if (typeof reply !== "string" && reply.components !== undefined)
