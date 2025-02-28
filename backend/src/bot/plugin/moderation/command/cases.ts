@@ -53,7 +53,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	const cases = await get_cases(
 		member.guildID,
 		{
-			actor_ids: filter.actor_id !== null ? [] : undefined,
+			actor_ids: filter.actor_id !== null ? [filter.actor_id] : undefined,
 			target_ids: filter.target_id !== null ? [filter.target_id] : undefined,
 			limit: limit + 1,
 			reversed: !state.reversed,
