@@ -42,3 +42,16 @@ export const CASE_TYPE_NAME: { [T in CaseType]: string } = {
 	[CaseType.Ban]: "Ban",
 	[CaseType.Unban]: "Unban"
 };
+
+export const CASE_TYPE_PAST_TENSE: { [T in CaseType]: string } = {
+	[CaseType.Note]: "added note to",
+	[CaseType.Warn]: "warned",
+	[CaseType.Unwarn]: "unwarned",
+	[CaseType.VoiceMute]: "voice muted",
+	[CaseType.VoiceUnmute]: "voice unmuted",
+	[CaseType.Mute]: "muted",
+	[CaseType.Unmute]: "unmuted",
+	[CaseType.Kick]: "kicked",
+	[CaseType.Ban]: "banned",
+	[CaseType.Unban]: "unbanned"
+};

@@ -97,11 +97,11 @@ export const unban_command = define_command({
 				await context.respond(`${icons.success} Unbanned <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]!`);
 			} else if (unsuccessful_unbans.length === 1) {
 				const unban = unsuccessful_unbans[0]!;
-				await context.respond(`${icons.error} Could not unban <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(escape_markdown(unban.error))}!`);
+				await context.respond(`${icons.error} Could not unban <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(unban.error)}!`);
 			}
 		} else {
 			const successful_message = successful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]`).join("\n");
-			const unsuccessful_message = unsuccessful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(unban.error)}`).join("\n");
+			const unsuccessful_message = unsuccessful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}): ${unban.error}`).join("\n");
 
 			if (unsuccessful_unbans.length === 0) {
 				await context.respond(

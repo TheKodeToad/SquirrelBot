@@ -1,6 +1,5 @@
 import { DiscordRESTError } from "oceanic.js";
 import { get_user_cached } from "./cache.ts";
-import { escape_markdown } from "./markdown.ts";
 
 export function format_rest_error(rest_error: DiscordRESTError) {
 	if (rest_error.resBody !== null
@@ -13,7 +12,7 @@ export function format_rest_error(rest_error: DiscordRESTError) {
 
 export async function format_user_tag(id: string) {
 	try {
-		return escape_markdown((await get_user_cached(id)).tag);
+		return (await get_user_cached(id)).tag;
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;

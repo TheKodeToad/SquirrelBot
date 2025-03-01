@@ -1,34 +1,40 @@
 import { ButtonStyles, ComponentTypes, Member, type AnyTextableGuildChannel, type EmbedField } from "oceanic.js";
 import { get_cases } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
-import { format_user } from "../../../common/discord/format.ts";
+import { format_user, format_user_tag } from "../../../common/discord/format.ts";
+import { escape_markdown } from "../../../common/discord/markdown.ts";
 import { OptionType, define_command, type Component, type Reply } from "../../core/public/command.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
-import { CASE_TYPE_NAME, moderation_config } from "../index.ts";
+import { CASE_TYPE_NAME, CASE_TYPE_PAST_TENSE, moderation_config } from "../index.ts";
 
 
 export const cases_command = define_command({
 	id: "cases",
 	options: {
-		actor: {
+		actor_id: {
 			id: ["actor", "a", "by", "moderator", "mod"],
 			type: OptionType.USER,
 		},
-		target: {
+		target_id: {
 			id: ["target", "t", "for", "user"],
 			type: OptionType.USER,
+		},
+		compact: {
+			id: ["compact", "c"],
+			type: OptionType.VOID,
 		},
 	},
 	track_updates: true,
 	async run(context, args) {
-		await run(reply => context.respond(reply), context.member, context.channel, { actor_id: args.actor, target_id: args.target }, {});
+		await run(reply => context.respond(reply), context.member, context.channel, args, {});
 	},
 });
 
-interface Filter {
+interface Options {
 	actor_id: string | null;
 	target_id: string | null;
+	compact: boolean;
 }
 
 interface State {
@@ -37,7 +43,7 @@ interface State {
 	reversed?: boolean;
 }
 
-async function run(callback: (reply: Reply) => Promise<void>, member: Member, channel: AnyTextableGuildChannel, filter: Filter, state: State) {
+async function run(callback: (reply: Reply) => Promise<void>, member: Member, channel: AnyTextableGuildChannel, options: Options, state: State) {
 	const config = moderation_config.get(member.guildID);
 
 	if (config === undefined)
@@ -48,14 +54,15 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	if (!perms.case_read)
 		return;
 
-	const limit = 3;
+	const limit = options.compact ? 15 : 3;
 
 	const cases = await get_cases(
 		member.guildID,
 		{
-			actor_ids: filter.actor_id !== null ? [filter.actor_id] : undefined,
-			target_ids: filter.target_id !== null ? [filter.target_id] : undefined,
+			actor_ids: options.actor_id !== null ? [options.actor_id] : undefined,
+			target_ids: options.target_id !== null ? [options.target_id] : undefined,
 			limit: limit + 1,
+			// default to descending, using ascending when going back
 			reversed: !state.reversed,
 			number_greater_than: state.before,
 			number_less_than: state.after,
@@ -72,38 +79,50 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	if (has_more)
 		cases.splice(cases.length - 1, 1);
 
+	// reverse result so it still appears to be descending yet we have the last n instead of first n
 	if (state.reversed)
 		cases.reverse();
 
-	const has_filters = filter.actor_id !== null || filter.target_id !== null;
+	const has_filters = options.actor_id !== null || options.target_id !== null;
 	const title = has_filters ? "Filtered Cases" : "All Cases";
 
 	let description = "";
 
-	if (filter.actor_id !== null)
-		description += `Actor: ${await format_user(filter.actor_id)}\n`;
+	if (options.actor_id !== null)
+		description += `Actor: ${await format_user(options.actor_id)}\n`;
 
-	if (filter.target_id !== null)
-		description += `Target: ${await format_user(filter.target_id)}\n`;
+	if (options.target_id !== null)
+		description += `Target: ${await format_user(options.target_id)}\n`;
 
 	let fields: EmbedField[] = [];
 
 	for (const info of cases) {
 		const creation_secs = Math.floor(info.created_at.getTime() / 1000);
 
-		let value = "";
-		value += `Created at: <t:${creation_secs}> (<t:${creation_secs}:R>)\n`;
-		value += `Type: ${CASE_TYPE_NAME[info.type]}\n`;
+		if (options.compact) {
+			const actor = escape_markdown(await format_user_tag(info.actor_id));
+			const target = escape_markdown(await format_user_tag(info.target_id));
+			description += `<t:${creation_secs}:R> **#${info.number}:** ${actor} ${CASE_TYPE_PAST_TENSE[info.type]} ${target}`;
 
-		if (filter.actor_id === null)
-			value += `Actor: ${await format_user(info.actor_id)}\n`;
+			if (info.reason !== null && info.reason.length !== 0)
+				description += ` (${info.reason})`;
 
-		if (filter.target_id === null)
-			value += `Target: ${await format_user(info.target_id)}\n`;
+			description += "\n";
+		} else {
+			let value = "";
+			value += `Created at: <t:${creation_secs}> (<t:${creation_secs}:R>)\n`;
+			value += `Type: ${CASE_TYPE_NAME[info.type]}\n`;
 
-		value += `Reason: ${info.reason ?? "*None provided*"}\n`;
+			if (options.actor_id === null)
+				value += `Actor: ${await format_user(info.actor_id)}\n`;
 
-		fields.push({ name: "Case #" + info.number, value });
+			if (options.target_id === null)
+				value += `Target: ${await format_user(info.target_id)}\n`;
+
+			value += `Reason: ${info.reason ?? "*None provided*"}\n`;
+
+			fields.push({ name: "Case #" + info.number, value });
+		}
 	}
 
 	const components: Component[][] = [];
@@ -119,7 +138,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 				customID: "prev",
 				label: "←",
 				disabled: prev_disabled,
-				callback: component_context => run(reply => component_context.edit(reply), member, channel, filter, { before: cases[0]?.number, reversed: true }),
+				callback: component_context => run(reply => component_context.edit(reply), member, channel, options, { before: cases[0]?.number, reversed: true }),
 			},
 			{
 				type: ComponentTypes.BUTTON,
@@ -127,7 +146,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 				customID: "next",
 				label: "→",
 				disabled: next_disabled,
-				callback: component_context => run(reply => component_context.edit(reply), member, channel, filter, { after: cases[cases.length - 1]?.number }),
+				callback: component_context => run(reply => component_context.edit(reply), member, channel, options, { after: cases[cases.length - 1]?.number }),
 			}
 		]);
 	}
