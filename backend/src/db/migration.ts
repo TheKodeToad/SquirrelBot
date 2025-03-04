@@ -1,18 +1,22 @@
+import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import "../environment.ts";
 import { pool } from "./index.ts";
 
-export async function migrate() {
-	return await process_all(false);
+export async function migrate(ignore_errors: boolean) {
+	return await process_migrations(false, ignore_errors);
 }
 
 export async function check_migrations() {
-	return await process_all(true);
+	return await process_migrations(true, false);
 }
 
 export async function check_migrations_or_exit() {
 	const migrations_needed = await check_migrations();
+
+	if (migrations_needed === null)
+		process.exit(1);
 
 	if (migrations_needed > 0) {
 		console.error(`${migrations_needed} migrations needed!`);
@@ -22,68 +26,83 @@ export async function check_migrations_or_exit() {
 	}
 }
 
-async function process_all(check_only: boolean): Promise<number> {
+class MigrationError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "MigrationError";
+	}
+}
+
+async function process_migrations(check_only: boolean, ignore_errors: boolean): Promise<number> {
 	await pool.query(`
-		CREATE TABLE IF NOT EXISTS "migration_dirs" (
-			"path" TEXT NOT NULL PRIMARY KEY,
-			"last_run" INT NOT NULL
+		CREATE TABLE IF NOT EXISTS "migration_files" (
+			"number" INT NOT NULL PRIMARY KEY,
+			"checksum" BYTEA NOT NULL
 		)
 	`);
 
-	let total = 0;
-
-	const base = "migrations";
-
-	for (const directory of await fs.readdir(base)) {
-		const directory_path = path.join(base, directory);
-
-		if (!(await fs.stat(directory_path)).isDirectory())
-			continue;
-
-		total += await process_in(directory_path, check_only);
-	}
-
-	return total;
-}
-
-async function process_in(dir: string, check_only: boolean): Promise<number> {
 	let run_count = 0;
 	const files: string[] = [];
 
-	for (const name of await fs.readdir(dir)) {
-		const item_path = path.join(dir, name);
+	const base = "migrations";
 
-		if ((await fs.stat(item_path)).isDirectory())
+	for (const name of await fs.readdir(base)) {
+		const item_path = path.join(base, name);
+
+		if (!(await fs.stat(item_path)).isFile())
 			continue;
 
-		const pattern = /^([0-9]+)-\w+\.sql$/;
+		const pattern = /^([0-9]+)-.+\.sql$/;
 		const matches = pattern.exec(name);
 
 		if (!matches)
 			continue;
 
-		const index = Number(matches[1]);
+		const number = Number(matches[1]);
 
-		if (Number.isNaN(index))
+		if (Number.isNaN(number))
 			continue;
 
-		files[index] = item_path;
+		files[number] = item_path;
 	}
 
-	const last_run: number = (await pool.query(
-		`
-			SELECT "last_run"
-			FROM "migration_dirs"
-			WHERE "path" = $1
-		`,
-		[dir]
-	)).rows[0]?.last_run ?? -1;
-
-	for (const [index, file] of files.entries()) {
+	for (const [number, file] of files.entries()) {
 		if (file === undefined)
-			continue;
+			throw new MigrationError(`Migration files are missing or numbers were skipped`);
 
-		if (index <= last_run) {
+		const { rows } = await pool.query(
+			`
+				SELECT "checksum"
+				FROM "migration_files"
+				WHERE "number" = $1
+			`,
+			[number]
+		);
+
+		const content = await fs.readFile(file, "utf-8");
+		const content_checksum = crypto.createHash("sha1").update(content).digest();
+
+		// already run
+		if (rows.length !== 0) {
+			const { checksum }: { checksum: Buffer; } = rows[0];
+
+			if (!checksum.equals(content_checksum)) {
+				const message = `"${file}" contents changed after it has already been run`;
+
+				if (ignore_errors) {
+					console.warn(message);
+					await pool.query(
+						`
+							UPDATE "migration_files"
+							SET "checksum" = $2
+							WHERE "number" = $1`,
+						[number, content_checksum]
+					);
+					continue;
+				} else
+					throw new MigrationError(message);
+			}
+
 			if (!check_only)
 				console.log(`Skipping "${file}" as it has already been run`);
 
@@ -99,22 +118,20 @@ async function process_in(dir: string, check_only: boolean): Promise<number> {
 
 		console.log(`Running file "${file}"`);
 
-		const sql = await fs.readFile(file, "utf-8");
 		const client = await pool.connect();
 
 		let done = false;
 		try {
+
 			await client.query("BEGIN");
 
-			await client.query(sql);
+			await client.query(content);
 			await client.query(
 				`
-					INSERT INTO "migration_dirs" ("path", "last_run")
+					INSERT INTO "migration_files" ("number", "checksum")
 					VALUES ($1, $2)
-					ON CONFLICT ("path")
-					DO UPDATE SET "last_run" = $2
 				`,
-				[dir, index]
+				[number, content_checksum]
 			);
 
 			await client.query("COMMIT");

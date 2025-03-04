@@ -1,11 +1,11 @@
 import { pool } from "./index.ts";
 import { check_migrations, migrate } from "./migration.ts";
 
-const command = process.argv[2];
+const [_, script, command, ...args] = process.argv;
 
 switch (command) {
 	case "migrate": {
-		const count = await migrate();
+		const count = await migrate(args.includes("--ignore-errors"));
 		await pool.end();
 
 		if (count > 0)
@@ -28,6 +28,6 @@ switch (command) {
 		break;
 	}
 	default:
-		console.error(`Usage: node ${process.argv[1]} <migrate|check>`);
+		console.error(`Usage: node ${script} <migrate|check> [--ignore-errors]`);
 		break;
 }

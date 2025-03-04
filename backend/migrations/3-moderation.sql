@@ -1,5 +1,5 @@
 CREATE TABLE "moderation_cases" (
-	"guild_id" NUMERIC(20, 0) NOT NULL,
+	"guild_id" NUMERIC(20, 0) REFERENCES "core_guild_info"("id") ON DELETE CASCADE,
 	"number" INT NOT NULL,
 
 	"type" SMALLINT NOT NULL,
@@ -17,5 +17,5 @@ CREATE TABLE "moderation_cases" (
 	PRIMARY KEY ("guild_id", "number")
 );
 
-CREATE INDEX IF NOT EXISTS "moderation_cases_idx_by_actor" ON "moderation_cases" ("guild_id", "actor_id");
-CREATE INDEX IF NOT EXISTS "moderation_cases_idx_by_target" ON "moderation_cases" ("guild_id", "target_id");
+CREATE INDEX "moderation_cases_idx_by_actor" ON "moderation_cases" ("guild_id", "actor_id");
+CREATE INDEX "moderation_cases_idx_by_target" ON "moderation_cases" ("guild_id", "target_id");
