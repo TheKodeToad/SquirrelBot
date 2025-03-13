@@ -1,28 +1,23 @@
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { safeParse } from "valibot";
+import { map_iteratable } from "../../../common/iterators.ts";
 import { get_guild_config, insert_guild_config } from "../../../db/core/configs.ts";
 import { add_channel_listener } from "../../../db/notification.ts";
-import { bot } from "../../index.ts";
 import { get_plugin, get_plugins } from "../../loader/index.ts";
 import type { Plugin } from "../../loader/plugin.ts";
+import { add_grant_access_listener, add_revoke_access_listener, get_allowed_guilds } from "./guild_info_sync.ts";
 
-export async function load_configs() {
-	await Promise.all(bot.guilds.map(async guild => {
-		for (const plugin of get_plugins()) {
-			if (plugin.config === undefined)
-				return;
-
-			// TODO: might not scale well
-			await insert_guild_config(guild.id, plugin.id, "");
-			await load_config(guild.id, plugin);
-		}
-	}));
+export async function init_configs() {
+	await Promise.all(map_iteratable(get_allowed_guilds(), create_and_load_configs));
+	add_grant_access_listener(create_and_load_configs);
+	add_revoke_access_listener(unload_configs);
+	await install_config_change_listener();
 }
 
 const config_update_lock = new AsyncLock;
 
-export async function install_config_change_listener(): Promise<void> {
+async function install_config_change_listener(): Promise<void> {
 	await add_channel_listener("config_update", async payload => {
 		if (payload === undefined)
 			return;
@@ -42,7 +37,7 @@ export async function install_config_change_listener(): Promise<void> {
 			return;
 		}
 
-		config_update_lock.acquire([guild_id, key], async () => {
+		await config_update_lock.acquire(guild_id, async () => {
 			const plugin = get_plugin(key);
 
 			if (plugin === undefined || plugin.config === undefined)
@@ -50,6 +45,29 @@ export async function install_config_change_listener(): Promise<void> {
 
 			await load_config(guild_id, plugin);
 		});
+	});
+}
+
+export async function create_and_load_configs(guild_id: string) {
+	await config_update_lock.acquire(guild_id, async () => {
+		for (const plugin of get_plugins()) {
+			if (plugin.config === undefined)
+				return;
+
+			await insert_guild_config(guild_id, plugin.id, "");
+			await load_config(guild_id, plugin);
+		}
+	});
+}
+
+export async function unload_configs(guild_id: string) {
+	await config_update_lock.acquire(guild_id, async () => {
+		for (const plugin of get_plugins()) {
+			if (plugin.config === undefined)
+				return;
+
+			plugin.config.delete(guild_id);
+		}
 	});
 }
 

@@ -43,5 +43,5 @@ serve({
 	port: 8080,
 });
 
-setInterval(async () => await delete_expired_tokens(), 1000 * 60 * 60 * 12);
+setInterval(async () => await delete_expired_tokens(), 1000 * 60 * 60);
 await delete_expired_tokens();

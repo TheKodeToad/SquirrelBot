@@ -12,7 +12,7 @@ export function get_commands_by_name(name: string): Command[] {
 	return lookup.get(name) ?? [];
 }
 
-export function init_cache() {
+export function init_command_cache() {
 	for (const plugin of get_plugins()) {
 		if (plugin.commands === undefined)
 			continue;

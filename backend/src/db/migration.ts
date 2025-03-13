@@ -4,8 +4,8 @@ import path from "path";
 import "../environment.ts";
 import { pool } from "./index.ts";
 
-export async function migrate(ignore_errors: boolean) {
-	return await process_migrations(false, ignore_errors);
+export async function migrate(ignore_changes: boolean) {
+	return await process_migrations(false, ignore_changes);
 }
 
 export async function check_migrations() {
@@ -33,7 +33,7 @@ class MigrationError extends Error {
 	}
 }
 
-async function process_migrations(check_only: boolean, ignore_errors: boolean): Promise<number> {
+async function process_migrations(check_only: boolean, ignore_changes: boolean): Promise<number> {
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS "migration_files" (
 			"number" INT NOT NULL PRIMARY KEY,
@@ -89,7 +89,7 @@ async function process_migrations(check_only: boolean, ignore_errors: boolean): 
 			if (!checksum.equals(content_checksum)) {
 				const message = `"${file}" contents changed after it has already been run`;
 
-				if (ignore_errors) {
+				if (ignore_changes) {
 					console.warn(message);
 					await pool.query(
 						`
@@ -100,7 +100,7 @@ async function process_migrations(check_only: boolean, ignore_errors: boolean): 
 					);
 					continue;
 				} else
-					throw new MigrationError(message);
+					throw new MigrationError(message + " - you may bypass this with --ignore-changes");
 			}
 
 			if (!check_only)

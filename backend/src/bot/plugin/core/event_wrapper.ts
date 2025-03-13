@@ -1,6 +1,6 @@
 import type { ClientEvents } from "oceanic.js";
-import { BOT_ALLOWED_GUILDS } from "../../../environment.ts";
 import { bot } from "../../index.ts";
+import { is_guild_allowed } from "./guild_info_sync.ts";
 
 export function wrap_listener<E extends keyof ClientEvents>(
 	event: E,
@@ -12,7 +12,7 @@ export function wrap_listener<E extends keyof ClientEvents>(
 		if (event in EVENT_TO_GUILD)
 			guild ??= EVENT_TO_GUILD[event](...args);
 
-		if (guild !== null && !BOT_ALLOWED_GUILDS.has(guild))
+		if (guild !== null && !is_guild_allowed(guild))
 			return;
 
 		try {
