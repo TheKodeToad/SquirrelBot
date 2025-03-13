@@ -14,7 +14,7 @@
 		"async-lock": "^1.4.1",
 		"dotenv": "^16.4.7",
 		"hono": "^4.7.4",
-		"oceanic.js": "1.11.2",
+		"oceanic.js": "^1.11.2",
 		"pg": "^8.13.3",
 		"smol-toml": "^1.3.1",
 		"valibot": "^0.42.1"

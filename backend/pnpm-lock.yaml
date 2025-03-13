@@ -21,7 +21,7 @@ importers:
         specifier: ^4.7.4
         version: 4.7.4
       oceanic.js:
-        specifier: 1.11.2
+        specifier: ^1.11.2
         version: 1.11.2
       pg:
         specifier: ^8.13.3
