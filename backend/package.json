@@ -10,7 +10,7 @@
 		"_node": "node --disable-proto=delete --experimental-transform-types"
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.13.8",
+		"@hono/node-server": "^1.14.0",
 		"async-lock": "^1.4.1",
 		"dotenv": "^16.4.7",
 		"hono": "^4.7.4",
