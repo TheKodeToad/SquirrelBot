@@ -4,6 +4,8 @@ import { icons } from "../../core/public/icons.ts";
 export const ping_command = define_command({
 	id: "ping",
 	track_updates: true, // allow deleting
+
+	pre_run: () => true,
 	async run(context) {
 		const base_response = `${icons.info} Gateway: ${context.shard.latency}ms`;
 		const pre_respond = Date.now();

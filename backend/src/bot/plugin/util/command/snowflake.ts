@@ -14,6 +14,8 @@ export const snowflake_command = define_command({
 			position: 0,
 		},
 	},
+
+	pre_run: () => true,
 	async run(context, args) {
 		const snowflake = BigInt(args.input);
 		const timestamp = DISCORD_EPOCH + (snowflake >> 22n);

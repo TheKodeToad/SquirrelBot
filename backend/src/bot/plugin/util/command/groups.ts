@@ -17,6 +17,8 @@ export const groups_command = define_command({
 			position: 0,
 		}
 	},
+
+	pre_run: () => true,
 	async run(context, args) {
 		const core_config = core_config_cache.get(context.guild.id);
 
