@@ -3,10 +3,11 @@ import { get_cases } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { format_user, format_user_tag } from "../../../common/discord/format.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
-import { OptionType, define_command, type Component, type Reply } from "../../core/public/command.ts";
+import { OptionType, define_command, type Component, type Reply } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { CASE_TYPE_NAME, CASE_TYPE_PAST_TENSE, moderation_config } from "../index.ts";
+import { permissions_guard } from "../../core/public/command/helper.ts";
 
 
 export const cases_command = define_command({
@@ -26,6 +27,8 @@ export const cases_command = define_command({
 		},
 	},
 	track_updates: true,
+
+	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
 	async run(context, args) {
 		await run(reply => context.respond(reply), context.member, context.channel, args, {});
 	},

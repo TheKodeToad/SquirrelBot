@@ -1,9 +1,9 @@
 import { get_case } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { format_user } from "../../../common/discord/format.ts";
-import { OptionType, define_command } from "../../core/public/command.ts";
+import { permissions_guard } from "../../core/public/command/helper.ts";
+import { OptionType, define_command } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { CASE_TYPE_NAME, moderation_config } from "../index.ts";
 
 export const case_command = define_command({
@@ -17,17 +17,9 @@ export const case_command = define_command({
 		},
 	},
 	track_updates: true,
+
+	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
 	async run(context, { number }) {
-		const config = moderation_config.get(context.guild.id);
-
-		if (config === undefined)
-			return;
-
-		const perms = resolve_permissions(config, context.member, context.channel);
-
-		if (!perms.case_read)
-			return;
-
 		const info = await get_case(context.guild.id, number);
 		if (info === null) {
 			await context.respond(`${icons.error} Case #${number} not found!`);

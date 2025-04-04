@@ -5,9 +5,9 @@ import { format_rest_error } from "../../../common/discord/format.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
 import { get_highest_role } from "../../../common/discord/permissions.ts";
 import { bot } from "../../../index.ts";
-import { OptionType, define_command } from "../../core/public/command.ts";
+import { permissions_guard } from "../../core/public/command/helper.ts";
+import { OptionType, define_command } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { moderation_config } from "../index.ts";
 
 export const kick_command = define_command({
@@ -34,17 +34,9 @@ export const kick_command = define_command({
 			id: ["no-dm", "nd", "no-direct-message"],
 		},
 	},
-	async run(context, args) {
-		const config = moderation_config.get(context.guild.id);
 
-		if (config === undefined)
-			return;
-
-		const perms = resolve_permissions(config, context.member, context.channel);
-
-		if (!perms.kick)
-			return;
-
+	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.kick),
+	async run(context, args, { config }) {
 		let send_dm = config.kick.send_direct_message;
 
 		if (args.dm)

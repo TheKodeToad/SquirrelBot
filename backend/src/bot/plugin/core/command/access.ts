@@ -2,11 +2,13 @@ import { BOT_ALLOWED_GUILDS } from "../../../../environment.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
 import { bot } from "../../../index.ts";
 import { grant_access, revoke_access } from "../guild_info_sync.ts";
-import { define_command, OptionType } from "../public/command.ts";
+import { define_command, OptionType, type CommandContext } from "../public/command/index.ts";
 import { icons } from "../public/icons.ts";
 
 // for now
-const ME = "706152404072267788";
+function check_for_me(context: CommandContext): boolean {
+	return context.user.id === "706152404072267788";
+}
 
 export const grant_access_command = define_command({
 	id: ["grant_access", "whitelist"],
@@ -19,10 +21,9 @@ export const grant_access_command = define_command({
 			position: 0,
 		},
 	},
-	async run(context, args) {
-		if (context.user.id !== ME)
-			return;
 
+	pre_run: check_for_me,
+	async run(context, args) {
 		const guild_name = bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
 
 		if (await grant_access(args.guild))
@@ -43,10 +44,9 @@ export const revoke_access_command = define_command({
 			position: 0,
 		},
 	},
-	async run(context, args) {
-		if (context.user.id !== ME)
-			return;
 
+	pre_run: check_for_me,
+	async run(context, args) {
 		const guild_name = bot.guilds.get(args.guild)?.name ?? "<unknown>";
 
 		const result = await revoke_access(args.guild);

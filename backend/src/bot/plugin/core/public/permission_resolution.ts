@@ -57,14 +57,16 @@ function test_group(group: CoreGroup, member: Member): boolean {
 	return false;
 }
 
+export interface ConfigWithPermissions<P extends Record<string, boolean> = {}> {
+	default_permissions: P,
+	permission_overrides: (Partial<P> & PermissionsFilter)[];
+}
+
 export function resolve_permissions<P extends Record<string, boolean>>(
-	config: {
-		default_permissions: P,
-		permission_overrides: (Partial<P> & PermissionsFilter)[];
-	},
+	config: ConfigWithPermissions<P>,
 	member: Member,
 	channel: Exclude<AnyGuildChannel, CategoryChannel>
-): Record<keyof P, boolean> {
+): P {
 	const groups = resolve_groups(member);
 
 	const result = { ...config.default_permissions };

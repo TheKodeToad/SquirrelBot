@@ -1,5 +1,5 @@
 import { ComponentTypes, type MessageActionRow } from "oceanic.js";
-import type { Command, Reply } from "../public/command.ts";
+import type { Command, Reply } from "../public/command/index.ts";
 
 /**
  * How long to expire command state (edit tracking + component listening)

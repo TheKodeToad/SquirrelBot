@@ -1,7 +1,7 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { bot } from "../../../index.ts";
 import { core_config } from "../index.ts";
-import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../public/command.ts";
+import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../public/command/index.ts";
 import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands, get_commands_by_name } from "./command_cache.ts";
@@ -71,6 +71,16 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	const command = matches[0]!;
 	const context = new SlashContext(command, interaction);
 
+	const data = command.pre_run(context);
+
+	if (data === false) {
+		context._abandon();
+		return;
+	}
+
+	if (data == null)
+		throw new Error("Nullish value returned from pre_run!");
+
 	const args: Record<string, any> = {};
 
 	if (command.options !== undefined) {
@@ -96,12 +106,12 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	}
 
 	try {
-		await command.run(context, args);
+		await command.run(context, args, data);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;
 	} finally {
-		context._remove_timeout();
+		context._abandon();
 	}
 });
 
@@ -138,13 +148,13 @@ class SlashContext implements CommandContext {
 
 			await this._interaction.editOriginal(message_options);
 		} else {
-			this._remove_timeout();
+			this._abandon();
 			await this._interaction.reply(message_options);
 			this._responded = true;
 		}
 	}
 
-	_remove_timeout() {
+	_abandon() {
 		if (this._defer_timeout !== null) {
 			clearTimeout(this._defer_timeout);
 			this._defer_timeout = null;

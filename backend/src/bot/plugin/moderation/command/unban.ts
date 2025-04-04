@@ -2,7 +2,8 @@ import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { CaseType, create_case } from "../../../../db/moderation/cases.ts";
 import { format_rest_error, format_user_tag } from "../../../common/discord/format.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
-import { OptionType, define_command } from "../../core/public/command.ts";
+import { permissions_guard } from "../../core/public/command/helper.ts";
+import { OptionType, define_command } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { moderation_config } from "../index.ts";
@@ -23,6 +24,8 @@ export const unban_command = define_command({
 			position: 1,
 		},
 	},
+
+	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
 	async run(context, args) {
 		const config = moderation_config.get(context.guild.id);
 

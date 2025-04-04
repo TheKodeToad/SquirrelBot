@@ -1,5 +1,5 @@
 import { get_plugins } from "../../../loader/index.ts";
-import type { Command } from "../public/command.ts";
+import type { Command } from "../public/command/index.ts";
 
 const all: Command[] = [];
 const lookup: Map<string, Command[]> = new Map;

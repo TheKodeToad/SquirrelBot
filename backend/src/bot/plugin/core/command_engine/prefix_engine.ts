@@ -3,7 +3,7 @@ import { is_snowflake } from "../../../../common/snowflake.ts";
 import { TTLMap } from "../../../../common/ttl_map.ts";
 import { can_write_in_channel } from "../../../common/discord/permissions.ts";
 import { core_config } from "../index.ts";
-import { type Command, type CommandContext, type Option, OptionType, type OptionTypeValue, type Reply } from "../public/command.ts";
+import { type Command, type CommandContext, type Option, OptionType, type OptionTypeValue, type Reply } from "../public/command/index.ts";
 import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands_by_name } from "./command_cache.ts";
@@ -57,8 +57,17 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 
 	const context = new PrefixContext(command, message, prev_response);
 
+	const data = command.pre_run(context);
+
+	if (data === false)
+		return false;
+
+	if (data == null)
+		throw new Error("Nullish value returned from pre_run!");
+
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
 	const parser = new Parser(context, input);
+
 
 	try {
 		var args = parser.parse();
@@ -75,7 +84,7 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 	}
 
 	try {
-		await command.run(context, args);
+		await command.run(context, args, data);
 		if (command.track_updates && context._response !== null)
 			tracked_messages.set(message.id, context._response);
 	} catch (error) {

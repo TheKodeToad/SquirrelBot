@@ -3,7 +3,7 @@ import { get_member_cached } from "../../../common/discord/cache.ts";
 import { format_rest_error } from "../../../common/discord/format.ts";
 import { escape_markdown, make_inline_codeblock } from "../../../common/discord/markdown.ts";
 import { core_config as core_config_cache } from "../../core/index.ts";
-import { define_command, OptionType } from "../../core/public/command.ts";
+import { define_command, OptionType } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_groups } from "../../core/public/permission_resolution.ts";
 
