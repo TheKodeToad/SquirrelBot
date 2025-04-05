@@ -1,6 +1,9 @@
 import type { ClientEvents } from "oceanic.js";
+import { module_logger } from "../../../common/logger/index.ts";
 import { bot } from "../../index.ts";
 import { is_guild_allowed } from "./guild_info_sync.ts";
+
+const logger = module_logger();
 
 export function wrap_listener<E extends keyof ClientEvents>(
 	event: E,
@@ -18,8 +21,7 @@ export function wrap_listener<E extends keyof ClientEvents>(
 		try {
 			await listener(...args);
 		} catch (error) {
-			console.error(`Error handling event "${event}":`);
-			console.error(error);
+			logger.error(`Error handling event "${event}"`, error);
 		}
 	};
 }

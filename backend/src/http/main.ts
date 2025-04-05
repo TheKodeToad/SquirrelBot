@@ -4,12 +4,15 @@ import fs from "fs/promises";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import path from "path";
+import { module_logger } from "../common/logger/index.ts";
 import { delete_expired_tokens } from "../db/api/tokens.ts";
 import { check_migrations_or_exit } from "../db/migration.ts";
 import { CLIENT_ID, REDIRECT_URI } from "../environment.ts";
 import api_v1 from "./api/v1/index.ts";
 
 await check_migrations_or_exit();
+
+const logger = module_logger();
 
 const app = new Hono;
 app.route("/api/v1", api_v1);
@@ -34,7 +37,7 @@ app.onError((error, context) => {
 		return context.json({ error: error.message }, error.status);
 	}
 
-	console.error(error);
+	logger.error("Something went wrong while serving an endpoint!", error);
 	return context.json({ message: "Internal server error" }, 500);
 });
 

@@ -3,6 +3,16 @@ import { fileURLToPath } from "url";
 import { getCallSites } from "util";
 import { LOG_LEVEL } from "../../environment.ts";
 
+export function module_logger(): Logger {
+	const script_name = fileURLToPath(getCallSites()[1]!.scriptName);
+	let discriminator = path.relative("src", script_name);
+
+	if (discriminator.endsWith(".ts"))
+		discriminator = discriminator.substring(0, discriminator.lastIndexOf("."));
+
+	return new Logger(discriminator);
+}
+
 export enum LogLevel {
 	DEBUG,
 	INFO,
@@ -11,7 +21,7 @@ export enum LogLevel {
 	FATAL
 }
 
-const level_names = ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"];
+const level_names = ["debug", "info", "warn", "error", "fatal"];
 const level_colors = [
 	// DEBUG: green
 	"\x1b[32m",
@@ -27,15 +37,8 @@ const level_colors = [
 
 const PARSED_LOG_LEVEL = level_names.indexOf(LOG_LEVEL);
 
-export function module_logger() {
-	const script_name = fileURLToPath(getCallSites()[1]!.scriptName);
-	let discriminator = path.relative("src", script_name);
 
-	if (discriminator.endsWith(".ts"))
-		discriminator = discriminator.substring(0, discriminator.lastIndexOf("."));
-
-	return new Logger(discriminator);
-}
+type Message = string | (() => string);
 
 export class Logger {
 	private discriminator: string;
@@ -44,11 +47,27 @@ export class Logger {
 		this.discriminator = discriminator;
 	}
 
-	info(message: string, error?: Error) {
+	debug(message: Message, error?: unknown) {
+		this.log(LogLevel.DEBUG, message, error);
+	}
+
+	info(message: Message, error?: unknown) {
 		this.log(LogLevel.INFO, message, error);
 	}
 
-	log(level: LogLevel, message: string, error?: Error) {
+	warn(message: Message, error?: unknown) {
+		this.log(LogLevel.WARN, message, error);
+	}
+
+	error(message: Message, error?: unknown) {
+		this.log(LogLevel.ERROR, message, error);
+	}
+
+	fatal(message: Message, error?: unknown) {
+		this.log(LogLevel.FATAL, message, error);
+	}
+
+	log(level: LogLevel, message: Message, error?: unknown) {
 		if (PARSED_LOG_LEVEL > level)
 			return;
 
@@ -58,11 +77,17 @@ export class Logger {
 			now.getMinutes().toString().padStart(2, "0") + ":" +
 			now.getSeconds().toString().padStart(2, "0");
 
-		let formatted_message = `\x1b[2m${time} ${this.discriminator} \x1b[0m${level_colors[level]}${level_names[level]}:\x1b[0m ${message}`;
+		if (typeof message === "function")
+			message = message();
 
-		if (error !== undefined)
-			formatted_message += "\n" + error;
+		let formatted_message = `\x1b[2m${time} \x1b[0m${level_colors[level]}${level_names[level]}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`;
 
 		console.error(formatted_message);
+
+		if (error !== undefined) {
+			console.group();
+			console.error(error);
+			console.groupEnd();
+		}
 	}
 }

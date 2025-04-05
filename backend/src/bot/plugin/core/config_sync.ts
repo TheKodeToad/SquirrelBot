@@ -2,11 +2,14 @@ import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { safeParse } from "valibot";
 import { map_iteratable } from "../../../common/iterators.ts";
+import { module_logger } from "../../../common/logger/index.ts";
 import { get_guild_config, insert_guild_config } from "../../../db/core/configs.ts";
 import { add_channel_listener } from "../../../db/notification.ts";
 import { get_plugin, get_plugins } from "../../loader/index.ts";
 import type { Plugin } from "../../loader/plugin.ts";
 import { add_grant_access_listener, add_revoke_access_listener, get_allowed_guilds } from "./guild_info_sync.ts";
+
+const logger = module_logger();
 
 export async function init_configs() {
 	await Promise.all(map_iteratable(get_allowed_guilds(), create_and_load_configs));
@@ -28,12 +31,12 @@ async function install_config_change_listener(): Promise<void> {
 			if (!(error instanceof SyntaxError))
 				throw error;
 
-			console.warn("Malformed JSON in config_update payload", error);
+			logger.warn("Malformed JSON in config_update payload", error);
 			return;
 		}
 
 		if (!(typeof key === "string" && typeof guild_id === "string")) {
-			console.warn("config_update payload does not conform to { key: string, guild_id: string; }");
+			logger.warn("config_update payload does not conform to { key: string, guild_id: string; }");
 			return;
 		}
 
@@ -85,10 +88,8 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 	try {
 		var table = parseToml(raw_value);
 	} catch (error) {
-		if (!(error instanceof TomlError)) {
-			console.error("Unexpected error parsing TOML (bug)");
-			console.error(error);
-		}
+		if (!(error instanceof TomlError))
+			logger.error("Unexpected error parsing TOML (bug)", error);
 
 		plugin.config.delete(guild_id);
 		return;
@@ -98,8 +99,7 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 		var result = safeParse(plugin.config.schema, table);
 	} catch (error) {
 		// if our code is broken it might throw
-		console.error("Unexpected error in valibot safeParse (bug)");
-		console.error(error);
+		logger.error("Unexpected error in valibot safeParse (bug)", error);
 
 		plugin.config.delete(guild_id);
 		return;

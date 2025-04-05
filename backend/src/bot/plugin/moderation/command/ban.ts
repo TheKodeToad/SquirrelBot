@@ -38,6 +38,7 @@ export const ban_command = define_command({
 
 	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.ban),
 	async run(context, args, { config }) {
+		throw new Error("Ban failed");
 		let send_direct_message = config.ban.send_direct_message;
 
 		if (args.dm)
