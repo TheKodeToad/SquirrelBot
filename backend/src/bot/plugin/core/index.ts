@@ -3,6 +3,7 @@ import { get_plugins } from "../../loader/index.ts";
 import { define_plugin } from "../../loader/plugin.ts";
 import { about_command } from "./command/about.ts";
 import { grant_access_command, revoke_access_command } from "./command/access.ts";
+import { groups_command } from "./command/groups.ts";
 import { init_command_cache } from "./command_engine/command_cache.ts";
 import { component_interaction_handler } from "./command_engine/component_engine.ts";
 import { prefix_delete_handler, prefix_edit_handler, prefix_send_handler } from "./command_engine/prefix_engine.ts";
@@ -18,7 +19,7 @@ export const core_config = new ConfigCache(core_config_schema);
 export const core_plugin = define_plugin({
 	id: "core",
 	config: core_config,
-	commands: [about_command, grant_access_command, revoke_access_command],
+	commands: [about_command, grant_access_command, revoke_access_command, groups_command],
 	listeners: [
 		prefix_send_handler,
 		prefix_edit_handler,

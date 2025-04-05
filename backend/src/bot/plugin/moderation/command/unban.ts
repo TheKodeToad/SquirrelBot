@@ -5,7 +5,6 @@ import { escape_markdown } from "../../../common/discord/markdown.ts";
 import { permissions_guard } from "../../core/public/command/helper.ts";
 import { OptionType, define_command } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { resolve_permissions } from "../../core/public/permission_resolution.ts";
 import { moderation_config } from "../index.ts";
 
 export const unban_command = define_command({
@@ -25,18 +24,8 @@ export const unban_command = define_command({
 		},
 	},
 
-	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
+	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.unban),
 	async run(context, args) {
-		const config = moderation_config.get(context.guild.id);
-
-		if (config === undefined)
-			return;
-
-		const perms = resolve_permissions(config, context.member, context.channel);
-
-		if (!perms.ban)
-			return;
-
 		let successful_unbans: { case_number: number, id: string, name: string; }[] = [];
 		let unsuccessful_unbans: { id: string, name: string, error: string; }[] = [];
 

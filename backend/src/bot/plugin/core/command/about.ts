@@ -3,7 +3,6 @@ import { bot } from "../../../index.ts";
 import { core_config } from "../index.ts";
 import { permissions_guard } from "../public/command/helper.ts";
 import { define_command } from "../public/command/index.ts";
-import { resolve_permissions } from "../public/permission_resolution.ts";
 
 const DESCRIPTION = `
 Advanced moderation and management bot created by TheKodeToad.
@@ -31,16 +30,6 @@ export const about_command = define_command({
 
 	pre_run: context => permissions_guard(context, core_config, permissions => permissions.about_command),
 	async run(context) {
-		const config = core_config.get(context.guild.id);
-
-		if (config === undefined)
-			return;
-
-		const perms = resolve_permissions(config, context.member, context.channel);
-
-		if (!perms.about_command)
-			return;
-
 		const uptime = Math.floor(process.uptime());
 		let uptime_string = "";
 

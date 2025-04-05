@@ -32,11 +32,13 @@ export const core_config_schema = object({
 		prefix_commands: optional(boolean(), true),
 		slash_commands: optional(boolean(), true),
 		about_command: optional(boolean(), true),
+		groups_command: optional(boolean(), false)
 	}), {}),
 	permission_overrides: optional(array(object({
 		prefix_commands: optional(boolean()),
 		slash_commands: optional(boolean()),
 		about_command: optional(boolean()),
+		groups_command: optional(boolean()),
 		...permissions_filter_schema.entries
 	})), []),
 });

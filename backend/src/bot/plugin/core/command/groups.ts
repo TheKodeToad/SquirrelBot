@@ -2,10 +2,11 @@ import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { get_member_cached } from "../../../common/discord/cache.ts";
 import { format_rest_error } from "../../../common/discord/format.ts";
 import { escape_markdown, make_inline_codeblock } from "../../../common/discord/markdown.ts";
-import { core_config as core_config_cache } from "../../core/index.ts";
-import { define_command, OptionType } from "../../core/public/command/index.ts";
-import { icons } from "../../core/public/icons.ts";
-import { resolve_groups } from "../../core/public/permission_resolution.ts";
+import { core_config, core_config as core_config_cache } from "../index.ts";
+import { permissions_guard } from "../public/command/helper.ts";
+import { define_command, OptionType } from "../public/command/index.ts";
+import { icons } from "../public/icons.ts";
+import { resolve_groups } from "../public/permission_resolution.ts";
 
 export const groups_command = define_command({
 	id: "groups",
@@ -18,7 +19,8 @@ export const groups_command = define_command({
 		}
 	},
 
-	pre_run: () => true,
+	pre_run: context => permissions_guard(context, core_config, permissions => permissions.groups_command),
+
 	async run(context, args) {
 		const core_config = core_config_cache.get(context.guild.id);
 
