@@ -6,4 +6,4 @@ const red = 0xED4245;
 const white = 0xFFFFFF;
 const black = 0x000000;
 
-export const Colors = { blurple, green, yellow, fuchsia, red, white, black };
+export const Colors = Object.freeze({ blurple, green, yellow, fuchsia, red, white, black });
