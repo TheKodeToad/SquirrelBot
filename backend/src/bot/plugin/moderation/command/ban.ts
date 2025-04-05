@@ -1,13 +1,10 @@
-import { DiscordRESTError } from "oceanic.js";
-import { CaseType, create_case } from "../../../../db/moderation/cases.ts";
-import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache.ts";
-import { format_rest_error } from "../../../common/discord/format.ts";
+import type { CreateMessageOptions } from "oceanic.js";
+import { CaseType } from "../../../../db/moderation/cases.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
-import { get_highest_role } from "../../../common/discord/permissions.ts";
-import { bot } from "../../../index.ts";
 import { permissions_guard } from "../../core/public/command/helper.ts";
 import { OptionType, define_command } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
+import { do_batch_action } from "../helper/batch_action.ts";
 import { moderation_config } from "../index.ts";
 
 export const ban_command = define_command({
@@ -41,126 +38,74 @@ export const ban_command = define_command({
 
 	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.ban),
 	async run(context, args, { config }) {
-		let send_dm = config.ban.send_direct_message;
+		let send_direct_message = config.ban.send_direct_message;
 
 		if (args.dm)
-			send_dm = true;
+			send_direct_message = true;
 
 		if (args.no_dm)
-			send_dm = false;
+			send_direct_message = false;
 
-		const direct_message = config.ban.direct_message ?? { content: `You are permanently banned from ${escape_markdown(context.guild.name)}.` };
+		let direct_message: CreateMessageOptions | undefined = undefined;
+
+		if (send_direct_message) {
+			direct_message = config.ban.direct_message ?? {
+				content: `You are permanently banned from ${escape_markdown(context.guild.name)}.`
+			};
+		}
+
 		const delete_message_seconds = (args.purge ?? config.ban.purge_messages) * (1000 * 60 * 60 * 24);
 
-		const members = await request_members_cached(context.guild, args.user);
+		const { successful, unsuccessful } = await do_batch_action({
+			guild: context.guild,
+			ids: args.user,
 
-		let successful_bans: { case_number: number, id: string, name: string, dm_sent: boolean; }[] = [];
-		let unsuccessful_bans: { id: string, name: string, error: string; }[] = [];
+			actor: context.member,
+			direct_message,
 
-		for (const target of args.user) {
-			let name: string;
-			let in_guild: boolean;
-			let is_bot: boolean;
+			members_only: false,
 
-			const target_member = members.get(target);
-
-			if (target_member !== undefined) {
-				name = target_member.tag;
-				in_guild = true;
-				is_bot = target_member.bot;
-
-				const target_position = get_highest_role(target_member).position;
-
-				if (context.guild.ownerID !== context.user.id
-					&& (context.guild.ownerID === target
-						|| get_highest_role(context.member).position <= target_position)) {
-					unsuccessful_bans.push({ id: target, name, error: "Your highest role is not above target's highest role" });
-					continue;
-				}
-
-				if (context.guild.ownerID !== bot.user.id
-					&& (context.guild.ownerID === target
-						|| get_highest_role(context.guild.clientMember).position <= target_position)
-				) {
-					unsuccessful_bans.push({ id: target, name, error: "Bot's highest role is not above target's highest role" });
-					continue;
-				}
-			} else {
-				try {
-					const user = await get_user_cached(target);
-					name = user.tag;
-					in_guild = false;
-					is_bot = user.bot;
-				} catch (error) {
-					if (!(error instanceof DiscordRESTError))
-						throw error;
-
-					unsuccessful_bans.push({ id: target, name: "<unknown>", error: `User fetch failed: ${format_rest_error(error)}` });
-					continue;
-				}
-			}
-
-			let dm_sent = false;
-
-			if (in_guild && !is_bot && send_dm) {
-				try {
-					const dm = await create_dm_cached(target);
-					await dm.createMessage(direct_message);
-					dm_sent = true;
-				} catch (error) {
-					if (!(error instanceof DiscordRESTError))
-						throw error;
-				}
-			}
-
-			try {
-				await context.guild.createBan(target, {
+			async perform(user) {
+				await context.guild.createBan(user.id, {
 					reason: args.reason ?? undefined,
 					deleteMessageSeconds: delete_message_seconds,
 				});
-			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
-					throw error;
-
-				unsuccessful_bans.push({ id: target, name, error: format_rest_error(error) });
-				continue;
-			}
-
-			const case_number = await create_case(context.guild.id, {
-				type: CaseType.Ban,
-				actor_id: context.user.id,
-				target_id: target,
-				reason: args.reason ?? undefined,
-				delete_message_seconds,
-				dm_sent,
-			});
-
-			successful_bans.push({ case_number, id: target, name, dm_sent });
-		}
+			},
+			make_case(actor, target, dm_delivered) {
+				return {
+					type: CaseType.Ban,
+					actor_id: actor,
+					target_id: target,
+					reason: args.reason ?? undefined,
+					delete_message_seconds,
+					dm_delivered,
+				};
+			},
+		});
 
 		if (args.user.length === 1) {
-			if (successful_bans.length === 1) {
-				const ban = successful_bans[0]!;
-				await context.respond(`${icons.success} Banned <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]!`);
-			} else if (unsuccessful_bans.length === 1) {
-				const ban = unsuccessful_bans[0]!;
-				await context.respond(`${icons.error} Could not ban <@${ban.id}> (${escape_markdown(ban.name)}): ${escape_markdown(ban.error)}!`);
+			if (successful.length === 1) {
+				const ban = successful[0]!;
+				await context.respond(`${icons.success} Banned <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_delivered ? " with direct message" : ""} [#${ban.case_number}]!`);
+			} else if (unsuccessful.length === 1) {
+				const ban = unsuccessful[0]!;
+				await context.respond(`${icons.error} Could not ban <@${ban.id}> (${escape_markdown(ban.name ?? "<unknown>")}): ${escape_markdown(ban.error)}!`);
 			}
 		} else {
-			const successful_message = successful_bans.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_sent ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
-			const unsuccessful_message = unsuccessful_bans.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name)}): ${escape_markdown(ban.error)}`).join("\n");
+			const successful_message = successful.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name)})${ban.dm_delivered ? " with direct message" : ""} [#${ban.case_number}]`).join("\n");
+			const unsuccessful_message = unsuccessful.map(ban => `- <@${ban.id}> (${escape_markdown(ban.name ?? "<unknown>")}): ${escape_markdown(ban.error)}`).join("\n");
 
-			if (unsuccessful_bans.length === 0) {
+			if (unsuccessful.length === 0) {
 				await context.respond(
 					`${icons.success} Banned all ${args.user.length} users:\n${successful_message}`
 				);
-			} else if (successful_bans.length === 0) {
+			} else if (successful.length === 0) {
 				await context.respond(
 					`${icons.error} None of ${args.user.length} users were banned:\n${unsuccessful_message}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful_bans.length} of ${args.user.length} bans were successful!\n`
+					`${icons.warning} Only ${successful.length} of ${args.user.length} bans were successful!\n`
 					+ `Successful bans:\n${successful_message}\n`
 					+ `Unsuccessful bans:\n${unsuccessful_message}`
 				);

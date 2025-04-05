@@ -2,7 +2,6 @@ import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member,
 
 type Id = string | [string, ...string[]];
 
-
 export function define_command<O extends Record<string, Option>, D extends {}>(command: Command<O, D>): Command<O, D> {
 	return command;
 }

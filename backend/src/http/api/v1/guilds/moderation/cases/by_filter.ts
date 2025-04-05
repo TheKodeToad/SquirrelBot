@@ -134,10 +134,10 @@ router.get("/", async context => {
 	if (typeof dm_sent === "string") {
 		switch (dm_sent) {
 			case "true":
-				query.dm_sent = true;
+				query.dm_delivered = true;
 				break;
 			case "false":
-				query.dm_sent = false;
+				query.dm_delivered = false;
 				break;
 			default:
 				throw new HTTPException(400);

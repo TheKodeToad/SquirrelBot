@@ -73,7 +73,7 @@ export interface CreateCaseOptions {
 	reason?: string;
 
 	delete_message_seconds?: number;
-	dm_sent?: boolean;
+	dm_delivered?: boolean;
 }
 
 export interface CaseQuery {
@@ -90,7 +90,7 @@ export interface CaseQuery {
 
 	delete_message_seconds_less_than?: number;
 	delete_message_seconds_greater_than?: number;
-	dm_sent?: boolean;
+	dm_delivered?: boolean;
 
 	reversed?: boolean;
 	limit?: number;
@@ -177,7 +177,7 @@ export async function get_cases(guild_id: string, query: CaseQuery): Promise<Cas
 			query.target_ids,
 			query.delete_message_seconds_less_than,
 			query.delete_message_seconds_greater_than,
-			query.dm_sent,
+			query.dm_delivered,
 			query.reversed,
 			query.limit,
 		]
@@ -228,7 +228,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 				options.target_id,
 				options.reason ?? null,
 				options.delete_message_seconds ?? null,
-				options.dm_sent ?? null,
+				options.dm_delivered ?? null,
 			]
 		);
 
