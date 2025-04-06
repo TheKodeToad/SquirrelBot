@@ -25,15 +25,15 @@ export enum LogLevel {
 
 const level_names = ["debug", "info", "warn", "error", "fatal"];
 const level_colors = [
-	// DEBUG: green
+	// debug: green
 	"\x1b[32m",
-	// INFO: blue
+	// info: blue
 	"\x1b[34m",
-	// WARN: yellow
+	// warn: yellow
 	"\x1b[33m",
-	// ERROR: red
+	// error: red
 	"\x1b[31m",
-	// DISASTER: reversed red
+	// fatal: reversed red
 	"\x1b[7m\x1b[31m"
 ];
 
