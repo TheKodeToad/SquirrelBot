@@ -3,6 +3,8 @@ import { fileURLToPath } from "url";
 import { getCallSites } from "util";
 import { LOG_LEVEL } from "../../environment.ts";
 
+// A custom logger because the Node.JS ecosystem is scary
+
 export function module_logger(): Logger {
 	const script_name = fileURLToPath(getCallSites()[1]!.scriptName);
 	let discriminator = path.relative("src", script_name);
