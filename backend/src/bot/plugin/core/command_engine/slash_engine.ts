@@ -24,11 +24,11 @@ export async function sync_slash_commands(): Promise<void> {
 				type: map_flag_type(flag.type),
 			}
 		)) : [],
-	})) as CreateApplicationCommandOptions[];
+	} satisfies CreateApplicationCommandOptions));
 	await bot.application.bulkEditGlobalCommands(commands);
 }
 
-function map_flag_type(type: OptionType): ApplicationCommandOptionTypes {
+function map_flag_type(type: OptionType) {
 	switch (type) {
 		case OptionType.VOID:
 		case OptionType.BOOLEAN:

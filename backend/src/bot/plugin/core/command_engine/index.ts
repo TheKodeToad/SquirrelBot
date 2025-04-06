@@ -29,6 +29,6 @@ export function transform_reply(reply: Reply) {
 		embeds: [],
 		files: [],
 		...reply,
-		components: reply.components?.map(components => ({ type: ComponentTypes.ACTION_ROW, components } as MessageActionRow)) ?? []
+		components: reply.components?.map(components => ({ type: ComponentTypes.ACTION_ROW, components } satisfies MessageActionRow)) ?? []
 	};
 }
