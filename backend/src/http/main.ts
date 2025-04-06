@@ -37,7 +37,7 @@ app.onError((error, context) => {
 		return context.json({ error: error.message }, error.status);
 	}
 
-	logger.error("Something went wrong while serving an endpoint!", error);
+	logger.error?.("Something went wrong while serving an endpoint!", error);
 	return context.json({ message: "Internal server error" }, 500);
 });
 

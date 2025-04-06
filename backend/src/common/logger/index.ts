@@ -5,6 +5,7 @@ import { LOG_LEVEL } from "../../environment.ts";
 import { log_level_name, LogLevel } from "./level.ts";
 
 // A custom logger because the Node.JS ecosystem is scary
+// Logging allowing for lazy evaluation with ?.info etc.
 
 export function module_logger(): Logger {
 	const script_name = fileURLToPath(getCallSites()[1]!.scriptName);
@@ -26,7 +27,7 @@ function log_level_color(level: LogLevel): string {
 	}
 }
 
-type Message = string | (() => string);
+type LoggerFunction = (message: string, data?: unknown) => void;
 
 export class Logger {
 	private discriminator: string;
@@ -35,48 +36,73 @@ export class Logger {
 		this.discriminator = discriminator;
 	}
 
-	debug(message: Message, data?: unknown) {
-		this.log(LogLevel.Debug, message, data);
-	}
+	/**
+	 * Print a debugging message.
+	 * Usage: logger.debug?.("My message") (lazily evaluated).
+	 * Extra data can also be passed in to be logged on a new line (recommended for a relavent object or error).
+	 *
+	 * This should be used for debugging information which is likely to be handy long-term.
+	 * Try to avoid excessive usage.
+	 * If you just want to see a value use a debugger or console.log - the latter is easy to spot and remove if it is accidentally left over.
+	 */
+	get debug(): LoggerFunction | undefined { return this.log(LogLevel.Debug); }
 
-	info(message: Message, data?: unknown) {
-		this.log(LogLevel.Info, message, data);
-	}
+	/**
+	 * Print an info message.
+	 * Usage: logger.debug?.("My message") (lazily evaluated).
+	 * Extra data can also be passed in to be logged on a new line (rarely used, only recommended for a summary of info).
+	 *
+	 * This should be used - rarely - for information which is relevent for the whole bot - mainly startup info.
+	 */
+	get info(): LoggerFunction | undefined { return this.log(LogLevel.Info); }
 
-	warn(message: Message, data?: unknown) {
-		this.log(LogLevel.Warn, message, data);
-	}
+	/**
+	 * Print a warning message.
+	 * Usage: logger.warn?.("My message") (lazily evaluated).
+	 * Extra data can also be passed in to be logged on a new line (recommended for errors).
+	 *
+	 * This should be used for unexpected behavior which does not threaten stability.
+	 */
+	get warn(): LoggerFunction | undefined { return this.log(LogLevel.Warn); }
 
-	error(message: Message, data?: unknown) {
-		this.log(LogLevel.Error, message, data);
-	}
+	/**
+	 * Print an error message.
+	 * Usage: logger.error?.("My message") (lazily evaluated).
+	 * Extra data can also be passed in to be logged on a new line (recommended for errors).
+	 *
+	 * This should be used for unexpected errors which potentially could be more serious.
+	 */
+	get error(): LoggerFunction | undefined { return this.log(LogLevel.Error); }
 
-	fatal(message: Message, data?: unknown) {
-		this.log(LogLevel.Fatal, message, data);
-	}
+	/**
+	 * Print a fatal error message.
+	 * Usage: logger.fatal?.("My message") (lazily evaluated).
+	 * Extra data can also be passed in to be logged on a new line (recommended for errors).
+	 *
+	 * This should be used very rarely for critical errors.
+	 */
+	get fatal(): LoggerFunction | undefined { return this.log(LogLevel.Fatal); }
 
-	log(level: LogLevel, message: Message, data?: unknown) {
+	log(level: LogLevel): LoggerFunction | undefined {
 		if (LOG_LEVEL > level)
-			return;
+			return undefined;
 
-		const now = new Date;
-		const time =
-			now.getHours().toString().padStart(2, "0") + ":" +
-			now.getMinutes().toString().padStart(2, "0") + ":" +
-			now.getSeconds().toString().padStart(2, "0");
+		return (message, data) => {
+			const now = new Date;
+			const time =
+				now.getHours().toString().padStart(2, "0") + ":" +
+				now.getMinutes().toString().padStart(2, "0") + ":" +
+				now.getSeconds().toString().padStart(2, "0");
 
-		// TODO: probably not secure enough
-		if (typeof message === "function")
-			message = message();
+			// you mean you DON'T know ansi escape codes off by heart
+			// too bad!
+			console.error(`\x1b[2m${time} \x1b[0m${log_level_color(level)}${log_level_name(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);
 
-		// you mean you DON'T know ansi escape codes off by heart
-		// too bad!
-		console.error(`\x1b[2m${time} \x1b[0m${log_level_color(level)}${log_level_name(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);
-
-		if (data !== undefined) {
-			console.group();
-			console.error(data);
-			console.groupEnd();
-		}
+			if (data !== undefined) {
+				console.group();
+				console.error(data);
+				console.groupEnd();
+			}
+		};
 	}
 }

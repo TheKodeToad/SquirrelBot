@@ -9,20 +9,20 @@ const logger = module_logger();
 await check_migrations_or_exit();
 
 bot.once("ready", async () => {
-	logger.debug("Ready event received");
+	logger.debug?.("Ready event received");
 
-	logger.info("Starting up plugins");
+	logger.info?.("Starting up plugins");
 	load_plugins();
 	await apply_plugins();
-	logger.info(() => `Total plugins: ${count_plugins()}`);
-	logger.info("I'm ready :O");
+	logger.info?.(`Total plugins: ${count_plugins()}`);
+	logger.info?.("I'm ready :O");
 });
 
 process.on("unhandledRejection", error => {
-	logger.error("Unhandled Promise rejection!", error);
+	logger.error?.("Unhandled Promise rejection!", error);
 });
 
-logger.info("Connecting Postgres listener");
+logger.info?.("Connecting Postgres listener");
 await connect_listener();
-logger.info("Connecting to Discord");
+logger.info?.("Connecting to Discord");
 await bot.connect();

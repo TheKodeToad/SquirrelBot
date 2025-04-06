@@ -71,7 +71,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 
 	if (matches.length !== 1) {
 		if (matches.length === 0)
-			logger.warn(() => `Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
+			logger.warn?.(`Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
 
 		return;
 	}
@@ -82,7 +82,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	const data = command.pre_run(context);
 
 	if (data === false) {
-		logger.debug(() => `Command '${interaction.data.name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
+		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
 		context._abandon();
 		return;
 	}
@@ -114,7 +114,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 		}
 	}
 
-	logger.debug(() => `Parsed arguments from options; running '${interaction.data.name}'`, args);
+	logger.debug?.(`Parsed arguments from options; running '${interaction.data.name}'`, args);
 
 	try {
 		await command.run(context, args, data);

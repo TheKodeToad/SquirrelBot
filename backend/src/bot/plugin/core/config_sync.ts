@@ -31,12 +31,12 @@ async function install_config_change_listener(): Promise<void> {
 			if (!(error instanceof SyntaxError))
 				throw error;
 
-			logger.warn("Malformed JSON in config_update payload", error);
+			logger.warn?.("Malformed JSON in config_update payload", error);
 			return;
 		}
 
 		if (!(typeof key === "string" && typeof guild_id === "string")) {
-			logger.warn("config_update payload does not conform to { key: string, guild_id: string; }");
+			logger.warn?.("config_update payload does not conform to { key: string, guild_id: string; }");
 			return;
 		}
 
@@ -44,11 +44,11 @@ async function install_config_change_listener(): Promise<void> {
 			const plugin = get_plugin(key);
 
 			if (plugin === undefined || plugin.config === undefined) {
-				logger.debug(() => `Ignoring config_update for plugin '${key}'`);
+				logger.debug?.(`Ignoring config_update for plugin '${key}'`);
 				return;
 			}
 
-			logger.debug(() => `Updating config for plugin '${key}' in guild ${guild_id}`);
+			logger.debug?.(`Updating config for plugin '${key}' in guild ${guild_id}`);
 
 			await load_config(guild_id, plugin);
 		});
@@ -93,7 +93,7 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 		var table = parseToml(raw_value);
 	} catch (error) {
 		if (!(error instanceof TomlError))
-			logger.error("Unexpected error parsing TOML (bug)", error);
+			logger.error?.("Unexpected error parsing TOML (bug)", error);
 
 		plugin.config.delete(guild_id);
 		return;
@@ -103,7 +103,7 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 		var result = safeParse(plugin.config.schema, table);
 	} catch (error) {
 		// if our code is broken it might throw
-		logger.error("Unexpected error in valibot safeParse (bug)", error);
+		logger.error?.("Unexpected error in valibot safeParse (bug)", error);
 
 		plugin.config.delete(guild_id);
 		return;

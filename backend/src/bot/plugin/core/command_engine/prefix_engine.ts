@@ -55,7 +55,7 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 	const matches = get_commands_by_name(name).filter(command => command.support_prefix ?? true);
 
 	if (matches.length !== 1) {
-		logger.debug(() => `${matches.length} commands found matching '${name}' (ignored)`);
+		logger.debug?.(`${matches.length} commands found matching '${name}' (ignored)`);
 		return false;
 	}
 
@@ -66,7 +66,7 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 	const data = command.pre_run(context);
 
 	if (data === false) {
-		logger.debug(() => `Command '${name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
+		logger.debug?.(`Command '${name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
 		return false;
 	}
 
@@ -90,7 +90,7 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 		return true;
 	}
 
-	logger.debug(() => `Parsed arguments; running '${name}'`, args);
+	logger.debug?.(`Parsed arguments; running '${name}'`, args);
 
 	try {
 		await command.run(context, args, data);

@@ -16,14 +16,14 @@ export function wrap_listener<E extends keyof ClientEvents>(
 			guild ??= EVENT_TO_GUILD[event](...args);
 
 		if (guild !== null && !is_guild_allowed(guild)) {
-			logger.debug(() => `Filtering out event '${event}' from disallowed guild ${guild}`);
+			logger.debug?.(`Filtering out event '${event}' from disallowed guild ${guild}`);
 			return;
 		}
 
 		try {
 			await listener(...args);
 		} catch (error) {
-			logger.error(`Error handling event "${event}"`, error);
+			logger.error?.(`Error handling event "${event}"`, error);
 		}
 	};
 }

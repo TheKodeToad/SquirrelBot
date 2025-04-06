@@ -92,7 +92,7 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 		}
 	}
 
-	logger.debug(`Resolved permissions for ${debug_format_user(member.user)} ${debug_format_channel(channel)} ${debug_format_guild(member.guild)}`, {
+	logger.debug?.(`Resolved permissions for ${debug_format_user(member.user)} ${debug_format_channel(channel)} ${debug_format_guild(member.guild)}`, {
 		groups,
 		default_permissions: config.default_permissions,
 		permission_overrides: config.permission_overrides,

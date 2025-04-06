@@ -14,7 +14,7 @@ export function register_plugin(plugin: Plugin): void {
 
 
 	plugins.set(plugin.id, plugin);
-	logger.debug(() => `Registered plugin #${plugin.id}`);
+	logger.debug?.(`Registered plugin #${plugin.id}`);
 }
 
 export function get_plugins(): IterableIterator<Plugin> {
@@ -38,7 +38,7 @@ export function load_plugins() {
 
 export async function apply_plugins(): Promise<void> {
 	for (const plugin of plugins.values()) {
-		logger.debug(() => `Applying plugin #${plugin.id}`);
+		logger.debug?.(`Applying plugin #${plugin.id}`);
 		await plugin.apply?.();
 	}
 }

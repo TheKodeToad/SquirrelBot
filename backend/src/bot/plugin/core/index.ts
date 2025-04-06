@@ -35,13 +35,13 @@ export const core_plugin = define_plugin({
 	async apply() {
 		init_command_cache();
 
-		logger.debug("Initializing guild info");
+		logger.debug?.("Initializing guild info");
 		await init_guild_info();
-		logger.debug("Initializing configs");
+		logger.debug?.("Initializing configs");
 		await init_configs();
-		logger.debug("Syncing slash commands");
+		logger.debug?.("Syncing slash commands");
 		await sync_slash_commands();
-		logger.debug("Initializing icons");
+		logger.debug?.("Initializing icons");
 		await init_icons();
 
 		// TODO: is it a good idea to add listeners before the plugin is applied (no)
