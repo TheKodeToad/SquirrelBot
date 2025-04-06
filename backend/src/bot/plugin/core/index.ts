@@ -1,3 +1,4 @@
+import { module_logger } from "../../../common/logger/index.ts";
 import { core_config_schema } from "../../../schema/core.ts";
 import { get_plugins } from "../../loader/index.ts";
 import { define_plugin } from "../../loader/plugin.ts";
@@ -13,6 +14,8 @@ import { install_wrapped_listener } from "./event_wrapper.ts";
 import { guild_info_sync_guild_create_handler, guild_info_sync_guild_update_handler, init_guild_info } from "./guild_info_sync.ts";
 import { init_icons } from "./icon_sync.ts";
 import { ConfigCache } from "./public/config.ts";
+
+const logger = module_logger();
 
 export const core_config = new ConfigCache(core_config_schema);
 
@@ -32,9 +35,13 @@ export const core_plugin = define_plugin({
 	async apply() {
 		init_command_cache();
 
+		logger.debug("Initializing guild info");
 		await init_guild_info();
+		logger.debug("Initializing configs");
 		await init_configs();
+		logger.debug("Syncing slash commands");
 		await sync_slash_commands();
+		logger.debug("Initializing icons");
 		await init_icons();
 
 		// TODO: is it a good idea to add listeners before the plugin is applied (no)
