@@ -6,26 +6,23 @@ export enum LogLevel {
 	Fatal,
 }
 
-const level_colors: Record<LogLevel, string> & string[] = [
-	// debug: green
-	"\x1b[32m",
-	// info: blue
-	"\x1b[34m",
-	// warn: yellow
-	"\x1b[33m",
-	// error: red
-	"\x1b[31m",
-	// fatal: reversed red
-	"\x1b[7m\x1b[31m"
-];
-
-export function log_level_colour(level: LogLevel) {
-	return level_colors[level];
+export function log_level_by_name(name: string): LogLevel | undefined {
+	switch (name) {
+		case "debug": return LogLevel.Debug;
+		case "info": return LogLevel.Info;
+		case "warn": return LogLevel.Warn;
+		case "error": return LogLevel.Error;
+		case "fatal": return LogLevel.Fatal;
+		default: return undefined;
+	}
 }
 
-export function parse_level(name: string): LogLevel | undefined {
-	if (!Object.hasOwn(LogLevel, name))
-		return undefined;
-
-	return LogLevel[name as keyof typeof LogLevel];
+export function log_level_name(level: LogLevel): string {
+	switch (level) {
+		case LogLevel.Debug: return "debug";
+		case LogLevel.Info: return "info";
+		case LogLevel.Warn: return "warn";
+		case LogLevel.Error: return "error";
+		case LogLevel.Fatal: return "fatal";
+	}
 }

@@ -2,7 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getCallSites } from "util";
 import { LOG_LEVEL } from "../../environment.ts";
-import { log_level_colour as level_color, LogLevel } from "./level.ts";
+import { log_level_name, LogLevel } from "./level.ts";
 
 // A custom logger because the Node.JS ecosystem is scary
 
@@ -14,6 +14,16 @@ export function module_logger(): Logger {
 		discriminator = discriminator.substring(0, discriminator.lastIndexOf("."));
 
 	return new Logger(discriminator);
+}
+
+function log_level_color(level: LogLevel): string {
+	switch (level) {
+		case LogLevel.Debug: return "\x1b[32m"; // green
+		case LogLevel.Info: return "\x1b[34m"; // blue
+		case LogLevel.Warn: return "\x1b[33m"; // yellow
+		case LogLevel.Error: return "\x1b[31m"; // red
+		case LogLevel.Fatal: return "\x1b[7m\x1b[31m"; // reversed red
+	}
 }
 
 type Message = string | (() => string);
@@ -59,9 +69,9 @@ export class Logger {
 		if (typeof message === "function")
 			message = message();
 
-		let formatted_message = `\x1b[2m${time} \x1b[0m${level_color(level)}${LogLevel[level]}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`;
-
-		console.error(formatted_message);
+		// you mean you DON'T know ansi escape codes off by heart
+		// too bad!
+		console.error(`\x1b[2m${time} \x1b[0m${log_level_color(level)}${log_level_name(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);
 
 		if (data !== undefined) {
 			console.group();
