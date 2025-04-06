@@ -4,7 +4,8 @@ import { format_user } from "../../../common/discord/format.ts";
 import { permissions_guard } from "../../core/public/command/helper.ts";
 import { OptionType, define_command } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { CASE_TYPE_NAME, moderation_config } from "../index.ts";
+import { case_type_name } from "../helper/cases.ts";
+import { moderation_config } from "../index.ts";
 
 export const case_command = define_command({
 	id: "case",
@@ -39,7 +40,7 @@ export const case_command = define_command({
 					},
 					{
 						name: "Type",
-						value: CASE_TYPE_NAME[info.type]
+						value: case_type_name(info.type)
 					},
 					{
 						name: "Actor",

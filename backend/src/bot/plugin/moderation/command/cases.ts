@@ -3,11 +3,12 @@ import { get_cases } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { format_user, format_user_tag } from "../../../common/discord/format.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
+import { permissions_guard } from "../../core/public/command/helper.ts";
 import { OptionType, define_command, type Component, type Reply } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
 import { resolve_permissions } from "../../core/public/permission_resolution.ts";
-import { CASE_TYPE_NAME, CASE_TYPE_PAST_TENSE, moderation_config } from "../index.ts";
-import { permissions_guard } from "../../core/public/command/helper.ts";
+import { case_type_name, case_type_name_compact } from "../helper/cases.ts";
+import { moderation_config } from "../index.ts";
 
 
 export const cases_command = define_command({
@@ -105,7 +106,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 		if (options.compact) {
 			const actor = escape_markdown(await format_user_tag(info.actor_id));
 			const target = escape_markdown(await format_user_tag(info.target_id));
-			description += `<t:${creation_secs}:R> **#${info.number}:** ${actor} ${CASE_TYPE_PAST_TENSE[info.type]} ${target}`;
+			description += `<t:${creation_secs}:R> **#${info.number}:** ${actor} ${case_type_name_compact(info.type)} ${target}`;
 
 			if (info.reason !== null && info.reason.length !== 0)
 				description += ` (${info.reason})`;
@@ -114,7 +115,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 		} else {
 			let value = "";
 			value += `Created at: <t:${creation_secs}> (<t:${creation_secs}:R>)\n`;
-			value += `Type: ${CASE_TYPE_NAME[info.type]}\n`;
+			value += `Type: ${case_type_name(info.type)}\n`;
 
 			if (options.actor_id === null)
 				value += `Actor: ${await format_user(info.actor_id)}\n`;

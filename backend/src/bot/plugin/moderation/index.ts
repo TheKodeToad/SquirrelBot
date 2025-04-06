@@ -1,4 +1,3 @@
-import { CaseType } from "../../../db/moderation/cases.ts";
 import { moderation_config_schema } from "../../../schema/moderation.ts";
 import { define_plugin } from "../../loader/plugin.ts";
 import { ConfigCache } from "../core/public/config.ts";
@@ -16,42 +15,3 @@ export const moderation_plugin = define_plugin({
 	config: moderation_config,
 	commands: [ban_command, unban_command, kick_command, case_command, cases_command, purge_command],
 });
-
-export const CASE_ICON: { [T in CaseType]: string } = {
-	[CaseType.Note]: ":pencil:",
-	[CaseType.Warn]: ":warning:",
-	[CaseType.Unwarn]: ":warning:",
-	[CaseType.VoiceMute]: ":microphone:",
-	[CaseType.VoiceUnmute]: ":microphone:",
-	[CaseType.Mute]: ":mute:",
-	[CaseType.Unmute]: ":mute:",
-	[CaseType.Kick]: ":boot:",
-	[CaseType.Ban]: ":hammer:",
-	[CaseType.Unban]: ":hammer:"
-};
-
-export const CASE_TYPE_NAME: { [T in CaseType]: string } = {
-	[CaseType.Note]: "Note",
-	[CaseType.Warn]: "Warn",
-	[CaseType.Unwarn]: "Unwarn",
-	[CaseType.VoiceMute]: "Voice Mute",
-	[CaseType.VoiceUnmute]: "Voice Unmute",
-	[CaseType.Mute]: "Mute",
-	[CaseType.Unmute]: "Unmute",
-	[CaseType.Kick]: "Kick",
-	[CaseType.Ban]: "Ban",
-	[CaseType.Unban]: "Unban"
-};
-
-export const CASE_TYPE_PAST_TENSE: { [T in CaseType]: string } = {
-	[CaseType.Note]: "added note to",
-	[CaseType.Warn]: "warned",
-	[CaseType.Unwarn]: "unwarned",
-	[CaseType.VoiceMute]: "voice muted",
-	[CaseType.VoiceUnmute]: "voice unmuted",
-	[CaseType.Mute]: "muted",
-	[CaseType.Unmute]: "unmuted",
-	[CaseType.Kick]: "kicked",
-	[CaseType.Ban]: "banned",
-	[CaseType.Unban]: "unbanned"
-};
