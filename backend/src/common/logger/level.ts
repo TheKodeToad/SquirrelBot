@@ -1,9 +1,9 @@
 export enum LogLevel {
-	DEBUG,
-	INFO,
-	WARN,
-	ERROR,
-	FATAL
+	Debug,
+	Info,
+	Warn,
+	Error,
+	Fatal,
 }
 
 const level_colors: Record<LogLevel, string> & string[] = [

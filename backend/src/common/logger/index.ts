@@ -26,23 +26,23 @@ export class Logger {
 	}
 
 	debug(message: Message, data?: unknown) {
-		this.log(LogLevel.DEBUG, message, data);
+		this.log(LogLevel.Debug, message, data);
 	}
 
 	info(message: Message, data?: unknown) {
-		this.log(LogLevel.INFO, message, data);
+		this.log(LogLevel.Info, message, data);
 	}
 
 	warn(message: Message, data?: unknown) {
-		this.log(LogLevel.WARN, message, data);
+		this.log(LogLevel.Warn, message, data);
 	}
 
 	error(message: Message, data?: unknown) {
-		this.log(LogLevel.ERROR, message, data);
+		this.log(LogLevel.Error, message, data);
 	}
 
 	fatal(message: Message, data?: unknown) {
-		this.log(LogLevel.FATAL, message, data);
+		this.log(LogLevel.Fatal, message, data);
 	}
 
 	log(level: LogLevel, message: Message, data?: unknown) {

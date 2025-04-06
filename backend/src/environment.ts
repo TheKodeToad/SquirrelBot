@@ -9,7 +9,7 @@ export const BOT_TOKEN = process.env["BOT_DISCORD_TOKEN"] || "";
 export const BOT_ALLOWED_GUILDS = process.env["BOT_ALLOWED_GUILDS"]?.split(",") ?? [];
 export const HTTP_PORT = Number(process.env["PORT"]) || 8080;
 export const DB_TYPE_INTEGRITY = parse_boolean(process.env["DB_TYPE_INTEGRITY"]) ?? true;
-export const LOG_LEVEL = parse_log_level(process.env["LOG_LEVEL"] || "INFO") ?? LogLevel.INFO;
+export const LOG_LEVEL = parse_log_level(process.env["LOG_LEVEL"] || "INFO") ?? LogLevel.Info;
 
 function parse_boolean(string: string | undefined): boolean | undefined {
 	if (string === undefined)
