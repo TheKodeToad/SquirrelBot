@@ -43,8 +43,12 @@ async function install_config_change_listener(): Promise<void> {
 		await config_update_lock.acquire(guild_id, async () => {
 			const plugin = get_plugin(key);
 
-			if (plugin === undefined || plugin.config === undefined)
+			if (plugin === undefined || plugin.config === undefined) {
+				logger.debug(() => `Ignoring config_update for plugin '${key}'`);
 				return;
+			}
+
+			logger.debug(() => `Updating config for plugin '${key}' in guild ${guild_id}`);
 
 			await load_config(guild_id, plugin);
 		});

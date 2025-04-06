@@ -1,6 +1,8 @@
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { module_logger } from "../../../../common/logger/index.ts";
 import { is_snowflake } from "../../../../common/snowflake.ts";
 import { TTLMap } from "../../../../common/ttl_map.ts";
+import { debug_format_permission_context } from "../../../common/discord/debug_format.ts";
 import { can_write_in_channel } from "../../../common/discord/permissions.ts";
 import { core_config } from "../index.ts";
 import { type Command, type CommandContext, type Option, OptionType, type OptionTypeValue, type Reply } from "../public/command/index.ts";
@@ -9,6 +11,8 @@ import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands_by_name } from "./command_cache.ts";
 import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
 import { default_id, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "./index.ts";
+
+const logger = module_logger();
 
 export const prefix_send_handler = define_event_listener("messageCreate", async message => void await handle(message));
 export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
@@ -50,8 +54,10 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 	const name = unprefixed.split(" ", 1)[0]!;
 	const matches = get_commands_by_name(name).filter(command => command.support_prefix ?? true);
 
-	if (matches.length !== 1)
+	if (matches.length !== 1) {
+		logger.debug(() => `${matches.length} commands found matching '${name}' (ignored)`);
 		return false;
+	}
 
 	const command = matches[0]!;
 
@@ -59,15 +65,16 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 
 	const data = command.pre_run(context);
 
-	if (data === false)
+	if (data === false) {
+		logger.debug(() => `Command '${name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
 		return false;
+	}
 
 	if (data == null)
 		throw new Error("Nullish value returned from pre_run!");
 
 	const input = unprefixed.includes(" ") ? unprefixed.slice(unprefixed.indexOf(" ") + 1) : "";
 	const parser = new Parser(context, input);
-
 
 	try {
 		var args = parser.parse();
@@ -82,6 +89,8 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 
 		return true;
 	}
+
+	logger.debug(() => `Parsed arguments; running '${name}'`, args);
 
 	try {
 		await command.run(context, args, data);

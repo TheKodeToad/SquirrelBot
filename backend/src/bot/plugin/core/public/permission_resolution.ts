@@ -1,8 +1,12 @@
 import { type AnyGuildChannel, CategoryChannel, Member, ThreadChannel } from "oceanic.js";
+import { module_logger } from "../../../../common/logger/index.ts";
 import { test_number_filter } from "../../../../schema/common/number_filter.ts";
 import type { PermissionsFilter } from "../../../../schema/common/permissions_filter.ts";
 import type { CoreConfig, CoreGroup } from "../../../../schema/core.ts";
+import { debug_format_channel, debug_format_guild, debug_format_user } from "../../../common/discord/debug_format.ts";
 import { core_config } from "../index.ts";
+
+const logger = module_logger();
 
 interface GroupsResult {
 	groups: Set<string>;
@@ -70,12 +74,15 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 	const groups = resolve_groups(member);
 
 	const result = { ...config.default_permissions };
-
 	Object.setPrototypeOf(result, Object.prototype);
 
-	for (const override of config.permission_overrides) {
+	const debug_matched_overrides: number[] = [];
+
+	for (const [i, override] of config.permission_overrides.entries()) {
 		if (!test_filter(override, groups, channel))
 			continue;
+
+		debug_matched_overrides.push(i);
 
 		for (const key in override) {
 			if (!Object.hasOwn(result, key))
@@ -84,6 +91,14 @@ export function resolve_permissions<P extends Record<string, boolean>>(
 			result[key as keyof typeof result] = override[key]!;
 		}
 	}
+
+	logger.debug(`Resolved permissions for ${debug_format_user(member.user)} ${debug_format_channel(channel)} ${debug_format_guild(member.guild)}`, {
+		groups,
+		default_permissions: config.default_permissions,
+		permission_overrides: config.permission_overrides,
+		matched_overrides: debug_matched_overrides,
+		result
+	});
 
 	return result;
 }

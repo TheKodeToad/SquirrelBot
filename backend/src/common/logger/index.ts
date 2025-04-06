@@ -37,7 +37,6 @@ const level_colors = [
 
 const PARSED_LOG_LEVEL = level_names.indexOf(LOG_LEVEL);
 
-
 type Message = string | (() => string);
 
 export class Logger {
@@ -47,27 +46,27 @@ export class Logger {
 		this.discriminator = discriminator;
 	}
 
-	debug(message: Message, error?: unknown) {
-		this.log(LogLevel.DEBUG, message, error);
+	debug(message: Message, data?: unknown) {
+		this.log(LogLevel.DEBUG, message, data);
 	}
 
-	info(message: Message, error?: unknown) {
-		this.log(LogLevel.INFO, message, error);
+	info(message: Message, data?: unknown) {
+		this.log(LogLevel.INFO, message, data);
 	}
 
-	warn(message: Message, error?: unknown) {
-		this.log(LogLevel.WARN, message, error);
+	warn(message: Message, data?: unknown) {
+		this.log(LogLevel.WARN, message, data);
 	}
 
-	error(message: Message, error?: unknown) {
-		this.log(LogLevel.ERROR, message, error);
+	error(message: Message, data?: unknown) {
+		this.log(LogLevel.ERROR, message, data);
 	}
 
-	fatal(message: Message, error?: unknown) {
-		this.log(LogLevel.FATAL, message, error);
+	fatal(message: Message, data?: unknown) {
+		this.log(LogLevel.FATAL, message, data);
 	}
 
-	log(level: LogLevel, message: Message, error?: unknown) {
+	log(level: LogLevel, message: Message, data?: unknown) {
 		if (PARSED_LOG_LEVEL > level)
 			return;
 
@@ -77,6 +76,7 @@ export class Logger {
 			now.getMinutes().toString().padStart(2, "0") + ":" +
 			now.getSeconds().toString().padStart(2, "0");
 
+		// TODO: probably not secure enough
 		if (typeof message === "function")
 			message = message();
 
@@ -84,9 +84,9 @@ export class Logger {
 
 		console.error(formatted_message);
 
-		if (error !== undefined) {
+		if (data !== undefined) {
 			console.group();
-			console.error(error);
+			console.error(data);
 			console.groupEnd();
 		}
 	}

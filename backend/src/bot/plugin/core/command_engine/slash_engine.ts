@@ -1,4 +1,6 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
+import { module_logger } from "../../../../common/logger/index.ts";
+import { debug_format_permission_context } from "../../../common/discord/debug_format.ts";
 import { bot } from "../../../index.ts";
 import { core_config } from "../index.ts";
 import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../public/command/index.ts";
@@ -6,6 +8,8 @@ import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands, get_commands_by_name } from "./command_cache.ts";
 import { AUTO_DEFER_AFTER, transform_reply } from "./index.ts";
+
+const logger = module_logger();
 
 export async function sync_slash_commands(): Promise<void> {
 	const commands = get_commands().filter(command => command.support_slash ?? true).map(command => ({
@@ -65,8 +69,12 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 
 	const matches = get_commands_by_name(interaction.data.name).filter(command => command.support_slash ?? true);
 
-	if (matches.length !== 1)
+	if (matches.length !== 1) {
+		if (matches.length === 0)
+			logger.warn(() => `Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
+
 		return;
+	}
 
 	const command = matches[0]!;
 	const context = new SlashContext(command, interaction);
@@ -74,6 +82,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	const data = command.pre_run(context);
 
 	if (data === false) {
+		logger.debug(() => `Command '${interaction.data.name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
 		context._abandon();
 		return;
 	}
@@ -104,6 +113,8 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 			args[key] = option.array ? [slash_option.value] : slash_option.value;
 		}
 	}
+
+	logger.debug(() => `Parsed arguments from options; running '${interaction.data.name}'`, args);
 
 	try {
 		await command.run(context, args, data);
