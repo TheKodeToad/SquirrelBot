@@ -16,31 +16,36 @@ export enum CaseType {
 	Unban = 9,
 }
 
-export const CASE_TYPE_NAME_TO_ID = {
-	note: CaseType.Note,
-	warn: CaseType.Warn,
-	unwarn: CaseType.Unwarn,
-	voice_mute: CaseType.VoiceMute,
-	voice_unmute: CaseType.VoiceUnmute,
-	mute: CaseType.Mute,
-	unmute: CaseType.Unmute,
-	kick: CaseType.Kick,
-	ban: CaseType.Ban,
-	unban: CaseType.Unban,
-};
 
-export const CASE_TYPE_ID_TO_NAME: Record<CaseType, keyof typeof CASE_TYPE_NAME_TO_ID> = {
-	[CaseType.Note]: "note",
-	[CaseType.Warn]: "warn",
-	[CaseType.Unwarn]: "unwarn",
-	[CaseType.VoiceMute]: "voice_mute",
-	[CaseType.VoiceUnmute]: "voice_unmute",
-	[CaseType.Mute]: "mute",
-	[CaseType.Unmute]: "unmute",
-	[CaseType.Kick]: "kick",
-	[CaseType.Ban]: "ban",
-	[CaseType.Unban]: "unban",
-};
+export function case_type_by_id(id: string): CaseType | undefined {
+	switch (id) {
+		case "note": return CaseType.Note;
+		case "warn": return CaseType.Note;
+		case "unwarn": return CaseType.Note;
+		case "voice_mute": return CaseType.Note;
+		case "voice_unmute": return CaseType.Note;
+		case "mute": return CaseType.Note;
+		case "unmute": return CaseType.Note;
+		case "kick": return CaseType.Note;
+		case "ban": return CaseType.Note;
+		default: return undefined;
+	}
+}
+
+export function case_type_id(type: CaseType): string {
+	switch (type) {
+		case CaseType.Note: return "note";
+		case CaseType.Warn: return "warn";
+		case CaseType.Unwarn: return "unwarn";
+		case CaseType.VoiceMute: return "voice_mute";
+		case CaseType.VoiceUnmute: return "voice_unmute";
+		case CaseType.Mute: return "mute";
+		case CaseType.Unmute: return "unmute";
+		case CaseType.Kick: return "kick";
+		case CaseType.Ban: return "ban";
+		case CaseType.Unban: return "unban";
+	}
+}
 
 export const case_info_schema = object({
 	guild_id: string(),

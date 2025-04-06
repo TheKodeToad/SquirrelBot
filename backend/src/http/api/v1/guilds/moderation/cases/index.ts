@@ -1,12 +1,12 @@
 import { Hono } from "hono";
-import { CASE_TYPE_ID_TO_NAME, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
+import { case_type_id, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
 import by_filter from "./by_filter.ts";
 import by_number from "./by_number.ts";
 
 export function serialise_case_object(info: CaseInfo) {
 	return {
 		number: info.number,
-		type: CASE_TYPE_ID_TO_NAME[info.type],
+		type: case_type_id(info.type),
 		created_at: info.created_at.getTime(),
 		expires_at: info.expires_at?.getTime(),
 		actor_id: info.actor_id,

@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
-import { check, enum_, object, optional, pipe, string, transform } from "valibot";
-import { CaseType, get_cases, type CaseQuery } from "../../../../../../db/moderation/cases.ts";
+import { check, object, optional, pipe, string, transform } from "valibot";
+import { case_type_by_id, get_cases, type CaseQuery } from "../../../../../../db/moderation/cases.ts";
 import { parse_boolean_schema, parse_int_schema, snowflake_schema } from "../../../../../../schema/common/index.ts";
 import type { GuildAuthVars } from "../../../../../middleware/guild_auth.ts";
 import { serialise_case_object } from "./index.ts";
@@ -11,7 +11,7 @@ const router = new Hono<{ Variables: GuildAuthVars; }>;
 const query_schema = pipe(object({
 	before: optional(parse_int_schema),
 	after: optional(parse_int_schema),
-	type: optional(enum_(CaseType)),
+	type: optional(pipe(string(), transform(case_type_by_id), check(id => id !== undefined, "Invalid case type"))),
 	"created-before": optional(pipe(parse_int_schema, transform(input => new Date(input)))),
 	"created-after": optional(pipe(parse_int_schema, transform(input => new Date(input)))),
 	actor: optional(snowflake_schema),
@@ -41,7 +41,8 @@ router.get("/", vValidator("query", query_schema), async context => {
 	if (context.var.discord_guild_id === undefined)
 		throw new Error("Missing guild ID");
 
-	return context.json((await get_cases(context.var.discord_guild_id, context.req.valid("query"))).map(serialise_case_object));
+	const result = await get_cases(context.var.discord_guild_id, context.req.valid("query"));
+	return context.json(result.map(serialise_case_object));
 });
 
 export default router;
