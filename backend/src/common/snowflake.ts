@@ -1,8 +1,18 @@
-// 17 - length of Jason Citron's ID
-// 20 - length of 64-bit integer limit
-export const SNOWFLAKE_REGEX = /^[0-9]{17,20}$/;
-export const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
+const MIN_SNOWFLAKE_VALUE = 21414249976823808n;
+const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
 
 export function is_snowflake(input: string) {
-	return SNOWFLAKE_REGEX.test(input) && BigInt(input) <= MAX_SNOWFLAKE_VALUE;
+	if (input.length < 17 || input.length > 20)
+		return false;
+
+	try {
+		var parsed = BigInt(input);
+	} catch (error) {
+		if (!(error instanceof SyntaxError))
+			throw error;
+
+		return false;
+	}
+
+	return parsed >= MIN_SNOWFLAKE_VALUE && parsed <= MAX_SNOWFLAKE_VALUE;
 }

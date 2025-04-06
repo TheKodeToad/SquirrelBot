@@ -1,8 +1,8 @@
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
-import { array, boolean, instance, maxLength, object, optional, pipe, regex, string, transform, union, type InferOutput } from "valibot";
-import { SNOWFLAKE_REGEX } from "../../common/snowflake.ts";
+import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type InferOutput } from "valibot";
 import { color_schema } from "./color.ts";
+import { snowflake_schema } from "./index.ts";
 
 export const embed_schema = object({
 	title: optional(string()),
@@ -38,13 +38,13 @@ export const message_schema = pipe(
 				users: optional(union(
 					[
 						boolean(),
-						pipe(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid user ID"))), maxLength(100))
+						pipe(array(snowflake_schema), maxLength(100))
 					]
 				)),
 				roles: optional(union(
 					[
 						boolean(),
-						pipe(array(pipe(string(), regex(SNOWFLAKE_REGEX, "invalid user ID"))), maxLength(100))
+						pipe(array(snowflake_schema), maxLength(100))
 					]
 				)),
 			}), {}),
