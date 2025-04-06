@@ -12,7 +12,7 @@ export function wrap_listener<E extends keyof ClientEvents>(
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
 
-		if (event in EVENT_TO_GUILD)
+		if (Object.hasOwn(EVENT_TO_GUILD, event))
 			guild ??= EVENT_TO_GUILD[event](...args);
 
 		if (guild !== null && !is_guild_allowed(guild)) {
