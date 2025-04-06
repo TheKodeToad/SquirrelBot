@@ -1,8 +1,7 @@
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type InferOutput } from "valibot";
-import { color_schema } from "./color.ts";
-import { snowflake_schema } from "./index.ts";
+import { color_schema, snowflake_schema } from "./index.ts";
 
 export const embed_schema = object({
 	title: optional(string()),

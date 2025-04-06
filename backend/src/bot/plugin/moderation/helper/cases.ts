@@ -1,4 +1,4 @@
-import { CaseType } from "../../../../db/moderation/cases.js";
+import { CaseType } from "../../../../db/moderation/cases.ts";
 
 export function case_type_name(type: CaseType): string {
 	switch (type) {
