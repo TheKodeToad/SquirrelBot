@@ -89,7 +89,7 @@ class ComponentContextImpl implements ComponentContext {
 		this._ack_timeout = setTimeout(() => {
 			this._ack_timeout = null;
 			this._acked = true;
-			this._ack_promise = interaction.deferUpdate();
+			this._ack_promise = interaction.deferUpdate().then(() => { });
 		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
 		this._ack_promise = null;
 	}

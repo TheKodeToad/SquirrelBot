@@ -112,6 +112,11 @@ const EVENT_TO_GUILD: {
 	voiceChannelSwitch: member => member.guildID,
 	voiceStateUpdate: member => member.guildID,
 	webhooksUpdate: guild => guild.id,
+	guildSoundboardSoundCreate: sound => sound.guildID ?? null,
+	guildSoundboardSoundDelete: sound => "guildID" in sound ? (sound.guildID ?? null) : null,
+	guildSoundboardSoundUpdate: sound => sound.guildID ?? null,
+	guildSoundboardSoundsUpdate: (_sounds, _new_sounds, guild_id) => guild_id ?? null,
+	soundboardSounds: guild_id => guild_id,
 
 	connect: () => null,
 	debug: () => null,

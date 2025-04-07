@@ -7,6 +7,7 @@ import { type Command, type CommandContext, type Option, OptionType, type Reply 
 import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands, get_commands_by_name } from "./command_cache.ts";
+import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
 import { AUTO_DEFER_AFTER, transform_reply } from "./index.ts";
 
 const logger = module_logger();
@@ -83,7 +84,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
-		context._abandon();
+		context._clear_timeout();
 		return;
 	}
 
@@ -122,7 +123,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;
 	} finally {
-		context._abandon();
+		context._clear_timeout();
 	}
 });
 
@@ -134,38 +135,46 @@ class SlashContext implements CommandContext {
 	get member(): Member { return this._interaction.member; }
 	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;
-	_responded: boolean;
+	_response_id: string | null;
+	_acked: boolean;
 	_defer_timeout: NodeJS.Timeout | null;
 	_defer_promise: Promise<void> | null;
 
 	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>) {
 		this.command = command;
 		this._interaction = interaction;
-		this._responded = false;
+		this._response_id = null;
+		this._acked = false;
 		this._defer_promise = null;
 		this._defer_timeout = setTimeout(() => {
 			this._defer_timeout = null;
-			this._responded = true;
-			this._defer_promise = interaction.defer();
+			this._acked = true;
+			this._defer_promise = interaction.defer().then();
 		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
 	}
 
 	async respond(reply: Reply): Promise<void> {
 		const message_options = transform_reply(reply);
 
-		if (this._responded) {
-			if (this._defer_promise !== null)
-				await this._defer_promise;
+		if (this._acked) {
+			await this._defer_promise;
 
-			await this._interaction.editOriginal(message_options);
+			if (this._response_id !== null)
+				unlisten_for_interactions(this._response_id);
+
+			await this._interaction.editOriginal(message_options).then(message => this._response_id ??= message?.id ?? null);
 		} else {
-			this._abandon();
-			await this._interaction.reply(message_options);
-			this._responded = true;
+			this._clear_timeout();
+			await this._interaction.reply(message_options).then(
+				({ callback }) => this._response_id ??= callback?.resource?.message?.id ?? null
+			);
 		}
+
+		if (typeof reply !== "string" && reply.components !== undefined && this._response_id !== null)
+			listen_for_interactions(this._response_id, this._interaction.user.id, reply.components);
 	}
 
-	_abandon() {
+	_clear_timeout() {
 		if (this._defer_timeout !== null) {
 			clearTimeout(this._defer_timeout);
 			this._defer_timeout = null;
