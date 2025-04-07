@@ -6,6 +6,7 @@ import { apply_plugins, count_plugins, load_plugins } from "./loader/index.ts";
 
 const logger = module_logger();
 
+
 await check_migrations_or_exit();
 
 bot.once("ready", async () => {
