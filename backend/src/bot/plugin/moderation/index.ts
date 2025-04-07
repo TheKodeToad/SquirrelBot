@@ -1,4 +1,4 @@
-import { moderation_config_schema } from "../../../schema/moderation.ts";
+import { moderation_config_schema } from "../../../schema/plugin/moderation.ts";
 import { define_plugin } from "../../loader/plugin.ts";
 import { ConfigCache } from "../core/public/config.ts";
 import { ban_command } from "./command/ban.ts";

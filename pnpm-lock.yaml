@@ -39,16 +39,16 @@ importers:
         version: 1.0.0(typescript@5.8.3)
     devDependencies:
       '@types/async-lock':
-        specifier: 1.4.2
+        specifier: ^1.4.2
         version: 1.4.2
       '@types/node':
-        specifier: 22.14.0
+        specifier: ^22.14.0
         version: 22.14.0
       '@types/pg':
-        specifier: 8.11.11
+        specifier: ^8.11.11
         version: 8.11.11
       typescript:
-        specifier: 5.8.3
+        specifier: ^5.8.3
         version: 5.8.3
 
   frontend:

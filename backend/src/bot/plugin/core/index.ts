@@ -1,5 +1,5 @@
 import { module_logger } from "../../../common/logger/index.ts";
-import { core_config_schema } from "../../../schema/core.ts";
+import { core_config_schema } from "../../../schema/plugin/core.ts";
 import { get_plugins } from "../../loader/index.ts";
 import { define_plugin } from "../../loader/plugin.ts";
 import { about_command } from "./command/about.ts";

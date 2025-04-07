@@ -2,7 +2,7 @@ import { type AnyGuildChannel, CategoryChannel, Member, ThreadChannel } from "oc
 import { module_logger } from "../../../../common/logger/index.ts";
 import { test_number_filter } from "../../../../schema/common/number_filter.ts";
 import type { PermissionsFilter } from "../../../../schema/common/permissions_filter.ts";
-import type { CoreConfig, CoreGroup } from "../../../../schema/core.ts";
+import type { CoreConfig, CoreGroup } from "../../../../schema/plugin/core.ts";
 import { debug_format_channel, debug_format_guild, debug_format_user } from "../../../common/discord/debug_format.ts";
 import { core_config } from "../index.ts";
 
