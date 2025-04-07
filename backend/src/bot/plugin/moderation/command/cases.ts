@@ -31,7 +31,7 @@ export const cases_command = define_command({
 
 	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
 	async run(context, args) {
-		await run(reply => context.respond(reply), context.member, context.channel, args, {});
+		await run(async reply => await context.respond(reply), context.member, context.channel, args, {});
 	},
 });
 

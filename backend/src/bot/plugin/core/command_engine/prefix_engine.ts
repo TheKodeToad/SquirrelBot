@@ -115,7 +115,7 @@ async function handle_edit(message: Message) {
 
 	tracked_messages.delete(message.id);
 
-	if (!(await handle(message, response)))
+	if (!await handle(message, response))
 		await response.delete();
 }
 

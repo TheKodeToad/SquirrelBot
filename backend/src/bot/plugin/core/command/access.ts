@@ -27,9 +27,9 @@ export const grant_access_command = define_command({
 		const guild_name = bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
 
 		if (await grant_access(args.guild))
-			context.respond(`${icons.success} Granted access to **${escape_markdown(guild_name)}**!`);
+			await context.respond(`${icons.success} Granted access to **${escape_markdown(guild_name)}**!`);
 		else
-			context.respond(`${icons.error} Server **${escape_markdown(guild_name)}** already has access to the bot!`);
+			await context.respond(`${icons.error} Server **${escape_markdown(guild_name)}** already has access to the bot!`);
 	},
 });
 
@@ -53,15 +53,15 @@ export const revoke_access_command = define_command({
 
 		if (result !== false) {
 			if (result instanceof Date)
-				context.respond(`${icons.success} Revoked access for **${escape_markdown(guild_name)}**! Plugin data will be purged on <t:${Math.floor(result.getTime() / 1000)}:d>.`);
+				await context.respond(`${icons.success} Revoked access for **${escape_markdown(guild_name)}**! Plugin data will be purged on <t:${Math.floor(result.getTime() / 1000)}:d>.`);
 			else
-				context.respond(`${icons.success} Revoked access for **${escape_markdown(guild_name)}**! The bot might still have access if it is configured in the environment.`);
+				await context.respond(`${icons.success} Revoked access for **${escape_markdown(guild_name)}**! The bot might still have access if it is configured in the environment.`);
 
 		} else {
 			if (BOT_ALLOWED_GUILDS.includes(args.guild))
-				context.respond(`${icons.error} Server **${escape_markdown(guild_name)}** cannot be removed as it is configured in the bot's environment!`);
+				await context.respond(`${icons.error} Server **${escape_markdown(guild_name)}** cannot be removed as it is configured in the bot's environment!`);
 			else
-				context.respond(`${icons.error} Server **${escape_markdown(guild_name)}** does not have access to the bot!`);
+				await context.respond(`${icons.error} Server **${escape_markdown(guild_name)}** does not have access to the bot!`);
 		}
 	},
 });

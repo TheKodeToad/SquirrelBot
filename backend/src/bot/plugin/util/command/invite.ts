@@ -32,7 +32,7 @@ export const invite_command = define_command({
 		const matches = REGEX.exec(args.link);
 
 		if (matches === null) {
-			context.respond(`${icons.error} Provided link does not contain invite code!`);
+			await context.respond(`${icons.error} Provided link does not contain invite code!`);
 			return;
 		}
 
@@ -60,9 +60,9 @@ export const invite_command = define_command({
 				throw error;
 
 			if (error.code === JSONErrorCodes.UNKNOWN_INVITE)
-				context.respond(`${icons.error} Invite not found: '${code}'! This could be a friend invite or another type of invite invisible to bots.`);
+				await context.respond(`${icons.error} Invite not found: '${code}'! This could be a friend invite or another type of invite invisible to bots.`);
 			else
-				context.respond(`${icons.error} Invite fetch failed: ${format_rest_error(error)}`);
+				await context.respond(`${icons.error} Invite fetch failed: ${format_rest_error(error)}`);
 
 			return;
 		}
