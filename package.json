@@ -1,0 +1,11 @@
+{
+	"name": "squirrel",
+	"private": true,
+	"scripts": {
+		"check": "cd backend && npm run check && cd ../frontend && npm run check",
+		"bot": "cd backend && npm run bot",
+		"http": "cd backend && npm run http",
+		"frontend-build": "cd frontend && npm run build",
+		"frontend-watch": "cd frontend && npm run build"
+	}
+}

@@ -1,12 +1,14 @@
 {
 	"name": "frontend",
 	"scripts": {
+		"check": "tsc --noEmit",
 		"build": "node build.mjs",
 		"watch": "node build.mjs watch"
 	},
 	"devDependencies": {
 		"esbuild": "^0.25.1",
-		"esbuild-plugin-solid": "^0.6.0"
+		"esbuild-plugin-solid": "^0.6.0",
+		"typescript": "^5.8.2"
 	},
 	"dependencies": {
 		"@solid-primitives/deep": "^0.3.0",
