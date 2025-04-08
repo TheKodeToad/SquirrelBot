@@ -20,14 +20,14 @@ export enum CaseType {
 export function case_type_by_id(id: string): CaseType | undefined {
 	switch (id) {
 		case "note": return CaseType.Note;
-		case "warn": return CaseType.Note;
-		case "unwarn": return CaseType.Note;
-		case "voice_mute": return CaseType.Note;
-		case "voice_unmute": return CaseType.Note;
-		case "mute": return CaseType.Note;
-		case "unmute": return CaseType.Note;
-		case "kick": return CaseType.Note;
-		case "ban": return CaseType.Note;
+		case "warn": return CaseType.Warn;
+		case "unwarn": return CaseType.Unwarn;
+		case "voice_mute": return CaseType.VoiceMute;
+		case "voice_unmute": return CaseType.VoiceUnmute;
+		case "mute": return CaseType.Mute;
+		case "unmute": return CaseType.Unmute;
+		case "kick": return CaseType.Kick;
+		case "ban": return CaseType.Ban;
 		default: return undefined;
 	}
 }
