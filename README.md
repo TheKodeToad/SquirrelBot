@@ -2,7 +2,7 @@
 
 [Discord Server](https://discord.gg/SpVcZxyy6m) (not much here lol)
 
-Work in progress advanced moderation and management bot - aiming to be lightweight and support the latest features of Discord! The idea is pretty similar to [Zeppelin](https://github.com/ZeppelinBot/Zeppelin) with each server having its own text based config. However, SquirrelBot splits each server's configurations into a file for each plugin to keep things more tidy and uses YAML instead of TOML. Slash commands will also (hopefully) be treated as first-class citizens - though it's likely not feasible to support everything.
+Work in progress advanced moderation and management bot - aiming to be lightweight and support the latest features of Discord! The idea is pretty similar to [Zeppelin](https://github.com/ZeppelinBot/Zeppelin) with each server having its own text based config. However, SquirrelBot splits each server's configurations into a file for each plugin to keep things more tidy and uses TOML instead of YAML. Slash commands will also (hopefully) be treated as first-class citizens - though it's likely not feasible to support everything.
 
 The overall goal is to implement a set of plugins focused on moderation and utility - but keeping focused on Discord without getting carried away with third party integrations. Essentially, this bot *should not* and *will not* try to do everything.
 
