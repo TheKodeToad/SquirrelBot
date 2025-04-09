@@ -8,47 +8,36 @@ import { do_batch_action } from "../helper/batch_action.ts";
 import { moderation_config } from "../index.ts";
 
 export const kick_command = define_command({
-	id: "kick",
+	name: ["kick"],
 	options: {
 		user: {
 			type: OptionType.USER,
-			id: ["user", "u"],
+			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
 			type: OptionType.STRING,
-			id: ["reason", "r"],
+			name: ["reason", "r"],
 			position: 1,
 		},
 		dm: {
-			type: OptionType.VOID,
-			id: ["dm", "d", "direct-message"],
-		},
-		no_dm: {
-			type: OptionType.VOID,
-			id: ["no-dm", "nd", "no-direct-message"],
+			type: OptionType.FLAG,
+			name: ["dm", "d", "direct-message"],
+			negative_name: ["no-dm", "nd", "no-direct-message"],
 		},
 	},
 
 	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.kick),
 	async run(context, args, { config }) {
-		let send_direct_message = config.ban.send_direct_message;
-
-		if (args.dm)
-			send_direct_message = true;
-
-		if (args.no_dm)
-			send_direct_message = false;
-
-		let direct_message: CreateMessageOptions | undefined = undefined;
-
-		if (send_direct_message) {
-			direct_message = config.ban.direct_message ?? {
-				content: `You were kicked from ${escape_markdown(context.guild.name)}.`
-			};
-		}
+		const send_direct_message = args.dm ?? config.ban.send_direct_message;
+		const direct_message: CreateMessageOptions | undefined =
+			send_direct_message ?
+				config.ban.direct_message ?? {
+					content: `You were kicked from ${escape_markdown(context.guild.name)}.`
+				} :
+				undefined;
 
 		const { successful, unsuccessful } = await do_batch_action({
 			guild: context.guild,

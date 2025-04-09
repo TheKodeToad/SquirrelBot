@@ -1,13 +1,13 @@
 import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageActionRowComponent, type SelectMenuComponent, Shard, type TextButton, User } from "oceanic.js";
 
-type Id = string | [string, ...string[]];
+type NameList = [string, ...string[]];
 
 export function define_command<O extends Record<string, Option>, D extends {}>(command: Command<O, D>): Command<O, D> {
 	return command;
 }
 
 export interface Command<O extends Record<string, Option> = Record<string, Option>, D extends {} = {}> {
-	id: Id;
+	name: NameList;
 	options?: O;
 	support_prefix?: boolean;
 	support_slash?: boolean;
@@ -54,8 +54,9 @@ export interface ComponentCallback {
 }
 
 export enum OptionType {
-	VOID,
 	BOOLEAN,
+	/** Same as boolean for slash command; --option-name */
+	FLAG,
 	STRING,
 	INTEGER,
 	NUMBER,
@@ -65,16 +66,40 @@ export enum OptionType {
 	SNOWFLAKE,
 }
 
-export interface Option {
+export type Option =
+	BooleanOption |
+	FlagOption |
+	StringOption |
+	IntegerOption |
+	NumberOption |
+	UserOption |
+	RoleOption |
+	ChannelOption |
+	SnowflakeOption;
+
+interface BaseOption {
 	type: OptionType;
-	id: Id;
+	name: NameList;
 	required?: boolean;
 	array?: boolean;
 	position?: number;
 }
 
+interface FlagOption extends BaseOption {
+	type: OptionType.FLAG;
+	negative_name?: NameList;
+}
+
+interface BooleanOption extends BaseOption { type: OptionType.BOOLEAN; }
+interface StringOption extends BaseOption { type: OptionType.STRING; }
+interface IntegerOption extends BaseOption { type: OptionType.INTEGER; }
+interface NumberOption extends BaseOption { type: OptionType.NUMBER; }
+interface UserOption extends BaseOption { type: OptionType.USER; }
+interface RoleOption extends BaseOption { type: OptionType.ROLE; }
+interface ChannelOption extends BaseOption { type: OptionType.CHANNEL; }
+interface SnowflakeOption extends BaseOption { type: OptionType.SNOWFLAKE; }
+
 type OptionValue<F extends Option> =
-	F["type"] extends OptionType.VOID ? boolean :
 	F["array"] extends true ? ArrayValue<OptionTypeValue<F["type"]>, F["required"]> :
 	F["required"] extends true ? NullableValue<OptionTypeValue<F["type"]>, F["required"]> :
 	OptionTypeValue<F["type"]> | null;
@@ -83,7 +108,7 @@ type ArrayValue<O extends any, Required extends boolean | undefined> = Required 
 type NullableValue<O extends any, Required extends boolean | undefined> = Required extends true ? O : O | null;
 
 export type OptionTypeValue<T extends OptionType> =
-	T extends OptionType.VOID ? boolean :
+	T extends OptionType.FLAG ? boolean :
 	T extends OptionType.BOOLEAN ? boolean :
 	T extends OptionType.STRING ? string :
 	T extends OptionType.INTEGER ? number :

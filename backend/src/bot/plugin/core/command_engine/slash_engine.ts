@@ -15,11 +15,11 @@ const logger = module_logger();
 export async function sync_slash_commands(): Promise<void> {
 	const commands = get_commands().filter(command => command.support_slash ?? true).map(command => ({
 		type: ApplicationCommandTypes.CHAT_INPUT,
-		name: typeof command.id === "string" ? command.id : command.id[0],
+		name: typeof command.name === "string" ? command.name : command.name[0],
 		description: "command",
 		options: command.options ? Object.values(command.options).map(flag => (
 			{
-				name: typeof flag.id === "string" ? flag.id : flag.id[0],
+				name: typeof flag.name === "string" ? flag.name : flag.name[0],
 				description: "option",
 				required: flag.required && !("default" in flag && flag.default),
 				type: map_flag_type(flag.type),
@@ -31,7 +31,7 @@ export async function sync_slash_commands(): Promise<void> {
 
 function map_flag_type(type: OptionType) {
 	switch (type) {
-		case OptionType.VOID:
+		case OptionType.FLAG:
 		case OptionType.BOOLEAN:
 			return ApplicationCommandOptionTypes.BOOLEAN;
 		case OptionType.STRING:
@@ -49,6 +49,9 @@ function map_flag_type(type: OptionType) {
 		case OptionType.SNOWFLAKE:
 			return ApplicationCommandOptionTypes.INTEGER;
 	}
+
+	const update_for_added_option_types = (_: never) => { };
+	update_for_added_option_types(type);
 }
 
 export const slash_run_handler = define_event_listener("interactionCreate", async interaction => {
@@ -99,7 +102,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 		for (const [key, option] of Object.entries(command.options)) {
 			args[key] = option.array ? [] : null;
 
-			const id = Array.isArray(option.id) ? option.id[0] : option.id;
+			const id = Array.isArray(option.name) ? option.name[0] : option.name;
 			option_lookup.set(id, [key, option]);
 		}
 

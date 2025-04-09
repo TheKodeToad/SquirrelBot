@@ -25,7 +25,7 @@ const LIBRARIES = `
 `.replaceAll("\n", "");
 
 export const about_command = define_command({
-	id: "about",
+	name: ["about"],
 	track_updates: true,
 
 	pre_run: context => permissions_guard(context, core_config, permissions => permissions.about_command),

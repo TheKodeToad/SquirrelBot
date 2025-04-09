@@ -12,18 +12,18 @@ const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.c
 const logger = module_logger();
 
 export const invite_command = define_command({
-	id: ["invite", "inv"],
+	name: ["invite", "inv"],
 	track_updates: true,
 	options: {
 		link: {
 			type: OptionType.STRING,
-			id: ["link", "l"],
+			name: ["link", "l"],
 			required: true,
 			position: 0
 		},
 		hide_images: {
-			type: OptionType.VOID,
-			id: ["hide-images", "hi"]
+			type: OptionType.FLAG,
+			name: ["hide-images", "hi"]
 		}
 	},
 

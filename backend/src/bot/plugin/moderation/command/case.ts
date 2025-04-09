@@ -8,10 +8,10 @@ import { case_type_name } from "../helper/cases.ts";
 import { moderation_config } from "../index.ts";
 
 export const case_command = define_command({
-	id: "case",
+	name: ["case"],
 	options: {
 		number: {
-			id: ["number", "n"],
+			name: ["number", "n"],
 			type: OptionType.INTEGER,
 			required: true,
 			position: 0,

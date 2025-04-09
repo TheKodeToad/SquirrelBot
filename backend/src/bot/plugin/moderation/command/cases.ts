@@ -12,26 +12,32 @@ import { moderation_config } from "../index.ts";
 
 
 export const cases_command = define_command({
-	id: "cases",
+	name: ["cases"],
 	options: {
 		actor_id: {
-			id: ["actor", "a", "by", "moderator", "mod"],
+			name: ["actor", "a", "by", "moderator", "mod"],
 			type: OptionType.USER,
 		},
 		target_id: {
-			id: ["target", "t", "for", "user"],
+			name: ["target", "t", "for", "user"],
 			type: OptionType.USER,
 		},
 		compact: {
-			id: ["compact", "c"],
-			type: OptionType.VOID,
+			name: ["compact", "c"],
+			type: OptionType.FLAG,
 		},
 	},
 	track_updates: true,
 
 	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
 	async run(context, args) {
-		await run(async reply => await context.respond(reply), context.member, context.channel, args, {});
+		await run(
+			async reply => await context.respond(reply),
+			context.member,
+			context.channel,
+			{ ...args, compact: args.compact ?? false },
+			{}
+		);
 	},
 });
 

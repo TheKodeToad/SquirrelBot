@@ -6,29 +6,29 @@ import { icons } from "../../core/public/icons.ts";
 import { moderation_config } from "../index.ts";
 
 export const purge_command = define_command({
-	id: ["purge", "sweep", "clear"],
+	name: ["purge", "sweep", "clear"],
 	options: {
 		count: {
-			id: ["count", "c"],
+			name: ["count", "c"],
 			type: OptionType.INTEGER,
 			position: 0,
 			required: true,
 		},
 		match: {
-			id: ["match", "m"],
+			name: ["match", "m"],
 			type: OptionType.STRING,
 			position: 1,
 		},
 		bots: {
-			id: "bots",
-			type: OptionType.VOID,
+			name: ["bots"],
+			type: OptionType.FLAG,
 		},
 		humans: {
-			id: "humans",
-			type: OptionType.VOID,
+			name: ["humans"],
+			type: OptionType.FLAG,
 		},
 		author: {
-			id: ["author", "a", "by", "from"],
+			name: ["author", "a", "by", "from"],
 			type: OptionType.USER,
 			array: true,
 		}

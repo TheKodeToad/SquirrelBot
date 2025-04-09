@@ -6,12 +6,12 @@ import { util_config } from "../index.ts";
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 
 export const snowflake_command = define_command({
-	id: "snowflake",
+	name: ["snowflake"],
 	track_updates: true,
 	options: {
 		input: {
 			type: OptionType.SNOWFLAKE,
-			id: ["input", "i"],
+			name: ["input", "i"],
 			required: true,
 			position: 0,
 		},

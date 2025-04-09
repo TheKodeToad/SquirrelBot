@@ -1,5 +1,5 @@
 import { ComponentTypes, type MessageActionRow } from "oceanic.js";
-import type { Command, Reply } from "../public/command/index.ts";
+import type { Reply } from "../public/command/index.ts";
 
 /**
  * How long to expire command state (edit tracking + component listening)
@@ -11,13 +11,6 @@ export const STATE_CLEANUP_INTERVAL = 1000 * 60;
  * (this should also improve latency - in the best case only one api call is being sent back to Discord)
  */
 export const AUTO_DEFER_AFTER = 1000;
-
-export function default_id(id: Command["id"]): string {
-	if (Array.isArray(id))
-		return id[0];
-	else
-		return id;
-}
 
 export function transform_reply(reply: Reply) {
 	if (typeof reply === "string")

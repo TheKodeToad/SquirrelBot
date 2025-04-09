@@ -18,11 +18,8 @@ export function init_command_cache() {
 			continue;
 
 		for (const command of plugin.commands) {
-			if (Array.isArray(command.id)) {
-				for (const id of command.id)
-					put_command(id, command);
-			} else
-				put_command(command.id, command);
+			for (const name of command.name)
+				put_command(name, command);
 
 			all.push(command);
 		}

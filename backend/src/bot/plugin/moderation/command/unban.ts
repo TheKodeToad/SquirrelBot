@@ -8,18 +8,18 @@ import { icons } from "../../core/public/icons.ts";
 import { moderation_config } from "../index.ts";
 
 export const unban_command = define_command({
-	id: "unban",
+	name: ["unban"],
 	options: {
 		user: {
 			type: OptionType.USER,
-			id: ["user", "u"],
+			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
 			type: OptionType.STRING,
-			id: ["reason", "r"],
+			name: ["reason", "r"],
 			position: 1,
 		},
 	},

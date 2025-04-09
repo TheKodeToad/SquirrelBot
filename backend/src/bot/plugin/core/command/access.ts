@@ -11,12 +11,12 @@ function check_for_me(context: CommandContext): boolean {
 }
 
 export const grant_access_command = define_command({
-	id: ["grant_access", "whitelist"],
+	name: ["grant_access", "whitelist"],
 	support_slash: false, // don't want this cluttering the command list
 	options: {
 		guild: {
 			type: OptionType.SNOWFLAKE,
-			id: "server",
+			name: ["server"],
 			required: true,
 			position: 0,
 		},
@@ -34,12 +34,12 @@ export const grant_access_command = define_command({
 });
 
 export const revoke_access_command = define_command({
-	id: ["revoke_access", "unwhitelist"],
+	name: ["revoke_access", "unwhitelist"],
 	support_slash: false,
 	options: {
 		guild: {
 			type: OptionType.SNOWFLAKE,
-			id: "server",
+			name: ["server"],
 			required: true,
 			position: 0,
 		},

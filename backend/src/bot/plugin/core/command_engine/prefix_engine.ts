@@ -10,7 +10,7 @@ import { define_event_listener } from "../public/event_listener.ts";
 import { resolve_permissions } from "../public/permission_resolution.ts";
 import { get_commands_by_name } from "./command_cache.ts";
 import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
-import { default_id, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "./index.ts";
+import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "./index.ts";
 
 const logger = module_logger();
 
@@ -189,6 +189,8 @@ class PrefixContext implements CommandContext {
 	}
 }
 
+// TODO: unmaintainable spaghetti - refactor and make this command-type agnostic
+
 class Parser {
 	private context: PrefixContext;
 	private input: string;
@@ -206,6 +208,7 @@ class Parser {
 		const result: Record<string, any> = {};
 		const option_lookup: Map<string, [string, Option]> = new Map;
 		const positional_options: [string, Option][] = [];
+		const negative_options: Map<string, string> = new Map;
 
 		if (this.context.command.options) {
 			for (const [key, option] of Object.entries(this.context.command.options)) {
@@ -214,11 +217,12 @@ class Parser {
 				if (option.position !== undefined)
 					positional_options[option.position] = [key, option];
 
-				if (Array.isArray(option.id)) {
-					for (const id of option.id)
-						option_lookup.set(id, [key, option]);
-				} else
-					option_lookup.set(option.id, [key, option]);
+				for (const id of option.name)
+					option_lookup.set(id, [key, option]);
+
+				if ("negative_name" in option && option.negative_name !== undefined)
+					for (const name of option.negative_name)
+						negative_options.set(name, key);
 			}
 		}
 
@@ -245,22 +249,31 @@ class Parser {
 
 			this.skip_spaces();
 
-			let flag_id = this.read_word().slice(1);
+			let option_name = this.read_word().slice(1);
 			// allow --option-name
 			// also conviniently turns "--" into ""
-			if (flag_id.startsWith("-"))
-				flag_id = flag_id.slice(1);
+			if (option_name.startsWith("-"))
+				option_name = option_name.slice(1);
 
-			if (!option_lookup.has(flag_id)) {
-				if (flag_id.length === 0)
+			let entry = option_lookup.get(option_name);
+
+			if (entry === undefined) {
+				const negative_key = negative_options.get(option_name);
+
+				if (negative_key !== undefined) {
+					result[negative_key] = false;
+					continue;
+				}
+
+				if (option_name.length === 0)
 					throw new ParseError(`Expected option name after '--'`);
 				else
-					throw new ParseError(`Cannot find option '${flag_id}'`);
+					throw new ParseError(`Cannot find option '${option_name}'`);
 			}
 
-			const [key, option] = option_lookup.get(flag_id)!;
-			const value = option.array ? this.read_values(option.type) : this.read_value(option.type);
+			const [key, option] = entry;
 
+			const value = option.array ? this.read_values(option.type) : this.read_value(option.type);
 			result[key] = value;
 		}
 
@@ -276,7 +289,7 @@ class Parser {
 
 			if (missing_flags.length !== 0) {
 				const missing_flag_names = missing_flags
-					.map(([_, option]) => default_id(option.id))
+					.map(([_, option]) => `'${option.name[0]}'`)
 					.join(", ");
 
 				throw new ParseError(`Missing ${missing_flag_names}`);
@@ -295,7 +308,7 @@ class Parser {
 		this.skip_spaces();
 
 		switch (type) {
-			case OptionType.VOID:
+			case OptionType.FLAG:
 				return true;
 			case OptionType.BOOLEAN:
 				return this.read_boolean();
@@ -318,7 +331,7 @@ class Parser {
 
 	read_values(type: OptionType, stop_at_error = false, require_one = false): OptionTypeValue<OptionType>[] {
 		switch (type) {
-			case OptionType.VOID:
+			case OptionType.FLAG:
 				return [];
 			case OptionType.BOOLEAN:
 				return this.read_sequence(() => this.read_boolean(), stop_at_error, require_one);

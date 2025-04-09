@@ -1,4 +1,3 @@
-import type { CreateMessageOptions } from "oceanic.js";
 import { CaseType } from "../../../../db/moderation/cases.ts";
 import { escape_markdown } from "../../../common/discord/markdown.ts";
 import { permissions_guard } from "../../core/public/command/helper.ts";
@@ -8,51 +7,40 @@ import { do_batch_action } from "../helper/batch_action.ts";
 import { moderation_config } from "../index.ts";
 
 export const ban_command = define_command({
-	id: "ban",
+	name: ["ban"],
 	options: {
 		user: {
 			type: OptionType.USER,
-			id: ["user", "u"],
+			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
 			type: OptionType.STRING,
-			id: ["reason", "r"],
+			name: ["reason", "r"],
 			position: 1,
 		},
 		dm: {
-			type: OptionType.VOID,
-			id: ["dm", "d", "direct-message"],
-		},
-		no_dm: {
-			type: OptionType.VOID,
-			id: ["no-dm", "nd", "no-direct-message"],
+			type: OptionType.FLAG,
+			name: ["dm", "d", "direct-message"],
+			negative_name: ["no-dm", "nd", "no-direct-message"],
 		},
 		purge: {
 			type: OptionType.NUMBER,
-			id: ["purge", "p", "delete"],
+			name: ["purge", "p", "delete"],
 		},
 	},
 
 	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.ban),
 	async run(context, args, { config }) {
-		let send_direct_message = config.ban.send_direct_message;
+		const send_direct_message = args.dm ?? config.ban.send_direct_message;
 
-		if (args.dm)
-			send_direct_message = true;
-
-		if (args.no_dm)
-			send_direct_message = false;
-
-		let direct_message: CreateMessageOptions | undefined = undefined;
-
-		if (send_direct_message) {
-			direct_message = config.ban.direct_message ?? {
+		const direct_message = send_direct_message
+			? config.ban.direct_message ?? {
 				content: `You are permanently banned from ${escape_markdown(context.guild.name)}.`
-			};
-		}
+			}
+			: undefined;
 
 		const delete_message_seconds = (args.purge ?? config.ban.purge_messages) * (1000 * 60 * 60 * 24);
 

@@ -4,7 +4,7 @@ import { icons } from "../../core/public/icons.ts";
 import { util_config } from "../index.ts";
 
 export const ping_command = define_command({
-	id: "ping",
+	name: ["ping"],
 	track_updates: true, // allow deleting
 
 	pre_run: context => permissions_guard(context, util_config, permissions => permissions.ping_command),

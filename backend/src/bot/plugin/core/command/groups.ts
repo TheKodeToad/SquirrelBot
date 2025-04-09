@@ -9,12 +9,12 @@ import { icons } from "../public/icons.ts";
 import { resolve_groups } from "../public/permission_resolution.ts";
 
 export const groups_command = define_command({
-	id: "groups",
+	name: ["groups"],
 	track_updates: true,
 	options: {
 		user: {
 			type: OptionType.USER,
-			id: ["user", "u"],
+			name: ["user", "u"],
 			position: 0,
 		}
 	},
