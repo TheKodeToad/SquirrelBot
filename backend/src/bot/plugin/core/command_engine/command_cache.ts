@@ -1,14 +1,21 @@
 import { get_plugins } from "../../../loader/index.ts";
-import type { Command } from "../public/command/index.ts";
+import type { Command, Option } from "../public/command/index.ts";
 
-const all: Command[] = [];
-const lookup: Map<string, Command[]> = new Map;
+export interface CommandCacheEntry {
+	command: Command;
+	options_by_position: [string, Option][];
+	options_by_name: Map<string, [string, Option]>;
+	options_by_negative_name: Map<string, string>;
+}
 
-export function get_commands(): Command[] {
+const all: CommandCacheEntry[] = [];
+const lookup: Map<string, CommandCacheEntry[]> = new Map;
+
+export function get_commands(): CommandCacheEntry[] {
 	return all;
 }
 
-export function get_commands_by_name(name: string): Command[] {
+export function get_commands_by_name(name: string): CommandCacheEntry[] {
 	return lookup.get(name) ?? [];
 }
 
@@ -18,21 +25,53 @@ export function init_command_cache() {
 			continue;
 
 		for (const command of plugin.commands) {
-			for (const name of command.name)
-				put_command(name, command);
+			const entry = make_cache_entry(command);
 
-			all.push(command);
+			for (const name of command.name) {
+				let array = lookup.get(name);
+
+				if (array === undefined) {
+					array = [];
+					lookup.set(name, array);
+				}
+
+				array.push(entry);
+			}
+
+			all.push(entry);
 		}
 	}
 }
 
-function put_command(key: string, value: Command) {
-	let array = lookup.get(key);
+// TODO: remove this!
+export function make_cache_entry(command: Command): CommandCacheEntry {
+	const options_by_position: [string, Option][] = [];
+	const options_by_name: Map<string, [string, Option]> = new Map;
+	const options_by_negative_name: Map<string, string> = new Map;
 
-	if (array === undefined) {
-		array = [];
-		lookup.set(key, array);
+	for (const key in command.options) {
+		if (!Object.hasOwn(command.options, key))
+			continue;
+
+		const option = command.options[key]!;
+
+		if (typeof option.position === "number")
+			options_by_position[option.position] = [key, option];
+
+		for (const name of option.name)
+			options_by_name.set(name, [key, option]);
+
+		if ("negative_name" in option && option.negative_name !== undefined)
+			for (const negative_name of option.negative_name)
+				options_by_negative_name.set(negative_name, key);
 	}
 
-	array.push(value);
+	return {
+		command,
+		options_by_position: options_by_position,
+		options_by_name: options_by_name,
+		options_by_negative_name: options_by_negative_name,
+	};
 }
+
+

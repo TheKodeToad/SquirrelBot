@@ -19,7 +19,7 @@ export function create_dm_cached(user_id: string): PrivateChannel | Promise<Priv
 
 export async function request_members_cached(
 	guild: Guild,
-	user_ids: string[],
+	user_ids: readonly string[],
 	options?: Pick<RequestGuildMembersOptions, "presences" | "timeout">
 ): Promise<Map<string, Member>> {
 	const result: Map<string, Member> = new Map;

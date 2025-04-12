@@ -1,0 +1,157 @@
+const WORD_END_PATTERN = /\s/g;
+const WHITESPACE_EATER_PATTERN = /\s+/y;
+
+export class StringReader {
+	private _input: string;
+	// TODO track the next item instead of the current?
+	private _cursor: number;
+	private _marked_cursor: number | null;
+	private _ops: number;
+
+	constructor(input: string) {
+		this._input = input;
+		this._cursor = -1;
+		this._marked_cursor = null;
+		this._ops = 100_000;
+	}
+
+	private _track_op() {
+		if (--this._ops < 0)
+			throw new Error("Operation limit exceeded; infinite loop assumed");
+	}
+
+	private _can_read(offset = 1): boolean {
+		const i = this._cursor + offset;
+		return i >= 0 && i < this._input.length;
+	}
+
+	private _read(): string {
+		if (!this._can_read())
+			throw new Error("can_read() = false");
+
+		return this._input[++this._cursor]!;
+	}
+
+	can_read(offset = 1): boolean {
+		this._track_op();
+
+		return this._can_read(offset);
+	}
+
+	read() {
+		this._track_op();
+
+		return this._read();
+	}
+
+	peek(offset = 1): string {
+		this._track_op();
+
+		if (!this._can_read(offset))
+			throw new Error(`can_read(${offset}) = false`);
+
+		return this._input[this._cursor + offset]!;
+	}
+
+	mark() {
+		if (this._marked_cursor !== null)
+			throw new Error("Already marked");
+
+		this._marked_cursor = this._cursor;
+	}
+
+	unmark() {
+		this._marked_cursor = null;
+	}
+
+	reset() {
+		if (this._marked_cursor === null)
+			throw new Error("No mark set");
+
+		this._cursor = this._marked_cursor;
+	}
+
+	read_until(pattern: string | RegExp): string {
+		this._track_op();
+
+		this._read();
+
+		let end_index = this._input.length;
+
+		if (pattern instanceof RegExp) {
+			if (!pattern.global)
+				throw new Error("Non-global RegExp passed");
+
+			pattern.lastIndex = this._cursor;
+			const match = pattern.exec(this._input);
+
+			if (match !== null)
+				end_index = match.index;
+		} else {
+			const match = this._input.indexOf(pattern, this._cursor);
+
+			if (match !== -1)
+				end_index = match;
+		}
+
+		const result = this._input.substring(this._cursor, end_index);
+		this._cursor = end_index - 1;
+
+		return result;
+	}
+
+	read_word(): string {
+		return this.read_until(WORD_END_PATTERN);
+	}
+
+	match(sequence: string | RegExp, offset = 1): boolean {
+		this._track_op();
+
+		if (this._cursor >= this._input.length)
+			return false;
+
+		if (sequence instanceof RegExp) {
+			if (!sequence.sticky)
+				throw new Error("Non-sticky RegExp passed");
+
+			sequence.lastIndex = this._cursor + offset;
+
+			const match = sequence.exec(this._input);
+			return match !== null;
+		} else
+			return this._input.startsWith(sequence, this._cursor + offset);
+	}
+
+	skip_over(sequence: string | RegExp): boolean {
+		this._track_op();
+
+		if (this._cursor >= this._input.length)
+			return false;
+
+		if (sequence instanceof RegExp) {
+			if (!sequence.sticky)
+				throw new Error("Non-sticky RegExp passed");
+
+			sequence.lastIndex = this._cursor + 1;
+			const match = sequence.exec(this._input);
+
+			if (match === null || match.length === 0)
+				return false;
+
+			this._cursor += match[0].length;
+
+			return true;
+		} else {
+			if (!this._input.startsWith(sequence, this._cursor + 1))
+				return false;
+
+			this._cursor += sequence.length;
+
+			return true;
+		}
+	}
+
+	skip_whitespace(): boolean {
+		return this.skip_over(WHITESPACE_EATER_PATTERN);
+	}
+}

@@ -53,19 +53,6 @@ export interface ComponentCallback {
 	invoker_only?: boolean;
 }
 
-export enum OptionType {
-	BOOLEAN,
-	/** Same as boolean for slash command; --option-name */
-	FLAG,
-	STRING,
-	INTEGER,
-	NUMBER,
-	USER,
-	ROLE,
-	CHANNEL,
-	SNOWFLAKE,
-}
-
 export type Option =
 	BooleanOption |
 	FlagOption |
@@ -76,6 +63,31 @@ export type Option =
 	RoleOption |
 	ChannelOption |
 	SnowflakeOption;
+
+export enum OptionType {
+	BOOLEAN,
+	/**
+	 * Same as boolean for slash command;
+	 * --name to enable and and --negative-name to disable for prefix commands.
+	 */
+	FLAG,
+	INTEGER,
+	NUMBER,
+	STRING,
+	SNOWFLAKE,
+	USER,
+	ROLE,
+	CHANNEL,
+}
+
+/**
+ * Any value which is permitted in args.
+ */
+export type AnyArgsValue = OptionValue<any>;
+/**
+ * Any type which is permitted in an array in args.
+ */
+export type AnyArgsValueItem = OptionTypeValue<any>;
 
 interface BaseOption {
 	type: OptionType;
@@ -88,6 +100,8 @@ interface BaseOption {
 interface FlagOption extends BaseOption {
 	type: OptionType.FLAG;
 	negative_name?: NameList;
+	array?: false;
+	position?: undefined;
 }
 
 interface BooleanOption extends BaseOption { type: OptionType.BOOLEAN; }
@@ -104,10 +118,10 @@ type OptionValue<F extends Option> =
 	F["required"] extends true ? NullableValue<OptionTypeValue<F["type"]>, F["required"]> :
 	OptionTypeValue<F["type"]> | null;
 
-type ArrayValue<O extends any, Required extends boolean | undefined> = Required extends true ? [O, ...O[]] : O[];
+type ArrayValue<O extends any, Required extends boolean | undefined> = Required extends true ? readonly [O, ...O[]] : readonly O[];
 type NullableValue<O extends any, Required extends boolean | undefined> = Required extends true ? O : O | null;
 
-export type OptionTypeValue<T extends OptionType> =
+type OptionTypeValue<T extends OptionType> =
 	T extends OptionType.FLAG ? boolean :
 	T extends OptionType.BOOLEAN ? boolean :
 	T extends OptionType.STRING ? string :

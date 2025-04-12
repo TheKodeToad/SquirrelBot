@@ -19,7 +19,7 @@ type BatchAction =
 	)
 	& {
 		guild: Guild;
-		ids: string[];
+		ids: readonly string[];
 
 		actor: Member;
 		direct_message?: CreateMessageOptions;

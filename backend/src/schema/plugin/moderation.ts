@@ -39,6 +39,7 @@ export const moderation_config_schema = object({
 		ban: optional(boolean(), false),
 		unban: optional(boolean(), false),
 		kick: optional(boolean(), false),
+		warn: optional(boolean(), false),
 		purge: optional(boolean(), false),
 		case_read: optional(boolean(), false),
 	}), {}),

@@ -8,8 +8,20 @@ export const REDIRECT_URI = process.env["REDIRECT_URI"] || "";
 export const BOT_TOKEN = process.env["BOT_DISCORD_TOKEN"] || "";
 export const BOT_ALLOWED_GUILDS = process.env["BOT_ALLOWED_GUILDS"]?.split(",") ?? [];
 export const HTTP_PORT = Number(process.env["PORT"]) || 8080;
-export const DB_TYPE_INTEGRITY = parse_boolean(process.env["DB_TYPE_INTEGRITY"]) ?? true;
 export const LOG_LEVEL = log_level_by_name(process.env["LOG_LEVEL"] || "info") ?? LogLevel.Info;
+
+// advanced
+
+/**
+ * Enables precautions against type confusion vulnerabilities or confusing bugs by doing extra runtime type checking on internal structures.
+ * This is applied to database return types and parsed commands.
+ *
+ * This is on by default.
+ *
+ * You do not get much by disabling this - some redundant and potentially more expensive checks are simply skipped.
+ * User facing validation is not skipped nor are many trivial checks.
+ */
+export const INTERNAL_TYPE_INTEGRITY = parse_boolean(process.env["INTERNAL_TYPE_INTEGRITY"]) ?? true;
 
 function parse_boolean(string: string | undefined): boolean | undefined {
 	if (string === undefined)

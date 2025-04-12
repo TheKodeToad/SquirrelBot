@@ -1,35 +1,36 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
-import { module_logger } from "../../../../common/logger/index.ts";
-import { debug_format_permission_context } from "../../../common/discord/debug_format.ts";
-import { bot } from "../../../index.ts";
-import { core_config } from "../index.ts";
-import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../public/command/index.ts";
-import { define_event_listener } from "../public/event_listener.ts";
-import { resolve_permissions } from "../public/permission_resolution.ts";
-import { get_commands, get_commands_by_name } from "./command_cache.ts";
-import { listen_for_interactions, unlisten_for_interactions } from "./component_engine.ts";
-import { AUTO_DEFER_AFTER, transform_reply } from "./index.ts";
+import { module_logger } from "../../../../../common/logger/index.ts";
+import { require_exhaustive_switch } from "../../../../../common/types.ts";
+import { debug_format_permission_context } from "../../../../common/discord/debug_format.ts";
+import { bot } from "../../../../index.ts";
+import { core_config } from "../../index.ts";
+import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../../public/command/index.ts";
+import { define_event_listener } from "../../public/event_listener.ts";
+import { resolve_permissions } from "../../public/permission_resolution.ts";
+import { get_commands, get_commands_by_name } from "../command_cache.ts";
+import { AUTO_DEFER_AFTER, transform_reply } from "../index.ts";
+import { listen_for_interactions, unlisten_for_interactions } from "./component_handler.ts";
 
 const logger = module_logger();
 
 export async function sync_slash_commands(): Promise<void> {
-	const commands = get_commands().filter(command => command.support_slash ?? true).map(command => ({
+	const commands = get_commands().filter(({ command }) => command.support_slash ?? true).map(({ command }) => ({
 		type: ApplicationCommandTypes.CHAT_INPUT,
 		name: typeof command.name === "string" ? command.name : command.name[0],
 		description: "command",
-		options: command.options ? Object.values(command.options).map(flag => (
+		options: command.options ? Object.values(command.options).map(options => (
 			{
-				name: typeof flag.name === "string" ? flag.name : flag.name[0],
+				name: options.name[0],
 				description: "option",
-				required: flag.required && !("default" in flag && flag.default),
-				type: map_flag_type(flag.type),
+				required: options.required,
+				type: map_option_type(options.type),
 			}
 		)) : [],
 	} satisfies CreateApplicationCommandOptions));
 	await bot.application.bulkEditGlobalCommands(commands);
 }
 
-function map_flag_type(type: OptionType) {
+function map_option_type(type: OptionType) {
 	switch (type) {
 		case OptionType.FLAG:
 		case OptionType.BOOLEAN:
@@ -50,8 +51,7 @@ function map_flag_type(type: OptionType) {
 			return ApplicationCommandOptionTypes.INTEGER;
 	}
 
-	const update_for_added_option_types = (_: never) => { };
-	update_for_added_option_types(type);
+	require_exhaustive_switch(type);
 }
 
 export const slash_run_handler = define_event_listener("interactionCreate", async interaction => {
@@ -71,7 +71,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	if (!perms.slash_commands)
 		return;
 
-	const matches = get_commands_by_name(interaction.data.name).filter(command => command.support_slash ?? true);
+	const matches = get_commands_by_name(interaction.data.name).filter(({ command }) => command.support_slash ?? true);
 
 	if (matches.length !== 1) {
 		if (matches.length === 0)
@@ -80,10 +80,10 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 		return;
 	}
 
-	const command = matches[0]!;
-	const context = new SlashContext(command, interaction);
+	const command_entry = matches[0]!;
+	const context = new SlashContext(command_entry.command, interaction);
 
-	const data = command.pre_run(context);
+	const data = command_entry.command.pre_run(context);
 
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
@@ -96,14 +96,12 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 
 	const args: Record<string, any> = {};
 
-	if (command.options !== undefined) {
+	if (command_entry.command !== undefined) {
 		const option_lookup = new Map<string, [string, Option]>;
 
-		for (const [key, option] of Object.entries(command.options)) {
+		for (const [key, option] of Object.entries(command_entry.command.options ?? {})) {
 			args[key] = option.array ? [] : null;
-
-			const id = Array.isArray(option.name) ? option.name[0] : option.name;
-			option_lookup.set(id, [key, option]);
+			option_lookup.set(option.name[0], [key, option]);
 		}
 
 		for (const slash_option of interaction.data.options.raw) {
@@ -121,7 +119,7 @@ export const slash_run_handler = define_event_listener("interactionCreate", asyn
 	logger.debug?.(`Parsed arguments from options; running '${interaction.data.name}'`, args);
 
 	try {
-		await command.run(context, args, data);
+		await command_entry.command.run(context, args, data);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;

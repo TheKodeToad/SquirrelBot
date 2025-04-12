@@ -6,7 +6,6 @@ import { bot } from "../../../index.ts";
 import { define_command, OptionType } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
 
-
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 
 const logger = module_logger();

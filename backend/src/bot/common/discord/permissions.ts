@@ -1,4 +1,5 @@
 import { type AnyGuildChannel, ChannelTypes, Member, Permissions, Role } from "oceanic.js";
+import { require_exhaustive_switch } from "../../../common/types.ts";
 import { bot } from "../../index.ts";
 
 /**
@@ -50,8 +51,7 @@ export function can_write_in_channel(channel: AnyGuildChannel, member: Member): 
 			return false;
 	}
 
-	const fix_this_code_for_discord_update = (_: never) => { };
-	fix_this_code_for_discord_update(channel);
+	require_exhaustive_switch(channel);
 
 	return false;
 }
