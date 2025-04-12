@@ -10,6 +10,6 @@ export interface Plugin {
 	apply?(): Promise<void> | void;
 }
 
-export function define_plugin(plugin: Plugin): Plugin {
+export function definePlugin(plugin: Plugin): Plugin {
 	return plugin;
 }

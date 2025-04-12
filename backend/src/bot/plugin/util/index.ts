@@ -1,14 +1,14 @@
-import { util_config_schema } from "../../../schema/plugin/util.ts";
-import { define_plugin } from "../../loader/plugin.ts";
+import { utilConfigSchema } from "../../../schema/plugin/util.ts";
+import { definePlugin } from "../../loader/plugin.ts";
 import { ConfigCache } from "../core/public/config.ts";
-import { invite_command } from "./command/invite.ts";
-import { ping_command } from "./command/ping.ts";
-import { snowflake_command } from "./command/snowflake.ts";
+import { inviteCommand } from "./command/invite.ts";
+import { pingCommand } from "./command/ping.ts";
+import { snowflakeCommand } from "./command/snowflake.ts";
 
-export const util_config = new ConfigCache(util_config_schema);
+export const utilConfig = new ConfigCache(utilConfigSchema);
 
-export const util_plugin = define_plugin({
+export const utilPlugin = definePlugin({
 	id: "util",
-	config: util_config,
-	commands: [ping_command, snowflake_command, invite_command],
+	config: utilConfig,
+	commands: [pingCommand, snowflakeCommand, inviteCommand],
 });

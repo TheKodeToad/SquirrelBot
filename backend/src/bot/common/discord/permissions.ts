@@ -1,12 +1,12 @@
 import { type AnyGuildChannel, ChannelTypes, Member, Permissions, Role } from "oceanic.js";
-import { require_exhaustive_switch } from "../../../common/types.ts";
+import { requireExhaustiveSwitch } from "../../../common/types.ts";
 import { bot } from "../../index.ts";
 
 /**
  * Resolve member roles from cached guild.
  * This will throw if the guild is not cached.
  */
-export function resolve_member_roles(member: Member): Role[] {
+export function resolveMemberRoles(member: Member): Role[] {
 	return member.roles.map(id => member.guild.roles.get(id)!);
 }
 
@@ -14,12 +14,12 @@ export function resolve_member_roles(member: Member): Role[] {
  * Get the highest role a member has; otherwise the everyone role.
  * This will throw if the guild is not cached.
  */
-export function get_highest_role(member: Member): Role {
-	return [...resolve_member_roles(member), member.guild.roles.get(member.guildID)!]
+export function getHighestRole(member: Member): Role {
+	return [...resolveMemberRoles(member), member.guild.roles.get(member.guildID)!]
 		.reduce((prev, cur) => prev?.position > cur.position ? prev : cur);
 }
 
-export function can_write_in_channel(channel: AnyGuildChannel, member: Member): boolean {
+export function canWriteInChannel(channel: AnyGuildChannel, member: Member): boolean {
 	// channel was deleted
 	if (bot.getChannel(channel.id) === undefined)
 		return false;
@@ -51,7 +51,7 @@ export function can_write_in_channel(channel: AnyGuildChannel, member: Member): 
 			return false;
 	}
 
-	require_exhaustive_switch(channel);
+	requireExhaustiveSwitch(channel);
 
 	return false;
 }

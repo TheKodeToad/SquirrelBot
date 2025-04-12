@@ -1,13 +1,13 @@
-import { get_case } from "../../../../db/moderation/cases.ts";
+import { getCase } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
-import { format_user } from "../../../common/discord/format.ts";
-import { permissions_guard } from "../../core/public/command/helper.ts";
-import { OptionType, define_command } from "../../core/public/command/index.ts";
+import { formatUser } from "../../../common/discord/format.ts";
+import { permissionsGuard } from "../../core/public/command/helper.ts";
+import { OptionType, defineCommand } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { case_type_name } from "../helper/cases.ts";
-import { moderation_config } from "../index.ts";
+import { caseTypeName } from "../helper/cases.ts";
+import { moderationConfig } from "../index.ts";
 
-export const case_command = define_command({
+export const caseCommand = defineCommand({
 	name: ["case"],
 	options: {
 		number: {
@@ -17,17 +17,17 @@ export const case_command = define_command({
 			position: 0,
 		},
 	},
-	track_updates: true,
+	trackUpdates: true,
 
-	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.case_read),
+	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.case_read),
 	async run(context, { number }) {
-		const info = await get_case(context.guild.id, number);
+		const info = await getCase(context.guild.id, number);
 		if (info === null) {
 			await context.respond(`${icons.error} Case #${number} not found!`);
 			return;
 		}
 
-		const creation_secs = Math.floor(info.created_at.getTime() / 1000);
+		const creationSecs = Math.floor(info.created_at.getTime() / 1000);
 
 		await context.respond({
 			embeds: [{
@@ -36,19 +36,19 @@ export const case_command = define_command({
 				fields: [
 					{
 						name: "Created at",
-						value: `<t:${creation_secs}> (<t:${creation_secs}:R>)`,
+						value: `<t:${creationSecs}> (<t:${creationSecs}:R>)`,
 					},
 					{
 						name: "Type",
-						value: case_type_name(info.type)
+						value: caseTypeName(info.type)
 					},
 					{
 						name: "Actor",
-						value: await format_user(info.actor_id)
+						value: await formatUser(info.actor_id)
 					},
 					{
 						name: "Target",
-						value: await format_user(info.target_id)
+						value: await formatUser(info.target_id)
 					},
 					{
 						name: "Reason",

@@ -1,7 +1,7 @@
 import { bot } from "../../index.ts";
 import { icons } from "./public/icons.ts";
 
-export async function init_icons() {
+export async function initIcons() {
 	const emojis = await bot.application.getEmojis();
 	for (const emoji of emojis.items)
 		if (Object.hasOwn(icons, emoji.name))

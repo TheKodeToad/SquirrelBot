@@ -1,5 +1,5 @@
 import { pool } from "./index.ts";
-import { check_migrations, migrate } from "./migration.ts";
+import { checkMigrations, migrate } from "./migration.ts";
 
 const [_, script, command, ...args] = process.argv;
 
@@ -16,7 +16,7 @@ switch (command) {
 		break;
 	}
 	case "check": {
-		const count = await check_migrations();
+		const count = await checkMigrations();
 		await pool.end();
 
 		if (count > 0) {

@@ -6,7 +6,7 @@ export enum LogLevel {
 	Fatal,
 }
 
-export function log_level_by_name(name: string): LogLevel | undefined {
+export function logLevelByName(name: string): LogLevel | undefined {
 	switch (name) {
 		case "debug": return LogLevel.Debug;
 		case "info": return LogLevel.Info;
@@ -17,7 +17,7 @@ export function log_level_by_name(name: string): LogLevel | undefined {
 	}
 }
 
-export function log_level_name(level: LogLevel): string {
+export function logLevelName(level: LogLevel): string {
 	switch (level) {
 		case LogLevel.Debug: return "debug";
 		case LogLevel.Info: return "info";

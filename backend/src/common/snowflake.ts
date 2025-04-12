@@ -1,7 +1,7 @@
 const MIN_SNOWFLAKE_VALUE = 21414249976823808n;
 const MAX_SNOWFLAKE_VALUE = 18446744073709551614n;
 
-export function is_snowflake(input: string) {
+export function isSnowflake(input: string) {
 	if (input.length < 17 || input.length > 20)
 		return false;
 

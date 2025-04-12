@@ -1,27 +1,27 @@
 import type { InferOutput } from "valibot";
 import { array, boolean, number, object, optional, pipe, rawTransform, record, string } from "valibot";
-import { snowflake_schema } from "../common/index.ts";
-import { permissions_filter_schema } from "../common/permissions_filter.ts";
+import { snowflakeSchema } from "../common/index.ts";
+import { permissionsFilterSchema } from "../common/permissions_filter.ts";
 
-const core_group_schema = object({
-	users: optional(array(pipe(string(), snowflake_schema)), []),
-	roles: optional(array(pipe(string(), snowflake_schema)), []),
+const coreGroupSchema = object({
+	users: optional(array(pipe(string(), snowflakeSchema)), []),
+	roles: optional(array(pipe(string(), snowflakeSchema)), []),
 	inherits: optional(array(string()), []),
 	level: optional(number())
 });
-export interface CoreGroup extends InferOutput<typeof core_group_schema> { }
+export interface CoreGroup extends InferOutput<typeof coreGroupSchema> { }
 
-const core_groups_schema = pipe(
+const coreGroupsSchema = pipe(
 	record(
 		string(),
-		core_group_schema
+		coreGroupSchema
 	),
-	transform_core_groups()
+	transformCoreGroups()
 );
-export interface CoreGroups extends InferOutput<typeof core_groups_schema> { }
+export interface CoreGroups extends InferOutput<typeof coreGroupsSchema> { }
 
-export const core_config_schema = object({
-	groups: optional(core_groups_schema, {}),
+export const coreConfigSchema = object({
+	groups: optional(coreGroupsSchema, {}),
 
 	prefix_commands: optional(object({
 		prefix: optional(string(), "?"),
@@ -39,20 +39,20 @@ export const core_config_schema = object({
 		slash_commands: optional(boolean()),
 		about_command: optional(boolean()),
 		groups_command: optional(boolean()),
-		...permissions_filter_schema.entries
+		...permissionsFilterSchema.entries
 	})), []),
 });
-export interface CoreConfig extends InferOutput<typeof core_config_schema> { }
+export interface CoreConfig extends InferOutput<typeof coreConfigSchema> { }
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
-function transform_core_groups() {
+function transformCoreGroups() {
 	return rawTransform<Record<string, CoreGroup>, Map<string, CoreGroup>>(({ dataset, addIssue, NEVER }) => {
 		if (!dataset.typed)
 			return NEVER;
 
 		// show all errors for invalid inherits references at once
-		let has_issues = false;
+		let hasIssues = false;
 
 		for (const key in dataset.value) {
 			if (!Object.hasOwn(dataset.value, key))
@@ -70,12 +70,12 @@ function transform_core_groups() {
 							{ type: "array", origin: "value", input: value.inherits!, key: index, value: reference }
 						]
 					});
-					has_issues = true;
+					hasIssues = true;
 				}
 			});
 		}
 
-		if (has_issues)
+		if (hasIssues)
 			return NEVER;
 
 		let result: Map<string, CoreGroup> = new Map;
@@ -86,7 +86,7 @@ function transform_core_groups() {
 
 			const value = dataset.value[key]!;
 
-			const inherits = flatten_inheritance(value, key, dataset.value);
+			const inherits = flattenInheritence(value, key, dataset.value);
 
 			if (inherits === null) {
 				addIssue({
@@ -106,16 +106,16 @@ function transform_core_groups() {
 	});
 }
 
-function flatten_inheritance(input: CoreGroup, key: string, groups: Record<string, CoreGroup>): string[] | null {
+function flattenInheritence(input: CoreGroup, key: string, groups: Record<string, CoreGroup>): string[] | null {
 	const output: string[] = [];
 
-	if (!_flatten_inheritance(input, output, key, groups, 0))
+	if (!_flattenInheritence(input, output, key, groups, 0))
 		return null;
 
 	return output;
 }
 
-function _flatten_inheritance(input: CoreGroup, output: string[], root: string, groups: Record<string, CoreGroup>, depth: number): boolean {
+function _flattenInheritence(input: CoreGroup, output: string[], root: string, groups: Record<string, CoreGroup>, depth: number): boolean {
 	if (depth > MAX_INHERITANCE_DEPTH)
 		return false;
 
@@ -128,9 +128,9 @@ function _flatten_inheritance(input: CoreGroup, output: string[], root: string, 
 
 		output.push(reference);
 
-		const referenced_group = groups[reference]!;
+		const referencedGroup = groups[reference]!;
 
-		if (!_flatten_inheritance(referenced_group, output, root, groups, depth + 1))
+		if (!_flattenInheritence(referencedGroup, output, root, groups, depth + 1))
 			return false;
 	}
 

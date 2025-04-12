@@ -1,32 +1,32 @@
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
-import { module_logger } from "../../../../../common/logger/index.ts";
+import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttl_map.ts";
-import { debug_format_permission_context } from "../../../../common/discord/debug_format.ts";
-import { can_write_in_channel } from "../../../../common/discord/permissions.ts";
-import { core_config } from "../../index.ts";
+import { debugFormatPermissionContext } from "../../../../common/discord/debug_format.ts";
+import { canWriteInChannel } from "../../../../common/discord/permissions.ts";
+import { coreConfig } from "../../index.ts";
 import { type Command, type CommandContext, type Reply } from "../../public/command/index.ts";
-import { define_event_listener } from "../../public/event_listener.ts";
+import { defineEventListener } from "../../public/event_listener.ts";
 import { icons } from "../../public/icons.ts";
-import { resolve_permissions } from "../../public/permission_resolution.ts";
-import { get_commands_by_name } from "../command_cache.ts";
-import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "../index.ts";
-import { ArgsParseError, read_command_args, read_command_name } from "../parsing/command.ts";
+import { resolvePermissions } from "../../public/permission_resolution.ts";
+import { getCommandsByName } from "../command_cache.ts";
+import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
+import { ArgsParseError, readCommandArgs, readCommandName } from "../parsing/command.ts";
 import { StringReader } from "../parsing/string_reader.ts";
-import { listen_for_interactions, unlisten_for_interactions } from "./component_handler.ts";
+import { listenForInteractions, unlistenForInteractions } from "./component_handler.ts";
 
-const logger = module_logger();
+const logger = moduleLogger();
 
-export const prefix_send_handler = define_event_listener("messageCreate", async message => void await handle(message));
-export const prefix_edit_handler = define_event_listener("messageUpdate", handle_edit);
-export const prefix_delete_handler = define_event_listener("messageDelete", handle_delete);
+export const prefixSendHandler = defineEventListener("messageCreate", async message => void await handle(message));
+export const prefixEditHandler = defineEventListener("messageUpdate", handleEdit);
+export const prefixDeleteHandler = defineEventListener("messageDelete", handleDelete);
 
 // if anything is added here, make sure the message type can be replied to
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
-const tracked_messages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
-setInterval(() => tracked_messages.cleanup(), STATE_CLEANUP_INTERVAL);
+const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
+setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL);
 
-async function handle(message: Message, prev_response?: Message): Promise<boolean> {
+async function handle(message: Message, prevResponse?: Message): Promise<boolean> {
 	if (!message.inCachedGuildChannel())
 		return false;
 
@@ -37,54 +37,54 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
 		return false;
 
-	if (!can_write_in_channel(message.channel, message.channel.guild.clientMember))
+	if (!canWriteInChannel(message.channel, message.channel.guild.clientMember))
 		return false;
 
-	const config = core_config.get(message.guildID);
+	const config = coreConfig.get(message.guildID);
 
 	if (config === undefined)
 		return false;
 
 	const { prefix } = config.prefix_commands;
-	const perms = resolve_permissions(config, message.member, message.channel);
+	const perms = resolvePermissions(config, message.member, message.channel);
 
 	if (!perms.prefix_commands)
 		return false;
 
 	const reader = new StringReader(message.content);
 
-	const name = read_command_name(reader, prefix);
+	const name = readCommandName(reader, prefix);
 
 	if (name === null)
 		return false;
 
-	const matches = get_commands_by_name(name).filter(({ command }) => command.support_prefix ?? true);
+	const matches = getCommandsByName(name).filter(({ command }) => command.supportPrefix ?? true);
 
 	if (matches.length !== 1) {
 		logger.debug?.(`${matches.length} commands found matching '${name}' (ignored)`);
 		return false;
 	}
 
-	const command_entry = matches[0]!;
+	const commandEntry = matches[0]!;
 
-	const context = new PrefixContext(command_entry.command, message, prev_response);
+	const context = new PrefixContext(commandEntry.command, message, prevResponse);
 
-	const data = command_entry.command.pre_run(context);
+	const data = commandEntry.command.preRun(context);
 
 	if (data === false) {
-		logger.debug?.(`Command '${name}' rejected context - ${debug_format_permission_context(context.member, context.channel)}`);
+		logger.debug?.(`Command '${name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
 		return false;
 	}
 
 	if (data == null)
-		throw new Error("Nullish value returned from pre_run!");
+		throw new Error("Nullish value returned from preRun!");
 
-	const args_result = read_command_args(reader, command_entry);
+	const argsResult = readCommandArgs(reader, commandEntry);
 
-	if (args_result.error !== null) {
-		switch (args_result.error) {
+	if (argsResult.error !== null) {
+		switch (argsResult.error) {
 			case ArgsParseError.MISSING_OPTIONS:
-				await context.respond(`${icons.error} Missing options: ${[...args_result.options].map(option => "'" + option + "'").join(", ")}.`);
+				await context.respond(`${icons.error} Missing options: ${[...argsResult.options].map(option => "'" + option + "'").join(", ")}.`);
 				break;
 
 			case ArgsParseError.BARE_NAMED_KEY:
@@ -92,11 +92,11 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 				break;
 
 			case ArgsParseError.BAD_NAMED_KEY:
-				await context.respond(`${icons.error} No option named '${args_result.name}'.`);
+				await context.respond(`${icons.error} No option named '${argsResult.name}'.`);
 				break;
 
 			case ArgsParseError.BAD_NAMED_VALUE:
-				await context.respond(`${icons.error} Invalid value passed for '${args_result.name}'.`);
+				await context.respond(`${icons.error} Invalid value passed for '${argsResult.name}'.`);
 				break;
 
 			case ArgsParseError.BAD_POSITIONAL_INDEX:
@@ -104,23 +104,23 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 				break;
 
 			case ArgsParseError.BAD_POSITIONAL_VALUE:
-				await context.respond(`${icons.error} Invalid value passed for unlabeled option #${args_result.index + 1}.`);
+				await context.respond(`${icons.error} Invalid value passed for unlabeled option #${argsResult.index + 1}.`);
 				break;
 		}
 
 		if (context._response !== null)
-			tracked_messages.set(message.id, context._response);
+			trackedMessages.set(message.id, context._response);
 
 		return true;
 	}
 
-	logger.debug?.(`Parsed arguments; running '${name}'`, args_result);
+	logger.debug?.(`Parsed arguments; running '${name}'`, argsResult);
 
 	try {
-		await command_entry.command.run(context, args_result.result as any, data);
+		await commandEntry.command.run(context, argsResult.result as any, data);
 
-		if (command_entry.command.track_updates && context._response !== null)
-			tracked_messages.set(message.id, context._response);
+		if (commandEntry.command.trackUpdates && context._response !== null)
+			trackedMessages.set(message.id, context._response);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;
@@ -129,29 +129,29 @@ async function handle(message: Message, prev_response?: Message): Promise<boolea
 	return true;
 }
 
-async function handle_edit(message: Message) {
-	const response = tracked_messages.get(message.id);
+async function handleEdit(message: Message) {
+	const response = trackedMessages.get(message.id);
 
 	if (!response)
 		return;
 
 	if (response !== null)
-		unlisten_for_interactions(response.id);
+		unlistenForInteractions(response.id);
 
-	tracked_messages.delete(message.id);
+	trackedMessages.delete(message.id);
 
 	if (!await handle(message, response))
 		await response.delete();
 }
 
-async function handle_delete(message: PossiblyUncachedMessage) {
-	const response = tracked_messages.get(message.id);
+async function handleDelete(message: PossiblyUncachedMessage) {
+	const response = trackedMessages.get(message.id);
 
 	if (!response)
 		return;
 
-	tracked_messages.delete(message.id);
-	unlisten_for_interactions(response.id);
+	trackedMessages.delete(message.id);
+	unlistenForInteractions(response.id);
 	await response.delete();
 }
 
@@ -173,14 +173,14 @@ class PrefixContext implements CommandContext {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const message_options = transform_reply(reply);
+		const messageOptions = transformReply(reply);
 
 		if (this.message.channel instanceof GuildChannel
-			&& !can_write_in_channel(this.message.channel, this.message.channel.guild.clientMember))
+			&& !canWriteInChannel(this.message.channel, this.message.channel.guild.clientMember))
 			return;
 
 		if (this._response === null) {
-			const config = core_config.get(this.guild.id);
+			const config = coreConfig.get(this.guild.id);
 
 			if (config === undefined)
 				return;
@@ -196,17 +196,17 @@ class PrefixContext implements CommandContext {
 						messageID: this.message.id,
 						failIfNotExists: false,
 					},
-					...message_options
+					...messageOptions
 				});
 			} else
-				this._response = await this.channel.createMessage(message_options);
+				this._response = await this.channel.createMessage(messageOptions);
 		} else {
-			unlisten_for_interactions(this._response.id);
-			await this._response.edit(message_options);
+			unlistenForInteractions(this._response.id);
+			await this._response.edit(messageOptions);
 		}
 
 		if (typeof reply !== "string" && reply.components !== undefined)
-			listen_for_interactions(this._response.id, this.message.author.id, reply.components);
+			listenForInteractions(this._response.id, this.message.author.id, reply.components);
 	}
 
 	async _delete(): Promise<void> {

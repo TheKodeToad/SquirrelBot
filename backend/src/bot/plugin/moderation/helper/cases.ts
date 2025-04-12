@@ -1,6 +1,6 @@
 import { CaseType } from "../../../../db/moderation/cases.ts";
 
-export function case_type_name(type: CaseType): string {
+export function caseTypeName(type: CaseType): string {
 	switch (type) {
 		case CaseType.Note:
 			return "Note";
@@ -25,7 +25,7 @@ export function case_type_name(type: CaseType): string {
 	}
 }
 
-export function case_type_name_compact(type: CaseType): string {
+export function caseTypeNameCompact(type: CaseType): string {
 	switch (type) {
 		case CaseType.Note:
 			return "added note to";

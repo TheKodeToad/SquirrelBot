@@ -5,6 +5,6 @@ export interface EventListener<E extends keyof ClientEvents = keyof ClientEvents
 	listener(...args: ClientEvents[E]): Promise<void> | void;
 }
 
-export function define_event_listener<E extends keyof ClientEvents>(type: E, listener: EventListener<E>["listener"]): EventListener<E> {
+export function defineEventListener<E extends keyof ClientEvents>(type: E, listener: EventListener<E>["listener"]): EventListener<E> {
 	return { type, listener };
 }

@@ -1,17 +1,17 @@
 import crypto from "crypto";
 import { date, object, string } from "valibot";
-import { db_parse, pool } from "../index.ts";
+import { dbParse, pool } from "../index.ts";
 
 const ALGORITHM = "sha-256";
 
-const token_info_schema = object({
+const tokenInfoSchema = object({
 	user_id: string(),
 	expires_at: date()
 });
 
-export async function generate_token(user_id: string): Promise<[token: string, expiry: Date]> {
+export async function generateToken(userID: string): Promise<[token: string, expiry: Date]> {
 	const secret = crypto.randomBytes(16);
-	const expires_at = new Date(Date.now() + (1000 * 60 * 60 * 24 * 7));
+	const expiresAt = new Date(Date.now() + (1000 * 60 * 60 * 24 * 7));
 
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret));
 
@@ -24,17 +24,17 @@ export async function generate_token(user_id: string): Promise<[token: string, e
 			)
 			VALUES ($1, $2, $3)
 		`,
-		[user_id, hash, expires_at]
+		[userID, hash, expiresAt]
 	);
 
-	return [BigInt(user_id).toString(16) + "." + secret.toString("hex"), expires_at];
+	return [BigInt(userID).toString(16) + "." + secret.toString("hex"), expiresAt];
 }
 
 /**
  * @returns user ID if valid
  */
-export async function validate_token(token: string): Promise<string | null> {
-	const key = await token_key(token);
+export async function validateToken(token: string): Promise<string | null> {
+	const key = await tokenKey(token);
 
 	if (key === null)
 		return null;
@@ -51,7 +51,7 @@ export async function validate_token(token: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	const { expires_at, user_id } = db_parse(token_info_schema, result.rows[0]);
+	const { expires_at, user_id } = dbParse(tokenInfoSchema, result.rows[0]);
 
 	if (Date.now() >= expires_at.getTime())
 		return null;
@@ -59,8 +59,8 @@ export async function validate_token(token: string): Promise<string | null> {
 	return user_id;
 }
 
-export async function delete_token(token: string): Promise<boolean> {
-	const key = await token_key(token);
+export async function deleteToken(token: string): Promise<boolean> {
+	const key = await tokenKey(token);
 
 	if (key === null)
 		return false;
@@ -76,20 +76,20 @@ export async function delete_token(token: string): Promise<boolean> {
 	return result.rowCount === 1;
 }
 
-async function token_key(token: string): Promise<[bigint, Buffer] | null> {
-	const split_index = token.indexOf(".");
+async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
+	const splitIndex = token.indexOf(".");
 
-	if (split_index === -1)
+	if (splitIndex === -1)
 		return null;
 
-	const user_id_part = token.slice(0, split_index);
-	const secret_part = token.slice(split_index + 1);
+	const userIDPart = token.slice(0, splitIndex);
+	const secretPart = token.slice(splitIndex + 1);
 
-	if (user_id_part.length === 0 || secret_part.length === 0)
+	if (userIDPart.length === 0 || secretPart.length === 0)
 		return null;
 
 	try {
-		var user_id = BigInt("0x" + user_id_part);
+		var userID = BigInt("0x" + userIDPart);
 	} catch (error) {
 		if (!(error instanceof SyntaxError))
 			throw error;
@@ -97,13 +97,13 @@ async function token_key(token: string): Promise<[bigint, Buffer] | null> {
 		return null;
 	}
 
-	const secret_buffer = Buffer.from(secret_part, "hex");
-	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret_buffer));
+	const secretBuffer = Buffer.from(secretPart, "hex");
+	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secretBuffer));
 
-	return [user_id, hash];
+	return [userID, hash];
 }
 
-export async function delete_expired_tokens(): Promise<void> {
+export async function deleteExpiredTokens(): Promise<void> {
 	await pool.query(
 		`
 			DELETE FROM "api_tokens"

@@ -1,11 +1,11 @@
 import { UndeletableMessageTypes } from "oceanic.js";
 import { bot } from "../../../index.ts";
-import { permissions_guard } from "../../core/public/command/helper.ts";
-import { OptionType, define_command } from "../../core/public/command/index.ts";
+import { permissionsGuard } from "../../core/public/command/helper.ts";
+import { OptionType, defineCommand } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { moderation_config } from "../index.ts";
+import { moderationConfig } from "../index.ts";
 
-export const purge_command = define_command({
+export const purgeCommand = defineCommand({
 	name: ["purge", "sweep", "clear"],
 	options: {
 		count: {
@@ -34,7 +34,7 @@ export const purge_command = define_command({
 		}
 	},
 
-	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.purge),
+	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.purge),
 	async run(context, args) {
 		let purged = 0;
 
@@ -46,11 +46,11 @@ export const purge_command = define_command({
 		for await (const messages of iter) {
 			let stop = false;
 
-			const to_delete: string[] = [];
-			const two_weeks_ago = Date.now() - (1000 * 60 * 60 * 24 * 14);
+			const toDelete: string[] = [];
+			const twoWeeksAgo = Date.now() - (1000 * 60 * 60 * 24 * 14);
 
 			for (const message of messages) {
-				if (message.createdAt.getTime() < two_weeks_ago) {
+				if (message.createdAt.getTime() < twoWeeksAgo) {
 					stop = true;
 					break;
 				}
@@ -61,22 +61,22 @@ export const purge_command = define_command({
 				if (args.match !== null && !message.content.includes(args.match))
 					continue;
 
-				const by_bot = message.author.bot || message.webhookID !== undefined; // TODO: maybe slightly annoying with PluralKit/Tupperbox?
+				const byBot = message.author.bot || message.webhookID !== undefined; // TODO: maybe slightly annoying with PluralKit/Tupperbox?
 
-				if (args.bots && !by_bot)
+				if (args.bots && !byBot)
 					continue;
 
-				if (args.humans && by_bot)
+				if (args.humans && byBot)
 					continue;
 
 				if (args.author.length !== 0 && !args.author.includes(message.author.id))
 					continue;
 
-				to_delete.push(message.id);
+				toDelete.push(message.id);
 			}
 
-			await context.channel.deleteMessages(to_delete);
-			purged += to_delete.length;
+			await context.channel.deleteMessages(toDelete);
+			purged += toDelete.length;
 
 			if (stop)
 				break;

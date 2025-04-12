@@ -4,22 +4,22 @@ import path from "path";
 import "../environment.ts";
 import { pool } from "./index.ts";
 
-export async function migrate(ignore_changes: boolean) {
-	return await process_migrations(false, ignore_changes);
+export async function migrate(ignoreChanges: boolean) {
+	return await processMigrations(false, ignoreChanges);
 }
 
-export async function check_migrations() {
-	return await process_migrations(true, false);
+export async function checkMigrations() {
+	return await processMigrations(true, false);
 }
 
-export async function check_migrations_or_exit() {
-	const migrations_needed = await check_migrations();
+export async function checkMigrationsOrExit() {
+	const migrationsNeeded = await checkMigrations();
 
-	if (migrations_needed === null)
+	if (migrationsNeeded === null)
 		process.exit(1);
 
-	if (migrations_needed > 0) {
-		console.error(`${migrations_needed} migrations needed!`);
+	if (migrationsNeeded > 0) {
+		console.error(`${migrationsNeeded} migrations needed!`);
 		console.error("Run pnpm migrate!");
 		console.error("Note: this cannot be reversed! Backups are *your* responsibility!");
 		process.exit(1);
@@ -33,7 +33,7 @@ class MigrationError extends Error {
 	}
 }
 
-async function process_migrations(check_only: boolean, ignore_changes: boolean): Promise<number> {
+async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS "migration_files" (
 			"number" INT NOT NULL PRIMARY KEY,
@@ -41,15 +41,15 @@ async function process_migrations(check_only: boolean, ignore_changes: boolean):
 		)
 	`);
 
-	let run_count = 0;
+	let runCount = 0;
 	const files: string[] = [];
 
 	const base = "migrations";
 
 	for (const name of await fs.readdir(base)) {
-		const item_path = path.join(base, name);
+		const itemPath = path.join(base, name);
 
-		if (!(await fs.stat(item_path)).isFile())
+		if (!(await fs.stat(itemPath)).isFile())
 			continue;
 
 		const pattern = /^([0-9]+)-.+\.sql$/;
@@ -63,7 +63,7 @@ async function process_migrations(check_only: boolean, ignore_changes: boolean):
 		if (Number.isNaN(number))
 			continue;
 
-		files[number] = item_path;
+		files[number] = itemPath;
 	}
 
 	for (const [number, file] of files.entries()) {
@@ -80,38 +80,38 @@ async function process_migrations(check_only: boolean, ignore_changes: boolean):
 		);
 
 		const content = await fs.readFile(file, "utf-8");
-		const content_checksum = crypto.createHash("sha1").update(content).digest();
+		const contentChecksum = crypto.createHash("sha1").update(content).digest();
 
 		// already run
 		if (rows.length !== 0) {
 			const { checksum }: { checksum: Buffer; } = rows[0];
 
-			if (!checksum.equals(content_checksum)) {
+			if (!checksum.equals(contentChecksum)) {
 				const message = `"${file}" contents changed after it has already been run`;
 
-				if (ignore_changes) {
+				if (ignoreChanges) {
 					console.warn(message);
 					await pool.query(
 						`
 							UPDATE "migration_files"
 							SET "checksum" = $2
 							WHERE "number" = $1`,
-						[number, content_checksum]
+						[number, contentChecksum]
 					);
 					continue;
 				} else
 					throw new MigrationError(message + " - you may bypass this with --ignore-changes");
 			}
 
-			if (!check_only)
+			if (!checkOnly)
 				console.log(`Skipping "${file}" as it has already been run`);
 
 			continue;
 		}
 
-		++run_count;
+		++runCount;
 
-		if (check_only) {
+		if (checkOnly) {
 			console.error(`File "${file}" needs run!`);
 			continue;
 		}
@@ -131,7 +131,7 @@ async function process_migrations(check_only: boolean, ignore_changes: boolean):
 					INSERT INTO "migration_files" ("number", "checksum")
 					VALUES ($1, $2)
 				`,
-				[number, content_checksum]
+				[number, contentChecksum]
 			);
 
 			await client.query("COMMIT");
@@ -144,5 +144,5 @@ async function process_migrations(check_only: boolean, ignore_changes: boolean):
 		}
 	}
 
-	return run_count;
+	return runCount;
 }

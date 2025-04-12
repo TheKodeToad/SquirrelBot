@@ -1,7 +1,7 @@
 import { array, boolean, date, nullable, object, string, type InferOutput } from "valibot";
-import { db_parse, pool } from "../index.ts";
+import { dbParse, pool } from "../index.ts";
 
-const guild_info_schema = object({
+const guildInfoSchema = object({
 	id: string(),
 	name: nullable(string()),
 	icon_hash: nullable(string()),
@@ -10,11 +10,11 @@ const guild_info_schema = object({
 	delete_at: nullable(date()),
 });
 
-const guild_info_array_schema = array(guild_info_schema);
+const guildInfoArraySchema = array(guildInfoSchema);
 
-export interface GuildInfo extends InferOutput<typeof guild_info_schema> { }
+export interface GuildInfo extends InferOutput<typeof guildInfoSchema> { }
 
-export async function get_guild_info(id: string): Promise<GuildInfo | null> {
+export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 	const result = await pool.query(
 		`
 			SELECT
@@ -33,13 +33,13 @@ export async function get_guild_info(id: string): Promise<GuildInfo | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	return db_parse(guild_info_schema, result.rows[0]);
+	return dbParse(guildInfoSchema, result.rows[0]);
 }
 
 /**
  * Only use for caching purposes!
  */
-export async function get_all_guild_info(): Promise<GuildInfo[]> {
+export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 	const result = await pool.query(`
 		SELECT
 			"id",
@@ -51,10 +51,10 @@ export async function get_all_guild_info(): Promise<GuildInfo[]> {
 		FROM "core_guild_info"
 	`);
 
-	return db_parse(guild_info_array_schema, result.rows);
+	return dbParse(guildInfoArraySchema, result.rows);
 }
 
-export async function get_guild_owner_id(id: string): Promise<string | null> {
+export async function getGuildOwnerID(id: string): Promise<string | null> {
 	const result = await pool.query(
 		`
 			SELECT "owner_id"
@@ -67,10 +67,10 @@ export async function get_guild_owner_id(id: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	return db_parse(string(), result.rows[0].owner_id);
+	return dbParse(string(), result.rows[0].owner_id);
 }
 
-export async function get_guild_info_by_owner(owner_id: string): Promise<GuildInfo[]> {
+export async function getGuildInfoByOwner(ownerID: string): Promise<GuildInfo[]> {
 	const result = await pool.query(
 		`
 			SELECT
@@ -81,13 +81,13 @@ export async function get_guild_info_by_owner(owner_id: string): Promise<GuildIn
 			FROM "core_guild_info"
 			WHERE "owner_id" = $1
 		`,
-		[owner_id]
+		[ownerID]
 	);
 
-	return db_parse(guild_info_array_schema, result.rows);
+	return dbParse(guildInfoArraySchema, result.rows);
 }
 
-export async function delete_guild_info(id: string): Promise<void> {
+export async function deleteGuildInfo(id: string): Promise<void> {
 	await pool.query(
 		`
 			DELETE FROM "core_guild_info"
@@ -97,7 +97,7 @@ export async function delete_guild_info(id: string): Promise<void> {
 	);
 }
 
-export async function update_guild_info(id: string, name: string, icon_hash: string | null, owner_id: string | null): Promise<void> {
+export async function updateGuildInfo(id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
 	await pool.query(
 		`
 			UPDATE "core_guild_info"
@@ -107,11 +107,11 @@ export async function update_guild_info(id: string, name: string, icon_hash: str
 				"owner_id" = $4
 			WHERE "id" = $1
 		`,
-		[id, name, icon_hash, owner_id]
+		[id, name, iconHash, ownerID]
 	);
 }
 
-export async function insert_guild_info(id: string, name: string | null, icon_hash: string | null, owner_id: string | null, allowed: boolean): Promise<boolean> {
+export async function insertGuildInfo(id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
 	const result = await pool.query(
 		`
 			INSERT INTO "core_guild_info" (
@@ -123,13 +123,13 @@ export async function insert_guild_info(id: string, name: string | null, icon_ha
 			)
 			VALUES ($1, $2, $3, $4, $5)
 		`,
-		[id, name, icon_hash, owner_id, allowed]
+		[id, name, iconHash, ownerID, allowed]
 	);
 
 	return result.rowCount === 1;
 }
 
-export async function mark_guild_allowed(id: string, name: string | null, icon_hash: string | null, owner_id: string | null): Promise<void> {
+export async function markGuildAllowed(id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
 	await pool.query(
 		`
 			INSERT INTO "core_guild_info" (
@@ -147,11 +147,11 @@ export async function mark_guild_allowed(id: string, name: string | null, icon_h
 				"allowed" = TRUE,
 				"delete_at" = NULL
 		`,
-		[id, name, icon_hash, owner_id]
+		[id, name, iconHash, ownerID]
 	);
 }
 
-export async function mark_unknown_guild_allowed(id: string): Promise<void> {
+export async function markUnknownGuildAllowed(id: string): Promise<void> {
 	await pool.query(
 		`
 			INSERT INTO "core_guild_info" ("id", "allowed")
@@ -164,7 +164,7 @@ export async function mark_unknown_guild_allowed(id: string): Promise<void> {
 	);
 }
 
-export async function mark_guild_not_allowed(id: string): Promise<void> {
+export async function markGuildNotAllowed(id: string): Promise<void> {
 	await pool.query(
 		`
 			UPDATE "core_guild_info"
@@ -175,7 +175,7 @@ export async function mark_guild_not_allowed(id: string): Promise<void> {
 	);
 }
 
-export async function schedule_guild_info_deletion(id: string): Promise<Date | null> {
+export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null> {
 	const date = new Date;
 	date.setDate(date.getDate() + 30);
 
@@ -198,7 +198,7 @@ export async function schedule_guild_info_deletion(id: string): Promise<Date | n
 		return null;
 }
 
-export async function cancel_guild_info_deletion(id: string): Promise<void> {
+export async function cancelGuildInfoDeletion(id: string): Promise<void> {
 	await pool.query(
 		`
 			UPDATE "core_guild_info"
@@ -209,7 +209,7 @@ export async function cancel_guild_info_deletion(id: string): Promise<void> {
 	);
 }
 
-export async function delete_expired_guild_info(): Promise<void> {
+export async function deleteExpiredGuildInfo(): Promise<void> {
 	await pool.query(
 		`
 			DELETE FROM "core_guild_info"

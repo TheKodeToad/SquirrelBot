@@ -1,25 +1,25 @@
 import { Guild, Member, PrivateChannel, type RequestGuildMembersOptions, User } from "oceanic.js";
 import { bot } from "../../index.ts";
 
-export function get_user_cached(user_id: string): User | Promise<User> {
-	return bot.users.get(user_id) ?? bot.rest.users.get(user_id);
+export function getUserCached(userID: string): User | Promise<User> {
+	return bot.users.get(userID) ?? bot.rest.users.get(userID);
 }
 
-export function get_member_cached(guild: Guild, user_id: string): Member | Promise<Member> {
-	return guild.members.get(user_id) ?? bot.rest.guilds.getMember(guild.id, user_id);
+export function getMemberCached(guild: Guild, userID: string): Member | Promise<Member> {
+	return guild.members.get(userID) ?? bot.rest.guilds.getMember(guild.id, userID);
 }
 
-export function get_bot_user_cached(guild: Guild): Member | Promise<Member> {
-	return get_member_cached(guild, bot.user.id);
+export function getBotUserCached(guild: Guild): Member | Promise<Member> {
+	return getMemberCached(guild, bot.user.id);
 }
 
-export function create_dm_cached(user_id: string): PrivateChannel | Promise<PrivateChannel> {
-	return bot.privateChannels.find(channel => channel.recipient.id === user_id) ?? bot.rest.users.createDM(user_id);
+export function createDMCached(userID: string): PrivateChannel | Promise<PrivateChannel> {
+	return bot.privateChannels.find(channel => channel.recipient.id === userID) ?? bot.rest.users.createDM(userID);
 }
 
-export async function request_members_cached(
+export async function requestMembersCached(
 	guild: Guild,
-	user_ids: readonly string[],
+	userIDs: readonly string[],
 	options?: Pick<RequestGuildMembersOptions, "presences" | "timeout">
 ): Promise<Map<string, Member>> {
 	const result: Map<string, Member> = new Map;
@@ -36,7 +36,7 @@ export async function request_members_cached(
 		queue.length = 0;
 	};
 
-	for (const id of user_ids) {
+	for (const id of userIDs) {
 		const member = guild.members.get(id);
 		if (member !== undefined)
 			result.set(id, member);

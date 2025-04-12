@@ -1,12 +1,12 @@
 import { Hono } from "hono";
-import { case_type_id, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
-import by_filter from "./by_filter.ts";
-import by_number from "./by_number.ts";
+import { caseTypeID, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
+import byFilter from "./by_filter.ts";
+import byNumber from "./by_number.ts";
 
-export function serialise_case_object(info: CaseInfo) {
+export function serializeCaseObject(info: CaseInfo) {
 	return {
 		number: info.number,
-		type: case_type_id(info.type),
+		type: caseTypeID(info.type),
 		created_at: info.created_at.getTime(),
 		expires_at: info.expires_at?.getTime(),
 		actor_id: info.actor_id,
@@ -18,6 +18,6 @@ export function serialise_case_object(info: CaseInfo) {
 }
 
 const router = new Hono;
-router.route("/", by_number);
-router.route("/", by_filter);
+router.route("/", byNumber);
+router.route("/", byFilter);
 export default router;

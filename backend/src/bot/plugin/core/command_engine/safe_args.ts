@@ -1,5 +1,5 @@
-import { is_snowflake } from "../../../../common/snowflake.ts";
-import { require_exhaustive_switch } from "../../../../common/types.ts";
+import { isSnowflake } from "../../../../common/snowflake.ts";
+import { requireExhaustiveSwitch } from "../../../../common/types.ts";
 import { INTERNAL_TYPE_INTEGRITY } from "../../../../environment.ts";
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../public/command/index.ts";
 
@@ -23,7 +23,7 @@ export class SafeArgs {
 				continue;
 
 			const value: AnyArgsValue = (option.array ?? false) ? [] : null;
-			this._result_define(key, value);
+			this._resultDefine(key, value);
 
 			if (option.required ?? false)
 				this._missing.add(key);
@@ -31,7 +31,7 @@ export class SafeArgs {
 	}
 
 	// TODO: biggest bottleneck of parser lol
-	private _result_define(key: string, value: AnyArgsValue) {
+	private _resultDefine(key: string, value: AnyArgsValue) {
 		Object.defineProperty(this._result, key, {
 			configurable: true,
 			enumerable: true,
@@ -39,7 +39,7 @@ export class SafeArgs {
 		});
 	}
 
-	private _get_schema_value(key: string): Option {
+	private _getSchemaValue(key: string): Option {
 		if (!Object.hasOwn(this._schema, key))
 			throw new Error(`Option schema does not contain key '${key}'`);
 
@@ -52,19 +52,19 @@ export class SafeArgs {
 	}
 
 	set(key: string, value: AnyArgsValue) {
-		const option = this._get_schema_value(key);
+		const option = this._getSchemaValue(key);
 
 		if (option.array ?? false)
 			throw new Error(`Set instead of add used for options['${key}']`);
 
-		validate_type(option.type, value);
+		validateType(option.type, value);
 
-		this._result_define(key, value);
+		this._resultDefine(key, value);
 		this._missing.delete(key);
 	}
 
-	push_to(key: string, ...value: AnyArgsValueItem[]) {
-		const option = this._get_schema_value(key);
+	pushTo(key: string, ...value: AnyArgsValueItem[]) {
+		const option = this._getSchemaValue(key);
 
 		if (!(option.array ?? false))
 			throw new Error(`Add used instead of set for options['${key}']`);
@@ -81,17 +81,17 @@ export class SafeArgs {
 			return;
 
 		for (const item of value)
-			validate_type(option.type, item);
+			validateType(option.type, item);
 
 		array.push(...value);
 		this._missing.delete(key);
 	}
 
-	get_missing() {
+	getMissing() {
 		return this._missing;
 	}
 
-	get_frozen_result() {
+	getFrozenResult() {
 		Object.freeze(this._result);
 
 		for (const key in this._result) {
@@ -113,7 +113,7 @@ export class SafeArgs {
 	}
 }
 
-function validate_type(type: OptionType, value: unknown): void {
+function validateType(type: OptionType, value: unknown): void {
 	if (!INTERNAL_TYPE_INTEGRITY)
 		return;
 
@@ -150,13 +150,13 @@ function validate_type(type: OptionType, value: unknown): void {
 			if (typeof value !== "string")
 				throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
 
-			if (!is_snowflake(value))
-				throw new Error(`is_snowflake('${value}') is false`);
+			if (!isSnowflake(value))
+				throw new Error(`isSnowflake('${value}') is false`);
 
 			break;
 
 		default:
-			require_exhaustive_switch(type);
+			requireExhaustiveSwitch(type);
 			break;
 	}
 }

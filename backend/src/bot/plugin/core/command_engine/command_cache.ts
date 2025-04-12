@@ -1,31 +1,31 @@
-import { get_plugins } from "../../../loader/index.ts";
+import { getPlugins } from "../../../loader/index.ts";
 import type { Command, Option } from "../public/command/index.ts";
 
 export interface CommandCacheEntry {
 	command: Command;
-	options_by_position: [string, Option][];
-	options_by_name: Map<string, [string, Option]>;
-	options_by_negative_name: Map<string, string>;
+	optionsByPosition: [string, Option][];
+	optionsByName: Map<string, [string, Option]>;
+	optionsByNegativeName: Map<string, string>;
 }
 
 const all: CommandCacheEntry[] = [];
 const lookup: Map<string, CommandCacheEntry[]> = new Map;
 
-export function get_commands(): CommandCacheEntry[] {
+export function getCommands(): CommandCacheEntry[] {
 	return all;
 }
 
-export function get_commands_by_name(name: string): CommandCacheEntry[] {
+export function getCommandsByName(name: string): CommandCacheEntry[] {
 	return lookup.get(name) ?? [];
 }
 
-export function init_command_cache() {
-	for (const plugin of get_plugins()) {
+export function initCommandCache() {
+	for (const plugin of getPlugins()) {
 		if (plugin.commands === undefined)
 			continue;
 
 		for (const command of plugin.commands) {
-			const entry = make_cache_entry(command);
+			const entry = makeCacheEntry(command);
 
 			for (const name of command.name) {
 				let array = lookup.get(name);
@@ -44,10 +44,10 @@ export function init_command_cache() {
 }
 
 // TODO: remove this!
-export function make_cache_entry(command: Command): CommandCacheEntry {
-	const options_by_position: [string, Option][] = [];
-	const options_by_name: Map<string, [string, Option]> = new Map;
-	const options_by_negative_name: Map<string, string> = new Map;
+export function makeCacheEntry(command: Command): CommandCacheEntry {
+	const optionsByPosition: [string, Option][] = [];
+	const optionsByName: Map<string, [string, Option]> = new Map;
+	const optionsByNegativeName: Map<string, string> = new Map;
 
 	for (const key in command.options) {
 		if (!Object.hasOwn(command.options, key))
@@ -56,21 +56,21 @@ export function make_cache_entry(command: Command): CommandCacheEntry {
 		const option = command.options[key]!;
 
 		if (typeof option.position === "number")
-			options_by_position[option.position] = [key, option];
+			optionsByPosition[option.position] = [key, option];
 
 		for (const name of option.name)
-			options_by_name.set(name, [key, option]);
+			optionsByName.set(name, [key, option]);
 
-		if ("negative_name" in option && option.negative_name !== undefined)
-			for (const negative_name of option.negative_name)
-				options_by_negative_name.set(negative_name, key);
+		if ("negativeName" in option && option.negativeName !== undefined)
+			for (const negativeName of option.negativeName)
+				optionsByNegativeName.set(negativeName, key);
 	}
 
 	return {
 		command,
-		options_by_position: options_by_position,
-		options_by_name: options_by_name,
-		options_by_negative_name: options_by_negative_name,
+		optionsByPosition,
+		optionsByName,
+		optionsByNegativeName,
 	};
 }
 

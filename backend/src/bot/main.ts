@@ -1,20 +1,20 @@
-import { module_logger } from "../common/logger/index.ts";
-import { check_migrations_or_exit } from "../db/migration.ts";
-import { connect_listener } from "../db/notification.ts";
+import { moduleLogger } from "../common/logger/index.ts";
+import { checkMigrationsOrExit } from "../db/migration.ts";
+import { connectListener } from "../db/notification.ts";
 import { bot } from "./index.ts";
-import { apply_plugins, count_plugins, load_plugins } from "./loader/index.ts";
+import { applyPlugins, countPlugins, loadPlugins } from "./loader/index.ts";
 
-const logger = module_logger();
+const logger = moduleLogger();
 
-await check_migrations_or_exit();
+await checkMigrationsOrExit();
 
 bot.once("ready", async () => {
 	logger.debug?.("Ready event received");
 
 	logger.info?.("Starting up plugins");
-	load_plugins();
-	await apply_plugins();
-	logger.info?.(`Total plugins: ${count_plugins()}`);
+	loadPlugins();
+	await applyPlugins();
+	logger.info?.(`Total plugins: ${countPlugins()}`);
 	logger.info?.("I'm ready :O");
 });
 
@@ -23,6 +23,6 @@ process.on("unhandledRejection", error => {
 });
 
 logger.info?.("Connecting Postgres listener");
-await connect_listener();
+await connectListener();
 logger.info?.("Connecting to Discord");
 await bot.connect();

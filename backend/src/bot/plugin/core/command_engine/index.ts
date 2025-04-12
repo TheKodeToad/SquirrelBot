@@ -12,7 +12,7 @@ export const STATE_CLEANUP_INTERVAL = 1000 * 60;
  */
 export const AUTO_DEFER_AFTER = 1000;
 
-export function transform_reply(reply: Reply) {
+export function transformReply(reply: Reply) {
 	if (typeof reply === "string")
 		reply = { content: reply };
 

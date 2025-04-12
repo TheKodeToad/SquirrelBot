@@ -1,11 +1,11 @@
 import type { ClientEvents } from "oceanic.js";
-import { module_logger } from "../../../common/logger/index.ts";
+import { moduleLogger } from "../../../common/logger/index.ts";
 import { bot } from "../../index.ts";
-import { is_guild_allowed } from "./guild_info_sync.ts";
+import { isGuildAllowed } from "./guild_info_sync.ts";
 
-const logger = module_logger();
+const logger = moduleLogger();
 
-export function wrap_listener<E extends keyof ClientEvents>(
+export function wrapListener<E extends keyof ClientEvents>(
 	event: E,
 	listener: (...args: ClientEvents[E]) => void | Promise<void>
 ) {
@@ -15,7 +15,7 @@ export function wrap_listener<E extends keyof ClientEvents>(
 		if (Object.hasOwn(EVENT_TO_GUILD, event))
 			guild ??= EVENT_TO_GUILD[event](...args);
 
-		if (guild !== null && !is_guild_allowed(guild)) {
+		if (guild !== null && !isGuildAllowed(guild)) {
 			logger.debug?.(`Filtering out event '${event}' from disallowed guild ${guild}`);
 			return;
 		}
@@ -28,11 +28,11 @@ export function wrap_listener<E extends keyof ClientEvents>(
 	};
 }
 
-export function install_wrapped_listener<E extends keyof ClientEvents>(
+export function installWrappedListener<E extends keyof ClientEvents>(
 	event: E,
 	listener: (...args: ClientEvents[E]) => void | Promise<void>
 ): void {
-	bot.on(event, wrap_listener(event, listener));
+	bot.on(event, wrapListener(event, listener));
 }
 
 const EVENT_TO_GUILD: {
@@ -115,8 +115,8 @@ const EVENT_TO_GUILD: {
 	guildSoundboardSoundCreate: sound => sound.guildID ?? null,
 	guildSoundboardSoundDelete: sound => "guildID" in sound ? (sound.guildID ?? null) : null,
 	guildSoundboardSoundUpdate: sound => sound.guildID ?? null,
-	guildSoundboardSoundsUpdate: (_sounds, _new_sounds, guild_id) => guild_id ?? null,
-	soundboardSounds: guild_id => guild_id,
+	guildSoundboardSoundsUpdate: (_sounds, _newSounds, guildID) => guildID ?? null,
+	soundboardSounds: guildID => guildID,
 
 	connect: () => null,
 	debug: () => null,

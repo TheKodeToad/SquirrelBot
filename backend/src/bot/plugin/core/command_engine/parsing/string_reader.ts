@@ -5,74 +5,74 @@ export class StringReader {
 	private _input: string;
 	// TODO track the next item instead of the current?
 	private _cursor: number;
-	private _marked_cursor: number | null;
+	private _markedCursor: number | null;
 	private _ops: number;
 
 	constructor(input: string) {
 		this._input = input;
 		this._cursor = -1;
-		this._marked_cursor = null;
+		this._markedCursor = null;
 		this._ops = 100_000;
 	}
 
-	private _track_op() {
+	private _trackOp() {
 		if (--this._ops < 0)
 			throw new Error("Operation limit exceeded; infinite loop assumed");
 	}
 
-	private _can_read(offset = 1): boolean {
+	private _canRead(offset = 1): boolean {
 		const i = this._cursor + offset;
 		return i >= 0 && i < this._input.length;
 	}
 
 	private _read(): string {
-		if (!this._can_read())
-			throw new Error("can_read() = false");
+		if (!this._canRead())
+			throw new Error("canRead() = false");
 
 		return this._input[++this._cursor]!;
 	}
 
-	can_read(offset = 1): boolean {
-		this._track_op();
+	canRead(offset = 1): boolean {
+		this._trackOp();
 
-		return this._can_read(offset);
+		return this._canRead(offset);
 	}
 
 	read() {
-		this._track_op();
+		this._trackOp();
 
 		return this._read();
 	}
 
 	peek(offset = 1): string {
-		this._track_op();
+		this._trackOp();
 
-		if (!this._can_read(offset))
-			throw new Error(`can_read(${offset}) = false`);
+		if (!this._canRead(offset))
+			throw new Error(`canRead(${offset}) = false`);
 
 		return this._input[this._cursor + offset]!;
 	}
 
 	mark() {
-		if (this._marked_cursor !== null)
+		if (this._markedCursor !== null)
 			throw new Error("Already marked");
 
-		this._marked_cursor = this._cursor;
+		this._markedCursor = this._cursor;
 	}
 
 	unmark() {
-		this._marked_cursor = null;
+		this._markedCursor = null;
 	}
 
 	reset() {
-		if (this._marked_cursor === null)
+		if (this._markedCursor === null)
 			throw new Error("No mark set");
 
-		this._cursor = this._marked_cursor;
+		this._cursor = this._markedCursor;
 	}
 
-	read_until(pattern: string | RegExp): string {
-		this._track_op();
+	readUntil(pattern: string | RegExp): string {
+		this._trackOp();
 
 		this._read();
 
@@ -100,12 +100,12 @@ export class StringReader {
 		return result;
 	}
 
-	read_word(): string {
-		return this.read_until(WORD_END_PATTERN);
+	readWord(): string {
+		return this.readUntil(WORD_END_PATTERN);
 	}
 
 	match(sequence: string | RegExp, offset = 1): boolean {
-		this._track_op();
+		this._trackOp();
 
 		if (this._cursor >= this._input.length)
 			return false;
@@ -122,8 +122,8 @@ export class StringReader {
 			return this._input.startsWith(sequence, this._cursor + offset);
 	}
 
-	skip_over(sequence: string | RegExp): boolean {
-		this._track_op();
+	skipOver(sequence: string | RegExp): boolean {
+		this._trackOp();
 
 		if (this._cursor >= this._input.length)
 			return false;
@@ -151,7 +151,7 @@ export class StringReader {
 		}
 	}
 
-	skip_whitespace(): boolean {
-		return this.skip_over(WHITESPACE_EATER_PATTERN);
+	skipWhitespace(): boolean {
+		return this.skipOver(WHITESPACE_EATER_PATTERN);
 	}
 }

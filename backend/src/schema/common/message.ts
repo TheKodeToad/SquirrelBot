@@ -1,14 +1,14 @@
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type InferOutput } from "valibot";
-import { color_schema, snowflake_schema } from "./index.ts";
+import { colorSchema, snowflakeSchema } from "./index.ts";
 
-export const embed_schema = object({
+export const embedSchema = object({
 	title: optional(string()),
 	description: optional(string()),
 	url: optional(string()),
 	timestamp: optional(pipe(instance(TomlDate), transform(date => date.toISOString()))), // TODO is this filter consistent with Discord's
-	color: optional(color_schema),
+	color: optional(colorSchema),
 	footer: optional(object({
 		text: string(),
 		icon: string()
@@ -27,7 +27,7 @@ export const embed_schema = object({
 	})))
 });
 
-export const message_schema = pipe(
+export const messageSchema = pipe(
 	object({
 		content: optional(pipe(string(), maxLength(2000))),
 		allowed_mentions: optional(pipe(
@@ -37,19 +37,19 @@ export const message_schema = pipe(
 				users: optional(union(
 					[
 						boolean(),
-						pipe(array(snowflake_schema), maxLength(100))
+						pipe(array(snowflakeSchema), maxLength(100))
 					]
 				)),
 				roles: optional(union(
 					[
 						boolean(),
-						pipe(array(snowflake_schema), maxLength(100))
+						pipe(array(snowflakeSchema), maxLength(100))
 					]
 				)),
 			}), {}),
 			transform(({ replied_user, ...input }) => ({ repliedUser: replied_user, ...input }))
 		), {}),
-		embeds: optional(array(embed_schema)),
+		embeds: optional(array(embedSchema)),
 		silent: optional(boolean())
 	}),
 	transform(({ allowed_mentions, silent, ...input }) => ({
@@ -59,5 +59,5 @@ export const message_schema = pipe(
 	}))
 );
 
-export interface Message extends InferOutput<typeof message_schema> { }
-export interface Embed extends InferOutput<typeof embed_schema> { }
+export interface Message extends InferOutput<typeof messageSchema> { }
+export interface Embed extends InferOutput<typeof embedSchema> { }

@@ -1,18 +1,18 @@
 import { ChannelTypes, DiscordRESTError, InviteTypes, JSONErrorCodes, type EmbedOptions } from "oceanic.js";
-import { module_logger } from "../../../../common/logger/index.ts";
+import { moduleLogger } from "../../../../common/logger/index.ts";
 import { Colors } from "../../../common/discord/colors.ts";
-import { format_rest_error } from "../../../common/discord/format.ts";
+import { formatRESTError } from "../../../common/discord/format.ts";
 import { bot } from "../../../index.ts";
-import { define_command, OptionType } from "../../core/public/command/index.ts";
+import { defineCommand, OptionType } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
 
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 
-const logger = module_logger();
+const logger = moduleLogger();
 
-export const invite_command = define_command({
+export const inviteCommand = defineCommand({
 	name: ["invite", "inv"],
-	track_updates: true,
+	trackUpdates: true,
 	options: {
 		link: {
 			type: OptionType.STRING,
@@ -20,13 +20,13 @@ export const invite_command = define_command({
 			required: true,
 			position: 0
 		},
-		hide_images: {
+		hideImages: {
 			type: OptionType.FLAG,
 			name: ["hide-images", "hi"]
 		}
 	},
 
-	pre_run: () => true,
+	preRun: () => true,
 	async run(context, args) {
 		const matches = REGEX.exec(args.link);
 
@@ -61,7 +61,7 @@ export const invite_command = define_command({
 			if (error.code === JSONErrorCodes.UNKNOWN_INVITE)
 				await context.respond(`${icons.error} Invite not found: '${code}'! This could be a friend invite or another type of invite invisible to bots.`);
 			else
-				await context.respond(`${icons.error} Invite fetch failed: ${format_rest_error(error)}`);
+				await context.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
 
 			return;
 		}
@@ -70,19 +70,18 @@ export const invite_command = define_command({
 
 		embed.fields = [];
 
-
 		if (type === InviteTypes.GUILD && guild !== null) {
 			embed.author = { name: guild.name };
 
-			const icon_url = guild.iconURL();
+			const iconURL = guild.iconURL();
 
-			if (icon_url !== null && !args.hide_images)
-				embed.author.iconURL = icon_url;
+			if (iconURL !== null && !args.hideImages)
+				embed.author.iconURL = iconURL;
 
-			const banner_url = guild.bannerURL();
+			const bannerURL = guild.bannerURL();
 
-			if (banner_url !== null && !args.hide_images)
-				embed.image = { url: banner_url };
+			if (bannerURL !== null && !args.hideImages)
+				embed.image = { url: bannerURL };
 
 			embed.description = "";
 
@@ -130,10 +129,10 @@ export const invite_command = define_command({
 			embed.author = { name: "Unknown Invite" };
 
 		if (expiresAt !== undefined) {
-			const expiry_secs = Math.floor(expiresAt.getTime() / 1000);
+			const expirySecs = Math.floor(expiresAt.getTime() / 1000);
 			embed.fields.push({
 				name: "Expires At",
-				value: `<t:${expiry_secs}> (<t:${expiry_secs}:R>)`
+				value: `<t:${expirySecs}> (<t:${expirySecs}:R>)`
 			});
 		}
 

@@ -1,19 +1,19 @@
 import type { SchemaWithOutput } from "../../../../../common/types.ts";
 import type { ConfigCache } from "../config.ts";
-import { resolve_permissions, type ConfigWithPermissions } from "../permission_resolution.ts";
+import { resolvePermissions, type ConfigWithPermissions } from "../permission_resolution.ts";
 import type { CommandContext } from "./index.ts";
 
-export function permissions_guard<C extends ConfigWithPermissions>(
+export function permissionsGuard<C extends ConfigWithPermissions>(
 	context: CommandContext,
-	config_cache: ConfigCache<SchemaWithOutput<C>>,
+	configCache: ConfigCache<SchemaWithOutput<C>>,
 	requirement?: (permissions: C["default_permissions"], config: C) => boolean
 ): false | PermissionsGuardData<C> {
-	const config = config_cache.get(context.guild.id);
+	const config = configCache.get(context.guild.id);
 
 	if (config === undefined)
 		return false;
 
-	const permissions = resolve_permissions(config, context.member, context.channel);
+	const permissions = resolvePermissions(config, context.member, context.channel);
 
 	if (requirement !== undefined && !requirement(permissions, config))
 		return false;

@@ -1,7 +1,7 @@
 import { array, boolean, object, optional } from "valibot";
-import { permissions_filter_schema } from "../common/permissions_filter.ts";
+import { permissionsFilterSchema } from "../common/permissions_filter.ts";
 
-export const util_config_schema = object({
+export const utilConfigSchema = object({
 	default_permissions: optional(object({
 		invite_command: optional(boolean(), false),
 		ping_command: optional(boolean(), false),
@@ -11,6 +11,6 @@ export const util_config_schema = object({
 		invite_command: optional(boolean()),
 		ping_command: optional(boolean()),
 		snowflake_command: optional(boolean()),
-		...permissions_filter_schema.entries
+		...permissionsFilterSchema.entries
 	})), []),
 });

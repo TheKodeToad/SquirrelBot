@@ -1,14 +1,14 @@
 import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
-import { message_schema } from "../common/message.ts";
-import { permissions_filter_schema } from "../common/permissions_filter.ts";
+import { messageSchema } from "../common/message.ts";
+import { permissionsFilterSchema } from "../common/permissions_filter.ts";
 
-export const preset_reason_schema = object({
+export const presetReasonSchema = object({
 	name: string(),
 	replacement: string(),
 });
-export interface PresetReason extends InferOutput<typeof preset_reason_schema> { }
+export interface PresetReason extends InferOutput<typeof presetReasonSchema> { }
 
-const discord_reasons: PresetReason[] = [
+const discordReasons: PresetReason[] = [
 	// TODO: treat these keys specially
 	// "" will be replaced from language data
 	{ name: "spam-acc", replacement: "" /* Suspicious or spam account */ },
@@ -16,23 +16,23 @@ const discord_reasons: PresetReason[] = [
 	{ name: "rules", replacement: "" /* Breaking server rules */ },
 ];
 
-export const moderation_config_schema = object({
-	preset_reasons: optional(array(preset_reason_schema), []), // TODO
+export const moderationConfigSchema = object({
+	preset_reasons: optional(array(presetReasonSchema), []), // TODO
 	preset_prefix: optional(string(), "!"), // TODO
 
 	ban: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(message_schema),
+		direct_message: optional(messageSchema),
 		purge_messages: optional(number(), 0),
-		preset_reasons: optional(array(preset_reason_schema), discord_reasons) // TODO
+		preset_reasons: optional(array(presetReasonSchema), discordReasons) // TODO
 	}), {}),
 	unban: optional(object({
-		preset_reasons: optional(array(preset_reason_schema), [])
+		preset_reasons: optional(array(presetReasonSchema), [])
 	}), {}),
 	kick: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(message_schema),
-		preset_reasons: optional(array(preset_reason_schema), discord_reasons), // TODO
+		direct_message: optional(messageSchema),
+		preset_reasons: optional(array(presetReasonSchema), discordReasons), // TODO
 	}), {}),
 
 	default_permissions: optional(object({
@@ -49,7 +49,7 @@ export const moderation_config_schema = object({
 		kick: optional(boolean()),
 		purge: optional(boolean()),
 		case_read: optional(boolean()),
-		...permissions_filter_schema.entries
+		...permissionsFilterSchema.entries
 	})), []),
 });
-export interface ModerationConfig extends InferOutput<typeof moderation_config_schema> { }
+export interface ModerationConfig extends InferOutput<typeof moderationConfigSchema> { }

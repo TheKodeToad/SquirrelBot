@@ -1,19 +1,19 @@
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command/index.ts";
 import type { CommandCacheEntry } from "../command_cache.ts";
 import { SafeArgs } from "../safe_args.ts";
-import { read_boolean, read_channel, read_integer, read_number, read_role, read_snowflake, read_string, read_user } from "./primitives.ts";
+import { readBoolean, readChannel, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitives.ts";
 import type { StringReader } from "./string_reader.ts";
 
-export function read_command_name(reader: StringReader, prefix: string): string | null {
-	if (!reader.skip_over(prefix))
+export function readCommandName(reader: StringReader, prefix: string): string | null {
+	if (!reader.skipOver(prefix))
 		return null;
 
-	reader.skip_whitespace();
+	reader.skipWhitespace();
 
-	if (!reader.can_read())
+	if (!reader.canRead())
 		return null;
 
-	return reader.read_word();
+	return reader.readWord();
 }
 
 export const enum ArgsParseError {
@@ -35,128 +35,128 @@ export type ArgsResult =
 const GREEDY_VALUE_TERMINATOR = /\s+--?[\w\-]/g;
 const ARRAY_TERMINATOR = /--?[\w\-]/y;
 
-export function read_command_args(reader: StringReader, command_entry: CommandCacheEntry): ArgsResult {
-	const output = new SafeArgs(command_entry.command.options ?? {});
+export function readCommandArgs(reader: StringReader, commandEntry: CommandCacheEntry): ArgsResult {
+	const output = new SafeArgs(commandEntry.command.options ?? {});
 
-	let positional_index = 0;
+	let positionalIndex = 0;
 
-	reader.skip_whitespace();
+	reader.skipWhitespace();
 
-	while (reader.can_read()) {
-		const named_option_result = read_named_arg(reader, command_entry, output);
+	while (reader.canRead()) {
+		const namedOptionResult = readNamedArg(reader, commandEntry, output);
 
-		if (typeof named_option_result !== "boolean")
-			return named_option_result;
+		if (typeof namedOptionResult !== "boolean")
+			return namedOptionResult;
 
-		if (named_option_result)
+		if (namedOptionResult)
 			continue;
 
-		const found_by_position = command_entry.options_by_position[positional_index];
+		const foundByPosition = commandEntry.optionsByPosition[positionalIndex];
 
-		if (found_by_position === undefined) {
+		if (foundByPosition === undefined) {
 			return {
 				error: ArgsParseError.BAD_POSITIONAL_INDEX,
-				index: positional_index,
+				index: positionalIndex,
 			};
 		}
 
-		const [key, option] = found_by_position;
+		const [key, option] = foundByPosition;
 
-		const value = read_command_arg(reader, option, false);
+		const value = readCommandArg(reader, option, false);
 
 		if (value === null) {
 			return {
 				error: ArgsParseError.BAD_POSITIONAL_VALUE,
-				index: positional_index
+				index: positionalIndex
 			};
 		}
 
 		if (value instanceof Array)
-			output.push_to(key, ...value);
+			output.pushTo(key, ...value);
 		else
 			output.set(key, value);
 
-		++positional_index;
+		++positionalIndex;
 	}
 
-	if (output.get_missing().size !== 0) {
+	if (output.getMissing().size !== 0) {
 		return {
 			error: ArgsParseError.MISSING_OPTIONS,
-			options: output.get_missing()
+			options: output.getMissing()
 		};
 	}
 
 	return {
 		error: null,
-		result: output.get_frozen_result()
+		result: output.getFrozenResult()
 	};
 }
 
-function read_named_arg(reader: StringReader, command_entry: CommandCacheEntry, output: SafeArgs): ArgsResult | boolean {
-	if (!reader.skip_over("-"))
+function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, output: SafeArgs): ArgsResult | boolean {
+	if (!reader.skipOver("-"))
 		return false;
 
-	reader.skip_over("-");
+	reader.skipOver("-");
 
-	if (!reader.can_read())
+	if (!reader.canRead())
 		return { error: ArgsParseError.BARE_NAMED_KEY };
 
-	const option_name = reader.read_word();
+	const optionName = reader.readWord();
 
-	const found_by_name = command_entry.options_by_name.get(option_name);
+	const foundByName = commandEntry.optionsByName.get(optionName);
 
-	if (found_by_name !== undefined) {
-		const [key, option] = found_by_name;
+	if (foundByName !== undefined) {
+		const [key, option] = foundByName;
 
-		reader.skip_whitespace();
+		reader.skipWhitespace();
 
-		const value = read_command_arg(reader, option, true);
+		const value = readCommandArg(reader, option, true);
 
 		if (value === null) {
 			return {
 				error: ArgsParseError.BAD_NAMED_VALUE,
-				name: option_name
+				name: optionName
 			};
 		}
 
 		// maybe best not to make this immutable? it causes typing issues
 		if (value instanceof Array)
-			output.push_to(key, ...value);
+			output.pushTo(key, ...value);
 		else
 			output.set(key, value);
 
 		return true;
 	}
 
-	const found_by_negative_name = command_entry.options_by_negative_name.get(option_name);
+	const foundByNegativeName = commandEntry.optionsByNegativeName.get(optionName);
 
-	if (found_by_negative_name !== undefined) {
-		const key = found_by_negative_name;
+	if (foundByNegativeName !== undefined) {
+		const key = foundByNegativeName;
 		output.set(key, false);
 		return true;
 	}
 
 	return {
 		error: ArgsParseError.BAD_NAMED_KEY,
-		name: option_name
+		name: optionName
 	};
 }
 
 // null explicitly indicates error
-function read_command_arg(reader: StringReader, option: Option, propagate_array_error: boolean): AnyArgsValue | null {
+function readCommandArg(reader: StringReader, option: Option, propagateArrayError: boolean): AnyArgsValue | null {
 	if (!(option.array ?? false)) {
-		if (!reader.can_read())
+		if (!reader.canRead())
 			return null;
 
 		const result = read_command_arg_value(reader, option.type, GREEDY_VALUE_TERMINATOR);
-		reader.skip_whitespace();
+		reader.skipWhitespace();
 
 		return result;
 	}
 
 	let result: AnyArgsValueItem[] = [];
 
-	while (reader.can_read() && !reader.match(ARRAY_TERMINATOR)) {
+	while (reader.canRead() && !reader.match(ARRAY_TERMINATOR)) {
 		reader.mark();
 
 		const item = read_command_arg_value(reader, option.type);
@@ -164,7 +164,7 @@ function read_command_arg(reader: StringReader, option: Option, propagate_array_
 		if (item === null) {
 			reader.reset();
 
-			if (propagate_array_error)
+			if (propagateArrayError)
 				return null;
 			else
 				break; // just keep the array without item
@@ -173,7 +173,7 @@ function read_command_arg(reader: StringReader, option: Option, propagate_array_
 
 		result.push(item);
 
-		reader.skip_whitespace();
+		reader.skipWhitespace();
 	}
 
 	return result;
@@ -182,30 +182,30 @@ function read_command_arg(reader: StringReader, option: Option, propagate_array_
 function read_command_arg_value(reader: StringReader, type: OptionType, terminator?: RegExp): AnyArgsValueItem | null {
 	switch (type) {
 		case OptionType.BOOLEAN:
-			return read_boolean(reader);
+			return readBoolean(reader);
 
 		case OptionType.FLAG:
 			return true;
 
 		case OptionType.INTEGER:
-			return read_integer(reader);
+			return readInteger(reader);
 
 		case OptionType.NUMBER:
-			return read_number(reader);
+			return readNumber(reader);
 
 		case OptionType.STRING:
-			return read_string(reader, terminator);
+			return readString(reader, terminator);
 
 		case OptionType.SNOWFLAKE:
-			return read_snowflake(reader);
+			return readSnowflake(reader);
 
 		case OptionType.USER:
-			return read_user(reader);
+			return readUser(reader);
 
 		case OptionType.ROLE:
-			return read_role(reader);
+			return readRole(reader);
 
 		case OptionType.CHANNEL:
-			return read_channel(reader);
+			return readChannel(reader);
 	}
 }

@@ -1,10 +1,10 @@
 import type { AnyChannel, Guild, Member, User } from "oceanic.js";
 
-export function debug_format_user(user: User) {
+export function debugFormatUser(user: User) {
 	return `@${user.tag}[${user.id}]`;
 }
 
-export function debug_format_channel(channel: AnyChannel) {
+export function debugFormatChannel(channel: AnyChannel) {
 	let name = "<unnamed>";
 
 	if ("name" in channel)
@@ -13,10 +13,10 @@ export function debug_format_channel(channel: AnyChannel) {
 	return `#${name}[${channel.id}]`;
 }
 
-export function debug_format_guild(guild: Guild) {
+export function debugFormatGuild(guild: Guild) {
 	return `*${guild.name}[${guild.id}]`;
 }
 
-export function debug_format_permission_context(member: Member, channel: AnyChannel) {
-	return `${debug_format_user(member.user)} in ${debug_format_channel(channel)}, ${debug_format_guild(member.guild)}`;
+export function debugFormatPermissionContext(member: Member, channel: AnyChannel) {
+	return `${debugFormatUser(member.user)} in ${debugFormatChannel(channel)}, ${debugFormatGuild(member.guild)}`;
 }

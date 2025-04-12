@@ -2,29 +2,29 @@ import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member,
 
 type NameList = [string, ...string[]];
 
-export function define_command<O extends Record<string, Option>, D extends {}>(command: Command<O, D>): Command<O, D> {
+export function defineCommand<O extends Record<string, Option>, D extends {}>(command: Command<O, D>): Command<O, D> {
 	return command;
 }
 
 export interface Command<O extends Record<string, Option> = Record<string, Option>, D extends {} = {}> {
 	name: NameList;
 	options?: O;
-	support_prefix?: boolean;
-	support_slash?: boolean;
-	track_updates?: boolean;
+	supportPrefix?: boolean;
+	supportSlash?: boolean;
+	trackUpdates?: boolean;
 
 	/**
 	 * Check preconditions - return false to abort execution and anything else to proceed.
 	 * Note: to prevent nasty bugs this may not return null or undefined!
 	 * @param context Contextual information
 	 */
-	pre_run(context: CommandContext): D | false;
+	preRun(context: CommandContext): D | false;
 
 	/**
 	 * Invoke the command, and call context.respond to display output.
 	 * @param context Contextual information
 	 * @param args Parsed options
-	 * @param data The result from pre_run
+	 * @param data The result from preRun
 	 */
 	run(context: CommandContext, args: { readonly [K in keyof O]: OptionValue<O[K]> }, data: D): Promise<void> | void;
 }
@@ -50,7 +50,7 @@ export type Component = ((TextButton | SelectMenuComponent) & ComponentCallback)
 
 export interface ComponentCallback {
 	callback: (context: ComponentContext) => Promise<void>;
-	invoker_only?: boolean;
+	invokerOnly?: boolean;
 }
 
 export type Option =
@@ -99,7 +99,7 @@ interface BaseOption {
 
 interface FlagOption extends BaseOption {
 	type: OptionType.FLAG;
-	negative_name?: NameList;
+	negativeName?: NameList;
 	array?: false;
 	position?: undefined;
 }

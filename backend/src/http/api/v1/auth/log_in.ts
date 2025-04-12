@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { validator } from "hono/validator";
-import { generate_token } from "../../../../db/api/tokens.ts";
+import { generateToken } from "../../../../db/api/tokens.ts";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment.ts";
 
 interface TokenResponse {
@@ -32,7 +32,7 @@ router.post("/", validator("json", value => value), async context => {
 	if (typeof code !== "string")
 		throw new HTTPException(400, { message: "Missing code" });
 
-	const token_response = await fetch("https://discord.com/api/v10/oauth2/token", {
+	const tokenResponse = await fetch("https://discord.com/api/v10/oauth2/token", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
@@ -47,21 +47,21 @@ router.post("/", validator("json", value => value), async context => {
 		}),
 	});
 
-	if (!token_response.ok)
+	if (!tokenResponse.ok)
 		throw new HTTPException(500, { message: "Failed fetching OAuth token" });
 
-	const token_json: TokenResponse = await token_response.json();
-	const auth = token_json.token_type + " " + token_json.access_token;
+	const tokenJSON: TokenResponse = await tokenResponse.json();
+	const auth = tokenJSON.token_type + " " + tokenJSON.access_token;
 
-	const user_response = await fetch("https://discord.com/api/v10/users/@me", { headers: { "Authorization": auth } });
+	const userResponse = await fetch("https://discord.com/api/v10/users/@me", { headers: { "Authorization": auth } });
 
-	if (user_response.status === 401)
+	if (userResponse.status === 401)
 		throw new HTTPException(500, { message: "Application deauthorized" });
 
-	if (!user_response.ok)
+	if (!userResponse.ok)
 		throw new HTTPException(500, { message: "Failed fetching Discord user" });
 
-	const user_json: UserResponse = await user_response.json();
+	const userJSON: UserResponse = await userResponse.json();
 
 	await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
 		method: "POST",
@@ -69,17 +69,17 @@ router.post("/", validator("json", value => value), async context => {
 		body: new URLSearchParams({
 			client_id: CLIENT_ID,
 			client_secret: CLIENT_SECRET,
-			token: token_json.access_token,
+			token: tokenJSON.access_token,
 			token_type_hint: "access_token",
 		})
 	});
 
-	const [token, expires_at] = await generate_token(user_json.id);
+	const [token, expiresAt] = await generateToken(userJSON.id);
 	return context.json({
 		token,
-		expires_at: expires_at.getTime(),
-		username: user_json.username,
-		avatar: user_json.avatar
+		expires_at: expiresAt.getTime(),
+		username: userJSON.username,
+		avatar: userJSON.avatar
 	});
 });
 export default router;

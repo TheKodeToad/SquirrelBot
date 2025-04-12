@@ -9,15 +9,15 @@ export class ConfigCache<S extends BaseSchema<unknown, unknown, BaseIssue<unknow
 		this._cache = new Map;
 	}
 
-	get(guild_id: string): InferOutput<S> | undefined {
-		return this._cache.get(guild_id);
+	get(guildID: string): InferOutput<S> | undefined {
+		return this._cache.get(guildID);
 	}
 
-	set(guild_id: string, value: InferOutput<S>) {
-		this._cache.set(guild_id, value);
+	set(guildID: string, value: InferOutput<S>) {
+		this._cache.set(guildID, value);
 	}
 
-	delete(guild_id: string) {
-		this._cache.delete(guild_id);
+	delete(guildID: string) {
+		this._cache.delete(guildID);
 	}
 }

@@ -1,13 +1,13 @@
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
-import { CaseType, create_case } from "../../../../db/moderation/cases.ts";
-import { format_rest_error, format_user_tag } from "../../../common/discord/format.ts";
-import { escape_markdown } from "../../../common/discord/markdown.ts";
-import { permissions_guard } from "../../core/public/command/helper.ts";
-import { OptionType, define_command } from "../../core/public/command/index.ts";
+import { CaseType, createCase } from "../../../../db/moderation/cases.ts";
+import { formatRESTError, formatUserTag } from "../../../common/discord/format.ts";
+import { escapeMarkdown } from "../../../common/discord/markdown.ts";
+import { permissionsGuard } from "../../core/public/command/helper.ts";
+import { OptionType, defineCommand } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { moderation_config } from "../index.ts";
+import { moderationConfig } from "../index.ts";
 
-export const unban_command = define_command({
+export const unbanCommand = defineCommand({
 	name: ["unban"],
 	options: {
 		user: {
@@ -24,17 +24,17 @@ export const unban_command = define_command({
 		},
 	},
 
-	pre_run: context => permissions_guard(context, moderation_config, permissions => permissions.unban),
+	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.unban),
 	async run(context, args) {
-		let successful_unbans: { case_number: number, id: string, name: string; }[] = [];
-		let unsuccessful_unbans: { id: string, name: string, error: string; }[] = [];
+		let successfulUnbans: { caseNumber: number, id: string, name: string; }[] = [];
+		let unsuccessfulUnbans: { id: string, name: string, error: string; }[] = [];
 
 		for (const target of args.user) {
-			const cached_member = context.guild.members.get(target);
-			if (cached_member !== undefined) {
-				unsuccessful_unbans.push({
+			const cachedMember = context.guild.members.get(target);
+			if (cachedMember !== undefined) {
+				unsuccessfulUnbans.push({
 					id: target,
-					name: cached_member.tag,
+					name: cachedMember.tag,
 					error: "User is not banned",
 				});
 				continue;
@@ -47,16 +47,16 @@ export const unban_command = define_command({
 					throw error;
 
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
-					unsuccessful_unbans.push({
+					unsuccessfulUnbans.push({
 						id: target,
-						name: await format_user_tag(target),
+						name: await formatUserTag(target),
 						error: "User is not banned",
 					});
 				} else {
-					unsuccessful_unbans.push({
+					unsuccessfulUnbans.push({
 						id: target,
-						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : await format_user_tag(target),
-						error: `Ban fetch failed: ${format_rest_error(error)}`,
+						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : await formatUserTag(target),
+						error: `Ban fetch failed: ${formatRESTError(error)}`,
 					});
 				}
 
@@ -69,45 +69,45 @@ export const unban_command = define_command({
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				unsuccessful_unbans.push({ id: target, name: ban.user.tag, error: format_rest_error(error) });
+				unsuccessfulUnbans.push({ id: target, name: ban.user.tag, error: formatRESTError(error) });
 				continue;
 			}
 
-			const case_number = await create_case(context.guild.id, {
+			const caseNumber = await createCase(context.guild.id, {
 				type: CaseType.Unban,
-				actor_id: context.user.id,
-				target_id: target,
+				actorID: context.user.id,
+				targetID: target,
 				reason: args.reason ?? undefined,
 			});
 
-			successful_unbans.push({ case_number, id: target, name: ban.user.tag });
+			successfulUnbans.push({ caseNumber: caseNumber, id: target, name: ban.user.tag });
 		}
 
 		if (args.user.length === 1) {
-			if (successful_unbans.length === 1) {
-				const unban = successful_unbans[0]!;
-				await context.respond(`${icons.success} Unbanned <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]!`);
-			} else if (unsuccessful_unbans.length === 1) {
-				const unban = unsuccessful_unbans[0]!;
-				await context.respond(`${icons.error} Could not unban <@${unban.id}> (${escape_markdown(unban.name)}): ${escape_markdown(unban.error)}!`);
+			if (successfulUnbans.length === 1) {
+				const unban = successfulUnbans[0]!;
+				await context.respond(`${icons.success} Unbanned <@${unban.id}> (${escapeMarkdown(unban.name)}) [#${unban.caseNumber}]!`);
+			} else if (unsuccessfulUnbans.length === 1) {
+				const unban = unsuccessfulUnbans[0]!;
+				await context.respond(`${icons.error} Could not unban <@${unban.id}> (${escapeMarkdown(unban.name)}): ${escapeMarkdown(unban.error)}!`);
 			}
 		} else {
-			const successful_message = successful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}) [#${unban.case_number}]`).join("\n");
-			const unsuccessful_message = unsuccessful_unbans.map(unban => `- <@${unban.id}> (${escape_markdown(unban.name)}): ${unban.error}`).join("\n");
+			const successfulMessage = successfulUnbans.map(unban => `- <@${unban.id}> (${escapeMarkdown(unban.name)}) [#${unban.caseNumber}]`).join("\n");
+			const unsuccessfulMessage = unsuccessfulUnbans.map(unban => `- <@${unban.id}> (${escapeMarkdown(unban.name)}): ${unban.error}`).join("\n");
 
-			if (unsuccessful_unbans.length === 0) {
+			if (unsuccessfulUnbans.length === 0) {
 				await context.respond(
-					`${icons.success} Unbanned all ${args.user.length} users:\n${successful_message}`
+					`${icons.success} Unbanned all ${args.user.length} users:\n${successfulMessage}`
 				);
-			} else if (successful_unbans.length === 0) {
+			} else if (successfulUnbans.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were unbanned:\n${unsuccessful_message}`
+					`${icons.error} None of ${args.user.length} users were unbanned:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful_unbans.length} of ${args.user.length} unbans were successful!\n`
-					+ `Successful unbans:\n${successful_message}\n`
-					+ `Unsuccessful unbans:\n${unsuccessful_message}`
+					`${icons.warning} Only ${successfulUnbans.length} of ${args.user.length} unbans were successful!\n`
+					+ `Successful unbans:\n${successfulMessage}\n`
+					+ `Unsuccessful unbans:\n${unsuccessfulMessage}`
 				);
 			}
 		}

@@ -1,6 +1,6 @@
 import AsyncLock from "async-lock";
 import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
-import { db_parse, pool } from "../index.ts";
+import { dbParse, pool } from "../index.ts";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -17,7 +17,7 @@ export enum CaseType {
 }
 
 
-export function case_type_by_id(id: string): CaseType | undefined {
+export function caseTypeByID(id: string): CaseType | undefined {
 	switch (id) {
 		case "note": return CaseType.Note;
 		case "warn": return CaseType.Warn;
@@ -32,7 +32,7 @@ export function case_type_by_id(id: string): CaseType | undefined {
 	}
 }
 
-export function case_type_id(type: CaseType): string {
+export function caseTypeID(type: CaseType): string {
 	switch (type) {
 		case CaseType.Note: return "note";
 		case CaseType.Warn: return "warn";
@@ -47,7 +47,7 @@ export function case_type_id(type: CaseType): string {
 	}
 }
 
-export const case_info_schema = object({
+export const caseInfoSchema = object({
 	guild_id: string(),
 	number: number(),
 
@@ -63,48 +63,48 @@ export const case_info_schema = object({
 	delete_message_seconds: nullable(number()),
 	dm_sent: nullable(boolean())
 });
-export const case_info_array_schema = array(case_info_schema);
+export const caseInfoArraySchema = array(caseInfoSchema);
 
-export interface CaseInfo extends InferOutput<typeof case_info_schema> { }
+export interface CaseInfo extends InferOutput<typeof caseInfoSchema> { }
 
 export interface CreateCaseOptions {
 	type: CaseType;
-	created_at?: Date;
-	expires_at?: Date;
+	createdAt?: Date;
+	expiresAt?: Date;
 
-	actor_id: string;
-	target_id: string;
+	actorID: string;
+	targetID: string;
 
 	reason?: string;
 
-	delete_message_seconds?: number;
-	dm_delivered?: boolean;
+	deleteMessageSeconds?: number;
+	dmDelivered?: boolean;
 }
 
 export interface CaseQuery {
-	number_less_than?: number;
-	number_greater_than?: number;
+	numberLessThan?: number;
+	numberGreaterThan?: number;
 	types?: CaseType[];
-	created_before?: Date;
-	created_after?: Date;
-	expires_before?: Date;
-	expires_after?: Date;
+	createdBefore?: Date;
+	createdAfter?: Date;
+	expiresBefore?: Date;
+	expiresAfter?: Date;
 
-	actor_ids?: string[];
-	target_ids?: string[];
+	actorIDs?: string[];
+	targetIDs?: string[];
 
-	delete_message_seconds_less_than?: number;
-	delete_message_seconds_greater_than?: number;
-	dm_delivered?: boolean;
+	deleteMessageSecondsLessThan?: number;
+	deleteMessageSecondsGreaterThan?: number;
+	dmDelivered?: boolean;
 
 	reversed?: boolean;
 	limit?: number;
 }
 
 // ensure number incrementation is atomic
-const create_case_lock = new AsyncLock;
+const createCaseLock = new AsyncLock;
 
-export async function get_case(guild_id: string, number: number): Promise<CaseInfo | null> {
+export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
@@ -125,16 +125,16 @@ export async function get_case(guild_id: string, number: number): Promise<CaseIn
 			WHERE "guild_id" = $1
 			AND "number" = $2
 		`,
-		[guild_id, number]
+		[guildID, number]
 	);
 
 	if (result.rowCount !== 1)
 		return null;
 
-	return db_parse(case_info_schema, result.rows[0]);
+	return dbParse(caseInfoSchema, result.rows[0]);
 }
 
-export async function get_cases(guild_id: string, query: CaseQuery): Promise<CaseInfo[]> {
+export async function getCases(guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
 	query.reversed ??= false;
 
 	const result = await pool.query(
@@ -170,31 +170,31 @@ export async function get_cases(guild_id: string, query: CaseQuery): Promise<Cas
 			LIMIT $15
 		`,
 		[
-			guild_id,
-			query.number_less_than,
-			query.number_greater_than,
+			guildID,
+			query.numberLessThan,
+			query.numberGreaterThan,
 			query.types,
-			query.created_before,
-			query.created_after,
-			query.expires_before,
-			query.expires_after,
-			query.actor_ids,
-			query.target_ids,
-			query.delete_message_seconds_less_than,
-			query.delete_message_seconds_greater_than,
-			query.dm_delivered,
+			query.createdBefore,
+			query.createdAfter,
+			query.expiresBefore,
+			query.expiresAfter,
+			query.actorIDs,
+			query.targetIDs,
+			query.deleteMessageSecondsLessThan,
+			query.deleteMessageSecondsGreaterThan,
+			query.dmDelivered,
 			query.reversed,
 			query.limit,
 		]
 	);
 
-	return db_parse(case_info_array_schema, result.rows);
+	return dbParse(caseInfoArraySchema, result.rows);
 }
 
-export async function create_case(guild_id: string, options: CreateCaseOptions): Promise<number> {
-	options.created_at ??= new Date;
+export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
+	options.createdAt ??= new Date;
 
-	return await create_case_lock.acquire(guild_id, async () => {
+	return await createCaseLock.acquire(guildID, async () => {
 		let number = (await pool.query(
 			`
 				SELECT "number"
@@ -203,7 +203,7 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 				ORDER BY "number" DESC
 				LIMIT 1
 			`,
-			[guild_id]
+			[guildID]
 		)).rows[0]?.number ?? 0;
 		++number;
 
@@ -224,16 +224,16 @@ export async function create_case(guild_id: string, options: CreateCaseOptions):
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 			`,
 			[
-				guild_id,
+				guildID,
 				number,
 				options.type,
-				options.created_at ?? null,
-				options.expires_at ?? null,
-				options.actor_id,
-				options.target_id,
+				options.createdAt ?? null,
+				options.expiresAt ?? null,
+				options.actorID,
+				options.targetID,
 				options.reason ?? null,
-				options.delete_message_seconds ?? null,
-				options.dm_delivered ?? null,
+				options.deleteMessageSeconds ?? null,
+				options.dmDelivered ?? null,
 			]
 		);
 

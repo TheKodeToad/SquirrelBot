@@ -1,8 +1,8 @@
 import { Colors } from "../../../common/discord/colors.ts";
 import { bot } from "../../../index.ts";
-import { core_config } from "../index.ts";
-import { permissions_guard } from "../public/command/helper.ts";
-import { define_command } from "../public/command/index.ts";
+import { coreConfig } from "../index.ts";
+import { permissionsGuard } from "../public/command/helper.ts";
+import { defineCommand } from "../public/command/index.ts";
 
 const DESCRIPTION = `
 Advanced moderation and management bot created by TheKodeToad.
@@ -24,22 +24,22 @@ const LIBRARIES = `
  and [more](https://github.com/TheKodeToad/SquirrelBot/blob/develop/backend/package.json)
 `.replaceAll("\n", "");
 
-export const about_command = define_command({
+export const aboutCommand = defineCommand({
 	name: ["about"],
-	track_updates: true,
+	trackUpdates: true,
 
-	pre_run: context => permissions_guard(context, core_config, permissions => permissions.about_command),
+	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.about_command),
 	async run(context) {
 		const uptime = Math.floor(process.uptime());
-		let uptime_string = "";
+		let uptimeString = "";
 
 		if (uptime >= 3600)
-			uptime_string += Math.floor(uptime / 3600) + " hours ";
+			uptimeString += Math.floor(uptime / 3600) + " hours ";
 
 		if (uptime >= 60)
-			uptime_string += Math.floor(uptime / 60) % 60 + " mins ";
+			uptimeString += Math.floor(uptime / 60) % 60 + " mins ";
 
-		uptime_string += uptime % 60 + " secs";
+		uptimeString += uptime % 60 + " secs";
 
 		await context.respond({
 			embeds: [{
@@ -49,7 +49,7 @@ export const about_command = define_command({
 				fields: [
 					{ name: "Source Code", value: "https://github.com/TheKodeToad/SquirrelBot (MIT license)" },
 					{ name: "Libraries", value: LIBRARIES },
-					{ name: "Uptime", value: uptime_string }
+					{ name: "Uptime", value: uptimeString }
 				],
 				thumbnail: { url: bot.user.avatarURL(undefined, 128) }
 			}]

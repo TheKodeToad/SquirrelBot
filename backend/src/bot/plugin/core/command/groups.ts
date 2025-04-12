@@ -1,16 +1,16 @@
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
-import { get_member_cached } from "../../../common/discord/cache.ts";
-import { format_rest_error } from "../../../common/discord/format.ts";
-import { escape_markdown, make_inline_codeblock } from "../../../common/discord/markdown.ts";
-import { core_config, core_config as core_config_cache } from "../index.ts";
-import { permissions_guard } from "../public/command/helper.ts";
-import { define_command, OptionType } from "../public/command/index.ts";
+import { getMemberCached } from "../../../common/discord/cache.ts";
+import { formatRESTError } from "../../../common/discord/format.ts";
+import { escapeMarkdown, makeInlineCodeblock } from "../../../common/discord/markdown.ts";
+import { coreConfig as coreConfigCache } from "../index.ts";
+import { permissionsGuard } from "../public/command/helper.ts";
+import { defineCommand, OptionType } from "../public/command/index.ts";
 import { icons } from "../public/icons.ts";
-import { resolve_groups } from "../public/permission_resolution.ts";
+import { resolveGroups } from "../public/permission_resolution.ts";
 
-export const groups_command = define_command({
+export const groupsCommand = defineCommand({
 	name: ["groups"],
-	track_updates: true,
+	trackUpdates: true,
 	options: {
 		user: {
 			type: OptionType.USER,
@@ -19,19 +19,19 @@ export const groups_command = define_command({
 		}
 	},
 
-	pre_run: context => permissions_guard(context, core_config, permissions => permissions.groups_command),
+	preRun: context => permissionsGuard(context, coreConfigCache, permissions => permissions.groups_command),
 
 	async run(context, args) {
-		const core_config = core_config_cache.get(context.guild.id);
+		const coreConfig = coreConfigCache.get(context.guild.id);
 
-		if (core_config === undefined)
+		if (coreConfig === undefined)
 			return;
 
 		let member = context.member;
 
 		if (args.user !== null) {
 			try {
-				member = await get_member_cached(context.guild, args.user);
+				member = await getMemberCached(context.guild, args.user);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
@@ -41,17 +41,17 @@ export const groups_command = define_command({
 					return;
 				}
 
-				await context.respond(`${icons.error} User fetch failed: ${escape_markdown(format_rest_error(error))}!`);
+				await context.respond(`${icons.error} User fetch failed: ${escapeMarkdown(formatRESTError(error))}!`);
 				return;
 			}
 		}
 
-		const result = resolve_groups(member);
+		const result = resolveGroups(member);
 
 		if (result.groups.size !== 0) {
-			const groups = Array.from(result.groups).toSorted().map(make_inline_codeblock);
-			await context.respond(`${icons.info} Groups for <@${member.id}> (${escape_markdown(member.tag)}): ${groups} (permission level ${result.level})`);
+			const groups = Array.from(result.groups).toSorted().map(makeInlineCodeblock);
+			await context.respond(`${icons.info} Groups for <@${member.id}> (${escapeMarkdown(member.tag)}): ${groups} (permission level ${result.level})`);
 		} else
-			await context.respond(`${icons.info} <@${member.id}> (${escape_markdown(member.tag)}) is not in any groups!`);
+			await context.respond(`${icons.info} <@${member.id}> (${escapeMarkdown(member.tag)}) is not in any groups!`);
 	},
 });

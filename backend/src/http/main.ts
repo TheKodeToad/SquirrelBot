@@ -4,21 +4,21 @@ import fs from "fs/promises";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import path from "path";
-import { module_logger } from "../common/logger/index.ts";
-import { delete_expired_tokens } from "../db/api/tokens.ts";
-import { check_migrations_or_exit } from "../db/migration.ts";
+import { moduleLogger } from "../common/logger/index.ts";
+import { deleteExpiredTokens } from "../db/api/tokens.ts";
+import { checkMigrationsOrExit } from "../db/migration.ts";
 import { CLIENT_ID, REDIRECT_URI } from "../environment.ts";
 import api_v1 from "./api/v1/index.ts";
 
-await check_migrations_or_exit();
+await checkMigrationsOrExit();
 
-const logger = module_logger();
+const logger = moduleLogger();
 
 const app = new Hono;
 app.route("/api/v1", api_v1);
 
-const static_root = "../frontend/static";
-app.use("/*", serveStatic({ root: static_root })); // yea
+const staticRoot = "../frontend/static";
+app.use("/*", serveStatic({ root: staticRoot })); // yea
 app.get("/env.js", context => {
 	const env = JSON.stringify({ CLIENT_ID, REDIRECT_URI });
 	return context.body(`window.SQUIRREL_ENV=${env}`, 200, { "Content-Type": "text/javascript" });
@@ -26,7 +26,7 @@ app.get("/env.js", context => {
 
 app.notFound(
 	async context =>
-		context.html(await fs.readFile(path.join(static_root, "app.html"), "utf-8"))
+		context.html(await fs.readFile(path.join(staticRoot, "app.html"), "utf-8"))
 );
 
 app.onError((error, context) => {
@@ -46,5 +46,5 @@ serve({
 	port: 8080,
 });
 
-setInterval(async () => await delete_expired_tokens(), 1000 * 60 * 60);
-await delete_expired_tokens();
+setInterval(async () => await deleteExpiredTokens(), 1000 * 60 * 60);
+await deleteExpiredTokens();

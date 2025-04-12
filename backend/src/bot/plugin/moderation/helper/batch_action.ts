@@ -1,19 +1,18 @@
 import { DiscordRESTError, type CreateMessageOptions, type Guild, type Member, type User } from "oceanic.js";
-import { create_case, type CreateCaseOptions } from "../../../../db/moderation/cases.ts";
-import { create_dm_cached, get_user_cached, request_members_cached } from "../../../common/discord/cache.ts";
-import { format_rest_error } from "../../../common/discord/format.ts";
-import { get_highest_role } from "../../../common/discord/permissions.ts";
+import { createCase, type CreateCaseOptions } from "../../../../db/moderation/cases.ts";
+import { createDMCached, getUserCached, requestMembersCached } from "../../../common/discord/cache.ts";
+import { formatRESTError } from "../../../common/discord/format.ts";
+import { getHighestRole } from "../../../common/discord/permissions.ts";
 import { bot } from "../../../index.ts";
-
 
 type BatchAction =
 	(
 		{
-			members_only: true;
+			membersOnly: true;
 			perform: (user: Member) => Promise<void>;
 		}
 		| {
-			members_only: false;
+			membersOnly: false;
 			perform: (user: Member | User) => Promise<void>;
 		}
 	)
@@ -22,17 +21,17 @@ type BatchAction =
 		ids: readonly string[];
 
 		actor: Member;
-		direct_message?: CreateMessageOptions;
+		directMessage?: CreateMessageOptions;
 
-		make_case(actor: string, target: string, dm_delivered: boolean): CreateCaseOptions | null;
+		makeCase(actor: string, target: string, dmDelivered: boolean): CreateCaseOptions | null;
 	};
 
 interface BatchResult {
 	successful: {
 		id: string;
 		name: string;
-		case_number: number | null;
-		dm_delivered: boolean;
+		caseNumber: number | null;
+		dmDelivered: boolean;
 	}[];
 	unsuccessful: {
 		id: string;
@@ -41,95 +40,95 @@ interface BatchResult {
 	}[];
 }
 
-export async function do_batch_action(action: BatchAction): Promise<BatchResult> {
+export async function doBatchAction(action: BatchAction): Promise<BatchResult> {
 	let result: BatchResult = { successful: [], unsuccessful: [] };
 
-	const members = await request_members_cached(action.guild, action.ids);
+	const members = await requestMembersCached(action.guild, action.ids);
 
-	for (const target_id of action.ids) {
-		const target_member = members.get(target_id);
+	for (const targetID of action.ids) {
+		const targetMember = members.get(targetID);
 
-		if (target_member === undefined) {
+		if (targetMember === undefined) {
 			try {
-				var target_user = await get_user_cached(target_id);
+				var targetUser = await getUserCached(targetID);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				result.unsuccessful.push({
-					id: target_id,
+					id: targetID,
 					name: "<unknown>",
-					error: "User fetch failed: " + format_rest_error(error)
+					error: "User fetch failed: " + formatRESTError(error)
 				});
 				continue;
 			}
 
-			if (action.members_only) {
+			if (action.membersOnly) {
 				result.unsuccessful.push({
-					id: target_id,
-					name: target_user.username,
+					id: targetID,
+					name: targetUser.username,
 					error: "User is not a member of the server",
 				});
 				continue;
 			}
 
 			try {
-				await action.perform(target_user);
+				await action.perform(targetUser);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				result.unsuccessful.push({
-					id: target_id,
-					name: target_user.tag,
-					error: format_rest_error(error),
+					id: targetID,
+					name: targetUser.tag,
+					error: formatRESTError(error),
 				});
 				continue;
 			}
 
-			let case_number: number | null = null;
+			let caseNumber: number | null = null;
 
-			if (action.make_case !== undefined) {
-				const new_case = action.make_case(action.actor.id, target_id, false);
+			if (action.makeCase !== undefined) {
+				const newCase = action.makeCase(action.actor.id, targetID, false);
 
-				if (new_case !== null)
-					case_number = await create_case(action.guild.id, new_case);
+				if (newCase !== null)
+					caseNumber = await createCase(action.guild.id, newCase);
 			}
 
 			result.successful.push({
-				id: target_id,
-				name: target_user.tag,
-				case_number,
-				dm_delivered: false,
+				id: targetID,
+				name: targetUser.tag,
+				caseNumber,
+				dmDelivered: false,
 			});
 
 			continue;
 		}
 
-		const target_position = get_highest_role(target_member).position;
+		const targetPosition = getHighestRole(targetMember).position;
 
 		if (action.guild.ownerID !== action.actor.id
-			&& (action.guild.ownerID === target_id
-				|| get_highest_role(action.actor).position <= target_position)) {
-			result.unsuccessful.push({ id: target_id, name: target_member.tag, error: "Your highest role is not above target's highest role" });
+			&& (action.guild.ownerID === targetID
+				|| getHighestRole(action.actor).position <= targetPosition)) {
+			result.unsuccessful.push({ id: targetID, name: targetMember.tag, error: "Your highest role is not above target's highest role" });
 			continue;
 		}
 
 		if (action.guild.ownerID !== bot.user.id
-			&& (action.guild.ownerID === target_id
-				|| get_highest_role(action.guild.clientMember).position <= target_position)
+			&& (action.guild.ownerID === targetID
+				|| getHighestRole(action.guild.clientMember).position <= targetPosition)
 		) {
-			result.unsuccessful.push({ id: target_id, name: target_member.tag, error: "Bot's highest role is not above target's highest role" });
+			result.unsuccessful.push({ id: targetID, name: targetMember.tag, error: "Bot's highest role is not above target's highest role" });
 			continue;
 		}
 
-		let dm_delivered = false;
+		let dmDelivered = false;
 
-		if (action.direct_message !== undefined && !target_member.bot) {
-			const dm_channel = await create_dm_cached(target_member.id);
+		if (action.directMessage !== undefined && !targetMember.bot) {
+			const dmChannel = await createDMCached(targetMember.id);
 			try {
-				dm_channel.createMessage(action.direct_message);
-				dm_delivered = true;
+				dmChannel.createMessage(action.directMessage);
+				dmDelivered = true;
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
@@ -137,33 +136,33 @@ export async function do_batch_action(action: BatchAction): Promise<BatchResult>
 		}
 
 		try {
-			await action.perform(target_member);
+			await action.perform(targetMember);
 		} catch (error) {
 			if (!(error instanceof DiscordRESTError))
 				throw error;
 
 			result.unsuccessful.push({
-				id: target_id,
-				name: target_member.tag,
-				error: format_rest_error(error),
+				id: targetID,
+				name: targetMember.tag,
+				error: formatRESTError(error),
 			});
 			continue;
 		}
 
-		let case_number: number | null = null;
+		let caseNumber: number | null = null;
 
-		if (action.make_case !== undefined) {
-			const new_case = action.make_case(action.actor.id, target_id, dm_delivered);
+		if (action.makeCase !== undefined) {
+			const newCase = action.makeCase(action.actor.id, targetID, dmDelivered);
 
-			if (new_case !== null)
-				case_number = await create_case(action.guild.id, new_case);
+			if (newCase !== null)
+				caseNumber = await createCase(action.guild.id, newCase);
 		}
 
 		result.successful.push({
-			id: target_id,
-			name: target_member.tag,
-			case_number,
-			dm_delivered,
+			id: targetID,
+			name: targetMember.tag,
+			caseNumber,
+			dmDelivered,
 		});
 	}
 

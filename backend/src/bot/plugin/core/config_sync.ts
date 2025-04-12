@@ -1,32 +1,32 @@
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { safeParse } from "valibot";
-import { map_iteratable } from "../../../common/iterators.ts";
-import { module_logger } from "../../../common/logger/index.ts";
-import { get_guild_config, insert_guild_config } from "../../../db/core/configs.ts";
-import { add_channel_listener } from "../../../db/notification.ts";
-import { get_plugin, get_plugins } from "../../loader/index.ts";
+import { mapIterable } from "../../../common/iterators.ts";
+import { moduleLogger } from "../../../common/logger/index.ts";
+import { getGuildConfig, insertGuildConfig } from "../../../db/core/configs.ts";
+import { addChannelListener } from "../../../db/notification.ts";
+import { getPlugin, getPlugins } from "../../loader/index.ts";
 import type { Plugin } from "../../loader/plugin.ts";
-import { add_grant_access_listener, add_revoke_access_listener, get_allowed_guilds } from "./guild_info_sync.ts";
+import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds } from "./guild_info_sync.ts";
 
-const logger = module_logger();
+const logger = moduleLogger();
 
-export async function init_configs() {
-	await Promise.all(map_iteratable(get_allowed_guilds(), create_and_load_configs));
-	add_grant_access_listener(create_and_load_configs);
-	add_revoke_access_listener(unload_configs);
-	await install_config_change_listener();
+export async function initConfigs() {
+	await Promise.all(mapIterable(getAllowedGuilds(), createAndLoadConfigs));
+	addGrantAccessListener(createAndLoadConfigs);
+	addRevokeAccessListener(unloadConfigs);
+	await installConfigChangeListener();
 }
 
-const config_update_lock = new AsyncLock;
+const configUpdateLock = new AsyncLock;
 
-async function install_config_change_listener(): Promise<void> {
-	await add_channel_listener("config_update", async payload => {
+async function installConfigChangeListener(): Promise<void> {
+	await addChannelListener("config_update", async payload => {
 		if (payload === undefined)
 			return;
 
 		try {
-			var { key, guild_id } = JSON.parse(payload);
+			var { key, guild_id: guildID } = JSON.parse(payload);
 		} catch (error) {
 			if (!(error instanceof SyntaxError))
 				throw error;
@@ -35,67 +35,67 @@ async function install_config_change_listener(): Promise<void> {
 			return;
 		}
 
-		if (!(typeof key === "string" && typeof guild_id === "string")) {
+		if (!(typeof key === "string" && typeof guildID === "string")) {
 			logger.warn?.("config_update payload does not conform to { key: string, guild_id: string; }");
 			return;
 		}
 
-		await config_update_lock.acquire(guild_id, async () => {
-			const plugin = get_plugin(key);
+		await configUpdateLock.acquire(guildID, async () => {
+			const plugin = getPlugin(key);
 
 			if (plugin === undefined || plugin.config === undefined) {
 				logger.debug?.(`Ignoring config_update for plugin '${key}'`);
 				return;
 			}
 
-			logger.debug?.(`Updating config for plugin '${key}' in guild ${guild_id}`);
+			logger.debug?.(`Updating config for plugin '${key}' in guild ${guildID}`);
 
-			await load_config(guild_id, plugin);
+			await loadConfig(guildID, plugin);
 		});
 	});
 }
 
-export async function create_and_load_configs(guild_id: string) {
-	await config_update_lock.acquire(guild_id, async () => {
-		for (const plugin of get_plugins()) {
+export async function createAndLoadConfigs(guildID: string) {
+	await configUpdateLock.acquire(guildID, async () => {
+		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
 				return;
 
-			await insert_guild_config(guild_id, plugin.id, "");
-			await load_config(guild_id, plugin);
+			await insertGuildConfig(guildID, plugin.id, "");
+			await loadConfig(guildID, plugin);
 		}
 	});
 }
 
-export async function unload_configs(guild_id: string) {
-	await config_update_lock.acquire(guild_id, async () => {
-		for (const plugin of get_plugins()) {
+export async function unloadConfigs(guildID: string) {
+	await configUpdateLock.acquire(guildID, async () => {
+		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
 				return;
 
-			plugin.config.delete(guild_id);
+			plugin.config.delete(guildID);
 		}
 	});
 }
 
-async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
+async function loadConfig(guildID: string, plugin: Plugin): Promise<void> {
 	if (plugin.config === undefined)
 		return;
 
-	const raw_value = await get_guild_config(guild_id, plugin.id);
+	const rawValue = await getGuildConfig(guildID, plugin.id);
 
-	if (raw_value === null) {
-		plugin.config.delete(guild_id);
+	if (rawValue === null) {
+		plugin.config.delete(guildID);
 		return;
 	}
 
 	try {
-		var table = parseToml(raw_value);
+		var table = parseToml(rawValue);
 	} catch (error) {
 		if (!(error instanceof TomlError))
 			logger.error?.("Unexpected error parsing TOML (bug)", error);
 
-		plugin.config.delete(guild_id);
+		plugin.config.delete(guildID);
 		return;
 	}
 
@@ -105,14 +105,14 @@ async function load_config(guild_id: string, plugin: Plugin): Promise<void> {
 		// if our code is broken it might throw
 		logger.error?.("Unexpected error in valibot safeParse (bug)", error);
 
-		plugin.config.delete(guild_id);
+		plugin.config.delete(guildID);
 		return;
 	}
 
 	if (!result.success || !result.typed) {
-		plugin.config.delete(guild_id);
+		plugin.config.delete(guildID);
 		return;
 	}
 
-	plugin.config.set(guild_id, result.output);
+	plugin.config.set(guildID, result.output);
 }

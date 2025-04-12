@@ -1,42 +1,41 @@
-import { module_logger } from "../../common/logger/index.ts";
-import { core_plugin } from "../plugin/core/index.ts";
-import { moderation_plugin } from "../plugin/moderation/index.ts";
-import { util_plugin } from "../plugin/util/index.ts";
+import { moduleLogger } from "../../common/logger/index.ts";
+import { corePlugin } from "../plugin/core/index.ts";
+import { moderationPlugin } from "../plugin/moderation/index.ts";
+import { utilPlugin } from "../plugin/util/index.ts";
 import type { Plugin } from "./plugin.ts";
 
-const logger = module_logger();
+const logger = moduleLogger();
 
 const plugins: Map<string, Plugin> = new Map;
 
-export function register_plugin(plugin: Plugin): void {
+export function registerPlugin(plugin: Plugin): void {
 	if (plugins.has(plugin.id))
 		throw new Error(`Duplicate registration of plugin #${plugin.id}`);
-
 
 	plugins.set(plugin.id, plugin);
 	logger.debug?.(`Registered plugin #${plugin.id}`);
 }
 
-export function get_plugins(): IterableIterator<Plugin> {
+export function getPlugins(): IterableIterator<Plugin> {
 	return plugins.values();
 }
 
-export function count_plugins(): number {
+export function countPlugins(): number {
 	return plugins.size;
 }
 
-export function get_plugin(id: string): Plugin | undefined {
+export function getPlugin(id: string): Plugin | undefined {
 	return plugins.get(id);
 }
 
-export function load_plugins() {
+export function loadPlugins() {
 	// only support first-party plugins for now :)
-	register_plugin(core_plugin);
-	register_plugin(moderation_plugin);
-	register_plugin(util_plugin);
+	registerPlugin(corePlugin);
+	registerPlugin(moderationPlugin);
+	registerPlugin(utilPlugin);
 }
 
-export async function apply_plugins(): Promise<void> {
+export async function applyPlugins(): Promise<void> {
 	for (const plugin of plugins.values()) {
 		logger.debug?.(`Applying plugin #${plugin.id}`);
 		await plugin.apply?.();

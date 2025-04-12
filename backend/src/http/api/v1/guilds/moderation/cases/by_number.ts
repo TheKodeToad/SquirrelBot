@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { get_case } from "../../../../../../db/moderation/cases.ts";
+import { getCase } from "../../../../../../db/moderation/cases.ts";
 import type { GuildAuthVars } from "../../../../../middleware/guild_auth.ts";
-import { serialise_case_object } from "./index.ts";
+import { serializeCaseObject } from "./index.ts";
 
 const router = new Hono<{ Variables: GuildAuthVars; }>;
 router.get("/:number{\\d+}", async context => {
-	if (context.var.discord_guild_id === undefined)
+	if (context.var.discordGuildID === undefined)
 		throw new Error("Missing guild ID");
 
 	const number = Number(context.req.param("number"));
@@ -14,11 +14,11 @@ router.get("/:number{\\d+}", async context => {
 	if (!Number.isSafeInteger(number))
 		throw new HTTPException(400);
 
-	const info = await get_case(context.var.discord_guild_id, number);
+	const info = await getCase(context.var.discordGuildID, number);
 
 	if (info === null)
 		throw new HTTPException(400);
 
-	return context.json(serialise_case_object(info));
+	return context.json(serializeCaseObject(info));
 });
 export default router;

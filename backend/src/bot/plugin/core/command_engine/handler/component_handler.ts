@@ -1,41 +1,41 @@
 import { ComponentInteraction, MessageFlags, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { TTLMap } from "../../../../../common/ttl_map.ts";
 import type { Component, ComponentCallback, ComponentContext, Reply } from "../../public/command/index.ts";
-import { define_event_listener } from "../../public/event_listener.ts";
-import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transform_reply } from "../index.ts";
+import { defineEventListener } from "../../public/event_listener.ts";
+import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
 
 interface ComponentData {
 	callbacks: Map<string, Required<ComponentCallback>>;
-	invoker_id: string;
+	invokerID: string;
 }
 
-const active_components: TTLMap<string, ComponentData> = new TTLMap(STATE_EXPIRE_AFTER);
-setInterval(() => active_components.cleanup(), STATE_CLEANUP_INTERVAL);
+const activeComponents: TTLMap<string, ComponentData> = new TTLMap(STATE_EXPIRE_AFTER);
+setInterval(() => activeComponents.cleanup(), STATE_CLEANUP_INTERVAL);
 
-export const component_interaction_handler = define_event_listener("interactionCreate", async interaction => {
+export const componentInterationHandler = defineEventListener("interactionCreate", async interaction => {
 	if (!interaction.inCachedGuildChannel())
 		return;
 
 	if (!interaction.isComponentInteraction())
 		return;
 
-	const component_data = active_components.get(interaction.message.id);
+	const componentData = activeComponents.get(interaction.message.id);
 
-	if (component_data === undefined)
+	if (componentData === undefined)
 		return;
 
-	const callback = component_data.callbacks.get(interaction.data.customID);
+	const callback = componentData.callbacks.get(interaction.data.customID);
 
 	if (callback === undefined)
 		return;
 
-	if (callback.invoker_only && interaction.user.id !== component_data.invoker_id) {
+	if (callback.invokerOnly && interaction.user.id !== componentData.invokerID) {
 		// just ignore
 		interaction.deferUpdate();
 		return;
 	}
 
-	const context = new ComponentContextImpl(interaction, component_data.invoker_id);
+	const context = new ComponentContextImpl(interaction, componentData.invokerID);
 
 	try {
 		await callback.callback(context);
@@ -52,7 +52,7 @@ export const component_interaction_handler = define_event_listener("interactionC
 	}
 });
 
-export function listen_for_interactions(message_id: string, invoker_id: string, components: Component[][]): void {
+export function listenForInteractions(messageID: string, invokerID: string, components: Component[][]): void {
 	const callbacks: ComponentData["callbacks"] = new Map;
 
 	for (const row of components) {
@@ -63,66 +63,66 @@ export function listen_for_interactions(message_id: string, invoker_id: string, 
 			if (component.disabled)
 				continue;
 
-			const { customID, callback, invoker_only } = component;
-			callbacks.set(customID, { callback, invoker_only: invoker_only ?? true });
+			const { customID, callback, invokerOnly } = component;
+			callbacks.set(customID, { callback, invokerOnly: invokerOnly ?? true });
 		}
 	}
 
-	active_components.set(message_id, { callbacks, invoker_id });
+	activeComponents.set(messageID, { callbacks, invokerID: invokerID });
 }
 
-export function unlisten_for_interactions(message_id: string): void {
-	active_components.delete(message_id);
+export function unlistenForInteractions(messageID: string): void {
+	activeComponents.delete(messageID);
 }
 
 class ComponentContextImpl implements ComponentContext {
 	private _interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
-	private _original_invoker: string;
+	private _originalInvoker: string;
 	private _acked: boolean;
-	private _ack_promise: Promise<void> | null;
-	private _ack_timeout: NodeJS.Timeout | null;
+	private _ackPromise: Promise<void> | null;
+	private _ackTimeout: NodeJS.Timeout | null;
 
-	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, original_invoker: string) {
+	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalInvoker: string) {
 		this._interaction = interaction;
-		this._original_invoker = original_invoker;
+		this._originalInvoker = originalInvoker;
 		this._acked = false;
-		this._ack_timeout = setTimeout(() => {
-			this._ack_timeout = null;
+		this._ackTimeout = setTimeout(() => {
+			this._ackTimeout = null;
 			this._acked = true;
-			this._ack_promise = interaction.deferUpdate().then(() => { });
+			this._ackPromise = interaction.deferUpdate().then(() => { });
 		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
-		this._ack_promise = null;
+		this._ackPromise = null;
 	}
 
 	async edit(reply: Reply): Promise<void> {
-		const message_options = transform_reply(reply);
+		const messageOptions = transformReply(reply);
 
-		unlisten_for_interactions(this._interaction.message.id);
+		unlistenForInteractions(this._interaction.message.id);
 
 		if (this._acked) {
-			if (this._ack_promise !== null)
-				await this._ack_promise;
+			if (this._ackPromise !== null)
+				await this._ackPromise;
 
-			await this._interaction.message.edit(message_options);
+			await this._interaction.message.edit(messageOptions);
 		} else {
-			this._remove_timeout();
-			await this._interaction.editParent(message_options);
+			this._removeTimeout();
+			await this._interaction.editParent(messageOptions);
 			this._acked = true;
 		}
 
 		if (typeof reply !== "string" && reply.components !== undefined)
-			listen_for_interactions(this._interaction.message.id, this._original_invoker, reply.components);
+			listenForInteractions(this._interaction.message.id, this._originalInvoker, reply.components);
 	}
 
-	_remove_timeout() {
-		if (this._ack_timeout !== null) {
-			clearTimeout(this._ack_timeout);
-			this._ack_timeout = null;
+	_removeTimeout() {
+		if (this._ackTimeout !== null) {
+			clearTimeout(this._ackTimeout);
+			this._ackTimeout = null;
 		}
 	}
 
 	async _abandon() {
-		this._remove_timeout();
+		this._removeTimeout();
 
 		if (!this._acked)
 			await this._interaction.deferUpdate();
