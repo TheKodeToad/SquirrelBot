@@ -1,7 +1,7 @@
 import { Route, Router } from "@solidjs/router";
 import { render } from "solid-js/web";
-import { HeaderBarComponent } from "./component/header_bar";
-import { NotFound } from "./route/not_found";
+import { HeaderBarComponent } from "./component/HeaderBarComponent";
+import { NotFound } from "./route/notFound";
 import { Servers } from "./route/servers";
 
 export function App() {

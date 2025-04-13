@@ -1,6 +1,6 @@
 import { createResource, For, Show } from "solid-js";
 import { getGuilds, GuildResponse } from "../client";
-import { LoginGate } from "../component/login_gate";
+import { LoginGate } from "../component/LoginGate";
 import { account } from "../state/account";
 
 export const Servers = () => <LoginGate><ServersComponent /></LoginGate>;
