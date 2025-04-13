@@ -18,6 +18,13 @@ bot.once("ready", async () => {
 	logger.info?.("I'm ready :O");
 });
 
+bot.on("error", (error, shard) => {
+	if (shard !== undefined)
+		logger.error?.(`Oceanic emitted error in shard #${shard}`, error);
+	else
+		logger.error?.("Oceanic emitted error", error);
+});
+
 process.on("unhandledRejection", error => {
 	logger.error?.("Unhandled Promise rejection!", error);
 });
