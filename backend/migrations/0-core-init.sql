@@ -1,8 +1,8 @@
-CREATE TABLE "core_guild_info" (
+CREATE TABLE "core_guildInfo" (
 	"id" NUMERIC(20, 0) PRIMARY KEY,
 	"name" TEXT,
-	"icon_hash" TEXT,
-	"owner_id" NUMERIC(20, 0),
+	"iconHash" TEXT,
+	"ownerID" NUMERIC(20, 0),
 	"allowed" BOOLEAN NOT NULL,
-	"delete_at" TIMESTAMPTZ CHECK ("delete_at" IS NULL OR "allowed" = false)
+	"deleteAt" TIMESTAMPTZ CHECK ("deleteAt" IS NULL OR "allowed" = false)
 );

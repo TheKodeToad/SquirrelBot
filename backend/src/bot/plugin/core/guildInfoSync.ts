@@ -20,11 +20,11 @@ export async function initGuildInfo() {
 		if (missingIndex !== -1) {
 			missing.splice(missingIndex, 1);
 
-			if (guildInfo.delete_at !== null)
+			if (guildInfo.deleteAt !== null)
 				await cancelGuildInfoDeletion(guildInfo.id);
 		} else if (!guildInfo.allowed) {
 			// was removed from env var
-			if (guildInfo.delete_at === null)
+			if (guildInfo.deleteAt === null)
 				await scheduleGuildInfoDeletion(guildInfo.id);
 
 			continue;
@@ -39,8 +39,8 @@ export async function initGuildInfo() {
 			continue;
 
 		if (guildInfo.name === realGuild.name
-			&& guildInfo.icon_hash === realGuild.icon
-			&& guildInfo.owner_id === realGuild.ownerID) {
+			&& guildInfo.iconHash === realGuild.icon
+			&& guildInfo.ownerID === realGuild.ownerID) {
 			continue;
 		}
 
@@ -52,9 +52,9 @@ export async function initGuildInfo() {
 
 		await insertGuildInfo(
 			missingGuildID,
-			realGuild?.ownerID ?? null,
 			realGuild?.name ?? null,
 			realGuild?.icon ?? null,
+			realGuild?.ownerID ?? null,
 			false,
 		);
 	}

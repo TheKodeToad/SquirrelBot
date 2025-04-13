@@ -1,21 +1,21 @@
 CREATE TABLE "moderation_cases" (
-	"guild_id" NUMERIC(20, 0) REFERENCES "core_guild_info"("id") ON DELETE CASCADE,
+	"guildID" NUMERIC(20, 0) REFERENCES "core_guildInfo"("id") ON DELETE CASCADE,
 	"number" INT NOT NULL,
 
 	"type" SMALLINT NOT NULL,
-	"created_at" TIMESTAMPTZ NOT NULL,
-	"expires_at" TIMESTAMPTZ,
+	"createdAt" TIMESTAMPTZ NOT NULL,
+	"expiresAt" TIMESTAMPTZ,
 
-	"actor_id" NUMERIC(20, 0) NOT NULL,
-	"target_id" NUMERIC(20, 0) NOT NULL,
+	"actorID" NUMERIC(20, 0) NOT NULL,
+	"targetID" NUMERIC(20, 0) NOT NULL,
 
 	"reason" TEXT,
 
-	"delete_message_seconds" INT,
-	"dm_sent" BOOLEAN,
+	"deleteMessageSeconds" INT,
+	"dmDelivered" BOOLEAN,
 
-	PRIMARY KEY ("guild_id", "number")
+	PRIMARY KEY ("guildID", "number")
 );
 
-CREATE INDEX "moderation_cases_idx_by_actor" ON "moderation_cases" ("guild_id", "actor_id");
-CREATE INDEX "moderation_cases_idx_by_target" ON "moderation_cases" ("guild_id", "target_id");
+CREATE INDEX "moderation_cases_indexByActor" ON "moderation_cases" ("guildID", "actorID");
+CREATE INDEX "moderation_cases_indexByTarget" ON "moderation_cases" ("guildID", "targetID");

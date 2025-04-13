@@ -27,7 +27,7 @@ export const caseCommand = defineCommand({
 			return;
 		}
 
-		const creationSecs = Math.floor(info.created_at.getTime() / 1000);
+		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
 
 		await context.respond({
 			embeds: [{
@@ -44,11 +44,11 @@ export const caseCommand = defineCommand({
 					},
 					{
 						name: "Actor",
-						value: await formatUser(info.actor_id)
+						value: await formatUser(info.actorID)
 					},
 					{
 						name: "Target",
-						value: await formatUser(info.target_id)
+						value: await formatUser(info.targetID)
 					},
 					{
 						name: "Reason",

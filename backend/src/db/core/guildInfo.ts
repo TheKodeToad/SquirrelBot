@@ -4,10 +4,10 @@ import { dbParse, pool } from "../index.ts";
 const guildInfoSchema = object({
 	id: string(),
 	name: nullable(string()),
-	icon_hash: nullable(string()),
-	owner_id: nullable(string()),
+	iconHash: nullable(string()),
+	ownerID: nullable(string()),
 	allowed: boolean(),
-	delete_at: nullable(date()),
+	deleteAt: nullable(date()),
 });
 
 const guildInfoArraySchema = array(guildInfoSchema);
@@ -20,11 +20,11 @@ export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 			SELECT
 				"id",
 				"name",
-				"icon_hash",
-				"owner_id",
+				"iconHash",
+				"ownerID",
 				"allowed",
-				"delete_at"
-			FROM "core_guild_info"
+				"deleteAt"
+			FROM "core_guildInfo"
 			WHERE "id" = $1
 		`,
 		[id]
@@ -44,11 +44,11 @@ export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 		SELECT
 			"id",
 			"name",
-			"icon_hash",
-			"owner_id",
+			"iconHash",
+			"ownerID",
 			"allowed",
-			"delete_at"
-		FROM "core_guild_info"
+			"deleteAt"
+		FROM "core_guildInfo"
 	`);
 
 	return dbParse(guildInfoArraySchema, result.rows);
@@ -57,8 +57,8 @@ export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 export async function getGuildOwnerID(id: string): Promise<string | null> {
 	const result = await pool.query(
 		`
-			SELECT "owner_id"
-			FROM "core_guild_info"
+			SELECT "ownerID"
+			FROM "core_guildInfo"
 			WHERE "id" = $1
 		`,
 		[id]
@@ -67,7 +67,7 @@ export async function getGuildOwnerID(id: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(string(), result.rows[0].owner_id);
+	return dbParse(string(), result.rows[0].ownerID);
 }
 
 export async function getGuildInfoByOwner(ownerID: string): Promise<GuildInfo[]> {
@@ -76,10 +76,12 @@ export async function getGuildInfoByOwner(ownerID: string): Promise<GuildInfo[]>
 			SELECT
 				"id",
 				"name",
-				"icon_hash",
-				"owner_id"
-			FROM "core_guild_info"
-			WHERE "owner_id" = $1
+				"iconHash",
+				"ownerID",
+				"allowed",
+				"deleteAt"
+			FROM "core_guildInfo"
+			WHERE "ownerID" = $1
 		`,
 		[ownerID]
 	);
@@ -90,7 +92,7 @@ export async function getGuildInfoByOwner(ownerID: string): Promise<GuildInfo[]>
 export async function deleteGuildInfo(id: string): Promise<void> {
 	await pool.query(
 		`
-			DELETE FROM "core_guild_info"
+			DELETE FROM "core_guildInfo"
 			WHERE "id" = $1
 		`,
 		[id]
@@ -100,11 +102,11 @@ export async function deleteGuildInfo(id: string): Promise<void> {
 export async function updateGuildInfo(id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
 	await pool.query(
 		`
-			UPDATE "core_guild_info"
+			UPDATE "core_guildInfo"
 			SET
 				"name" = $2,
-				"icon_hash" = $3,
-				"owner_id" = $4
+				"iconHash" = $3,
+				"ownerID" = $4
 			WHERE "id" = $1
 		`,
 		[id, name, iconHash, ownerID]
@@ -114,11 +116,11 @@ export async function updateGuildInfo(id: string, name: string, iconHash: string
 export async function insertGuildInfo(id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
 	const result = await pool.query(
 		`
-			INSERT INTO "core_guild_info" (
+			INSERT INTO "core_guildInfo" (
 				"id",
 				"name",
-				"icon_hash",
-				"owner_id",
+				"iconHash",
+				"ownerID",
 				"allowed"
 			)
 			VALUES ($1, $2, $3, $4, $5)
@@ -132,20 +134,20 @@ export async function insertGuildInfo(id: string, name: string | null, iconHash:
 export async function markGuildAllowed(id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
 	await pool.query(
 		`
-			INSERT INTO "core_guild_info" (
+			INSERT INTO "core_guildInfo" (
 				"id",
 				"name",
-				"icon_hash",
-				"owner_id",
+				"iconHash",
+				"ownerID",
 				"allowed"
 			)
 			VALUES ($1, $2, $3, $4, TRUE)
 			ON CONFLICT ("id") DO UPDATE SET
 				"name" = $2,
-				"icon_hash" = $3,
-				"owner_id" = $4,
+				"iconHash" = $3,
+				"ownerID" = $4,
 				"allowed" = TRUE,
-				"delete_at" = NULL
+				"deleteAt" = NULL
 		`,
 		[id, name, iconHash, ownerID]
 	);
@@ -154,11 +156,11 @@ export async function markGuildAllowed(id: string, name: string | null, iconHash
 export async function markUnknownGuildAllowed(id: string): Promise<void> {
 	await pool.query(
 		`
-			INSERT INTO "core_guild_info" ("id", "allowed")
+			INSERT INTO "core_guildInfo" ("id", "allowed")
 			VALUES ($1, TRUE)
 			ON CONFLICT ("id") DO UPDATE SET
 				"allowed" = TRUE,
-				"delete_at" = NULL
+				"deleteAt" = NULL
 		`,
 		[id]
 	);
@@ -167,7 +169,7 @@ export async function markUnknownGuildAllowed(id: string): Promise<void> {
 export async function markGuildNotAllowed(id: string): Promise<void> {
 	await pool.query(
 		`
-			UPDATE "core_guild_info"
+			UPDATE "core_guildInfo"
 			SET "allowed" = FALSE
 			WHERE "id" = $1
 		`,
@@ -181,13 +183,13 @@ export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null
 
 	const result = await pool.query(
 		`
-			UPDATE "core_guild_info"
+			UPDATE "core_guildInfo"
 			SET
 				"allowed" = FALSE,
-				"delete_at" = $2
+				"deleteAt" = $2
 			WHERE
 				"id" = $1
-				AND "delete_at" IS NULL
+				AND "deleteAt" IS NULL
 		`,
 		[id, date]
 	);
@@ -201,8 +203,8 @@ export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null
 export async function cancelGuildInfoDeletion(id: string): Promise<void> {
 	await pool.query(
 		`
-			UPDATE "core_guild_info"
-			SET "delete_at" = NULL
+			UPDATE "core_guildInfo"
+			SET "deleteAt" = NULL
 			WHERE "id" = $1
 		`,
 		[id]
@@ -212,8 +214,8 @@ export async function cancelGuildInfoDeletion(id: string): Promise<void> {
 export async function deleteExpiredGuildInfo(): Promise<void> {
 	await pool.query(
 		`
-			DELETE FROM "core_guild_info"
-			WHERE "delete_at" <= $1
+			DELETE FROM "core_guildInfo"
+			WHERE "deleteAt" <= $1
 		`,
 		[new Date]
 	);

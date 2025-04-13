@@ -106,11 +106,11 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	let fields: EmbedField[] = [];
 
 	for (const info of cases) {
-		const creationSecs = Math.floor(info.created_at.getTime() / 1000);
+		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
 
 		if (options.compact) {
-			const actor = escapeMarkdown(await formatUserTag(info.actor_id));
-			const target = escapeMarkdown(await formatUserTag(info.target_id));
+			const actor = escapeMarkdown(await formatUserTag(info.actorID));
+			const target = escapeMarkdown(await formatUserTag(info.targetID));
 			description += `<t:${creationSecs}:R> **#${info.number}:** ${actor} ${caseTypeNameCompact(info.type)} ${target}`;
 
 			if (info.reason !== null && info.reason.length !== 0)
@@ -123,10 +123,10 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 			value += `Type: ${caseTypeName(info.type)}\n`;
 
 			if (options.actorID === null)
-				value += `Actor: ${await formatUser(info.actor_id)}\n`;
+				value += `Actor: ${await formatUser(info.actorID)}\n`;
 
 			if (options.targetID === null)
-				value += `Target: ${await formatUser(info.target_id)}\n`;
+				value += `Target: ${await formatUser(info.targetID)}\n`;
 
 			value += `Reason: ${info.reason ?? "*None provided*"}\n`;
 

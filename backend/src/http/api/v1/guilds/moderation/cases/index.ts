@@ -1,19 +1,19 @@
 import { Hono } from "hono";
 import { caseTypeID, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
-import byFilter from "./by_filter.ts";
-import byNumber from "./by_number.ts";
+import byFilter from "./byFilter.ts";
+import byNumber from "./byNumber.ts";
 
 export function serializeCaseObject(info: CaseInfo) {
 	return {
 		number: info.number,
 		type: caseTypeID(info.type),
-		created_at: info.created_at.getTime(),
-		expires_at: info.expires_at?.getTime(),
-		actor_id: info.actor_id,
-		target_id: info.target_id,
+		created_at: info.createdAt.getTime(),
+		expires_at: info.expiresAt?.getTime(),
+		actor_id: info.actorID,
+		target_id: info.targetID,
 		reason: info.reason,
-		delete_message_seconds: info.delete_message_seconds,
-		dm_sent: info.dm_sent,
+		delete_message_seconds: info.deleteMessageSeconds,
+		dm_sent: info.dmDelivered,
 	};
 }
 

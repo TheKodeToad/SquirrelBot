@@ -48,20 +48,20 @@ export function caseTypeID(type: CaseType): string {
 }
 
 export const caseInfoSchema = object({
-	guild_id: string(),
+	guildID: string(),
 	number: number(),
 
 	type: enum_(CaseType),
-	created_at: date(),
-	expires_at: nullable(date()),
+	createdAt: date(),
+	expiresAt: nullable(date()),
 
-	actor_id: string(),
-	target_id: string(),
+	actorID: string(),
+	targetID: string(),
 
 	reason: nullable(string()),
 
-	delete_message_seconds: nullable(number()),
-	dm_sent: nullable(boolean())
+	deleteMessageSeconds: nullable(number()),
+	dmDelivered: nullable(boolean())
 });
 export const caseInfoArraySchema = array(caseInfoSchema);
 
@@ -111,18 +111,18 @@ export async function getCase(guildID: string, number: number): Promise<CaseInfo
 	const result = await pool.query(
 		`
 			SELECT
-				"guild_id",
+				"guildID",
 				"number",
 				"type",
-				"created_at",
-				"expires_at",
-				"actor_id",
-				"target_id",
+				"createdAt",
+				"expiresAt",
+				"actorID",
+				"targetID",
 				"reason",
-				"delete_message_seconds",
-				"dm_sent"
+				"deleteMessageSeconds",
+				"dmDelivered"
 			FROM "moderation_cases"
-			WHERE "guild_id" = $1
+			WHERE "guildID" = $1
 			AND "number" = $2
 		`,
 		[guildID, number]
@@ -140,31 +140,31 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	const result = await pool.query(
 		`
 			SELECT
-				"guild_id",
+				"guildID",
 				"number",
 				"type",
-				"created_at",
-				"expires_at",
-				"actor_id",
-				"target_id",
+				"createdAt",
+				"expiresAt",
+				"actorID",
+				"targetID",
 				"reason",
-				"delete_message_seconds",
-				"dm_sent"
+				"deleteMessageSeconds",
+				"dmDelivered"
 			FROM "moderation_cases"
-			WHERE "guild_id" = $1
+			WHERE "guildID" = $1
 			AND (
 				("number" < $2 OR $2 IS NULL)
 				AND ("number" > $3 OR $3 IS NULL)
 				AND ("type" = ANY($4) OR $4 IS NULL)
-				AND ("created_at" < $5 OR $5 IS NULL)
-				AND ("created_at" > $6 OR $6 IS NULL)
-				AND ("expires_at" < $7 OR $7 IS NULL)
-				AND ("expires_at" > $8 OR $8 IS NULL)
-				AND ("actor_id" = ANY($9) OR $9 IS NULL)
-				AND ("target_id" = ANY($10) OR $10 IS NULL)
-				AND ("delete_message_seconds" < $11 OR $11 IS NULL)
-				AND ("delete_message_seconds" > $12 OR $12 IS NULL)
-				AND ("dm_sent" = $13 OR $13 IS NULL)
+				AND ("createdAt" < $5 OR $5 IS NULL)
+				AND ("createdAt" > $6 OR $6 IS NULL)
+				AND ("expiresAt" < $7 OR $7 IS NULL)
+				AND ("expiresAt" > $8 OR $8 IS NULL)
+				AND ("actorID" = ANY($9) OR $9 IS NULL)
+				AND ("targetID" = ANY($10) OR $10 IS NULL)
+				AND ("deleteMessageSeconds" < $11 OR $11 IS NULL)
+				AND ("deleteMessageSeconds" > $12 OR $12 IS NULL)
+				AND ("dmDelivered" = $13 OR $13 IS NULL)
 			)
 			ORDER BY (CASE WHEN $14 THEN -"number" ELSE "number" END) ASC
 			LIMIT $15
@@ -199,7 +199,7 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 			`
 				SELECT "number"
 				FROM "moderation_cases"
-				WHERE "guild_id" = $1
+				WHERE "guildID" = $1
 				ORDER BY "number" DESC
 				LIMIT 1
 			`,
@@ -210,16 +210,16 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 		await pool.query(
 			`
 				INSERT INTO "moderation_cases" (
-					"guild_id",
+					"guildID",
 					"number",
 					"type",
-					"created_at",
-					"expires_at",
-					"actor_id",
-					"target_id",
+					"createdAt",
+					"expiresAt",
+					"actorID",
+					"targetID",
 					"reason",
-					"delete_message_seconds",
-					"dm_sent"
+					"deleteMessageSeconds",
+					"dmDelivered"
 				)
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 			`,

@@ -1,13 +1,13 @@
 CREATE TABLE "api_users" (
 	"id" NUMERIC(20, 0) NOT NULL,
 	"username" TEXT NOT NULL,
-	"avatar_hash" TEXT NOT NULL
+	"avatarHash" TEXT NOT NULL
 ); -- TODO: remove this
 
 CREATE TABLE "api_tokens" (
-	"user_id" NUMERIC(20, 0) NOT NULL,
+	"userID" NUMERIC(20, 0) NOT NULL,
 	"hash" BYTEA NOT NULL,
-	"expires_at" TIMESTAMPTZ NOT NULL,
+	"expiresAt" TIMESTAMPTZ NOT NULL,
 
-	PRIMARY KEY ("user_id", "hash")
+	PRIMARY KEY ("userID", "hash")
 );

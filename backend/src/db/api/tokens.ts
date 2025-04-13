@@ -5,8 +5,8 @@ import { dbParse, pool } from "../index.ts";
 const ALGORITHM = "sha-256";
 
 const tokenInfoSchema = object({
-	user_id: string(),
-	expires_at: date()
+	userID: string(),
+	expiresAt: date()
 });
 
 export async function generateToken(userID: string): Promise<[token: string, expiry: Date]> {
@@ -18,9 +18,9 @@ export async function generateToken(userID: string): Promise<[token: string, exp
 	pool.query(
 		`
 			INSERT INTO "api_tokens" (
-				"user_id",
+				"userID",
 				"hash",
-				"expires_at"
+				"expiresAt"
 			)
 			VALUES ($1, $2, $3)
 		`,
@@ -41,9 +41,9 @@ export async function validateToken(token: string): Promise<string | null> {
 
 	const result = await pool.query(
 		`
-			SELECT "user_id", "expires_at"
+			SELECT "userID", "expiresAt"
 			FROM "api_tokens"
-			WHERE "user_id" = $1 AND "hash" = $2
+			WHERE "userID" = $1 AND "hash" = $2
 		`,
 		key
 	);
@@ -51,12 +51,12 @@ export async function validateToken(token: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	const { expires_at, user_id } = dbParse(tokenInfoSchema, result.rows[0]);
+	const { expiresAt, userID } = dbParse(tokenInfoSchema, result.rows[0]);
 
-	if (Date.now() >= expires_at.getTime())
+	if (Date.now() >= expiresAt.getTime())
 		return null;
 
-	return user_id;
+	return userID;
 }
 
 export async function deleteToken(token: string): Promise<boolean> {
@@ -68,7 +68,7 @@ export async function deleteToken(token: string): Promise<boolean> {
 	const result = await pool.query(
 		`
 			DELETE FROM "api_tokens"
-			WHERE "user_id" = $1 AND "hash" = $2
+			WHERE "userID" = $1 AND "hash" = $2
 		`,
 		key
 	);
@@ -107,7 +107,7 @@ export async function deleteExpiredTokens(): Promise<void> {
 	await pool.query(
 		`
 			DELETE FROM "api_tokens"
-			WHERE "expires_at" <= $1
+			WHERE "expiresAt" <= $1
 		`,
 		[new Date]
 	);
