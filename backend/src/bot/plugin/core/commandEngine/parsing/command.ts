@@ -1,6 +1,6 @@
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command/index.ts";
 import type { CommandCacheEntry } from "../commandCache.ts";
-import { SafeArgs } from "../SafeArgs.ts";
+import { SafeArgs } from "../safeArgs.ts";
 import { readBoolean, readChannel, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitives.ts";
 import type { StringReader } from "./stringReader.ts";
 

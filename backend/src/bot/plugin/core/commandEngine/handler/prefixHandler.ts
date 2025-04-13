@@ -79,12 +79,12 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	if (data == null)
 		throw new Error("Nullish value returned from preRun!");
 
-	const argsResult = readCommandArgs(reader, commandEntry);
+	const args = readCommandArgs(reader, commandEntry);
 
-	if (argsResult.error !== null) {
-		switch (argsResult.error) {
+	if (args.error !== null) {
+		switch (args.error) {
 			case ArgsParseError.MISSING_OPTIONS:
-				await context.respond(`${icons.error} Missing options: ${[...argsResult.options].map(option => "'" + option + "'").join(", ")}.`);
+				await context.respond(`${icons.error} Missing options: ${[...args.options].map(option => "'" + option + "'").join(", ")}.`);
 				break;
 
 			case ArgsParseError.BARE_NAMED_KEY:
@@ -92,11 +92,11 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 				break;
 
 			case ArgsParseError.BAD_NAMED_KEY:
-				await context.respond(`${icons.error} No option named '${argsResult.name}'.`);
+				await context.respond(`${icons.error} No option named '${args.name}'.`);
 				break;
 
 			case ArgsParseError.BAD_NAMED_VALUE:
-				await context.respond(`${icons.error} Invalid value passed for '${argsResult.name}'.`);
+				await context.respond(`${icons.error} Invalid value passed for '${args.name}'.`);
 				break;
 
 			case ArgsParseError.BAD_POSITIONAL_INDEX:
@@ -104,7 +104,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 				break;
 
 			case ArgsParseError.BAD_POSITIONAL_VALUE:
-				await context.respond(`${icons.error} Invalid value passed for unlabeled option #${argsResult.index + 1}.`);
+				await context.respond(`${icons.error} Invalid value passed for unlabeled option #${args.index + 1}.`);
 				break;
 		}
 
@@ -114,10 +114,10 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 		return true;
 	}
 
-	logger.debug?.(`Parsed arguments; running '${name}'`, argsResult);
+	logger.debug?.(`Parsed arguments; running '${name}'`, args);
 
 	try {
-		await commandEntry.command.run(context, argsResult.result as any, data);
+		await commandEntry.command.run(context, args.result as any, data);
 
 		if (commandEntry.command.trackUpdates && context._response !== null)
 			trackedMessages.set(message.id, context._response);

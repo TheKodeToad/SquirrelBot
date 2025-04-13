@@ -4,11 +4,12 @@ import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { bot } from "../../../../index.ts";
 import { coreConfig } from "../../index.ts";
-import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../../public/command/index.ts";
+import { type Command, type CommandContext, OptionType, type Reply } from "../../public/command/index.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
 import { getCommands, getCommandsByName } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
+import { SafeArgs } from "../safeArgs.ts";
 import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
@@ -18,12 +19,12 @@ export async function syncSlashCommands(): Promise<void> {
 		type: ApplicationCommandTypes.CHAT_INPUT,
 		name: typeof command.name === "string" ? command.name : command.name[0],
 		description: "command",
-		options: command.options ? Object.values(command.options).map(options => (
+		options: command.options ? Object.values(command.options).map(option => (
 			{
-				name: options.name[0],
+				name: option.name[0],
 				description: "option",
-				required: options.required,
-				type: mapOptionType(options.type),
+				required: option.required ?? false,
+				type: mapOptionType(option.type),
 			}
 		)) : [],
 	} satisfies CreateApplicationCommandOptions));
@@ -87,44 +88,41 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
-		context._clear_timeout();
+		context._clearTimeout();
 		return;
 	}
 
 	if (data == null)
 		throw new Error("Nullish value returned from preRun!");
 
-	const args: Record<string, any> = {};
+	const safeArgs = new SafeArgs(commandEntry.command.options ?? {});
 
-	if (commandEntry.command !== undefined) {
-		const optionLookup = new Map<string, [string, Option]>;
+	for (const slashOption of interaction.data.options.raw) {
+		if (!("value" in slashOption))
+			continue;
 
-		for (const [key, option] of Object.entries(commandEntry.command.options ?? {})) {
-			args[key] = option.array ? [] : null;
-			optionLookup.set(option.name[0], [key, option]);
-		}
+		if (!commandEntry.optionsByName.has(slashOption.name))
+			continue;
 
-		for (const slashOption of interaction.data.options.raw) {
-			if (!("value" in slashOption))
-				continue;
+		const [key, option] = commandEntry.optionsByName.get(slashOption.name)!;
 
-			if (!optionLookup.has(slashOption.name))
-				continue;
-
-			const [key, option] = optionLookup.get(slashOption.name)!;
-			args[key] = option.array ? [slashOption.value] : slashOption.value;
-		}
+		if (option.array ?? false)
+			safeArgs.pushTo(key, slashOption.value);
+		else
+			safeArgs.set(key, slashOption.value);
 	}
+
+	const args = safeArgs.getFrozenResult();
 
 	logger.debug?.(`Parsed arguments from options; running '${interaction.data.name}'`, args);
 
 	try {
-		await commandEntry.command.run(context, args, data);
+		await commandEntry.command.run(context, args as any, data);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;
 	} finally {
-		context._clear_timeout();
+		context._clearTimeout();
 	}
 });
 
@@ -165,7 +163,7 @@ class SlashContext implements CommandContext {
 
 			await this._interaction.editOriginal(messageOptions).then(message => this._responseID ??= message?.id ?? null);
 		} else {
-			this._clear_timeout();
+			this._clearTimeout();
 			await this._interaction.reply(messageOptions).then(
 				({ callback }) => this._responseID ??= callback?.resource?.message?.id ?? null
 			);
@@ -175,7 +173,7 @@ class SlashContext implements CommandContext {
 			listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
 	}
 
-	_clear_timeout() {
+	_clearTimeout() {
 		if (this._deferTimeout !== null) {
 			clearTimeout(this._deferTimeout);
 			this._deferTimeout = null;

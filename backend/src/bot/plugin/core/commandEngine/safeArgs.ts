@@ -7,11 +7,13 @@ export class SafeArgs {
 	private _schema: Record<string, Option>;
 	private _result: Record<string, AnyArgsValue>;
 	private _missing: Set<string>;
+	private _frozen: boolean;
 
 	constructor(schema: Record<string, Option>) {
 		this._schema = schema;
 		this._result = {};
 		this._missing = new Set;
+		this._frozen = false;
 
 		for (const key in schema) {
 			if (!Object.hasOwn(schema, key))
@@ -52,6 +54,9 @@ export class SafeArgs {
 	}
 
 	set(key: string, value: AnyArgsValue) {
+		if (this._frozen)
+			throw new Error("set cannot be called after getFrozenResult");
+
 		const option = this._getSchemaValue(key);
 
 		if (option.array ?? false)
@@ -64,6 +69,9 @@ export class SafeArgs {
 	}
 
 	pushTo(key: string, ...value: AnyArgsValueItem[]) {
+		if (this._frozen)
+			throw new Error("pushTo cannot be called after getFrozenResult");
+
 		const option = this._getSchemaValue(key);
 
 		if (!(option.array ?? false))
@@ -92,18 +100,22 @@ export class SafeArgs {
 	}
 
 	getFrozenResult() {
-		Object.freeze(this._result);
+		if (!this._frozen) {
+			this._frozen = true;
 
-		for (const key in this._result) {
-			if (!Object.hasOwn(this._result, key))
-				continue;
+			Object.freeze(this._result);
 
-			const object = this._result[key];
+			for (const key in this._result) {
+				if (!Object.hasOwn(this._result, key))
+					continue;
 
-			if (typeof key !== "object")
-				continue;
+				const object = this._result[key];
 
-			Object.freeze(object);
+				if (typeof key !== "object")
+					continue;
+
+				Object.freeze(object);
+			}
 		}
 
 		if (this._missing.size !== 0)
