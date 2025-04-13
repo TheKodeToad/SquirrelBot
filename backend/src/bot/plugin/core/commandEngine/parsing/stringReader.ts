@@ -76,7 +76,7 @@ export class StringReader {
 
 		this._read();
 
-		let end_index = this._input.length;
+		let endIndex = this._input.length;
 
 		if (pattern instanceof RegExp) {
 			if (!pattern.global)
@@ -86,16 +86,16 @@ export class StringReader {
 			const match = pattern.exec(this._input);
 
 			if (match !== null)
-				end_index = match.index;
+				endIndex = match.index;
 		} else {
 			const match = this._input.indexOf(pattern, this._cursor);
 
 			if (match !== -1)
-				end_index = match;
+				endIndex = match;
 		}
 
-		const result = this._input.substring(this._cursor, end_index);
-		this._cursor = end_index - 1;
+		const result = this._input.substring(this._cursor, endIndex);
+		this._cursor = endIndex - 1;
 
 		return result;
 	}
