@@ -1,19 +1,19 @@
 import type { AnyArgsValue } from "../../public/command/index.ts";
 
 export const enum ArgsParseError {
-	MISSING_OPTIONS,
-	BAD_NAMED_KEY,
-	BAD_NAMED_VALUE,
-	BARE_NAMED_KEY,
-	BAD_POSITIONAL_INDEX,
-	BAD_POSITIONAL_VALUE
+	MissingOptions,
+	BadNamedKey,
+	BadNamedValue,
+	BareNamedKey,
+	BadPositionalIndex,
+	BadPoisitionValue,
 }
 
 export type ArgsParseResultWithError =
-	| { error: ArgsParseError.MISSING_OPTIONS; options: Set<string>; }
-	| { error: ArgsParseError.BAD_NAMED_KEY | ArgsParseError.BAD_NAMED_VALUE; name: string; }
-	| { error: ArgsParseError.BARE_NAMED_KEY; }
-	| { error: ArgsParseError.BAD_POSITIONAL_INDEX | ArgsParseError.BAD_POSITIONAL_VALUE; index: number; };
+	| { error: ArgsParseError.MissingOptions; options: Set<string>; }
+	| { error: ArgsParseError.BadNamedKey | ArgsParseError.BadNamedValue; name: string; }
+	| { error: ArgsParseError.BareNamedKey; }
+	| { error: ArgsParseError.BadPositionalIndex | ArgsParseError.BadPoisitionValue; index: number; };
 
 export type ArgsParseResult =
 	| { error: null; result: Record<string, AnyArgsValue>; }
@@ -21,22 +21,22 @@ export type ArgsParseResult =
 
 export function formatArgsParseError(error: ArgsParseResultWithError): string {
 	switch (error.error) {
-		case ArgsParseError.MISSING_OPTIONS:
+		case ArgsParseError.MissingOptions:
 			return `Missing options: ${[...error.options].map(option => "'" + option + "'").join(", ")}.`;
 
-		case ArgsParseError.BARE_NAMED_KEY:
+		case ArgsParseError.BareNamedKey:
 			return "Missing option name after hyphen.";
 
-		case ArgsParseError.BAD_NAMED_KEY:
+		case ArgsParseError.BadNamedKey:
 			return `No option named '${error.name}'.`;
 
-		case ArgsParseError.BAD_NAMED_VALUE:
+		case ArgsParseError.BadNamedValue:
 			return `Invalid value passed for '${error.name}'.`;
 
-		case ArgsParseError.BAD_POSITIONAL_INDEX:
+		case ArgsParseError.BadPositionalIndex:
 			return "Too many unlabeled options provided.";
 
-		case ArgsParseError.BAD_POSITIONAL_VALUE:
+		case ArgsParseError.BadPoisitionValue:
 			return `Invalid value passed for unlabeled option #${error.index + 1}.`;
 	}
 }

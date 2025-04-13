@@ -13,7 +13,7 @@ export const groupsCommand = defineCommand({
 	trackUpdates: true,
 	options: {
 		user: {
-			type: OptionType.USER,
+			type: OptionType.User,
 			name: ["user", "u"],
 			position: 0,
 		}

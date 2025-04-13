@@ -11,14 +11,14 @@ export const unbanCommand = defineCommand({
 	name: ["unban"],
 	options: {
 		user: {
-			type: OptionType.USER,
+			type: OptionType.User,
 			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
-			type: OptionType.STRING,
+			type: OptionType.String,
 			name: ["reason", "r"],
 			position: 1,
 		},

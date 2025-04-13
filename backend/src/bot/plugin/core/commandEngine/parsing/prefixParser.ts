@@ -40,7 +40,7 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 
 		if (foundByPosition === undefined) {
 			return {
-				error: ArgsParseError.BAD_POSITIONAL_INDEX,
+				error: ArgsParseError.BadPositionalIndex,
 				index: positionalIndex,
 			};
 		}
@@ -51,7 +51,7 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 
 		if (value === null) {
 			return {
-				error: ArgsParseError.BAD_POSITIONAL_VALUE,
+				error: ArgsParseError.BadPoisitionValue,
 				index: positionalIndex
 			};
 		}
@@ -66,7 +66,7 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 
 	if (output.getMissing().size !== 0) {
 		return {
-			error: ArgsParseError.MISSING_OPTIONS,
+			error: ArgsParseError.MissingOptions,
 			options: output.getMissing()
 		};
 	}
@@ -84,7 +84,7 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 	reader.skipOver("-");
 
 	if (!reader.canRead())
-		return { error: ArgsParseError.BARE_NAMED_KEY };
+		return { error: ArgsParseError.BareNamedKey };
 
 	const optionName = reader.readWord();
 
@@ -99,7 +99,7 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 
 		if (value === null) {
 			return {
-				error: ArgsParseError.BAD_NAMED_VALUE,
+				error: ArgsParseError.BadNamedValue,
 				name: optionName
 			};
 		}
@@ -122,7 +122,7 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 	}
 
 	return {
-		error: ArgsParseError.BAD_NAMED_KEY,
+		error: ArgsParseError.BadNamedKey,
 		name: optionName
 	};
 }
@@ -166,31 +166,31 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 
 function readCommandArgValue(reader: StringReader, type: OptionType, terminator?: RegExp): AnyArgsValueItem | null {
 	switch (type) {
-		case OptionType.BOOLEAN:
+		case OptionType.Boolean:
 			return readBoolean(reader);
 
-		case OptionType.FLAG:
+		case OptionType.Flag:
 			return true;
 
-		case OptionType.INTEGER:
+		case OptionType.Integer:
 			return readInteger(reader);
 
-		case OptionType.NUMBER:
+		case OptionType.Number:
 			return readNumber(reader);
 
-		case OptionType.STRING:
+		case OptionType.String:
 			return readString(reader, terminator);
 
-		case OptionType.SNOWFLAKE:
+		case OptionType.Snowflake:
 			return readSnowflake(reader);
 
-		case OptionType.USER:
+		case OptionType.User:
 			return readUser(reader);
 
-		case OptionType.ROLE:
+		case OptionType.Role:
 			return readRole(reader);
 
-		case OptionType.CHANNEL:
+		case OptionType.Channel:
 			return readChannel(reader);
 	}
 }

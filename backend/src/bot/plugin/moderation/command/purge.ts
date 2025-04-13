@@ -10,26 +10,26 @@ export const purgeCommand = defineCommand({
 	options: {
 		count: {
 			name: ["count", "c"],
-			type: OptionType.INTEGER,
+			type: OptionType.Integer,
 			position: 0,
 			required: true,
 		},
 		match: {
 			name: ["match", "m"],
-			type: OptionType.STRING,
+			type: OptionType.String,
 			position: 1,
 		},
 		bots: {
 			name: ["bots"],
-			type: OptionType.FLAG,
+			type: OptionType.Flag,
 		},
 		humans: {
 			name: ["humans"],
-			type: OptionType.FLAG,
+			type: OptionType.Flag,
 		},
 		author: {
 			name: ["author", "a", "by", "from"],
-			type: OptionType.USER,
+			type: OptionType.User,
 			array: true,
 		}
 	},

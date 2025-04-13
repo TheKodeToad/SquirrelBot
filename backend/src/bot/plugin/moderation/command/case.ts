@@ -12,7 +12,7 @@ export const caseCommand = defineCommand({
 	options: {
 		number: {
 			name: ["number", "n"],
-			type: OptionType.INTEGER,
+			type: OptionType.Integer,
 			required: true,
 			position: 0,
 		},

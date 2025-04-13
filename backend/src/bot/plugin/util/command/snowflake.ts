@@ -10,7 +10,7 @@ export const snowflakeCommand = defineCommand({
 	trackUpdates: true,
 	options: {
 		input: {
-			type: OptionType.SNOWFLAKE,
+			type: OptionType.Snowflake,
 			name: ["input", "i"],
 			required: true,
 			position: 0,

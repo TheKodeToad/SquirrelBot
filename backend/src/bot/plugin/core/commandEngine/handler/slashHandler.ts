@@ -60,22 +60,22 @@ export async function syncSlashCommands(): Promise<void> {
 
 function mapOptionType(type: OptionType) {
 	switch (type) {
-		case OptionType.FLAG:
-		case OptionType.BOOLEAN:
+		case OptionType.Flag:
+		case OptionType.Boolean:
 			return ApplicationCommandOptionTypes.BOOLEAN;
-		case OptionType.STRING:
+		case OptionType.String:
 			return ApplicationCommandOptionTypes.STRING;
-		case OptionType.INTEGER:
+		case OptionType.Integer:
 			return ApplicationCommandOptionTypes.INTEGER;
-		case OptionType.NUMBER:
+		case OptionType.Number:
 			return ApplicationCommandOptionTypes.NUMBER;
-		case OptionType.USER:
+		case OptionType.User:
 			return ApplicationCommandOptionTypes.USER;
-		case OptionType.ROLE:
+		case OptionType.Role:
 			return ApplicationCommandOptionTypes.ROLE;
-		case OptionType.CHANNEL:
+		case OptionType.Channel:
 			return ApplicationCommandOptionTypes.CHANNEL;
-		case OptionType.SNOWFLAKE:
+		case OptionType.Snowflake:
 			return ApplicationCommandOptionTypes.STRING;
 	}
 

@@ -15,13 +15,13 @@ export const inviteCommand = defineCommand({
 	trackUpdates: true,
 	options: {
 		link: {
-			type: OptionType.STRING,
+			type: OptionType.String,
 			name: ["link", "l"],
 			required: true,
 			position: 0
 		},
 		hideImages: {
-			type: OptionType.FLAG,
+			type: OptionType.Flag,
 			name: ["hide-images", "hi"]
 		}
 	},

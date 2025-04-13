@@ -11,19 +11,19 @@ export const kickCommand = defineCommand({
 	name: ["kick"],
 	options: {
 		user: {
-			type: OptionType.USER,
+			type: OptionType.User,
 			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
-			type: OptionType.STRING,
+			type: OptionType.String,
 			name: ["reason", "r"],
 			position: 1,
 		},
 		dm: {
-			type: OptionType.FLAG,
+			type: OptionType.Flag,
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},

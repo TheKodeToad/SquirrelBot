@@ -15,15 +15,15 @@ export const casesCommand = defineCommand({
 	options: {
 		actorID: {
 			name: ["actor", "a", "by", "moderator", "mod"],
-			type: OptionType.USER,
+			type: OptionType.User,
 		},
 		targetID: {
 			name: ["target", "t", "for", "user"],
-			type: OptionType.USER,
+			type: OptionType.User,
 		},
 		compact: {
 			name: ["compact", "c"],
-			type: OptionType.FLAG,
+			type: OptionType.Flag,
 		},
 	},
 	trackUpdates: true,

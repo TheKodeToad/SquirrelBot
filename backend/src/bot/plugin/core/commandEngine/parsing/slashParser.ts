@@ -21,7 +21,7 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 		let value: AnyArgsValueItem;
 
 		switch (option.type) {
-			case OptionType.SNOWFLAKE:
+			case OptionType.Snowflake:
 				if (typeof interactionOption.value !== "string")
 					continue;
 
@@ -33,7 +33,7 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 
 				if (reader.canRead() || snowflake === null) {
 					return {
-						error: ArgsParseError.BAD_NAMED_VALUE,
+						error: ArgsParseError.BadNamedValue,
 						name: interactionOption.name
 					};
 				}

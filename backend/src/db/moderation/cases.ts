@@ -16,7 +16,6 @@ export enum CaseType {
 	Unban = 9,
 }
 
-
 export function caseTypeByID(id: string): CaseType | undefined {
 	switch (id) {
 		case "note": return CaseType.Note;

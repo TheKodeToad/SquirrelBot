@@ -1,7 +1,7 @@
 import type { InferOutput } from "valibot";
 import { pipe, rawTransform, string } from "valibot";
 
-export enum NumberFilterMode {
+export const enum NumberFilterMode {
 	Equals,
 	NotEquals,
 	LessThan,

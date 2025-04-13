@@ -15,7 +15,7 @@ export const grantAccessCommand = defineCommand({
 	supportSlash: false, // don't want this cluttering the command list
 	options: {
 		guild: {
-			type: OptionType.SNOWFLAKE,
+			type: OptionType.Snowflake,
 			name: ["server"],
 			required: true,
 			position: 0,
@@ -38,7 +38,7 @@ export const revokeAccessCommand = defineCommand({
 	supportSlash: false,
 	options: {
 		guild: {
-			type: OptionType.SNOWFLAKE,
+			type: OptionType.Snowflake,
 			name: ["server"],
 			required: true,
 			position: 0,

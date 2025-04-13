@@ -64,20 +64,20 @@ export type Option =
 	ChannelOption |
 	SnowflakeOption;
 
-export enum OptionType {
-	BOOLEAN,
+export const enum OptionType {
+	Boolean,
 	/**
 	 * Same as boolean for slash command;
 	 * --name to enable and and --negative-name to disable for prefix commands.
 	 */
-	FLAG,
-	INTEGER,
-	NUMBER,
-	STRING,
-	SNOWFLAKE,
-	USER,
-	ROLE,
-	CHANNEL,
+	Flag,
+	Integer,
+	Number,
+	String,
+	Snowflake,
+	User,
+	Role,
+	Channel,
 }
 
 /**
@@ -98,20 +98,20 @@ interface BaseOption {
 }
 
 interface FlagOption extends BaseOption {
-	type: OptionType.FLAG;
+	type: OptionType.Flag;
 	negativeName?: NameList;
 	array?: false;
 	position?: undefined;
 }
 
-interface BooleanOption extends BaseOption { type: OptionType.BOOLEAN; }
-interface StringOption extends BaseOption { type: OptionType.STRING; }
-interface IntegerOption extends BaseOption { type: OptionType.INTEGER; }
-interface NumberOption extends BaseOption { type: OptionType.NUMBER; }
-interface UserOption extends BaseOption { type: OptionType.USER; }
-interface RoleOption extends BaseOption { type: OptionType.ROLE; }
-interface ChannelOption extends BaseOption { type: OptionType.CHANNEL; }
-interface SnowflakeOption extends BaseOption { type: OptionType.SNOWFLAKE; }
+interface BooleanOption extends BaseOption { type: OptionType.Boolean; }
+interface StringOption extends BaseOption { type: OptionType.String; }
+interface IntegerOption extends BaseOption { type: OptionType.Integer; }
+interface NumberOption extends BaseOption { type: OptionType.Number; }
+interface UserOption extends BaseOption { type: OptionType.User; }
+interface RoleOption extends BaseOption { type: OptionType.Role; }
+interface ChannelOption extends BaseOption { type: OptionType.Channel; }
+interface SnowflakeOption extends BaseOption { type: OptionType.Snowflake; }
 
 type OptionValue<F extends Option> =
 	F["array"] extends true ? ArrayValue<OptionTypeValue<F["type"]>, F["required"]> :
@@ -122,13 +122,13 @@ type ArrayValue<O extends any, Required extends boolean | undefined> = Required 
 type NullableValue<O extends any, Required extends boolean | undefined> = Required extends true ? O : O | null;
 
 type OptionTypeValue<T extends OptionType> =
-	T extends OptionType.FLAG ? boolean :
-	T extends OptionType.BOOLEAN ? boolean :
-	T extends OptionType.STRING ? string :
-	T extends OptionType.INTEGER ? number :
-	T extends OptionType.NUMBER ? number :
-	T extends OptionType.USER ? string :
-	T extends OptionType.ROLE ? string :
-	T extends OptionType.CHANNEL ? string :
-	T extends OptionType.SNOWFLAKE ? string :
+	T extends OptionType.Flag ? boolean :
+	T extends OptionType.Boolean ? boolean :
+	T extends OptionType.String ? string :
+	T extends OptionType.Integer ? number :
+	T extends OptionType.Number ? number :
+	T extends OptionType.User ? string :
+	T extends OptionType.Role ? string :
+	T extends OptionType.Channel ? string :
+	T extends OptionType.Snowflake ? string :
 	never;
