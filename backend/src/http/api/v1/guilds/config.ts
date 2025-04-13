@@ -26,9 +26,9 @@ router.put("/:key", async context => {
 		throw new HTTPException(404);
 
 	await notifyChannel(
-		"config_update",
+		"configUpdate",
 		JSON.stringify({
-			guild_id: context.var.discordGuildID,
+			guildID: context.var.discordGuildID,
 			key: context.req.param("key")
 		})
 	);

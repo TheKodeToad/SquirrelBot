@@ -21,22 +21,22 @@ export async function initConfigs() {
 const configUpdateLock = new AsyncLock;
 
 async function installConfigChangeListener(): Promise<void> {
-	await addChannelListener("config_update", async payload => {
+	await addChannelListener("configUpdate", async payload => {
 		if (payload === undefined)
 			return;
 
 		try {
-			var { key, guild_id: guildID } = JSON.parse(payload);
+			var { key, guildID } = JSON.parse(payload);
 		} catch (error) {
 			if (!(error instanceof SyntaxError))
 				throw error;
 
-			logger.warn?.("Malformed JSON in config_update payload", error);
+			logger.warn?.("Malformed JSON in configUpdate payload", error);
 			return;
 		}
 
 		if (!(typeof key === "string" && typeof guildID === "string")) {
-			logger.warn?.("config_update payload does not conform to { key: string, guild_id: string; }");
+			logger.warn?.("configUpdate payload does not conform to { key: string, guildID: string; }");
 			return;
 		}
 
@@ -44,7 +44,7 @@ async function installConfigChangeListener(): Promise<void> {
 			const plugin = getPlugin(key);
 
 			if (plugin === undefined || plugin.config === undefined) {
-				logger.debug?.(`Ignoring config_update for plugin '${key}'`);
+				logger.debug?.(`Ignoring configUpdate for plugin '${key}'`);
 				return;
 			}
 
