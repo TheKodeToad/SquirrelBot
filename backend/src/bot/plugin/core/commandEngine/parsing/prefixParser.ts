@@ -5,11 +5,13 @@ import { ArgsParseError, type ArgsParseResult } from "./index.ts";
 import { readBoolean, readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitiveParser.ts";
 import type { StringReader } from "./stringReader.ts";
 
+const LIMITED_WHITESPACE_EATER_PATTERN = /\s{0,3}/y;
+
 export function readPrefixName(reader: StringReader, prefix: string): string | null {
 	if (!reader.skipOver(prefix))
 		return null;
 
-	reader.skipWhitespace();
+	reader.skipOver(LIMITED_WHITESPACE_EATER_PATTERN);
 
 	if (!reader.canRead())
 		return null;
