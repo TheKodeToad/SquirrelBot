@@ -90,9 +90,9 @@ export async function grantAccess(id: string): Promise<boolean> {
 	if (realGuild !== undefined) {
 		await markGuildAllowed(
 			id,
-			realGuild?.ownerID ?? null,
 			realGuild?.name ?? null,
 			realGuild?.icon ?? null,
+			realGuild?.ownerID ?? null,
 		);
 	} else
 		await markUnknownGuildAllowed(id);
