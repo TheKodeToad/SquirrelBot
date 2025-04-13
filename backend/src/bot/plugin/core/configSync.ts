@@ -21,7 +21,7 @@ export async function initConfigs() {
 const configUpdateLock = new AsyncLock;
 
 async function installConfigChangeListener(): Promise<void> {
-	await addChannelListener("configUpdate", async payload => {
+	await addChannelListener("core_configUpdate", async payload => {
 		if (payload === undefined)
 			return;
 
