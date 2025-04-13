@@ -2,7 +2,7 @@ import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } fro
 import type { CommandCacheEntry } from "../commandCache.ts";
 import { SafeArgs } from "../safeArgs.ts";
 import { ArgsParseError, type ArgsParseResult } from "./index.ts";
-import { readBoolean, readChannel, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitiveParser.ts";
+import { readBoolean, readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitiveParser.ts";
 import type { StringReader } from "./stringReader.ts";
 
 export function readPrefixName(reader: StringReader, prefix: string): string | null {
@@ -192,5 +192,8 @@ function readCommandArgValue(reader: StringReader, type: Exclude<OptionType, Opt
 
 		case OptionType.Channel:
 			return readChannel(reader);
+
+		case OptionType.Duration:
+			return readDuration(reader);
 	}
 }

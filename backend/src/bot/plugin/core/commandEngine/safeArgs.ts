@@ -167,6 +167,12 @@ function validateType(type: OptionType, value: unknown): void {
 
 			break;
 
+		case OptionType.Duration:
+			if (typeof value !== "number")
+				throw new Error(`typeof value is '${typeof value}'; expected 'number'`);
+
+			break;
+
 		default:
 			requireExhaustiveSwitch(type);
 			break;

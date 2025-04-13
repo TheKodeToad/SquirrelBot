@@ -3,7 +3,7 @@ import { OptionType, type AnyArgsValueItem } from "../../public/command/index.ts
 import type { CommandCacheEntry } from "../commandCache.ts";
 import { SafeArgs } from "../safeArgs.ts";
 import { ArgsParseError, type ArgsParseResult } from "./index.ts";
-import { readSnowflake } from "./primitiveParser.ts";
+import { readDuration, readSnowflake } from "./primitiveParser.ts";
 import { StringReader } from "./stringReader.ts";
 
 export function readSlashArgs(interactionOptions: InteractionOptions[], commandEntry: CommandCacheEntry): ArgsParseResult {
@@ -18,31 +18,20 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 
 		const [key, option] = commandEntry.optionsByName.get(interactionOption.name)!;
 
-		let value: AnyArgsValueItem;
+		let value: AnyArgsValueItem | null = interactionOption.value;
 
-		switch (option.type) {
-			case OptionType.Snowflake:
-				if (typeof interactionOption.value !== "string")
-					continue;
+		if (typeof interactionOption.value === "string") {
+			if (option.type === OptionType.Snowflake)
+				value = readValue(interactionOption.value, readSnowflake);
+			else if (option.type === OptionType.Duration)
+				value = readValue(interactionOption.value, readDuration);
+		}
 
-				const reader = new StringReader(interactionOption.value);
-
-				reader.skipWhitespace();
-				const snowflake = readSnowflake(reader);
-				reader.skipWhitespace();
-
-				if (reader.canRead() || snowflake === null) {
-					return {
-						error: ArgsParseError.BadNamedValue,
-						name: interactionOption.name
-					};
-				}
-
-				value = snowflake;
-				break;
-			default:
-				value = interactionOption.value;
-				break;
+		if (value === null) {
+			return {
+				error: ArgsParseError.BadNamedValue,
+				name: interactionOption.name
+			};
 		}
 
 		if (option.array ?? false)
@@ -55,4 +44,17 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 		error: null,
 		result: output.getFrozenResult(),
 	};
+}
+
+export function readValue<T>(value: string, valueReader: (reader: StringReader) => T): T | null {
+	const reader = new StringReader(value);
+
+	reader.skipWhitespace();
+	const result = valueReader(reader);
+	reader.skipWhitespace();
+
+	if (reader.canRead() || result === null)
+		return null;
+
+	return result;
 }

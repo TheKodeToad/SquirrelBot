@@ -77,6 +77,8 @@ function mapOptionType(type: OptionType) {
 			return ApplicationCommandOptionTypes.CHANNEL;
 		case OptionType.Snowflake:
 			return ApplicationCommandOptionTypes.STRING;
+		case OptionType.Duration:
+			return ApplicationCommandOptionTypes.STRING;
 	}
 
 	requireExhaustiveSwitch(type);

@@ -2,7 +2,7 @@ import { isSnowflake } from "../../../../../common/snowflake.ts";
 import type { StringReader } from "./stringReader.ts";
 
 export function readBoolean(reader: StringReader) {
-	const result = reader.readWord();
+	const result = reader.readWord().toLowerCase();
 
 	if (result === "false" || result === "f" || result === "0")
 		return false;
@@ -100,4 +100,95 @@ function readMention(reader: StringReader, prefix: "@" | "&" | "#"): string | nu
 		return null;
 
 	return id;
+}
+
+const DURATION_UNIT_BOUNDARY = /[A-Za-z\s]/g;
+const DURATION_LENGTH_BOUNDARY = /[^A-Za-z]/g;
+
+export function readDuration(reader: StringReader): number | null {
+	let total = 0;
+
+	if (reader.skipOver("for"))
+		reader.skipWhitespace();
+
+	while (reader.canRead()) {
+		reader.mark();
+
+		const lengthString = reader.readUntil(DURATION_UNIT_BOUNDARY);
+		const length = parseInt(lengthString);
+
+		if (Number.isNaN(length) || length <= 0) {
+			reader.reset();
+			break;
+		}
+
+		reader.skipWhitespace();
+
+		if (!reader.canRead()) {
+			reader.reset();
+			break;
+		}
+
+		const unit = reader.readUntil(DURATION_LENGTH_BOUNDARY).toLowerCase();
+
+		const ms = durationToMS(length, unit);
+
+		if (ms === null) {
+			reader.reset();
+			break;
+		}
+
+		total += ms;
+
+		reader.unmark();
+		reader.skipWhitespace();
+
+		if (reader.skipOver("and"))
+			reader.skipWhitespace();
+	}
+
+	if (total <= 0)
+		return null;
+
+	return total;
+}
+
+
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = HOUR * 24;
+const WEEK = DAY * 7;
+const YEAR = DAY * 365.25;
+const MONTH = YEAR / 12;
+
+function durationToMS(length: number, unit: string): number | null {
+	switch (unit) {
+		case "ms":
+			return length;
+
+		case "s": case "sec": case "secs": case "second": case "seconds":
+			return length * SECOND;
+
+		case "m": case "min": case "mins": case "minute": case "minutes":
+			return length * MINUTE;
+
+		case "h": case "hr": case "hrs": case "hour": case "hours":
+			return length * HOUR;
+
+		case "d": case "dy": case "dys": case "day": case "days":
+			return length * DAY;
+
+		case "w": case "wk": case "wks": case "week": case "weeks":
+			return length * WEEK;
+
+		case "mo": case "mon": case "month": case "months":
+			return length * MONTH;
+
+		case "y": case "yr": case "yrs": case "year": case "years":
+			return length * YEAR;
+
+		default:
+			return null;
+	}
 }

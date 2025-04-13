@@ -53,17 +53,6 @@ export interface ComponentCallback {
 	invokerOnly?: boolean;
 }
 
-export type Option =
-	BooleanOption |
-	FlagOption |
-	StringOption |
-	IntegerOption |
-	NumberOption |
-	UserOption |
-	RoleOption |
-	ChannelOption |
-	SnowflakeOption;
-
 export const enum OptionType {
 	Boolean,
 	/**
@@ -78,6 +67,7 @@ export const enum OptionType {
 	User,
 	Role,
 	Channel,
+	Duration,
 }
 
 /**
@@ -88,6 +78,18 @@ export type AnyArgsValue = OptionValue<any>;
  * Any type which is permitted in an array in args.
  */
 export type AnyArgsValueItem = OptionTypeValue<any>;
+
+export type Option =
+	BooleanOption |
+	FlagOption |
+	StringOption |
+	IntegerOption |
+	NumberOption |
+	UserOption |
+	RoleOption |
+	ChannelOption |
+	SnowflakeOption |
+	DurationOption;
 
 interface BaseOption {
 	type: OptionType;
@@ -112,6 +114,7 @@ interface UserOption extends BaseOption { type: OptionType.User; }
 interface RoleOption extends BaseOption { type: OptionType.Role; }
 interface ChannelOption extends BaseOption { type: OptionType.Channel; }
 interface SnowflakeOption extends BaseOption { type: OptionType.Snowflake; }
+interface DurationOption extends BaseOption { type: OptionType.Duration; };
 
 type OptionValue<F extends Option> =
 	F["array"] extends true ? ArrayValue<OptionTypeValue<F["type"]>, F["required"]> :
@@ -131,4 +134,5 @@ type OptionTypeValue<T extends OptionType> =
 	T extends OptionType.Role ? string :
 	T extends OptionType.Channel ? string :
 	T extends OptionType.Snowflake ? string :
+	T extends OptionType.Duration ? number :
 	never;
