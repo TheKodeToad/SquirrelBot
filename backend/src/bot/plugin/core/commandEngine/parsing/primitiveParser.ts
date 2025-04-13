@@ -15,7 +15,7 @@ export function readBoolean(reader: StringReader) {
 export function readInteger(reader: StringReader) {
 	const result = parseInt(reader.readWord());
 
-	if (!Number.isInteger(result))
+	if (!Number.isSafeInteger(result))
 		return null;
 
 	return result;
@@ -152,7 +152,6 @@ export function readDuration(reader: StringReader): number | null {
 
 	return total;
 }
-
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
