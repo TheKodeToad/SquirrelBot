@@ -6,26 +6,26 @@ export interface Account {
 	avatar: string;
 }
 
-export const [account, set_account] = createSignal<Account | null>(load_from_storage());
+export const [account, setAccount] = createSignal<Account | null>(loadFromStorage());
 
-export function account_id() {
-	const the_account = account();
+export function accountID() {
+	const theAccount = account();
 
-	if (the_account === null)
+	if (theAccount === null)
 		return undefined;
 
-	const split_index = the_account.token.indexOf(".");
+	const splitIndex = theAccount.token.indexOf(".");
 
-	if (split_index === -1)
+	if (splitIndex === -1)
 		return undefined;
 
-	const user_id_part = the_account.token.slice(0, split_index);
+	const userIDPart = theAccount.token.slice(0, splitIndex);
 
-	if (user_id_part.length === 0)
+	if (userIDPart.length === 0)
 		return undefined;
 
 	try {
-		var user_id = BigInt("0x" + user_id_part);
+		var userID = BigInt("0x" + userIDPart);
 	} catch (error) {
 		if (!(error instanceof SyntaxError))
 			throw error;
@@ -33,21 +33,21 @@ export function account_id() {
 		return undefined;
 	}
 
-	return user_id;
+	return userID;
 }
 
-export function avatar_url() {
-	const the_account = account();
+export function avatarURL() {
+	const theAccount = account();
 
-	if (the_account === null)
+	if (theAccount === null)
 		return undefined;
 
-	return `https://cdn.discordapp.com/avatars/${account_id()!}/${the_account.avatar}.png?size=64`;
+	return `https://cdn.discordapp.com/avatars/${accountID()!}/${theAccount.avatar}.png?size=64`;
 }
 
 createEffect(on(account, account => localStorage.setItem("account", JSON.stringify(account))));
 
-function load_from_storage(): Account | null {
+function loadFromStorage(): Account | null {
 	const string = localStorage.getItem("account");
 
 	if (string === null)

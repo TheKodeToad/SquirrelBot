@@ -1,8 +1,8 @@
 import { IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
 import { Match, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { log_in, log_out } from "../auth_flow";
-import { account, avatar_url } from "../state/account";
+import { logIn, logOut } from "../auth_flow";
+import { account, avatarURL } from "../state/account";
 import { Button } from "./common/button";
 
 export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
@@ -12,13 +12,13 @@ export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 				SquirrelBot
 				<Switch>
 					<Match when={account() === null}>
-						<Button onClick={log_in} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
+						<Button onClick={logIn} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
 							Log In
 						</Button>
 					</Match>
 					<Match when={account() !== null}>
-						<Button onClick={() => log_out()} color="transparent" style={{ "margin-left": "auto" }}>
-							<img src={avatar_url()} class="avatar" /> {account()?.username} <IconLogout size="1em" />
+						<Button onClick={() => logOut()} color="transparent" style={{ "margin-left": "auto" }}>
+							<img src={avatarURL()} class="avatar" /> {account()?.username} <IconLogout size="1em" />
 						</Button>
 					</Match>
 				</Switch>
@@ -30,4 +30,4 @@ export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 			{children}
 		</>
 	);
-};;;
+};

@@ -1,14 +1,14 @@
-import { log_in as request_log_in, log_out as request_log_out } from "./client";
+import { logIn as requestLogIn, logOut as requestLogOut } from "./client";
 
-import { build_uri } from "./common/uri";
+import { buildURI } from "./common/uri";
 import { CLIENT_ID, REDIRECT_URI } from "./environment";
-import { account, set_account } from "./state/account";
+import { account, setAccount } from "./state/account";
 
-let auth_window: WindowProxy | null = null;
+let authWindow: WindowProxy | null = null;
 
-window.addEventListener("beforeunload", () => auth_window?.close());
+window.addEventListener("beforeunload", () => authWindow?.close());
 window.addEventListener("message", async event => {
-	if (!(event.source === auth_window && event.origin === location.origin)) {
+	if (!(event.source === authWindow && event.origin === location.origin)) {
 		console.warn("Message from unknown window @ " + event.origin);
 		return;
 	}
@@ -21,42 +21,42 @@ window.addEventListener("message", async event => {
 		return;
 	}
 
-	await login_callback(code);
+	await loginCallback(code);
 });
 
-export function log_in() {
-	if (!(auth_window === null || auth_window.closed)) {
-		auth_window.focus();
+export function logIn() {
+	if (!(authWindow === null || authWindow.closed)) {
+		authWindow.focus();
 		return;
 	}
 
-	const login_uri = build_uri`https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=identify&prompt=none`;
+	const login_uri = buildURI`https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=identify&prompt=none`;
 
 	const width = 1000;
 	const height = 800;
 	const left = screen.width / 2 - width / 2;
 	const top = screen.height / 2 - height / 2;
 
-	auth_window = open(login_uri, undefined, `popup=true,width=${width},height=${height},left=${left},top=${top}`);
+	authWindow = open(login_uri, undefined, `popup=true,width=${width},height=${height},left=${left},top=${top}`);
 
-	if (auth_window === null)
+	if (authWindow === null)
 		location.href = login_uri;
 }
 
-async function login_callback(code: string) {
-	const response = await request_log_in(code);
+async function loginCallback(code: string) {
+	const response = await requestLogIn(code);
 
 	if ("error" in response)
 		return; // TODO handle errors
 
-	set_account({
+	setAccount({
 		token: response.token,
 		username: response.username,
 		avatar: response.avatar
 	});
 }
 
-export async function log_out() {
+export async function logOut() {
 	const token = account()?.token;
 
 	if (token === undefined) {
@@ -64,6 +64,6 @@ export async function log_out() {
 		return;
 	}
 
-	set_account(null);
-	await request_log_out(token);
+	setAccount(null);
+	await requestLogOut(token);
 }

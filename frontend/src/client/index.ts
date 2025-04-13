@@ -20,7 +20,7 @@ export interface GuildResponse {
 	owner_id: string;
 }
 
-async function request_json<T>(route: string, method: HttpMethod, token?: string, body?: any): Promise<T | ErrorResponse> {
+async function requestJSON<T>(route: string, method: HttpMethod, token?: string, body?: any): Promise<T | ErrorResponse> {
 	const headers = new Headers;
 	headers.set("Content-Type", "application/json");
 
@@ -41,14 +41,14 @@ async function request_json<T>(route: string, method: HttpMethod, token?: string
 	return JSON.parse(text);
 }
 
-export function log_in(code: string) {
-	return request_json<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code });
+export function logIn(code: string) {
+	return requestJSON<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code });
 }
 
-export function log_out(token: string) {
-	return request_json<null>(AUTH_LOG_OUT, "GET", token);
+export function logOut(token: string) {
+	return requestJSON<null>(AUTH_LOG_OUT, "GET", token);
 }
 
-export function get_guilds(token: string) {
-	return request_json<GuildResponse[]>(GUILDS, "GET", token);
+export function getGuilds(token: string) {
+	return requestJSON<GuildResponse[]>(GUILDS, "GET", token);
 }

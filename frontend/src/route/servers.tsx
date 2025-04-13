@@ -1,12 +1,12 @@
 import { createResource, For, Show } from "solid-js";
-import { get_guilds, GuildResponse } from "../client";
+import { getGuilds, GuildResponse } from "../client";
 import { LoginGate } from "../component/login_gate";
 import { account } from "../state/account";
 
 export const Servers = () => <LoginGate><ServersComponent /></LoginGate>;
 
 function ServersComponent() {
-	const [guilds] = createResource(() => account() !== null ? get_guilds(account()!.token) : undefined);
+	const [guilds] = createResource(() => account() !== null ? getGuilds(account()!.token) : undefined);
 
 	return (
 		<div class="content">
