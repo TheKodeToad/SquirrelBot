@@ -9,13 +9,18 @@ const logger = moduleLogger();
 await checkMigrationsOrExit();
 
 bot.once("ready", async () => {
-	logger.debug?.("Ready event received");
+	try {
+		logger.debug?.("Ready event received");
 
-	logger.info?.("Starting up plugins");
-	loadPlugins();
-	await applyPlugins();
-	logger.info?.(`Total plugins: ${countPlugins()}`);
-	logger.info?.("I'm ready :O");
+		logger.info?.("Starting up plugins");
+		loadPlugins();
+		await applyPlugins();
+		logger.info?.(`Total plugins: ${countPlugins()}`);
+		logger.info?.("I'm ready :O");
+	} catch (error) {
+		logger.error?.("Unhandled error during initialization", error);
+		process.exit(1);
+	}
 });
 
 bot.on("error", (error, shard) => {
