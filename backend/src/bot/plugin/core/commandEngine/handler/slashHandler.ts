@@ -1,11 +1,15 @@
-import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
+import { readFile, writeFile } from "fs/promises";
+import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
+import path from "path";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
+import { CACHE_PATH } from "../../../../../environment.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { bot } from "../../../../index.ts";
 import { coreConfig } from "../../index.ts";
 import { type Command, type CommandContext, OptionType, type Reply } from "../../public/command/index.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
+import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
 import { getCommands, getCommandsByName } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
@@ -28,7 +32,29 @@ export async function syncSlashCommands(): Promise<void> {
 			}
 		)) : [],
 	} satisfies CreateApplicationCommandOptions));
+
+	const cacheFile = path.resolve(CACHE_PATH, "core_syncSlashCommandsHash.bin");
+
+	const newHash = new Uint8Array(await crypto.subtle.digest("sha-1", new TextEncoder().encode(JSON.stringify(commands))));
+
+	try {
+		const oldHash = await readFile(cacheFile, null);
+
+		if (oldHash.equals(newHash)) {
+			logger.debug?.("Skipping slash command sync - payload is unchanged");
+			return;
+		}
+	} catch (error) {
+		if (!(error instanceof Error && "code" in error && typeof "code" === "string"))
+			throw error;
+
+		if (error.code !== "ENOENT")
+			throw error;
+	}
+
 	await bot.application.bulkEditGlobalCommands(commands);
+
+	await writeFile(cacheFile, newHash);
 }
 
 function mapOptionType(type: OptionType) {
@@ -89,6 +115,10 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
 		context._clearTimeout();
+		await interaction.createMessage({
+			content: `${icons.error} You lack permission to execute this command in this channel.`,
+			flags: MessageFlags.EPHEMERAL,
+		});
 		return;
 	}
 

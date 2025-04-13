@@ -1,10 +1,14 @@
+import { mkdir } from "fs/promises";
 import { moduleLogger } from "../common/logger/index.ts";
 import { checkMigrationsOrExit } from "../db/migration.ts";
 import { connectListener } from "../db/notification.ts";
+import { CACHE_PATH } from "../environment.ts";
 import { bot } from "./index.ts";
 import { applyPlugins, countPlugins, loadPlugins } from "./loader/index.ts";
 
 const logger = moduleLogger();
+
+await mkdir(CACHE_PATH, { recursive: true });
 
 await checkMigrationsOrExit();
 
