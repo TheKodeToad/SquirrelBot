@@ -115,7 +115,7 @@ export function readDuration(reader: StringReader): number | null {
 		reader.mark();
 
 		const lengthString = reader.readUntil(DURATION_UNIT_BOUNDARY);
-		const length = parseInt(lengthString);
+		const length = parseFloat(lengthString);
 
 		if (Number.isNaN(length) || length <= 0) {
 			reader.reset();
@@ -147,7 +147,7 @@ export function readDuration(reader: StringReader): number | null {
 			reader.skipWhitespace();
 	}
 
-	if (total <= 0)
+	if (!(total > 0 && Number.isSafeInteger(total)))
 		return null;
 
 	return total;
