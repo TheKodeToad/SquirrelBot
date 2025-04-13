@@ -69,6 +69,8 @@ export class StringReader {
 			throw new Error("No mark set");
 
 		this._cursor = this._markedCursor;
+
+		this._markedCursor = null;
 	}
 
 	readUntil(pattern: string | RegExp): string {
