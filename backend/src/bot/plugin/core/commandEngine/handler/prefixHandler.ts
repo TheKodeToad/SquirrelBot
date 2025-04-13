@@ -10,7 +10,8 @@ import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
 import { getCommandsByName } from "../commandCache.ts";
 import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
-import { ArgsParseError, readCommandArgs, readCommandName } from "../parsing/command.ts";
+import { formatArgsParseError } from "../parsing/index.ts";
+import { readPrefixArgs, readPrefixName } from "../parsing/prefixParser.ts";
 import { StringReader } from "../parsing/stringReader.ts";
 import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
@@ -53,7 +54,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 
 	const reader = new StringReader(message.content);
 
-	const name = readCommandName(reader, prefix);
+	const name = readPrefixName(reader, prefix);
 
 	if (name === null)
 		return false;
@@ -79,34 +80,10 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	if (data == null)
 		throw new Error("Nullish value returned from preRun!");
 
-	const args = readCommandArgs(reader, commandEntry);
+	const args = readPrefixArgs(reader, commandEntry);
 
 	if (args.error !== null) {
-		switch (args.error) {
-			case ArgsParseError.MISSING_OPTIONS:
-				await context.respond(`${icons.error} Missing options: ${[...args.options].map(option => "'" + option + "'").join(", ")}.`);
-				break;
-
-			case ArgsParseError.BARE_NAMED_KEY:
-				await context.respond(`${icons.error} Missing option name after hyphen.`);
-				break;
-
-			case ArgsParseError.BAD_NAMED_KEY:
-				await context.respond(`${icons.error} No option named '${args.name}'.`);
-				break;
-
-			case ArgsParseError.BAD_NAMED_VALUE:
-				await context.respond(`${icons.error} Invalid value passed for '${args.name}'.`);
-				break;
-
-			case ArgsParseError.BAD_POSITIONAL_INDEX:
-				await context.respond(`${icons.error} Too many unlabeled options provided.`);
-				break;
-
-			case ArgsParseError.BAD_POSITIONAL_VALUE:
-				await context.respond(`${icons.error} Invalid value passed for unlabeled option #${args.index + 1}.`);
-				break;
-		}
+		await context.respond(`${icons.error} ${formatArgsParseError(args)}`);
 
 		if (context._response !== null)
 			trackedMessages.set(message.id, context._response);

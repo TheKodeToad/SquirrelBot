@@ -13,7 +13,8 @@ import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
 import { getCommands, getCommandsByName } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
-import { SafeArgs } from "../safeArgs.ts";
+import { formatArgsParseError } from "../parsing/index.ts";
+import { readSlashArgs } from "../parsing/slashParser.ts";
 import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
@@ -75,7 +76,7 @@ function mapOptionType(type: OptionType) {
 		case OptionType.CHANNEL:
 			return ApplicationCommandOptionTypes.CHANNEL;
 		case OptionType.SNOWFLAKE:
-			return ApplicationCommandOptionTypes.INTEGER;
+			return ApplicationCommandOptionTypes.STRING;
 	}
 
 	requireExhaustiveSwitch(type);
@@ -114,9 +115,8 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
-		context._clearTimeout();
-		await interaction.createMessage({
-			content: `${icons.error} You lack permission to execute this command in this channel.`,
+		await context.respond({
+			content: `${icons.error} You lack permission to execute the command in this channel.`,
 			flags: MessageFlags.EPHEMERAL,
 		});
 		return;
@@ -125,29 +125,20 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	if (data == null)
 		throw new Error("Nullish value returned from preRun!");
 
-	const safeArgs = new SafeArgs(commandEntry.command.options ?? {});
+	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
 
-	for (const slashOption of interaction.data.options.raw) {
-		if (!("value" in slashOption))
-			continue;
-
-		if (!commandEntry.optionsByName.has(slashOption.name))
-			continue;
-
-		const [key, option] = commandEntry.optionsByName.get(slashOption.name)!;
-
-		if (option.array ?? false)
-			safeArgs.pushTo(key, slashOption.value);
-		else
-			safeArgs.set(key, slashOption.value);
+	if (args.error !== null) {
+		await context.respond({
+			content: `${icons.error} ${formatArgsParseError(args)}`,
+			flags: MessageFlags.EPHEMERAL,
+		});
+		return;
 	}
 
-	const args = safeArgs.getFrozenResult();
-
-	logger.debug?.(`Parsed arguments from options; running '${interaction.data.name}'`, args);
+	logger.debug?.(`Parsed arguments; running '${interaction.data.name}'`, args);
 
 	try {
-		await commandEntry.command.run(context, args as any, data);
+		await commandEntry.command.run(context, args.result as any, data);
 	} catch (error) {
 		await context.respond(`:boom: Failed to execute command`);
 		throw error;

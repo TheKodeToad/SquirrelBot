@@ -45,7 +45,7 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 			flags: MessageFlags.EPHEMERAL
 		});
 		// HACK for now
-		context["_acked"] = true;
+		context._acked = true;
 		throw error;
 	} finally {
 		await context._abandon();
@@ -78,7 +78,7 @@ export function unlistenForInteractions(messageID: string): void {
 class ComponentContextImpl implements ComponentContext {
 	private _interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
 	private _originalInvoker: string;
-	private _acked: boolean;
+	_acked: boolean;
 	private _ackPromise: Promise<void> | null;
 	private _ackTimeout: NodeJS.Timeout | null;
 

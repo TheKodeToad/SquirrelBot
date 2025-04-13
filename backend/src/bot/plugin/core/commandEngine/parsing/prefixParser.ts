@@ -1,10 +1,11 @@
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command/index.ts";
 import type { CommandCacheEntry } from "../commandCache.ts";
 import { SafeArgs } from "../safeArgs.ts";
-import { readBoolean, readChannel, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitives.ts";
+import { ArgsParseError, type ArgsParseResult } from "./index.ts";
+import { readBoolean, readChannel, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitiveParser.ts";
 import type { StringReader } from "./stringReader.ts";
 
-export function readCommandName(reader: StringReader, prefix: string): string | null {
+export function readPrefixName(reader: StringReader, prefix: string): string | null {
 	if (!reader.skipOver(prefix))
 		return null;
 
@@ -16,26 +17,10 @@ export function readCommandName(reader: StringReader, prefix: string): string | 
 	return reader.readWord();
 }
 
-export const enum ArgsParseError {
-	MISSING_OPTIONS,
-	BAD_NAMED_KEY,
-	BAD_NAMED_VALUE,
-	BARE_NAMED_KEY,
-	BAD_POSITIONAL_INDEX,
-	BAD_POSITIONAL_VALUE,
-}
-
-export type ArgsResult =
-	| { error: null; result: Record<string, AnyArgsValue>; }
-	| { error: ArgsParseError.MISSING_OPTIONS, options: Set<string>; }
-	| { error: ArgsParseError.BAD_NAMED_KEY | ArgsParseError.BAD_NAMED_VALUE; name: string; }
-	| { error: ArgsParseError.BARE_NAMED_KEY; }
-	| { error: ArgsParseError.BAD_POSITIONAL_INDEX | ArgsParseError.BAD_POSITIONAL_VALUE, index: number; };
-
 const GREEDY_VALUE_TERMINATOR = /\s+--?[\w\-]/g;
 const ARRAY_TERMINATOR = /--?[\w\-]/y;
 
-export function readCommandArgs(reader: StringReader, commandEntry: CommandCacheEntry): ArgsResult {
+export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheEntry): ArgsParseResult {
 	const output = new SafeArgs(commandEntry.command.options ?? {});
 
 	let positionalIndex = 0;
@@ -92,7 +77,7 @@ export function readCommandArgs(reader: StringReader, commandEntry: CommandCache
 	};
 }
 
-function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, output: SafeArgs): ArgsResult | boolean {
+function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, output: SafeArgs): ArgsParseResult | boolean {
 	if (!reader.skipOver("-"))
 		return false;
 
