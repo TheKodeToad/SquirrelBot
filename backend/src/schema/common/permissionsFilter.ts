@@ -1,6 +1,6 @@
 import type { InferOutput } from "valibot";
 import { array, object, optional, string } from "valibot";
-import { numberFilterSchema } from "./number_filter.ts";
+import { numberFilterSchema } from "./numberFilter.ts";
 
 export const permissionsFilterSchema = object({
 	in_group: optional(array(string())),

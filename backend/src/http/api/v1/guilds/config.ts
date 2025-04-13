@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { getGuildConfig, updateGuildConfig } from "../../../../db/core/configs.ts";
 import { notifyChannel } from "../../../../db/notification.ts";
-import type { GuildAuthVars } from "../../../middleware/guild_auth.ts";
+import type { GuildAuthVars } from "../../../middleware/guildAuth.ts";
 
 const router = new Hono<{ Variables: GuildAuthVars; }>;
 

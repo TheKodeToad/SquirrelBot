@@ -6,7 +6,7 @@ import { escapeMarkdown } from "../../../common/discord/markdown.ts";
 import { permissionsGuard } from "../../core/public/command/helper.ts";
 import { defineCommand, OptionType, type Component, type Reply } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
-import { resolvePermissions } from "../../core/public/permission_resolution.ts";
+import { resolvePermissions } from "../../core/public/permissionResolution.ts";
 import { caseTypeName, caseTypeNameCompact } from "../helper/cases.ts";
 import { moderationConfig } from "../index.ts";
 

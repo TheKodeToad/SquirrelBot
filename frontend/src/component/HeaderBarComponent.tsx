@@ -1,9 +1,9 @@
 import { IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
 import { Match, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { logIn, logOut } from "../auth_flow";
+import { logIn, logOut } from "../authFlow";
 import { account, avatarURL } from "../state/account";
-import { Button } from "./common/button";
+import { Button } from "./common/Button";
 
 export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 	return (

@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import { IconArrowLeft, IconHome } from "@tabler/icons-solidjs";
-import { Button } from "../component/common/button";
+import { Button } from "../component/common/Button";
 
 export function NotFound() {
 	return (

@@ -1,7 +1,7 @@
-import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "../../../db/core/guild_info.ts";
+import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "../../../db/core/guildInfo.ts";
 import { BOT_ALLOWED_GUILDS } from "../../../environment.ts";
 import { bot } from "../../index.ts";
-import { defineEventListener } from "./public/event_listener.ts";
+import { defineEventListener } from "./public/eventListener.ts";
 
 type Listener = (guildID: string) => unknown;
 

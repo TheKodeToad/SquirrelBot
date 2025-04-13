@@ -6,7 +6,7 @@ import { coreConfig as coreConfigCache } from "../index.ts";
 import { permissionsGuard } from "../public/command/helper.ts";
 import { defineCommand, OptionType } from "../public/command/index.ts";
 import { icons } from "../public/icons.ts";
-import { resolveGroups } from "../public/permission_resolution.ts";
+import { resolveGroups } from "../public/permissionResolution.ts";
 
 export const groupsCommand = defineCommand({
 	name: ["groups"],

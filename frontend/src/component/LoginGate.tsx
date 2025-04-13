@@ -1,8 +1,8 @@
 import { IconArrowRight } from "@tabler/icons-solidjs";
 import { JSX, Show } from "solid-js";
-import { logIn } from "../auth_flow";
+import { logIn } from "../authFlow";
 import { account } from "../state/account";
-import { Button } from "./common/button";
+import { Button } from "./common/Button";
 
 export function LoginGate({ children }: { children: JSX.Element; }) {
 	return (

@@ -1,6 +1,6 @@
 import type { SchemaWithOutput } from "../../../../../common/types.ts";
 import type { ConfigCache } from "../config.ts";
-import { resolvePermissions, type ConfigWithPermissions } from "../permission_resolution.ts";
+import { resolvePermissions, type ConfigWithPermissions } from "../permissionResolution.ts";
 import type { CommandContext } from "./index.ts";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(

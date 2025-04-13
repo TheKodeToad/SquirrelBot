@@ -1,18 +1,18 @@
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
-import { TTLMap } from "../../../../../common/ttl_map.ts";
-import { debugFormatPermissionContext } from "../../../../common/discord/debug_format.ts";
+import { TTLMap } from "../../../../../common/ttlMap.ts";
+import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../../../common/discord/permissions.ts";
 import { coreConfig } from "../../index.ts";
 import { type Command, type CommandContext, type Reply } from "../../public/command/index.ts";
-import { defineEventListener } from "../../public/event_listener.ts";
+import { defineEventListener } from "../../public/eventListener.ts";
 import { icons } from "../../public/icons.ts";
-import { resolvePermissions } from "../../public/permission_resolution.ts";
-import { getCommandsByName } from "../command_cache.ts";
+import { resolvePermissions } from "../../public/permissionResolution.ts";
+import { getCommandsByName } from "../commandCache.ts";
 import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
 import { ArgsParseError, readCommandArgs, readCommandName } from "../parsing/command.ts";
-import { StringReader } from "../parsing/string_reader.ts";
-import { listenForInteractions, unlistenForInteractions } from "./component_handler.ts";
+import { StringReader } from "../parsing/stringReader.ts";
+import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 

@@ -7,7 +7,7 @@ import { getGuildConfig, insertGuildConfig } from "../../../db/core/configs.ts";
 import { addChannelListener } from "../../../db/notification.ts";
 import { getPlugin, getPlugins } from "../../loader/index.ts";
 import type { Plugin } from "../../loader/plugin.ts";
-import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds } from "./guild_info_sync.ts";
+import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds } from "./guildInfoSync.ts";
 
 const logger = moduleLogger();
 

@@ -1,15 +1,15 @@
 import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, Shard, User } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
-import { debugFormatPermissionContext } from "../../../../common/discord/debug_format.ts";
+import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { bot } from "../../../../index.ts";
 import { coreConfig } from "../../index.ts";
 import { type Command, type CommandContext, type Option, OptionType, type Reply } from "../../public/command/index.ts";
-import { defineEventListener } from "../../public/event_listener.ts";
-import { resolvePermissions } from "../../public/permission_resolution.ts";
-import { getCommands, getCommandsByName } from "../command_cache.ts";
+import { defineEventListener } from "../../public/eventListener.ts";
+import { resolvePermissions } from "../../public/permissionResolution.ts";
+import { getCommands, getCommandsByName } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
-import { listenForInteractions, unlistenForInteractions } from "./component_handler.ts";
+import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 

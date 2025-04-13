@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import logIn from "./log_in.ts";
-import logOut from "./log_out.ts";
+import logIn from "./logIn.ts";
+import logOut from "./logOut.ts";
 
 const hono = new Hono;
 hono.route("/log-in", logIn);

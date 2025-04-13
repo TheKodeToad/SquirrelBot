@@ -1,9 +1,9 @@
 import { type AnyGuildChannel, CategoryChannel, Member, ThreadChannel } from "oceanic.js";
 import { moduleLogger } from "../../../../common/logger/index.ts";
-import { testNumberFilter } from "../../../../schema/common/number_filter.ts";
-import type { PermissionsFilter } from "../../../../schema/common/permissions_filter.ts";
+import { testNumberFilter } from "../../../../schema/common/numberFilter.ts";
+import type { PermissionsFilter } from "../../../../schema/common/permissionsFilter.ts";
 import type { CoreConfig, CoreGroup } from "../../../../schema/plugin/core.ts";
-import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "../../../common/discord/debug_format.ts";
+import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "../../../common/discord/debugFormat.ts";
 import { coreConfig } from "../index.ts";
 
 const logger = moduleLogger();

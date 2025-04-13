@@ -1,5 +1,5 @@
 import { isSnowflake } from "../../../../../common/snowflake.ts";
-import type { StringReader } from "./string_reader.ts";
+import type { StringReader } from "./stringReader.ts";
 
 export function readBoolean(reader: StringReader) {
 	const result = reader.readWord();

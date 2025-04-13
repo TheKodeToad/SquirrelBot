@@ -1,7 +1,7 @@
 import type { ClientEvents } from "oceanic.js";
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { bot } from "../../index.ts";
-import { isGuildAllowed } from "./guild_info_sync.ts";
+import { isGuildAllowed } from "./guildInfoSync.ts";
 
 const logger = moduleLogger();
 

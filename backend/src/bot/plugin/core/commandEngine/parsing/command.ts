@@ -1,8 +1,8 @@
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command/index.ts";
-import type { CommandCacheEntry } from "../command_cache.ts";
-import { SafeArgs } from "../safe_args.ts";
+import type { CommandCacheEntry } from "../commandCache.ts";
+import { SafeArgs } from "../SafeArgs.ts";
 import { readBoolean, readChannel, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitives.ts";
-import type { StringReader } from "./string_reader.ts";
+import type { StringReader } from "./stringReader.ts";
 
 export function readCommandName(reader: StringReader, prefix: string): string | null {
 	if (!reader.skipOver(prefix))
@@ -148,7 +148,7 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 		if (!reader.canRead())
 			return null;
 
-		const result = read_command_arg_value(reader, option.type, GREEDY_VALUE_TERMINATOR);
+		const result = readCommandArgValue(reader, option.type, GREEDY_VALUE_TERMINATOR);
 		reader.skipWhitespace();
 
 		return result;
@@ -159,7 +159,7 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 	while (reader.canRead() && !reader.match(ARRAY_TERMINATOR)) {
 		reader.mark();
 
-		const item = read_command_arg_value(reader, option.type);
+		const item = readCommandArgValue(reader, option.type);
 
 		if (item === null) {
 			reader.reset();
@@ -179,7 +179,7 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 	return result;
 }
 
-function read_command_arg_value(reader: StringReader, type: OptionType, terminator?: RegExp): AnyArgsValueItem | null {
+function readCommandArgValue(reader: StringReader, type: OptionType, terminator?: RegExp): AnyArgsValueItem | null {
 	switch (type) {
 		case OptionType.BOOLEAN:
 			return readBoolean(reader);

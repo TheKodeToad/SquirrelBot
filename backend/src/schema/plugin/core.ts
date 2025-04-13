@@ -1,7 +1,7 @@
 import type { InferOutput } from "valibot";
 import { array, boolean, number, object, optional, pipe, rawTransform, record, string } from "valibot";
 import { snowflakeSchema } from "../common/index.ts";
-import { permissionsFilterSchema } from "../common/permissions_filter.ts";
+import { permissionsFilterSchema } from "../common/permissionsFilter.ts";
 
 const coreGroupSchema = object({
 	users: optional(array(pipe(string(), snowflakeSchema)), []),
