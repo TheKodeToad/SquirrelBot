@@ -25,7 +25,7 @@ export const prefixDeleteHandler = defineEventListener("messageDelete", handleDe
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
 const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
-setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL);
+setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
 async function handle(message: Message, prevResponse?: Message): Promise<boolean> {
 	if (!message.inCachedGuildChannel())

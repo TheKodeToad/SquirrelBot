@@ -6,7 +6,7 @@ const listenersLookup: Map<string, Listener[]> = new Map;
 
 export type Listener = (payload: string | undefined) => void | Promise<void>;
 
-export async function connectListener(): Promise<void> {
+export async function connectChannelListener(): Promise<void> {
 	listenerClient = await pool.connect();
 	await listenerClient.query(
 		`
@@ -23,6 +23,10 @@ export async function connectListener(): Promise<void> {
 
 		listeners.forEach(listener => listener(notification.payload));
 	});
+}
+
+export function disconnectChannelListener() {
+	listenerClient?.release();
 }
 
 export async function addChannelListener(channel: string, listener: Listener): Promise<void> {

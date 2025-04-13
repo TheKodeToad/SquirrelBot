@@ -10,7 +10,7 @@ interface ComponentData {
 }
 
 const activeComponents: TTLMap<string, ComponentData> = new TTLMap(STATE_EXPIRE_AFTER);
-setInterval(() => activeComponents.cleanup(), STATE_CLEANUP_INTERVAL);
+setInterval(() => activeComponents.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
 export const componentInterationHandler = defineEventListener("interactionCreate", async interaction => {
 	if (!interaction.inCachedGuildChannel())
