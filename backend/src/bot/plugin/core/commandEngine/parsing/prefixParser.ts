@@ -129,6 +129,9 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 
 // null explicitly indicates error
 function readCommandArg(reader: StringReader, option: Option, propagateArrayError: boolean): AnyArgsValue | null {
+	if (option.type === OptionType.Flag)
+		return true;
+
 	if (!(option.array ?? false)) {
 		if (!reader.canRead())
 			return null;
@@ -164,13 +167,10 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 	return result;
 }
 
-function readCommandArgValue(reader: StringReader, type: OptionType, terminator?: RegExp): AnyArgsValueItem | null {
+function readCommandArgValue(reader: StringReader, type: Exclude<OptionType, OptionType.Flag>, terminator?: RegExp): AnyArgsValueItem | null {
 	switch (type) {
 		case OptionType.Boolean:
 			return readBoolean(reader);
-
-		case OptionType.Flag:
-			return true;
 
 		case OptionType.Integer:
 			return readInteger(reader);
