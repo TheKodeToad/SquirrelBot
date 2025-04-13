@@ -112,7 +112,7 @@ export const inviteCommand = defineCommand({
 			if (guild.vanityURLCode !== null)
 				embed.footer.text += "discord.gg/" + guild.vanityURLCode + " • ";
 
-			embed.footer.text += guild.id;
+			embed.footer.text += "Server ID: " + guild.id;
 		} else if (type === InviteTypes.FRIEND && inviter !== undefined) {
 			embed.author = { name: inviter.tag || "<unknown>" + " (friend)" };
 			embed.footer = { text: "" };
