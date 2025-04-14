@@ -3,10 +3,11 @@ import { formatDateHMS } from "../../../common/format.ts";
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminder.ts";
 import { getMemberCached } from "../../common/discord/cache.ts";
-import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
+import { debugFormatChannel } from "../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../common/discord/permissions.ts";
 import { bot } from "../../index.ts";
 import { icons } from "../core/public/icons.ts";
+import { debugFormatReminder } from "./index.ts";
 
 const logger = moduleLogger();
 
@@ -29,7 +30,11 @@ export function trackNewReminder(reminder: Reminder) {
 async function poll() {
 	const end = new Date(Date.now() + TIMEOUT_POLL_RATE);
 
-	logger.debug?.("Setting timeouts for reminders from " + formatDateHMS(nextExpiryStartTime) + " to " + formatDateHMS(end));
+	logger.debug?.(
+		nextExpiryStartTime.getTime() === 0
+			? "Setting initial timeouts for missed reminders and upcoming reminders until " + formatDateHMS(end)
+			: "Setting timeouts for reminders from " + formatDateHMS(nextExpiryStartTime) + " to " + formatDateHMS(end)
+	);
 
 	const reminders = await getRemindersByFiresAt(nextExpiryStartTime, end);
 	nextExpiryStartTime = end;
@@ -42,7 +47,7 @@ function setFireTimeout(reminder: Reminder) {
 	const delay = Math.max(0, reminder.firesAt.getTime() - Date.now());
 	setTimeout(() => fire(reminder), delay);
 
-	logger.debug?.(`Setting up timeout for reminder #${reminder.number} in ${debugFormatGuildByID(reminder.guildID)} with delay ${delay}`);
+	logger.debug?.(`Setting up timeout for reminder ${debugFormatReminder(reminder)} with delay ${delay}`);
 }
 
 async function fire(reminder: Reminder) {
@@ -55,19 +60,25 @@ async function fire(reminder: Reminder) {
 	// TODO: should these issues be reported to somebody
 	// members could also be bulk requested ahead of time
 
-	if (guild === undefined)
+	if (guild === undefined) {
+		logger.debug?.(`Bot user is not in guild; not sending reminder ${debugFormatReminder(reminder)}`);
 		return; // no access to guild?
+	}
 
 	const channel = guild.channels.get(reminder.channelID);
 
-	if (channel === undefined)
+	if (channel === undefined) {
+		logger.debug?.(`Channel was deleted; not sending reminder ${debugFormatReminder(reminder)}`);
 		return; // deleted
+	}
 
 	if (!(channel instanceof TextableChannel))
 		return;
 
-	if (!canWriteInChannel(channel, guild.clientMember))
+	if (!canWriteInChannel(channel, guild.clientMember)) {
+		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
 		return;
+	}
 
 	try {
 		var owner = await getMemberCached(guild, reminder.ownerID);
@@ -79,8 +90,10 @@ async function fire(reminder: Reminder) {
 	}
 
 	// don't allow perm bypass
-	if (!canWriteInChannel(channel, owner))
+	if (!canWriteInChannel(channel, owner)) {
+		logger.debug?.(`Owner cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
 		return;
+	}
 
 	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${Math.floor(reminder.createdAt.getTime() / 1000)}>!**`;
 

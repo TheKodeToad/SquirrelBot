@@ -1,4 +1,6 @@
+import type { Reminder } from "../../../db/reminders/reminder.ts";
 import { remindersConfigSchema } from "../../../schema/plugin/reminder.ts";
+import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
 import { definePlugin } from "../../loader/plugin.ts";
 import { ConfigCache } from "../core/public/config.ts";
 import { remindCommand } from "./command/remindCommand.ts";
@@ -15,3 +17,7 @@ export const remindersPlugin = definePlugin({
 		beginPollingReminders();
 	},
 });
+
+export function debugFormatReminder(reminder: Reminder) {
+	return `#${reminder.number} in ${debugFormatGuildByID(reminder.guildID)}`;
+}
