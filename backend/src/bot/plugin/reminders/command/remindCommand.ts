@@ -7,17 +7,17 @@ import { remindersConfig } from "../index.ts";
 import { trackNewReminder } from "../scheduler.ts";
 
 export const remindCommand = defineCommand({
-	name: ["remind", "reminderset", "remindme"],
+	name: ["remind", "reminderset", "remindme", "reminder"],
 	options: {
-		duration: {
+		delay: {
 			type: OptionType.Duration,
-			name: ["duration"],
+			name: ["delay", "d"],
 			required: true,
 			position: 0,
 		},
 		message: {
 			type: OptionType.String,
-			name: ["message"],
+			name: ["message", "m"],
 			required: true,
 			position: 1,
 		}
@@ -29,7 +29,7 @@ export const remindCommand = defineCommand({
 			return;
 
 		const now = Date.now();
-		const firesAt = now + args.duration;
+		const firesAt = now + args.delay;
 
 		const reminder = await createReminder(context.guild.id, {
 			ownerID: context.user.id,
