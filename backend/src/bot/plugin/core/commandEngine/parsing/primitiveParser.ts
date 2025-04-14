@@ -147,7 +147,7 @@ export function readDuration(reader: StringReader): number | null {
 			reader.skipWhitespace();
 	}
 
-	if (!(total > 0 && Number.isSafeInteger(total)))
+	if (!Number.isSafeInteger(total) || total <= 0)
 		return null;
 
 	return total;

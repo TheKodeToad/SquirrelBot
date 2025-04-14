@@ -48,7 +48,7 @@ export const kickCommand = defineCommand({
 
 			membersOnly: true,
 
-			perform: async user => await context.guild.removeMember(user.id, args.reason ?? undefined),
+			perform: async member => await context.guild.removeMember(member.id, args.reason ?? undefined),
 			makeCase(actor, target, dmDelivered) {
 				return {
 					type: CaseType.Kick,

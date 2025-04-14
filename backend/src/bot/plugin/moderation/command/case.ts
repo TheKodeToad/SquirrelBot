@@ -1,3 +1,4 @@
+import type { EmbedField } from "oceanic.js";
 import { getCase } from "../../../../db/moderation/cases.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { formatUser } from "../../../common/discord/format.ts";
@@ -27,34 +28,48 @@ export const caseCommand = defineCommand({
 			return;
 		}
 
+		const fields: EmbedField[] = [];
+
 		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
+
+		fields.push({
+			name: "Created At",
+			value: `<t:${creationSecs}> (<t:${creationSecs}:R>)`,
+		});
+
+		if (info.expiresAt !== null) {
+			const expirySecs = Math.floor(info.expiresAt.getTime() / 1000);
+
+			fields.push({
+				name: "Expires At",
+				value: `<t:${expirySecs}> (<t:${expirySecs}:R>)`
+			});
+		}
+
+		fields.push(
+			{
+				name: "Type",
+				value: caseTypeName(info.type)
+			},
+			{
+				name: "Actor",
+				value: await formatUser(info.actorID)
+			},
+			{
+				name: "Target",
+				value: await formatUser(info.targetID)
+			},
+			{
+				name: "Reason",
+				value: info.reason ?? "*None provided*",
+			},
+		);
 
 		await context.respond({
 			embeds: [{
 				color: Colors.blurple,
 				title: `Case #${number}`,
-				fields: [
-					{
-						name: "Created at",
-						value: `<t:${creationSecs}> (<t:${creationSecs}:R>)`,
-					},
-					{
-						name: "Type",
-						value: caseTypeName(info.type)
-					},
-					{
-						name: "Actor",
-						value: await formatUser(info.actorID)
-					},
-					{
-						name: "Target",
-						value: await formatUser(info.targetID)
-					},
-					{
-						name: "Reason",
-						value: info.reason ?? "*None provided*",
-					},
-				],
+				fields
 			}]
 		});
 	},

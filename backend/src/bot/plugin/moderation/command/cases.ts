@@ -107,6 +107,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 
 	for (const info of cases) {
 		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
+		const expirySecs = Math.floor(info.createdAt.getTime() / 1000);
 
 		if (options.compact) {
 			const actor = escapeMarkdown(await formatUserTag(info.actorID));
@@ -119,7 +120,11 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 			description += "\n";
 		} else {
 			let value = "";
-			value += `Created at: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
+			value += `Created At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
+
+			if (info.expiresAt !== null)
+				value += `Expires At: <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
+
 			value += `Type: ${caseTypeName(info.type)}\n`;
 
 			if (options.actorID === null)
