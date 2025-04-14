@@ -1,6 +1,7 @@
 import { moduleLogger } from "../../common/logger/index.ts";
 import { corePlugin } from "../plugin/core/index.ts";
 import { moderationPlugin } from "../plugin/moderation/index.ts";
+import { remindersPlugin } from "../plugin/reminders/index.ts";
 import { utilPlugin } from "../plugin/util/index.ts";
 import type { Plugin } from "./plugin.ts";
 
@@ -32,6 +33,7 @@ export function loadPlugins() {
 	// only support first-party plugins for now :)
 	registerPlugin(corePlugin);
 	registerPlugin(moderationPlugin);
+	registerPlugin(remindersPlugin);
 	registerPlugin(utilPlugin);
 }
 

@@ -3,7 +3,8 @@ export const icons = {
 	success: "\u2705", // :white_check_mark:
 	error: "\u274C", // :x:
 	warning: "\u26A0\uFE0F", // :warning:
+	bell: "\uD83D\uDD14", // :bell:
 	offline: "\u26AB", // :black_circle:
 	online: "\uD83D\uDFE2", // :green_circle:
-	boost: "\uD83D\uDE80", // :rocket:
+	boost: "\uD83D\uDE80", // :rocket:,
 };

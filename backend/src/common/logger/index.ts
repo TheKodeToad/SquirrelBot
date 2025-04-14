@@ -2,6 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getCallSites } from "util";
 import { LOG_LEVEL } from "../../environment.ts";
+import { formatDateHMS } from "../format.ts";
 import { LogLevel, logLevelName } from "./level.ts";
 
 // A custom logger because the Node.JS ecosystem is scary
@@ -89,14 +90,10 @@ export class Logger {
 
 		return (message, data) => {
 			const now = new Date;
-			const time =
-				now.getHours().toString().padStart(2, "0") + ":" +
-				now.getMinutes().toString().padStart(2, "0") + ":" +
-				now.getSeconds().toString().padStart(2, "0");
 
 			// you mean you DON'T know ansi escape codes off by heart
 			// too bad!
-			console.error(`\x1b[2m${time} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);
+			console.error(`\x1b[2m${formatDateHMS()} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);
 
 			if (data !== undefined) {
 				console.group();

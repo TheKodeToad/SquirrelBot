@@ -1,0 +1,48 @@
+import { MessageFlags } from "oceanic.js";
+import { createReminder } from "../../../../db/reminders/reminder.ts";
+import { permissionsGuard } from "../../core/public/command/helper.ts";
+import { defineCommand, OptionType } from "../../core/public/command/index.ts";
+import { icons } from "../../core/public/icons.ts";
+import { remindersConfig } from "../index.ts";
+import { trackNewReminder } from "../scheduler.ts";
+
+export const remindCommand = defineCommand({
+	name: ["remind", "reminderset", "remindme"],
+	options: {
+		duration: {
+			type: OptionType.Duration,
+			name: ["seconds"],
+			required: true,
+			position: 0,
+		},
+		message: {
+			type: OptionType.String,
+			name: ["message"],
+			required: true,
+			position: 1,
+		}
+	},
+
+	preRun: (context) => permissionsGuard(context, remindersConfig),
+	async run(context, args) {
+		if (context.guild === null)
+			return;
+
+		const now = Date.now();
+		const firesAt = now + args.duration;
+
+		const reminder = await createReminder(context.guild.id, {
+			ownerID: context.user.id,
+			channelID: context.channel.id,
+			createdAt: new Date(now),
+			firesAt: new Date(firesAt),
+			message: args.message ?? undefined,
+			silent: ((context.message?.flags ?? 0) & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0,
+		});
+
+		trackNewReminder(reminder);
+
+		const firesAtSecs = Math.floor(firesAt / 1000);
+		await context.respond(`${icons.success} Reminder set for <t:${firesAtSecs}> (<t:${firesAtSecs}:R>) [#${reminder.number}]!`);
+	}
+});

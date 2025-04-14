@@ -1,4 +1,5 @@
-import type { AnyChannel, Guild, Member, User } from "oceanic.js";
+import type { AnyChannel, Guild, Member, Uncached, User } from "oceanic.js";
+import { bot } from "../../index.ts";
 
 export function debugFormatUser(user: User) {
 	return `@${user.tag}[${user.id}]`;
@@ -13,8 +14,17 @@ export function debugFormatChannel(channel: AnyChannel) {
 	return `#${name}[${channel.id}]`;
 }
 
-export function debugFormatGuild(guild: Guild) {
-	return `*${guild.name}[${guild.id}]`;
+export function debugFormatGuildByID(id: string) {
+	return debugFormatGuild(bot.guilds.get(id) ?? { id });
+}
+
+export function debugFormatGuild(guild: Guild | Uncached) {
+	let name = "<unknown>";
+
+	if ("name" in guild)
+		name = guild.name;
+
+	return `*${name}[${guild.id}]`;
 }
 
 export function debugFormatPermissionContext(member: Member, channel: AnyChannel) {
