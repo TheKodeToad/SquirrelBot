@@ -6,7 +6,7 @@
 		"watch": "node build.mjs watch"
 	},
 	"devDependencies": {
-		"esbuild": "^0.25.1",
+		"esbuild": "^0.25.2",
 		"esbuild-plugin-solid": "^0.6.0",
 		"typescript": "^5.8.2"
 	},
