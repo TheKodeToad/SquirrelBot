@@ -8,8 +8,8 @@ import { icons } from "../../../core/public/icons.ts";
 import { caseTypeName } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
 
-export const showCaseCommand = defineCommand({
-	name: ["showcase", "case"],
+export const caseShowCommand = defineCommand({
+	name: ["caseshow", "case", "showcase"],
 	options: {
 		number: {
 			name: ["number", "n"],

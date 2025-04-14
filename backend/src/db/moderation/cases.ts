@@ -100,9 +100,6 @@ export interface CaseQuery {
 	limit?: number;
 }
 
-// ensure number incrementation is atomic
-const createCaseLock = new AsyncLock;
-
 export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
@@ -190,10 +187,14 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	return dbParse(caseInfoArraySchema, result.rows);
 }
 
+// ensure number incrementation is atomic
+// TODO just do this in postgres
+const createDeleteCaseLock = new AsyncLock;
+
 export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
 	options.createdAt ??= new Date;
 
-	return await createCaseLock.acquire(guildID, async () => {
+	return await createDeleteCaseLock.acquire(guildID, async () => {
 		let number = (await pool.query(
 			`
 				SELECT "number"
@@ -240,3 +241,19 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 	});
 }
 
+export async function deleteCase(guildID: string, number: number): Promise<boolean> {
+	if (number < 0 || number >= 2 ** 32)
+		return false;
+
+	return await createDeleteCaseLock.acquire(guildID, async () => {
+		const result = await pool.query(
+			`
+				DELETE FROM "moderation_cases"
+				WHERE "guildID" = $1 AND "number" = $2
+			`,
+			[guildID, number]
+		);
+
+		return result.rowCount === 1;
+	});
+}

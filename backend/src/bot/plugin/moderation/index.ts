@@ -5,8 +5,9 @@ import { banCommand } from "./command/action/ban.ts";
 import { kickCommand } from "./command/action/kick.ts";
 import { muteCommand } from "./command/action/mute.ts";
 import { unbanCommand } from "./command/action/unban.ts";
-import { searchCasesCommand } from "./command/case/searchCases.ts";
-import { showCaseCommand } from "./command/case/showCase.ts";
+import { deleteCaseCommand } from "./command/case/caseDelete.ts";
+import { caseSearchCommand } from "./command/case/caseSearch.ts";
+import { caseShowCommand } from "./command/case/caseShow.ts";
 import { purgeCommand } from "./command/util/purge.ts";
 
 export const moderationConfig = new ConfigCache(moderationConfigSchema);
@@ -14,5 +15,14 @@ export const moderationConfig = new ConfigCache(moderationConfigSchema);
 export const moderationPlugin = definePlugin({
 	id: "moderation",
 	config: moderationConfig,
-	commands: [banCommand, unbanCommand, kickCommand, muteCommand, showCaseCommand, searchCasesCommand, purgeCommand],
+	commands: [
+		banCommand,
+		unbanCommand,
+		kickCommand,
+		muteCommand,
+		purgeCommand,
+		caseShowCommand,
+		deleteCaseCommand,
+		caseSearchCommand,
+	],
 });

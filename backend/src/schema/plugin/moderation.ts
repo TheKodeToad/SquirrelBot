@@ -47,6 +47,7 @@ export const moderationConfigSchema = object({
 		mute: optional(boolean(), false),
 		purge: optional(boolean(), false),
 		case_read: optional(boolean(), false),
+		case_delete: optional(boolean(), false),
 	}), {}),
 	permission_overrides: optional(array(object({
 		ban: optional(boolean()),
@@ -55,6 +56,7 @@ export const moderationConfigSchema = object({
 		mute: optional(boolean()),
 		purge: optional(boolean()),
 		case_read: optional(boolean()),
+		case_delete: optional(boolean()),
 		...permissionsFilterSchema.entries
 	})), []),
 });

@@ -10,8 +10,8 @@ import { resolvePermissions } from "../../../core/public/permissionResolution.ts
 import { caseTypeName, caseTypeNameCompact } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
 
-export const searchCasesCommand = defineCommand({
-	name: ["searchcases", "cases"],
+export const caseSearchCommand = defineCommand({
+	name: ["casesearch", "cases", "searchcases"],
 	options: {
 		actorID: {
 			name: ["actor", "a", "by", "moderator", "mod"],
