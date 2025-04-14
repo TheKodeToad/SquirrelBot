@@ -190,6 +190,7 @@ class SlashContext implements CommandContext {
 			await this._interaction.reply(messageOptions).then(
 				({ callback }) => this._responseID ??= callback?.resource?.message?.id ?? null
 			);
+			this._acked = true;
 		}
 
 		if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
