@@ -1,15 +1,15 @@
 import type { EmbedField } from "oceanic.js";
-import { getCase } from "../../../../db/moderation/cases.ts";
-import { Colors } from "../../../common/discord/colors.ts";
-import { formatUser } from "../../../common/discord/format.ts";
-import { permissionsGuard } from "../../core/public/command/helper.ts";
-import { OptionType, defineCommand } from "../../core/public/command/index.ts";
-import { icons } from "../../core/public/icons.ts";
-import { caseTypeName } from "../helper/cases.ts";
-import { moderationConfig } from "../index.ts";
+import { getCase } from "../../../../../db/moderation/cases.ts";
+import { Colors } from "../../../../common/discord/colors.ts";
+import { formatUser } from "../../../../common/discord/format.ts";
+import { permissionsGuard } from "../../../core/public/command/helper.ts";
+import { OptionType, defineCommand } from "../../../core/public/command/index.ts";
+import { icons } from "../../../core/public/icons.ts";
+import { caseTypeName } from "../../helper/cases.ts";
+import { moderationConfig } from "../../index.ts";
 
-export const caseCommand = defineCommand({
-	name: ["case"],
+export const showCaseCommand = defineCommand({
+	name: ["showcase", "case"],
 	options: {
 		number: {
 			name: ["number", "n"],

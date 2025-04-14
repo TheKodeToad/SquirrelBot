@@ -1,10 +1,10 @@
-import { CaseType } from "../../../../db/moderation/cases.ts";
-import { escapeMarkdown } from "../../../common/discord/markdown.ts";
-import { permissionsGuard } from "../../core/public/command/helper.ts";
-import { OptionType, defineCommand } from "../../core/public/command/index.ts";
-import { icons } from "../../core/public/icons.ts";
-import { doBatchAction } from "../helper/batchAction.ts";
-import { moderationConfig } from "../index.ts";
+import { CaseType } from "../../../../../db/moderation/cases.ts";
+import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
+import { permissionsGuard } from "../../../core/public/command/helper.ts";
+import { OptionType, defineCommand } from "../../../core/public/command/index.ts";
+import { icons } from "../../../core/public/icons.ts";
+import { doBatchAction } from "../../helper/batchAction.ts";
+import { moderationConfig } from "../../index.ts";
 
 export const banCommand = defineCommand({
 	name: ["ban"],

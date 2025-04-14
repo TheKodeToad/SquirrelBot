@@ -1,17 +1,17 @@
 import { ButtonStyles, ComponentTypes, Member, type AnyTextableGuildChannel, type EmbedField } from "oceanic.js";
-import { getCases } from "../../../../db/moderation/cases.ts";
-import { Colors } from "../../../common/discord/colors.ts";
-import { formatUser, formatUserTag } from "../../../common/discord/format.ts";
-import { escapeMarkdown } from "../../../common/discord/markdown.ts";
-import { permissionsGuard } from "../../core/public/command/helper.ts";
-import { defineCommand, OptionType, type Component, type Reply } from "../../core/public/command/index.ts";
-import { icons } from "../../core/public/icons.ts";
-import { resolvePermissions } from "../../core/public/permissionResolution.ts";
-import { caseTypeName, caseTypeNameCompact } from "../helper/cases.ts";
-import { moderationConfig } from "../index.ts";
+import { getCases } from "../../../../../db/moderation/cases.ts";
+import { Colors } from "../../../../common/discord/colors.ts";
+import { formatUser, formatUserTag } from "../../../../common/discord/format.ts";
+import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
+import { permissionsGuard } from "../../../core/public/command/helper.ts";
+import { defineCommand, OptionType, type Component, type Reply } from "../../../core/public/command/index.ts";
+import { icons } from "../../../core/public/icons.ts";
+import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
+import { caseTypeName, caseTypeNameCompact } from "../../helper/cases.ts";
+import { moderationConfig } from "../../index.ts";
 
-export const casesCommand = defineCommand({
-	name: ["cases"],
+export const searchCasesCommand = defineCommand({
+	name: ["searchcases", "cases"],
 	options: {
 		actorID: {
 			name: ["actor", "a", "by", "moderator", "mod"],
