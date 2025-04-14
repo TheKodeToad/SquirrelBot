@@ -1,7 +1,8 @@
-import { MessageFlags, TextableChannel } from "oceanic.js";
+import { MessageFlags, Permissions, TextableChannel } from "oceanic.js";
 import { formatDateHMS } from "../../../common/format.ts";
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminder.ts";
+import { getMemberCached } from "../../common/discord/cache.ts";
 import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../common/discord/permissions.ts";
 import { bot } from "../../index.ts";
@@ -51,6 +52,9 @@ async function fire(reminder: Reminder) {
 
 	const guild = bot.guilds.get(reminder.guildID);
 
+	// TODO: should these issues be reported to somebody
+	// members could also be bulk requested ahead of time
+
 	if (guild === undefined)
 		return; // no access to guild?
 
@@ -65,14 +69,34 @@ async function fire(reminder: Reminder) {
 	if (!canWriteInChannel(channel, guild.clientMember))
 		return;
 
+	try {
+		var owner = await getMemberCached(guild, reminder.ownerID);
+	} catch (error) {
+		return;
+	}
+
+	// don't allow perm bypass
+	if (!canWriteInChannel(channel, owner))
+		return;
+
 	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${Math.floor(reminder.createdAt.getTime() / 1000)}>!**`;
 
 	if (reminder.message !== null)
 		content += "\n>>> " + reminder.message;
 
+	let flags = 0;
+
+	if (reminder.silent)
+		flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
+
+	const ownerPerms = channel.permissionsOf(owner);
+
+	if (!ownerPerms.has(Permissions.EMBED_LINKS))
+		flags |= MessageFlags.SUPPRESS_EMBEDS;
+
 	await channel.createMessage({
 		content,
-		flags: MessageFlags.SUPPRESS_EMBEDS,
+		flags,
 		allowedMentions: { users: [reminder.ownerID] }
 	});
 }

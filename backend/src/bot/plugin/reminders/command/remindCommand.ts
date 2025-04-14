@@ -11,7 +11,7 @@ export const remindCommand = defineCommand({
 	options: {
 		duration: {
 			type: OptionType.Duration,
-			name: ["seconds"],
+			name: ["duration"],
 			required: true,
 			position: 0,
 		},
