@@ -12,10 +12,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.14.0
-        version: 1.14.0(hono@4.7.5)
+        version: 1.14.0(hono@4.7.6)
       '@hono/valibot-validator':
         specifier: ^0.5.2
-        version: 0.5.2(hono@4.7.5)(valibot@1.0.0(typescript@5.8.3))
+        version: 0.5.2(hono@4.7.6)(valibot@1.0.0(typescript@5.8.3))
       async-lock:
         specifier: ^1.4.1
         version: 1.4.1
@@ -23,8 +23,8 @@ importers:
         specifier: ^16.4.7
         version: 16.4.7
       hono:
-        specifier: ^4.7.5
-        version: 4.7.5
+        specifier: ^4.7.6
+        version: 4.7.6
       oceanic.js:
         specifier: git://github.com/TheKodeToad/Oceanic.git#43f79905fffb55e21524d435ed4c5bf3f666ef50
         version: https://codeload.github.com/TheKodeToad/Oceanic/tar.gz/43f79905fffb55e21524d435ed4c5bf3f666ef50
@@ -513,8 +513,8 @@ packages:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
     engines: {node: '>=4'}
 
-  hono@4.7.5:
-    resolution: {integrity: sha512-fDOK5W2C1vZACsgLONigdZTRZxuBqFtcKh7bUQ5cVSbwI2RWjloJDcgFOVzbQrlI6pCmhlTsVYZ7zpLj4m4qMQ==}
+  hono@4.7.6:
+    resolution: {integrity: sha512-564rVzELU+9BRqqx5k8sT2NFwGD3I3Vifdb6P7CmM6FiarOSY+fDC+6B+k9wcCb86ReoayteZP2ki0cRLN1jbw==}
     engines: {node: '>=16.9.0'}
 
   html-entities@2.3.3:
@@ -1013,13 +1013,13 @@ snapshots:
   '@esbuild/win32-x64@0.25.1':
     optional: true
 
-  '@hono/node-server@1.14.0(hono@4.7.5)':
+  '@hono/node-server@1.14.0(hono@4.7.6)':
     dependencies:
-      hono: 4.7.5
+      hono: 4.7.6
 
-  '@hono/valibot-validator@0.5.2(hono@4.7.5)(valibot@1.0.0(typescript@5.8.3))':
+  '@hono/valibot-validator@0.5.2(hono@4.7.6)(valibot@1.0.0(typescript@5.8.3))':
     dependencies:
-      hono: 4.7.5
+      hono: 4.7.6
       valibot: 1.0.0(typescript@5.8.3)
 
   '@jridgewell/gen-mapping@0.3.8':
@@ -1173,7 +1173,7 @@ snapshots:
 
   globals@11.12.0: {}
 
-  hono@4.7.5: {}
+  hono@4.7.6: {}
 
   html-entities@2.3.3: {}
 
