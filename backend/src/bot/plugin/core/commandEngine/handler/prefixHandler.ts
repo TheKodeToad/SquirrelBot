@@ -1,4 +1,4 @@
-import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
@@ -150,7 +150,12 @@ class PrefixContext implements CommandContext {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		const messageOptions = transformReply(reply);
+		let messageOptions = transformReply(reply);
+
+		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0) {
+			messageOptions.flags ??= 0;
+			messageOptions.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
+		}
 
 		if (this.message.channel instanceof GuildChannel
 			&& !canWriteInChannel(this.message.channel, this.message.channel.guild.clientMember))
