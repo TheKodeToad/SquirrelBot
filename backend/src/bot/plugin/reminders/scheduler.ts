@@ -1,4 +1,4 @@
-import { MessageFlags, Permissions, TextableChannel } from "oceanic.js";
+import { DiscordRESTError, MessageFlags, Permissions, TextableChannel } from "oceanic.js";
 import { formatDateHMS } from "../../../common/format.ts";
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminder.ts";
@@ -72,6 +72,9 @@ async function fire(reminder: Reminder) {
 	try {
 		var owner = await getMemberCached(guild, reminder.ownerID);
 	} catch (error) {
+		if (!(error instanceof DiscordRESTError))
+			throw error;
+
 		return;
 	}
 
