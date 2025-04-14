@@ -20,8 +20,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1
       dotenv:
-        specifier: ^16.4.7
-        version: 16.4.7
+        specifier: ^16.5.0
+        version: 16.5.0
       hono:
         specifier: ^4.7.6
         version: 4.7.6
@@ -479,8 +479,8 @@ packages:
   discord-api-types@0.37.119:
     resolution: {integrity: sha512-WasbGFXEB+VQWXlo6IpW3oUv73Yuau1Ig4AZF/m13tXcTKnMpc/mHjpztIlz4+BM9FG9BHQkEXiPto3bKduQUg==}
 
-  dotenv@16.4.7:
-    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
+  dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
 
   electron-to-chromium@1.5.117:
@@ -1118,7 +1118,7 @@ snapshots:
   discord-api-types@0.37.119:
     optional: true
 
-  dotenv@16.4.7: {}
+  dotenv@16.5.0: {}
 
   electron-to-chromium@1.5.117: {}
 
