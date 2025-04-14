@@ -24,7 +24,7 @@ export function trackNewReminder(reminder: Reminder) {
 	if (reminder.firesAt.getTime() >= nextExpiryStartTime.getTime())
 		return;
 
-	setTimeout(() => fire(reminder), Math.max(0, reminder.firesAt.getTime() - Date.now()));
+	setTimeout(() => fire(reminder), Math.max(0, reminder.firesAt.getTime() - Date.now())).unref();
 }
 
 async function poll() {
@@ -96,6 +96,9 @@ async function fire(reminder: Reminder) {
 	}
 
 	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${Math.floor(reminder.createdAt.getTime() / 1000)}>!**`;
+
+	if ((Date.now() - reminder.createdAt.getTime()) >= 10 * 60 * 1000)
+		content += `\n${icons.warning} Reminder running late! This is likely due to downtime. Please contact bot admins if this persists.`;
 
 	if (reminder.message !== null)
 		content += "\n>>> " + reminder.message;
