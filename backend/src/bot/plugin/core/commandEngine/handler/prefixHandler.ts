@@ -47,16 +47,17 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 		return false;
 
 	const { prefix } = config.prefix_commands;
-	const perms = resolvePermissions(config, message.member, message.channel);
-
-	if (!perms.prefix_commands)
-		return false;
 
 	const reader = new StringReader(message.content);
 
 	const name = readPrefixName(reader, prefix);
 
 	if (name === null)
+		return false;
+
+	const perms = resolvePermissions(config, message.member, message.channel);
+
+	if (!perms.prefix_commands)
 		return false;
 
 	const matches = getCommandsByName(name).filter(({ command }) => command.supportPrefix ?? true);
