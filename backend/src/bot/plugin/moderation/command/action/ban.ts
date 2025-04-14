@@ -3,7 +3,7 @@ import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { permissionsGuard } from "../../../core/public/command/helper.ts";
 import { OptionType, defineCommand } from "../../../core/public/command/index.ts";
 import { icons } from "../../../core/public/icons.ts";
-import { doBatchAction } from "../../helper/batchAction.ts";
+import { doBulkAction } from "../../helper/bulkAction.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const banCommand = defineCommand({
@@ -43,7 +43,7 @@ export const banCommand = defineCommand({
 
 		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages) * (1000 * 60 * 60 * 24);
 
-		const { successful, unsuccessful } = await doBatchAction({
+		const { successful, unsuccessful } = await doBulkAction({
 			guild: context.guild,
 			ids: args.user,
 

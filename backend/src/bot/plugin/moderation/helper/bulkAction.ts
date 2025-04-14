@@ -5,7 +5,7 @@ import { formatRESTError } from "../../../common/discord/format.ts";
 import { getHighestRole } from "../../../common/discord/permissions.ts";
 import { bot } from "../../../index.ts";
 
-type BatchAction =
+type BulkAction =
 	(
 		{
 			membersOnly: true;
@@ -26,7 +26,7 @@ type BatchAction =
 		makeCase(actor: string, target: string, dmDelivered: boolean): CreateCaseOptions | null;
 	};
 
-interface BatchResult {
+interface BulkResult {
 	successful: {
 		id: string;
 		name: string;
@@ -40,8 +40,8 @@ interface BatchResult {
 	}[];
 }
 
-export async function doBatchAction(action: BatchAction): Promise<BatchResult> {
-	let result: BatchResult = { successful: [], unsuccessful: [] };
+export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
+	let result: BulkResult = { successful: [], unsuccessful: [] };
 
 	const members = await requestMembersCached(action.guild, action.ids);
 
