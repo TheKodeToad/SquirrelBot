@@ -1,13 +1,12 @@
 import { ButtonStyles, ComponentTypes, Member, type AnyTextableGuildChannel, type EmbedField } from "oceanic.js";
 import { getCases } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
-import { formatUser, formatUserTag } from "../../../../common/discord/format.ts";
-import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
+import { formatUser } from "../../../../common/discord/format.ts";
 import { permissionsGuard } from "../../../core/public/command/helper.ts";
 import { defineCommand, OptionType, type Component, type Reply } from "../../../core/public/command/index.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
-import { caseTypeName, caseTypeNameCompact } from "../../helper/cases.ts";
+import { formatCaseSummary, formatCompactCaseSummary } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const caseSearchCommand = defineCommand({
@@ -63,7 +62,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	if (!perms.case_read)
 		return;
 
-	const limit = options.compact ? 15 : 3;
+	const limit = options.compact ? 12 : 3;
 
 	const cases = await getCases(
 		member.guildID,
@@ -98,10 +97,12 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	let description = "";
 
 	if (options.actorID !== null)
-		description += `Actor: ${await formatUser(options.actorID)}\n`;
+		description += `**Moderator:** ${await formatUser(options.actorID)}\n`;
 
 	if (options.targetID !== null)
-		description += `Target: ${await formatUser(options.targetID)}\n`;
+		description += `**Moderated User:** ${await formatUser(options.targetID)}\n`;
+
+	description += "\n";
 
 	let fields: EmbedField[] = [];
 
@@ -109,33 +110,23 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
 		const expirySecs = Math.floor(info.createdAt.getTime() / 1000);
 
-		if (options.compact) {
-			const actor = escapeMarkdown(await formatUserTag(info.actorID));
-			const target = escapeMarkdown(await formatUserTag(info.targetID));
-			description += `<t:${creationSecs}:R> **#${info.number}:** ${actor} ${caseTypeNameCompact(info.type)} ${target}`;
+		if (options.compact)
+			description += await formatCompactCaseSummary(info) + "\n";
+		else {
+			let value = await formatCaseSummary(info) + "\n";
 
-			if (info.reason !== null && info.reason.length !== 0)
-				description += ` (${info.reason})`;
+			if (options.actorID === null)
+				value += `Moderator: ${await formatUser(info.actorID)}\n`;
 
-			description += "\n";
-		} else {
-			let value = "";
-			value += `Created At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
+			value += `Performed At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
 
 			if (info.expiresAt !== null)
 				value += `Expires At: <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
 
-			value += `Type: ${caseTypeName(info.type)}\n`;
-
-			if (options.actorID === null)
-				value += `Actor: ${await formatUser(info.actorID)}\n`;
-
-			if (options.targetID === null)
-				value += `Target: ${await formatUser(info.targetID)}\n`;
-
-			value += `Reason: ${info.reason ?? "*None provided*"}\n`;
-
-			fields.push({ name: "Case #" + info.number, value });
+			fields.push({
+				name: "Case #" + info.number,
+				value
+			});
 		}
 	}
 

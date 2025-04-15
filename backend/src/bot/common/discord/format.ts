@@ -21,6 +21,7 @@ export async function formatUserTag(id: string) {
 	}
 }
 
+// TODO: what was I thinking
 export async function formatUser(id: string) {
 	return `<@${id}> (${await formatUserTag(id)})`;
 }

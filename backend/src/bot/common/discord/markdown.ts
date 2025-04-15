@@ -21,3 +21,7 @@ export function makeInlineCodeblock(input: string): string {
 export function makeMultilineCodeblock(input: string): string {
 	return "```\n" + input.replaceAll("`", ZWSP + "`" + ZWSP) + "\n```";
 }
+
+export function makeQuote(input: string) {
+	return "> " + input.replaceAll("\n", "\n> ");
+}
