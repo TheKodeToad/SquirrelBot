@@ -1,4 +1,3 @@
-import AsyncLock from "async-lock";
 import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
 import { dbParse, pool } from "../index.ts";
 
@@ -187,73 +186,52 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	return dbParse(caseInfoArraySchema, result.rows);
 }
 
-// ensure number incrementation is atomic
-// TODO just do this in postgres
-const createDeleteCaseLock = new AsyncLock;
-
 export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
 	options.createdAt ??= new Date;
 
-	return await createDeleteCaseLock.acquire(guildID, async () => {
-		let number = (await pool.query(
-			`
-				SELECT "number"
-				FROM "moderation_cases"
-				WHERE "guildID" = $1
-				ORDER BY "number" DESC
-				LIMIT 1
-			`,
-			[guildID]
-		)).rows[0]?.number ?? 0;
-		++number;
+	const result = await pool.query(
+		`
+			INSERT INTO "moderation_cases" (
+				"guildID",
+				"type",
+				"createdAt",
+				"expiresAt",
+				"actorID",
+				"targetID",
+				"reason",
+				"deleteMessageSeconds",
+				"dmDelivered"
+			)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			RETURNING "number"
+		`,
+		[
+			guildID,
+			options.type,
+			options.createdAt ?? null,
+			options.expiresAt ?? null,
+			options.actorID,
+			options.targetID,
+			options.reason ?? null,
+			options.deleteMessageSeconds ?? null,
+			options.dmDelivered ?? null,
+		]
+	);
 
-		await pool.query(
-			`
-				INSERT INTO "moderation_cases" (
-					"guildID",
-					"number",
-					"type",
-					"createdAt",
-					"expiresAt",
-					"actorID",
-					"targetID",
-					"reason",
-					"deleteMessageSeconds",
-					"dmDelivered"
-				)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-			`,
-			[
-				guildID,
-				number,
-				options.type,
-				options.createdAt ?? null,
-				options.expiresAt ?? null,
-				options.actorID,
-				options.targetID,
-				options.reason ?? null,
-				options.deleteMessageSeconds ?? null,
-				options.dmDelivered ?? null,
-			]
-		);
-
-		return number;
-	});
+	return dbParse(number(), result.rows[0].number);
 }
 
 export async function deleteCase(guildID: string, number: number): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32)
 		return false;
 
-	return await createDeleteCaseLock.acquire(guildID, async () => {
-		const result = await pool.query(
-			`
-				DELETE FROM "moderation_cases"
-				WHERE "guildID" = $1 AND "number" = $2
-			`,
-			[guildID, number]
-		);
+	const result = await pool.query(
+		`
+			DELETE FROM "moderation_cases"
+			WHERE "guildID" = $1 AND "number" = $2
+		`,
+		[guildID, number]
+	);
 
-		return result.rowCount === 1;
-	});
+	return result.rowCount === 1;
 }
