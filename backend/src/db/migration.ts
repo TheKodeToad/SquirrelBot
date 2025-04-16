@@ -100,7 +100,7 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 					);
 					continue;
 				} else
-					throw new MigrationError(message + " - you may bypass this with --ignore-errors");
+					throw new MigrationError(message + " - you may bypass this with pnpm migrate --ignore-errors");
 			}
 
 			if (!checkOnly)
