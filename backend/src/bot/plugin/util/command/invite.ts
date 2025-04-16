@@ -1,7 +1,7 @@
 import { ChannelTypes, DiscordRESTError, InviteTypes, JSONErrorCodes, type EmbedOptions } from "oceanic.js";
 import { moduleLogger } from "../../../../common/logger/index.ts";
 import { Colors } from "../../../common/discord/colors.ts";
-import { formatRESTError } from "../../../common/discord/format.ts";
+import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
 import { bot } from "../../../index.ts";
 import { defineCommand, OptionType } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
@@ -9,6 +9,8 @@ import { icons } from "../../core/public/icons.ts";
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 
 const logger = moduleLogger();
+
+// TODO: escape things lol
 
 export const inviteCommand = defineCommand({
 	name: ["invite", "inv"],
@@ -139,7 +141,7 @@ export const inviteCommand = defineCommand({
 		if (inviter !== undefined) {
 			embed.fields.push({
 				name: "Invited By",
-				value: `<@${inviter.id}> (${inviter.tag || inviter.globalName})`
+				value: formatUser(context.user)
 			});
 		}
 

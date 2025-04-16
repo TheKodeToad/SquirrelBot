@@ -1,7 +1,7 @@
 import type { EmbedOptions } from "oceanic.js";
 import { getCase } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
-import { formatUser } from "../../../../common/discord/format.ts";
+import { formatUserByID } from "../../../../common/discord/format.ts";
 import { permissionsGuard } from "../../../core/public/command/helper.ts";
 import { OptionType, defineCommand } from "../../../core/public/command/index.ts";
 import { icons } from "../../../core/public/icons.ts";
@@ -43,7 +43,7 @@ export const caseShowCommand = defineCommand({
 		embed.fields.push(
 			{
 				name: "Moderator",
-				value: await formatUser(info.actorID),
+				value: await formatUserByID(info.actorID),
 			},
 			{
 				name: "Performed At",

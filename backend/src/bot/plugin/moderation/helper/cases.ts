@@ -1,11 +1,11 @@
 import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
-import { formatUser, formatUserTag } from "../../../common/discord/format.ts";
+import { formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
 import { makeQuote } from "../../../common/discord/markdown.ts";
 
 export async function formatCaseSummary(info: CaseInfo): Promise<string> {
 	let result: string;
 
-	const target = await formatUser(info.targetID);
+	const target = await formatUserByID(info.targetID);
 
 	switch (info.type) {
 		case CaseType.Note: result = `Note added for ${target}`; break;
@@ -34,8 +34,8 @@ export async function formatCaseSummary(info: CaseInfo): Promise<string> {
 }
 
 export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> {
-	const actor = await formatUserTag(info.actorID);
-	const target = await formatUserTag(info.targetID);
+	const actor = await formatUserTagByID(info.actorID);
+	const target = await formatUserTagByID(info.targetID);
 
 	let result = `<t:${Math.floor(info.createdAt.getTime() / 1000)}:d> **#${info.number}:** `;
 

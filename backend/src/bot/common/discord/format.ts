@@ -1,27 +1,31 @@
-import { DiscordRESTError } from "oceanic.js";
+import { DiscordRESTError, Member, User } from "oceanic.js";
 import { getUserCached } from "./cache.ts";
+import { escapeMarkdown } from "./markdown.ts";
 
 export function formatRESTError(restError: DiscordRESTError) {
 	if (restError.resBody !== null
 		&& typeof restError.resBody.message === "string") {
-		return `API Error ${restError.code}: ${restError.resBody.message}`;
+		return `API Error ${restError.code}: ${escapeMarkdown(restError.resBody.message)}`;
 	}
 
 	return `HTTP Error ${restError.status}: ${restError.statusText}`;
 }
 
-export async function formatUserTag(id: string) {
+export async function formatUserTagByID(id: string) {
 	try {
-		return (await getUserCached(id)).tag;
+		return escapeMarkdown((await getUserCached(id)).tag);
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;
 
-		return "<unknown>";
+		return "\\<unknown\\>";
 	}
 }
 
-// TODO: what was I thinking
-export async function formatUser(id: string) {
-	return `<@${id}> (${await formatUserTag(id)})`;
+export async function formatUserByID(id: string) {
+	return `<@${id}> (${await formatUserTagByID(id)})`;
+}
+
+export function formatUser(user: User | Member) {
+	return `<@${user.id}> (${escapeMarkdown(user.tag)})`;
 }

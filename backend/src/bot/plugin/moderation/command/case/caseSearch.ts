@@ -1,7 +1,7 @@
 import { ButtonStyles, ComponentTypes, Member, type AnyTextableGuildChannel, type EmbedField } from "oceanic.js";
 import { getCases } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
-import { formatUser } from "../../../../common/discord/format.ts";
+import { formatUserByID } from "../../../../common/discord/format.ts";
 import { permissionsGuard } from "../../../core/public/command/helper.ts";
 import { defineCommand, OptionType, type Component, type Reply } from "../../../core/public/command/index.ts";
 import { icons } from "../../../core/public/icons.ts";
@@ -97,10 +97,10 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	let description = "";
 
 	if (options.actorID !== null)
-		description += `**Moderator:** ${await formatUser(options.actorID)}\n`;
+		description += `**Moderator:** ${await formatUserByID(options.actorID)}\n`;
 
 	if (options.targetID !== null)
-		description += `**Moderated User:** ${await formatUser(options.targetID)}\n`;
+		description += `**Moderated User:** ${await formatUserByID(options.targetID)}\n`;
 
 	description += "\n";
 
@@ -116,7 +116,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 			let value = await formatCaseSummary(info) + "\n";
 
 			if (options.actorID === null)
-				value += `Moderator: ${await formatUser(info.actorID)}\n`;
+				value += `Moderator: ${await formatUserByID(info.actorID)}\n`;
 
 			value += `Performed At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
 
