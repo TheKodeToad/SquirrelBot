@@ -6,7 +6,7 @@ import { kickCommand } from "./command/action/kick.ts";
 import { muteCommand } from "./command/action/mute.ts";
 import { unbanCommand } from "./command/action/unban.ts";
 import { deleteCaseCommand } from "./command/case/caseDelete.ts";
-import { caseSearchCommand } from "./command/case/caseSearch.ts";
+import { caseListCommand } from "./command/case/caseList.ts";
 import { caseShowCommand } from "./command/case/caseShow.ts";
 import { purgeCommand } from "./command/util/purge.ts";
 
@@ -23,6 +23,6 @@ export const moderationPlugin = definePlugin({
 		purgeCommand,
 		caseShowCommand,
 		deleteCaseCommand,
-		caseSearchCommand,
+		caseListCommand,
 	],
 });
