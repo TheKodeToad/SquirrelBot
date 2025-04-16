@@ -11,7 +11,7 @@ function checkForMe(context: CommandContext): boolean {
 }
 
 export const grantAccessCommand = defineCommand({
-	name: ["grant_access", "whitelist"],
+	name: ["grantaccess", "whitelist"],
 	supportSlash: false, // don't want this cluttering the command list
 	options: {
 		guild: {
@@ -34,7 +34,7 @@ export const grantAccessCommand = defineCommand({
 });
 
 export const revokeAccessCommand = defineCommand({
-	name: ["revoke_access", "unwhitelist"],
+	name: ["revokeaccess", "unwhitelist"],
 	supportSlash: false,
 	options: {
 		guild: {
