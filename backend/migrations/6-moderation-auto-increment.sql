@@ -1,5 +1,5 @@
 CREATE TABLE "moderation_caseNumberCounter" (
-	"guildID" NUMERIC(20, 0) PRIMARY KEY REFERENCES "core_guildInfo"("id") ON DELETE CASCADE,
+	"guildID" SNOWFLAKE PRIMARY KEY REFERENCES "core_guildInfo"("id") ON DELETE CASCADE,
 	"counter" INT NOT NULL
 );
 

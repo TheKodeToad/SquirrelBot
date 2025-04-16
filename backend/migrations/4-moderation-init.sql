@@ -1,13 +1,13 @@
 CREATE TABLE "moderation_cases" (
-	"guildID" NUMERIC(20, 0) REFERENCES "core_guildInfo"("id") ON DELETE CASCADE,
+	"guildID" SNOWFLAKE REFERENCES "core_guildInfo"("id") ON DELETE CASCADE,
 	"number" INT NOT NULL,
 
 	"type" SMALLINT NOT NULL,
 	"createdAt" TIMESTAMPTZ NOT NULL,
 	"expiresAt" TIMESTAMPTZ,
 
-	"actorID" NUMERIC(20, 0) NOT NULL,
-	"targetID" NUMERIC(20, 0) NOT NULL,
+	"actorID" SNOWFLAKE NOT NULL,
+	"targetID" SNOWFLAKE NOT NULL,
 
 	"reason" TEXT,
 
