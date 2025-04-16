@@ -118,7 +118,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 			&& (action.guild.ownerID === targetID
 				|| getHighestRole(action.guild.clientMember).position <= targetPosition)
 		) {
-			result.unsuccessful.push({ id: targetID, name: targetMember.tag, error: "Bot's highest role is not above target's highest role" });
+			result.unsuccessful.push({ id: targetID, name: targetMember.tag, error: "App's highest role is not above target's highest role" });
 			continue;
 		}
 

@@ -61,7 +61,7 @@ async function fire(reminder: Reminder) {
 	// members could also be bulk requested ahead of time
 
 	if (guild === undefined) {
-		logger.debug?.(`Bot user is not in guild; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`App user is not in guild; not sending reminder ${debugFormatReminder(reminder)}`);
 		return; // no access to guild?
 	}
 
@@ -76,7 +76,7 @@ async function fire(reminder: Reminder) {
 		return;
 
 	if (!canWriteInChannel(channel, guild.clientMember)) {
-		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`App user cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
 		return;
 	}
 
@@ -98,7 +98,7 @@ async function fire(reminder: Reminder) {
 	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${Math.floor(reminder.createdAt.getTime() / 1000)}>!**`;
 
 	if ((Date.now() - reminder.createdAt.getTime()) >= 10 * 60 * 1000)
-		content += `\n${icons.warning} Reminder running late! This is likely due to downtime. Please contact bot admins if this persists.`;
+		content += `\n${icons.warning} Reminder running late! This is likely due to downtime. Please contact app admins if this persists.`;
 
 	if (reminder.message !== null)
 		content += "\n>>> " + reminder.message;

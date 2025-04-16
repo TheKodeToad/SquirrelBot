@@ -29,7 +29,7 @@ export const grantAccessCommand = defineCommand({
 		if (await grantAccess(args.guild))
 			await context.respond(`${icons.success} Granted access to **${escapeMarkdown(guildName)}**!`);
 		else
-			await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** already has access to the bot!`);
+			await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** already has access to the app!`);
 	},
 });
 
@@ -55,13 +55,13 @@ export const revokeAccessCommand = defineCommand({
 			if (result instanceof Date)
 				await context.respond(`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! Plugin data will be purged on <t:${Math.floor(result.getTime() / 1000)}:d>.`);
 			else
-				await context.respond(`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! The bot might still have access if it is configured in the environment.`);
+				await context.respond(`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! The server might still have access if it is configured in the environment.`);
 
 		} else {
 			if (BOT_ALLOWED_GUILDS.includes(args.guild))
-				await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** cannot be removed as it is configured in the bot's environment!`);
+				await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** cannot be removed as it is configured in the app's environment!`);
 			else
-				await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** does not have access to the bot!`);
+				await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** does not have access to the app!`);
 		}
 	},
 });
