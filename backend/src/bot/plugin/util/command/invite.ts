@@ -3,6 +3,7 @@ import { moduleLogger } from "../../../../common/logger/index.ts";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
+import { escapeMarkdown } from "../../../common/discord/markdown.ts";
 import { bot } from "../../../index.ts";
 import { defineCommand, OptionType } from "../../core/public/command/index.ts";
 import { icons } from "../../core/public/icons.ts";
@@ -62,7 +63,7 @@ export const inviteCommand = defineCommand({
 				throw error;
 
 			if (error.code === JSONErrorCodes.UNKNOWN_INVITE)
-				await context.respond(`${icons.error} Invite not found: '${code}'! This could be a friend invite or another type of invite invisible to bots.`);
+				await context.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! This could be a friend invite or another type of invite invisible to bots.`);
 			else
 				await context.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
 
@@ -99,21 +100,21 @@ export const inviteCommand = defineCommand({
 			if (guild.description !== null) {
 				embed.fields.push({
 					name: "Description",
-					value: guild.description
+					value: escapeMarkdown(guild.description)
 				});
 			}
 
 			if (channel !== null && channel.name !== null) {
 				embed.fields.push({
 					name: "Channel",
-					value: `${channel.name} (${channel.id})`
+					value: escapeMarkdown(`${channel.name} (${channel.id})`)
 				});
 			}
 
 			embed.footer = { text: "" };
 
 			if (guild.vanityURLCode !== null)
-				embed.footer.text += "discord.gg/" + guild.vanityURLCode + " • ";
+				embed.footer.text += escapeMarkdown("discord.gg/" + guild.vanityURLCode) + " • ";
 
 			embed.footer.text += "Server ID: " + guild.id;
 		} else if (type === InviteTypes.FRIEND && inviter !== undefined) {
