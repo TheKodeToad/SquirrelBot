@@ -99,7 +99,7 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 		)).rows[0]?.number ?? 0;
 		++number;
 
-		const result = await pool.query(
+		await pool.query(
 			`
 				INSERT INTO "reminders_reminders" (
 					"guildID",

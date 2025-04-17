@@ -1,5 +1,6 @@
 import { ChannelTypes, DiscordRESTError, InviteTypes, JSONErrorCodes, type EmbedOptions } from "oceanic.js";
 import { moduleLogger } from "../../../../common/logger/index.ts";
+import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { Colors } from "../../../common/discord/colors.ts";
 import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
 import { bot } from "../../../index.ts";
@@ -131,7 +132,8 @@ export const inviteCommand = defineCommand({
 			embed.author = { name: "Unknown Invite" };
 
 		if (expiresAt !== undefined) {
-			const expirySecs = Math.floor(expiresAt.getTime() / 1000);
+			const expirySecs = dateToUnixSeconds(expiresAt);
+
 			embed.fields.push({
 				name: "Expires At",
 				value: `<t:${expirySecs}> (<t:${expirySecs}:R>)`

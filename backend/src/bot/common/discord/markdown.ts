@@ -14,14 +14,14 @@ export function escapeMarkdown(input: string): string {
 	return input.replace(FORMATTING_REGEX, "\\$&");
 }
 
-export function makeInlineCodeblock(input: string): string {
+export function makeMarkdownInlineCodeblock(input: string): string {
 	return "``" + input.replaceAll("`", ZWSP + "`" + ZWSP) + "``";
 }
 
-export function makeMultilineCodeblock(input: string): string {
+export function makeMarkdownMultilineCodeblock(input: string): string {
 	return "```\n" + input.replaceAll("`", ZWSP + "`" + ZWSP) + "\n```";
 }
 
-export function makeQuote(input: string) {
+export function makeMarkdownQuote(input: string) {
 	return "> " + input.replaceAll("\n", "\n> ");
 }

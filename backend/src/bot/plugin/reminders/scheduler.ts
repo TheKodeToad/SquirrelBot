@@ -1,6 +1,6 @@
 import { DiscordRESTError, MessageFlags, Permissions, TextableChannel } from "oceanic.js";
-import { formatDateHMS } from "../../../common/format.ts";
 import { moduleLogger } from "../../../common/logger/index.ts";
+import { dateToHMSString, dateToUnixSeconds } from "../../../common/time.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminder.ts";
 import { getMemberCached } from "../../common/discord/cache.ts";
 import { debugFormatChannel } from "../../common/discord/debugFormat.ts";
@@ -32,8 +32,8 @@ async function poll() {
 
 	logger.debug?.(
 		nextExpiryStartTime.getTime() === 0
-			? "Setting initial timeouts for missed reminders and upcoming reminders until " + formatDateHMS(end)
-			: "Setting timeouts for reminders from " + formatDateHMS(nextExpiryStartTime) + " to " + formatDateHMS(end)
+			? "Setting initial timeouts for missed reminders and upcoming reminders until " + dateToHMSString(end)
+			: "Setting timeouts for reminders from " + dateToHMSString(nextExpiryStartTime) + " to " + dateToHMSString(end)
 	);
 
 	const reminders = await getRemindersByFiresAt(nextExpiryStartTime, end);
@@ -95,7 +95,7 @@ async function fire(reminder: Reminder) {
 		return;
 	}
 
-	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${Math.floor(reminder.createdAt.getTime() / 1000)}>!**`;
+	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${dateToUnixSeconds(reminder.createdAt)}>!**`;
 
 	if ((Date.now() - reminder.createdAt.getTime()) >= 10 * 60 * 1000)
 		content += `\n${icons.warning} Reminder running late! This is likely due to downtime. Please contact app admins if this persists.`;

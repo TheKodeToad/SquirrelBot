@@ -1,4 +1,5 @@
 import { ButtonStyles, ComponentTypes, Member, type AnyTextableGuildChannel, type EmbedField } from "oceanic.js";
+import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { getCases } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
 import { formatUserByID } from "../../../../common/discord/format.ts";
@@ -107,9 +108,6 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	let fields: EmbedField[] = [];
 
 	for (const info of cases) {
-		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
-		const expirySecs = Math.floor(info.createdAt.getTime() / 1000);
-
 		if (options.compact)
 			description += await formatCompactCaseSummary(info) + "\n";
 		else {
@@ -118,10 +116,13 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 			if (options.actorID === null)
 				value += `Moderator: ${await formatUserByID(info.actorID)}\n`;
 
+			const creationSecs = dateToUnixSeconds(info.createdAt);
 			value += `Performed At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
 
-			if (info.expiresAt !== null)
+			if (info.expiresAt !== null) {
+				const expirySecs = dateToUnixSeconds(info.expiresAt);
 				value += `Expires At: <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
+			}
 
 			fields.push({
 				name: "Case #" + info.number,

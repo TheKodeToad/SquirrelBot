@@ -1,3 +1,4 @@
+import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { BOT_ALLOWED_GUILDS } from "../../../../environment.ts";
 import { escapeMarkdown } from "../../../common/discord/markdown.ts";
 import { bot } from "../../../index.ts";
@@ -53,9 +54,15 @@ export const revokeAccessCommand = defineCommand({
 
 		if (result !== false) {
 			if (result instanceof Date)
-				await context.respond(`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! Plugin data will be purged on <t:${Math.floor(result.getTime() / 1000)}:d>.`);
+				await context.respond(
+					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
+					+ `Plugin data will be purged on <t:${dateToUnixSeconds(result)}:d>.`
+				);
 			else
-				await context.respond(`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! The server might still have access if it is configured in the environment.`);
+				await context.respond(
+					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
+					+ "The server might still have access if it is configured in the environment."
+				);
 
 		} else {
 			if (BOT_ALLOWED_GUILDS.includes(args.guild))

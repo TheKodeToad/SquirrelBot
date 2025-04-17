@@ -1,4 +1,5 @@
 import { MessageFlags } from "oceanic.js";
+import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { createReminder } from "../../../../db/reminders/reminder.ts";
 import { permissionsGuard } from "../../core/public/command/helper.ts";
 import { defineCommand, OptionType } from "../../core/public/command/index.ts";
@@ -42,10 +43,11 @@ export const remindCommand = defineCommand({
 
 		trackNewReminder(reminder);
 
-		const firesAtSecs = Math.floor(firesAt / 1000);
+		const firesAtSecs = dateToUnixSeconds(firesAt);
+
 		await context.respond(
-			`${icons.success} Reminder set for <t:${firesAtSecs}> (<t:${firesAtSecs}:R>) [#${reminder.number}]!\n` +
-			`${icons.tip} No notification will be sent if you are muted or not present in the server.`
+			`${icons.success} Reminder set for <t:${firesAtSecs}> (<t:${firesAtSecs}:R>) [#${reminder.number}]!\n`
+			+ `${icons.tip} No notification will be sent if you are muted or not present in the server.`
 		);
 	}
 });

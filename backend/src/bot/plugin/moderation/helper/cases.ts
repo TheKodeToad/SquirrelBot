@@ -1,6 +1,7 @@
+import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
 import { formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
-import { makeQuote } from "../../../common/discord/markdown.ts";
+import { makeMarkdownQuote } from "../../../common/discord/markdown.ts";
 
 export async function formatCaseSummary(info: CaseInfo): Promise<string> {
 	let result: string;
@@ -28,7 +29,7 @@ export async function formatCaseSummary(info: CaseInfo): Promise<string> {
 	if (info.reason === null)
 		result += ".";
 	else
-		result += ":\n " + makeQuote(info.reason);
+		result += ":\n " + makeMarkdownQuote(info.reason);
 
 	return result;
 }
@@ -37,7 +38,7 @@ export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> 
 	const actor = await formatUserTagByID(info.actorID);
 	const target = await formatUserTagByID(info.targetID);
 
-	let result = `<t:${Math.floor(info.createdAt.getTime() / 1000)}:d> **#${info.number}:** `;
+	let result = `<t:${dateToUnixSeconds(info.createdAt)}:d> **#${info.number}:** `;
 
 	switch (info.type) {
 		case CaseType.Note: result += `Note added for ${target} by ${actor}`; break;

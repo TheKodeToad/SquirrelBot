@@ -1,4 +1,5 @@
 import type { EmbedOptions } from "oceanic.js";
+import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { getCase } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
 import { formatUserByID } from "../../../../common/discord/format.ts";
@@ -36,9 +37,9 @@ export const caseShowCommand = defineCommand({
 
 		embed.description = await formatCaseSummary(info);
 
-		const creationSecs = Math.floor(info.createdAt.getTime() / 1000);
-
 		embed.fields = [];
+
+		const creationSecs = dateToUnixSeconds(info.createdAt);
 
 		embed.fields.push(
 			{
@@ -52,7 +53,7 @@ export const caseShowCommand = defineCommand({
 		);
 
 		if (info.expiresAt !== null) {
-			const expirySecs = Math.floor(info.expiresAt.getTime() / 1000);
+			const expirySecs = dateToUnixSeconds(info.expiresAt);
 
 			embed.fields.push({
 				name: "Expires At",
