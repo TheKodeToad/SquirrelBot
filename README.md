@@ -8,21 +8,24 @@ The overall goal is to implement a set of plugins focused on moderation and util
 
 ## To-do
 - [ ] Support for non-English languages
-- [ ] Log things properly instead of just using console
+- [x] Log things properly instead of just using console
 - ❌ Unit testing
 - 🚧 Moderation
   - [x] Ban
   - [x] Kick
-  - [ ] Mute
+  - [x] Mute
   - [ ] Voice Mute
   - [ ] Warn
   - [x] Case recording
   - [ ] Case editing
 - ❌ Logging
-- 🚧 Utility - invite info, user info, server info, grant role, set channel props without needing manage channel perm
+- 🚧 Utility - invite info, user info, server info, grant role, set channel props without needing manage channel perm, emoji helper
 - ❌ Automator - automatic actions focused on moderation but could also be replying to keywords without taking action
-- ❌ Reminders
-- ❌ Custom Commands - post a plain response or run another command
+- 🚧 Reminders
+  - [x] Create reminder
+  - [ ] List or delete reminders
+  - [ ] Timezone setting - allow specifying reminder date in full or as time and/or weekday
+- ❌ Tags - post preset message with a command
 - ❌ Sticky and Static Messages - auto-reposted sticky notices in channels and static messages with support for selecting roles
 - ❌ Persistent Nickname and Roles
 - ❌ Starboard
