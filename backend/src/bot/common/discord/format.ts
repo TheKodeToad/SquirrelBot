@@ -8,7 +8,7 @@ export function formatRESTError(restError: DiscordRESTError) {
 		return `API Error ${restError.code}: ${escapeMarkdown(restError.resBody.message)}`;
 	}
 
-	return `HTTP Error ${restError.status}: ${restError.statusText}`;
+	return `HTTP Error ${restError.status}: ${escapeMarkdown(restError.statusText)}`;
 }
 
 export async function formatUserTagByID(id: string) {
