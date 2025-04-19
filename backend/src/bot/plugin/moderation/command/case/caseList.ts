@@ -63,7 +63,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 	if (!perms.case_read)
 		return;
 
-	const limit = options.compact ? 12 : 3;
+	const limit = options.compact ? 16 : 4;
 
 	const cases = await getCases(
 		member.guildID,
