@@ -6,7 +6,7 @@ import { formatUserByID } from "../../../../common/discord/format.ts";
 import { permissionsGuard } from "../../../core/public/command/helper.ts";
 import { OptionType, defineCommand } from "../../../core/public/command/index.ts";
 import { icons } from "../../../core/public/icons.ts";
-import { formatCaseSummary } from "../../helper/cases.ts";
+import { formatCaseSummary, formatCaseTitle } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const caseShowCommand = defineCommand({
@@ -31,7 +31,7 @@ export const caseShowCommand = defineCommand({
 		}
 
 		const embed: EmbedOptions = {
-			title: `Case #${number}`,
+			title: formatCaseTitle(info, info.expiresAt !== null && info.expiresAt.getTime() <= Date.now()),
 			color: Colors.blurple
 		};
 

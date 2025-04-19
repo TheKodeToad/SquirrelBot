@@ -7,7 +7,7 @@ import { permissionsGuard } from "../../../core/public/command/helper.ts";
 import { defineCommand, OptionType, type Component, type Reply } from "../../../core/public/command/index.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
-import { formatCaseSummary, formatCompactCaseSummary } from "../../helper/cases.ts";
+import { formatCaseSummary, formatCaseTitle, formatCompactCaseSummary } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const caseListCommand = defineCommand({
@@ -107,9 +107,13 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 
 	let fields: EmbedField[] = [];
 
+	const now = Date.now();
+
 	for (const info of cases) {
+		const expired = info.expiresAt !== null && info.expiresAt.getTime() <= now;
+
 		if (options.compact)
-			description += await formatCompactCaseSummary(info) + "\n";
+			description += await formatCompactCaseSummary(info, expired) + "\n";
 		else {
 			let value = await formatCaseSummary(info) + "\n";
 
@@ -125,7 +129,7 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 			}
 
 			fields.push({
-				name: "Case #" + info.number,
+				name: formatCaseTitle(info, expired),
 				value
 			});
 		}

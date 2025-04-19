@@ -9,10 +9,10 @@ DECLARE
 	next_number INT;
 BEGIN
 	INSERT INTO "moderation_caseNumberCounter" ("guildID", "counter")
-	VALUES (new."guildID", 1)
-	ON CONFLICT ("guildID")
-	DO UPDATE SET "counter" = "moderation_caseNumberCounter"."counter" + 1
-	RETURNING "counter" INTO next_number;
+		VALUES (new."guildID", 1)
+		ON CONFLICT ("guildID")
+		DO UPDATE SET "counter" = "moderation_caseNumberCounter"."counter" + 1
+		RETURNING "counter" INTO next_number;
 
 	new."number" := next_number;
 

@@ -45,6 +45,21 @@ export function caseTypeID(type: CaseType): string {
 	}
 }
 
+export function caseReverseType(type: CaseType): CaseType | null {
+	switch (type) {
+		case CaseType.Note: return null;
+		case CaseType.Warn: return CaseType.Unwarn;
+		case CaseType.Unwarn: return CaseType.Warn;
+		case CaseType.VoiceMute: return CaseType.VoiceUnmute;
+		case CaseType.VoiceUnmute: return CaseType.VoiceMute;
+		case CaseType.Mute: return CaseType.Unmute;
+		case CaseType.Unmute: return CaseType.Mute;
+		case CaseType.Kick: return null;
+		case CaseType.Ban: return CaseType.Unban;
+		case CaseType.Unban: return CaseType.Ban;
+	}
+}
+
 export const caseInfoSchema = object({
 	guildID: string(),
 	number: number(),
@@ -52,6 +67,7 @@ export const caseInfoSchema = object({
 	type: enum_(CaseType),
 	createdAt: date(),
 	expiresAt: nullable(date()),
+	shadowedBy: nullable(number()),
 
 	actorID: string(),
 	targetID: string(),
@@ -82,6 +98,7 @@ export interface CreateCaseOptions {
 export interface CaseQuery {
 	numberLessThan?: number;
 	numberGreaterThan?: number;
+
 	types?: CaseType[];
 	createdBefore?: Date;
 	createdAfter?: Date;
@@ -105,17 +122,7 @@ export async function getCase(guildID: string, number: number): Promise<CaseInfo
 
 	const result = await pool.query(
 		`
-			SELECT
-				"guildID",
-				"number",
-				"type",
-				"createdAt",
-				"expiresAt",
-				"actorID",
-				"targetID",
-				"reason",
-				"deleteMessageSeconds",
-				"dmDelivered"
+			SELECT *
 			FROM "moderation_cases"
 			WHERE "guildID" = $1
 			AND "number" = $2
@@ -134,17 +141,7 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 
 	const result = await pool.query(
 		`
-			SELECT
-				"guildID",
-				"number",
-				"type",
-				"createdAt",
-				"expiresAt",
-				"actorID",
-				"targetID",
-				"reason",
-				"deleteMessageSeconds",
-				"dmDelivered"
+			SELECT *
 			FROM "moderation_cases"
 			WHERE "guildID" = $1
 			AND (
@@ -189,36 +186,79 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
 	options.createdAt ??= new Date;
 
-	const result = await pool.query(
-		`
-			INSERT INTO "moderation_cases" (
-				"guildID",
-				"type",
-				"createdAt",
-				"expiresAt",
-				"actorID",
-				"targetID",
-				"reason",
-				"deleteMessageSeconds",
-				"dmDelivered"
-			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-			RETURNING "number"
-		`,
-		[
-			guildID,
-			options.type,
-			options.createdAt ?? null,
-			options.expiresAt ?? null,
-			options.actorID,
-			options.targetID,
-			options.reason ?? null,
-			options.deleteMessageSeconds ?? null,
-			options.dmDelivered ?? null,
-		]
-	);
+	const client = await pool.connect();
 
-	return dbParse(number(), result.rows[0].number);
+	let done = false;
+
+	try {
+		await client.query("BEGIN");
+
+		const result = await client.query(
+			`
+				INSERT INTO "moderation_cases" (
+					"guildID",
+					"type",
+					"createdAt",
+					"expiresAt",
+					"actorID",
+					"targetID",
+					"reason",
+					"deleteMessageSeconds",
+					"dmDelivered"
+				)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+				RETURNING "number"
+			`,
+			[
+				guildID,
+				options.type,
+				options.createdAt ?? null,
+				options.expiresAt ?? null,
+				options.actorID,
+				options.targetID,
+				options.reason ?? null,
+				options.deleteMessageSeconds ?? null,
+				options.dmDelivered ?? null,
+			]
+		);
+		const newNumber = dbParse(number(), result.rows[0].number);
+
+		const reverseType = caseReverseType(options.type);
+
+		if (reverseType !== null) {
+			await client.query(
+				`
+					WITH "shadowed" AS (
+						SELECT "guildID", "number"
+						FROM "moderation_cases"
+						WHERE
+							"number" != $1
+							AND ("type" = $2 OR "type" = $3)
+							AND ("expiresAt" IS NULL OR "expiresAt" > $4)
+						ORDER BY "number" DESC
+						LIMIT 1
+					)
+					UPDATE "moderation_cases"
+					SET "shadowedBy" = $1
+					FROM "shadowed"
+					WHERE
+						"moderation_cases"."guildID" = "shadowed"."guildID"
+						AND "moderation_cases"."number" = "shadowed"."number"
+				`,
+				[newNumber, options.type, reverseType, new Date]
+			);
+		}
+
+		await client.query("COMMIT");
+		done = true;
+
+		return newNumber;
+	} finally {
+		if (!done)
+			await client.query("ROLLBACK");
+
+		client.release();
+	}
 }
 
 export async function deleteCase(guildID: string, number: number): Promise<boolean> {

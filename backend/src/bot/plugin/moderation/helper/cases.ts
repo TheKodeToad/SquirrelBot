@@ -3,6 +3,15 @@ import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
 import { formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
 import { makeMarkdownQuote } from "../../../common/discord/markdown.ts";
 
+export function formatCaseTitle(info: CaseInfo, expired: boolean): string {
+	if (info.shadowedBy !== null)
+		return `~~Case #${info.number}~~ (revised/reversed)`;
+	else if (expired)
+		return `~~Case #${info.number}~~ (expired)`;
+	else
+		return "Case #" + info.number.toString();
+}
+
 export async function formatCaseSummary(info: CaseInfo): Promise<string> {
 	let result: string;
 
@@ -34,11 +43,16 @@ export async function formatCaseSummary(info: CaseInfo): Promise<string> {
 	return result;
 }
 
-export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> {
+export async function formatCompactCaseSummary(info: CaseInfo, expired: boolean): Promise<string> {
 	const actor = await formatUserTagByID(info.actorID);
 	const target = await formatUserTagByID(info.targetID);
 
-	let result = `<t:${dateToUnixSeconds(info.createdAt)}:d> **#${info.number}:** `;
+	let result = `<t:${dateToUnixSeconds(info.createdAt)}:d> `;
+
+	if (expired || info.shadowedBy !== null)
+		result += `**~~#${info.number}:~~** `;
+	else
+		result += `**#${info.number}:** `;
 
 	switch (info.type) {
 		case CaseType.Note: result += `Note added for ${target} by ${actor}`; break;
