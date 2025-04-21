@@ -23,7 +23,7 @@
 	"devDependencies": {
 		"@types/async-lock": "^1.4.2",
 		"@types/node": "^22.14.1",
-		"@types/pg": "^8.11.12",
+		"@types/pg": "^8.11.13",
 		"typescript": "^5.8.3"
 	}
 }
