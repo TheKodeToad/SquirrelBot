@@ -112,8 +112,8 @@ export interface CaseQuery {
 	deleteMessageSecondsGreaterThan?: number;
 	dmDelivered?: boolean;
 
-	reversed?: boolean;
-	limit?: number;
+	reversed: boolean;
+	limit: number;
 }
 
 export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {

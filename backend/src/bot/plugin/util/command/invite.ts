@@ -5,7 +5,7 @@ import { Colors } from "../../../common/discord/colors.ts";
 import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../common/discord/markdown.ts";
 import { bot } from "../../../index.ts";
-import { defineCommand, OptionType } from "../../core/public/command/index.ts";
+import { defineCommand, OptionType } from "../../core/public/command.ts";
 import { icons } from "../../core/public/icons.ts";
 
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;

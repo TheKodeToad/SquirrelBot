@@ -1,11 +1,11 @@
-import { ButtonStyles, ComponentTypes, Member, type AnyTextableGuildChannel, type EmbedField } from "oceanic.js";
+import { type Embed } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
-import { getCases } from "../../../../../db/moderation/cases.ts";
+import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
 import { formatUserByID } from "../../../../common/discord/format.ts";
-import { permissionsGuard } from "../../../core/public/command/helper.ts";
-import { defineCommand, OptionType, type Component, type Reply } from "../../../core/public/command/index.ts";
-import { icons } from "../../../core/public/icons.ts";
+import { defineCommand, OptionType, type ReplyObject } from "../../../core/public/command.ts";
+import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
+import { makePaginator } from "../../../core/public/helper/paginator.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
 import { formatCaseSummary, formatCaseTitle, formatCompactCaseSummary } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
@@ -30,95 +30,59 @@ export const caseListCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.case_read),
 	async run(context, args) {
-		await run(
-			async reply => await context.respond(reply),
-			context.member,
-			context.channel,
-			{ ...args, compact: args.compact ?? false },
-			{}
+		const paginator = await makePaginator(
+			{ limit: args.compact ? 16 : 4, reversed: false },
+
+			async query => {
+				// TODO: permission guarding for now
+				const config = moderationConfig.get(context.guild.id);
+
+				if (config === undefined)
+					return [];
+
+				const permissions = resolvePermissions(config, context.member, context.channel);
+
+				if (!permissions.case_read)
+					return [];
+
+				return await getCases(context.guild.id, {
+					actorIDs: args.actorID !== null ? [args.actorID] : undefined,
+					targetIDs: args.targetID !== null ? [args.targetID] : undefined,
+					limit: query.limit,
+					// default to descending, using ascending when going back
+					reversed: !query.reversed,
+					numberGreaterThan: query.before,
+					numberLessThan: query.after,
+				});
+			},
+
+			cases => formatCases(cases, args.compact ?? false)
 		);
+
+		await context.respond(paginator);
 	},
 });
 
-interface Options {
-	actorID: string | null;
-	targetID: string | null;
-	compact: boolean;
-}
+export async function formatCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
+	const embed: Embed = {
+		title: "Cases",
+		color: Colors.blurple,
+	};
 
-interface State {
-	before?: number;
-	after?: number;
-	reversed?: boolean;
-}
-
-async function run(callback: (reply: Reply) => Promise<void>, member: Member, channel: AnyTextableGuildChannel, options: Options, state: State) {
-	const config = moderationConfig.get(member.guildID);
-
-	if (config === undefined)
-		return;
-
-	const perms = resolvePermissions(config, member, channel);
-
-	if (!perms.case_read)
-		return;
-
-	const limit = options.compact ? 16 : 4;
-
-	const cases = await getCases(
-		member.guildID,
-		{
-			actorIDs: options.actorID !== null ? [options.actorID] : undefined,
-			targetIDs: options.targetID !== null ? [options.targetID] : undefined,
-			limit: limit + 1,
-			// default to descending, using ascending when going back
-			reversed: !state.reversed,
-			numberGreaterThan: state.before,
-			numberLessThan: state.after,
-		}
-	);
-
-	if (cases.length === 0) {
-		await callback(`${icons.info} No cases found!`);
-		return;
-	}
-
-	const hasMore = cases.length === limit + 1;
-
-	if (hasMore)
-		cases.splice(cases.length - 1, 1);
-
-	// reverse result so it still appears to be descending yet we have the last n instead of first n
-	if (state.reversed)
-		cases.reverse();
-
-	const hasFilters = options.actorID !== null || options.targetID !== null;
-	const title = hasFilters ? "Filtered Cases" : "All Cases";
-
-	let description = "";
-
-	if (options.actorID !== null)
-		description += `**Moderator:** ${await formatUserByID(options.actorID)}\n`;
-
-	if (options.targetID !== null)
-		description += `**Moderated User:** ${await formatUserByID(options.targetID)}\n`;
-
-	description += "\n";
-
-	let fields: EmbedField[] = [];
+	embed.description = "";
+	embed.fields = [];
 
 	const now = Date.now();
 
 	for (const info of cases) {
 		const expired = info.expiresAt !== null && info.expiresAt.getTime() <= now;
 
-		if (options.compact)
-			description += await formatCompactCaseSummary(info, expired) + "\n";
+		if (compact)
+			embed.description += await formatCompactCaseSummary(info, expired) + "\n";
 		else {
 			let value = await formatCaseSummary(info) + "\n";
 
-			if (options.actorID === null)
-				value += `Moderator: ${await formatUserByID(info.actorID)}\n`;
+			value += `Moderator: ${await formatUserByID(info.actorID)}\n`;
 
 			const creationSecs = dateToUnixSeconds(info.createdAt);
 			value += `Performed At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
@@ -128,46 +92,12 @@ async function run(callback: (reply: Reply) => Promise<void>, member: Member, ch
 				value += `Expires At: <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
 			}
 
-			fields.push({
+			embed.fields.push({
 				name: formatCaseTitle(info, expired),
 				value
 			});
 		}
 	}
 
-	const components: Component[][] = [];
-
-	const prevDisabled = state.after === undefined && (!hasMore || state.before === undefined);
-	const nextDisabled = state.before === undefined && !hasMore;
-
-	if (!(prevDisabled && nextDisabled)) {
-		components.push([
-			{
-				type: ComponentTypes.BUTTON,
-				style: ButtonStyles.SECONDARY,
-				customID: "prev",
-				label: "←",
-				disabled: prevDisabled,
-				callback: componentContext => run(reply => componentContext.edit(reply), member, channel, options, { before: cases[0]?.number, reversed: true }),
-			},
-			{
-				type: ComponentTypes.BUTTON,
-				style: ButtonStyles.SECONDARY,
-				customID: "next",
-				label: "→",
-				disabled: nextDisabled,
-				callback: componentContext => run(reply => componentContext.edit(reply), member, channel, options, { after: cases[cases.length - 1]?.number }),
-			}
-		]);
-	}
-
-	await callback({
-		embeds: [{
-			color: Colors.blurple,
-			title,
-			description,
-			fields
-		}],
-		components
-	});
+	return { embeds: [embed] };
 }

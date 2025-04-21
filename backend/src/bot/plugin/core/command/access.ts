@@ -3,7 +3,7 @@ import { BOT_ALLOWED_GUILDS } from "../../../../environment.ts";
 import { escapeMarkdown } from "../../../common/discord/markdown.ts";
 import { bot } from "../../../index.ts";
 import { grantAccess, revokeAccess } from "../guildInfoSync.ts";
-import { defineCommand, OptionType, type CommandContext } from "../public/command/index.ts";
+import { defineCommand, OptionType, type CommandContext } from "../public/command.ts";
 import { icons } from "../public/icons.ts";
 
 // for now

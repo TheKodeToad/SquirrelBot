@@ -1,5 +1,5 @@
-import { permissionsGuard } from "../../core/public/command/helper.ts";
-import { OptionType, defineCommand } from "../../core/public/command/index.ts";
+import { OptionType, defineCommand } from "../../core/public/command.ts";
+import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
 import { icons } from "../../core/public/icons.ts";
 import { utilConfig } from "../index.ts";
 

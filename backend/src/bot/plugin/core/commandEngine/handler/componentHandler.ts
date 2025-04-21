@@ -1,6 +1,6 @@
 import { ComponentInteraction, MessageFlags, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
-import type { Component, ComponentCallback, ComponentContext, Reply } from "../../public/command/index.ts";
+import type { Component, ComponentCallback, ComponentContext, Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
 

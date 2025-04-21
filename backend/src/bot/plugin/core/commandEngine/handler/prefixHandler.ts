@@ -4,7 +4,7 @@ import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../../../common/discord/permissions.ts";
 import { coreConfig } from "../../index.ts";
-import { type Command, type CommandContext, type Reply } from "../../public/command/index.ts";
+import { type Command, type CommandContext, type Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";

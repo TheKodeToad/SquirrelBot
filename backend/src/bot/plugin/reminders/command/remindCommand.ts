@@ -1,8 +1,8 @@
 import { MessageFlags } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
-import { createReminder } from "../../../../db/reminders/reminder.ts";
-import { permissionsGuard } from "../../core/public/command/helper.ts";
-import { defineCommand, OptionType } from "../../core/public/command/index.ts";
+import { createReminder } from "../../../../db/reminders/reminders.ts";
+import { defineCommand, OptionType } from "../../core/public/command.ts";
+import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
 import { icons } from "../../core/public/icons.ts";
 import { remindersConfig } from "../index.ts";
 import { trackNewReminder } from "../scheduler.ts";
@@ -24,7 +24,7 @@ export const remindCommand = defineCommand({
 		}
 	},
 
-	preRun: (context) => permissionsGuard(context, remindersConfig),
+	preRun: (context) => permissionsGuard(context, remindersConfig, permissions => permissions.personal_reminders),
 	async run(context, args) {
 		if (context.guild === null)
 			return;
@@ -35,6 +35,7 @@ export const remindCommand = defineCommand({
 		const reminder = await createReminder(context.guild.id, {
 			ownerID: context.user.id,
 			channelID: context.channel.id,
+			channelType: context.channel.type,
 			createdAt: new Date(now),
 			firesAt: new Date(firesAt),
 			message: args.message ?? undefined,

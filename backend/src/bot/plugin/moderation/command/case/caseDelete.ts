@@ -1,6 +1,6 @@
 import { deleteCase } from "../../../../../db/moderation/cases.ts";
-import { permissionsGuard } from "../../../core/public/command/helper.ts";
-import { defineCommand, OptionType } from "../../../core/public/command/index.ts";
+import { defineCommand, OptionType } from "../../../core/public/command.ts";
+import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { moderationConfig } from "../../index.ts";
 

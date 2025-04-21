@@ -44,7 +44,8 @@ export interface ComponentContext {
 	edit(reply: Reply): Promise<void>;
 }
 
-export type Reply = (Omit<CreateMessageOptions, "messageReference" | "tts" | "components"> & { components?: Component[][]; }) | string;
+export type ReplyObject = (Omit<CreateMessageOptions, "messageReference" | "tts" | "components"> & { components?: Component[][]; });
+export type Reply = ReplyObject | string;
 
 export type Component = ((TextButton | SelectMenuComponent) & ComponentCallback) | MessageActionRowComponent;
 

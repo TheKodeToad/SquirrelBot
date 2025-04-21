@@ -1,20 +1,37 @@
-import { Guild, Member, PrivateChannel, type RequestGuildMembersOptions, User } from "oceanic.js";
+import { type AnyThreadChannel, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, ThreadChannel, User } from "oceanic.js";
 import { bot } from "../../index.ts";
 
-export function getUserCached(userID: string): User | Promise<User> {
-	return bot.users.get(userID) ?? bot.rest.users.get(userID);
+export async function getUserCached(userID: string): Promise<User> {
+	return bot.users.get(userID) ?? await bot.rest.users.get(userID);
 }
 
-export function getMemberCached(guild: Guild, userID: string): Member | Promise<Member> {
-	return guild.members.get(userID) ?? bot.rest.guilds.getMember(guild.id, userID);
+export async function getMemberCached(guild: Guild, userID: string): Promise<Member> {
+	return guild.members.get(userID) ?? await bot.rest.guilds.getMember(guild.id, userID);
 }
 
-export function getBotUserCached(guild: Guild): Member | Promise<Member> {
+export function getBotUserCached(guild: Guild): Promise<Member> {
 	return getMemberCached(guild, bot.user.id);
 }
 
-export function createDMCached(userID: string): PrivateChannel | Promise<PrivateChannel> {
-	return bot.privateChannels.find(channel => channel.recipient.id === userID) ?? bot.rest.users.createDM(userID);
+export async function createDMCached(userID: string): Promise<PrivateChannel> {
+	return bot.privateChannels.find(channel => channel.recipient.id === userID) ?? await bot.rest.users.createDM(userID);
+}
+
+export async function getThreadCached(guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
+	const cached = guild.threads.get(threadID);
+
+	if (cached !== undefined)
+		return cached;
+
+	if (guild.channels.has(threadID))
+		return null;
+
+	const fetched = await bot.rest.channels.get(threadID);
+
+	if (fetched instanceof ThreadChannel)
+		return fetched;
+
+	return null;
 }
 
 export async function requestMembersCached(

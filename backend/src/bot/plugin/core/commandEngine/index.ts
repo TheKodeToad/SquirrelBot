@@ -1,5 +1,5 @@
 import { ComponentTypes, type MessageActionRow } from "oceanic.js";
-import type { Reply } from "../public/command/index.ts";
+import type { Reply } from "../public/command.ts";
 
 /**
  * How long to expire command state (edit tracking + component listening)
@@ -25,3 +25,4 @@ export function transformReply(reply: Reply) {
 		components: reply.components?.map(components => ({ type: ComponentTypes.ACTION_ROW, components } satisfies MessageActionRow)) ?? []
 	};
 }
+

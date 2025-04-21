@@ -3,8 +3,8 @@ import { getMemberCached } from "../../../common/discord/cache.ts";
 import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
 import { coreConfig as coreConfigCache } from "../index.ts";
-import { permissionsGuard } from "../public/command/helper.ts";
-import { defineCommand, OptionType } from "../public/command/index.ts";
+import { defineCommand, OptionType } from "../public/command.ts";
+import { permissionsGuard } from "../public/helper/commandGuards.ts";
 import { icons } from "../public/icons.ts";
 import { resolveGroups } from "../public/permissionResolution.ts";
 

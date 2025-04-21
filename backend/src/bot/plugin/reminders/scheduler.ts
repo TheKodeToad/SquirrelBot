@@ -1,10 +1,11 @@
-import { DiscordRESTError, MessageFlags, Permissions, TextableChannel } from "oceanic.js";
+import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { dateToHMSString, dateToUnixSeconds } from "../../../common/time.ts";
-import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminder.ts";
-import { getMemberCached } from "../../common/discord/cache.ts";
+import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminders.ts";
+import { getMemberCached, getThreadCached } from "../../common/discord/cache.ts";
 import { debugFormatChannel } from "../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../common/discord/permissions.ts";
+import { isTextableChannel, isThreadChannelType } from "../../common/discord/typeGuards.ts";
 import { bot } from "../../index.ts";
 import { icons } from "../core/public/icons.ts";
 import { debugFormatReminder } from "./index.ts";
@@ -61,27 +62,48 @@ async function fire(reminder: Reminder) {
 	// members could also be bulk requested ahead of time
 
 	if (guild === undefined) {
-		logger.debug?.(`App user is not in guild; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`Bot user is not in guild; not sending reminder ${debugFormatReminder(reminder)}`);
 		return; // no access to guild?
 	}
 
-	const channel = guild.channels.get(reminder.channelID);
+	let channel: AnyTextableChannel;
 
-	if (channel === undefined) {
-		logger.debug?.(`Channel was deleted; not sending reminder ${debugFormatReminder(reminder)}`);
-		return; // deleted
+	if (isThreadChannelType(reminder.channelType)) {
+		try {
+			var potentialThread = await getThreadCached(guild, reminder.channelID);
+		} catch (error) {
+			if (!(error instanceof DiscordRESTError))
+				throw error;
+
+			logger.debug?.(`Thread was deleted; not sending reminder ${debugFormatReminder(reminder)}`);
+			return;
+		}
+
+		if (potentialThread === null)
+			throw new Error("Inconsistent channel type - channel stopped being a thread?");
+
+		channel = potentialThread;
+	} else {
+		const potentialChannel = guild.channels.get(reminder.channelID);
+
+		if (potentialChannel === undefined) {
+			logger.debug?.(`Channel was deleted; not sending reminder ${debugFormatReminder(reminder)}`);
+			return;
+		}
+
+		if (!isTextableChannel(potentialChannel))
+			throw new Error("Inconsistent channel type - channel stopped being textable?");
+
+		channel = potentialChannel;
 	}
 
-	if (!(channel instanceof TextableChannel))
-		return;
-
 	if (!canWriteInChannel(channel, guild.clientMember)) {
-		logger.debug?.(`App user cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
 		return;
 	}
 
 	try {
-		var owner = await getMemberCached(guild, reminder.ownerID);
+		var reminderOwner = await getMemberCached(guild, reminder.ownerID);
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;
@@ -89,16 +111,17 @@ async function fire(reminder: Reminder) {
 		return;
 	}
 
+	// TODO: doesn't account for private thread but I don't think this really matters that much
 	// don't allow perm bypass
-	if (!canWriteInChannel(channel, owner)) {
+	if (!canWriteInChannel(channel, reminderOwner)) {
 		logger.debug?.(`Owner cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
 		return;
 	}
 
 	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${dateToUnixSeconds(reminder.createdAt)}>!**`;
 
-	if ((Date.now() - reminder.createdAt.getTime()) >= 10 * 60 * 1000)
-		content += `\n${icons.warning} Reminder running late! This is likely due to downtime. Please contact app admins if this persists.`;
+	if ((Date.now() - reminder.firesAt.getTime()) >= 10 * 60 * 1000)
+		content += `\n${icons.warning} Reminder running late! This is likely due to downtime.`;
 
 	if (reminder.message !== null)
 		content += "\n>>> " + reminder.message;
@@ -108,9 +131,9 @@ async function fire(reminder: Reminder) {
 	if (reminder.silent)
 		flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
 
-	const ownerPerms = channel.permissionsOf(owner);
+	const reminderOwnerPerms = channel.permissionsOf(reminderOwner);
 
-	if (!ownerPerms.has(Permissions.EMBED_LINKS))
+	if (!reminderOwnerPerms.has(Permissions.EMBED_LINKS))
 		flags |= MessageFlags.SUPPRESS_EMBEDS;
 
 	await channel.createMessage({

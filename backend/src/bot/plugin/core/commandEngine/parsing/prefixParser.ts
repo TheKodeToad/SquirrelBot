@@ -1,4 +1,4 @@
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command/index.ts";
+import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command.ts";
 import type { CommandCacheEntry } from "../commandCache.ts";
 import { SafeArgs } from "../safeArgs.ts";
 import { ArgsParseError, type ArgsParseResult } from "./index.ts";

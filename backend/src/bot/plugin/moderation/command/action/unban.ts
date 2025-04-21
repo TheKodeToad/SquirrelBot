@@ -2,8 +2,8 @@ import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { CaseType, createCase } from "../../../../../db/moderation/cases.ts";
 import { formatRESTError, formatUserTagByID } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { permissionsGuard } from "../../../core/public/command/helper.ts";
-import { OptionType, defineCommand } from "../../../core/public/command/index.ts";
+import { OptionType, defineCommand } from "../../../core/public/command.ts";
+import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { moderationConfig } from "../../index.ts";
 

@@ -1,5 +1,5 @@
 import type { InteractionOptions } from "oceanic.js";
-import { OptionType, type AnyArgsValueItem } from "../../public/command/index.ts";
+import { OptionType, type AnyArgsValueItem } from "../../public/command.ts";
 import type { CommandCacheEntry } from "../commandCache.ts";
 import { SafeArgs } from "../safeArgs.ts";
 import { ArgsParseError, type ArgsParseResult } from "./index.ts";
