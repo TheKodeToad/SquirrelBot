@@ -103,12 +103,14 @@ async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
 	return [userID, hash];
 }
 
-export async function deleteExpiredTokens(): Promise<void> {
-	await pool.query(
+export async function deleteExpiredTokens(): Promise<number> {
+	const result = await pool.query(
 		`
 			DELETE FROM "api_tokens"
 			WHERE "expiresAt" <= $1
 		`,
 		[new Date]
 	);
+
+	return result.rowCount ?? 0;
 }
