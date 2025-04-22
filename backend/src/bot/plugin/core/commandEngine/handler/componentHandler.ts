@@ -1,4 +1,4 @@
-import { ComponentInteraction, MessageFlags, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
+import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import type { Component, ComponentCallback, ComponentContext, Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
@@ -93,6 +93,12 @@ class ComponentContextImpl implements ComponentContext {
 		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
 		this._ackPromise = null;
 	}
+
+	get shard(): Shard { return this._interaction.guild.shard; }
+	get guild(): Guild { return this._interaction.guild; }
+	get user(): User { return this._interaction.user; };
+	get member(): Member { return this._interaction.member; }
+	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 
 	async edit(reply: Reply): Promise<void> {
 		const messageOptions = transformReply(reply);

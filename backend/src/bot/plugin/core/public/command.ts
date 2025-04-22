@@ -29,18 +29,21 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 	run(context: CommandContext, args: { readonly [K in keyof O]: OptionValue<O[K]> }, data: D): Promise<void> | void;
 }
 
-export interface CommandContext {
-	command: Command;
+export interface BaseContext {
 	shard: Shard;
 	guild: Guild;
 	user: User;
 	member: Member;
 	channel: AnyTextableGuildChannel;
+}
+
+export interface CommandContext extends BaseContext {
+	command: Command;
 	message?: Message<AnyTextableGuildChannel>;
 	respond(reply: Reply): Promise<void>;
 }
 
-export interface ComponentContext {
+export interface ComponentContext extends BaseContext {
 	edit(reply: Reply): Promise<void>;
 }
 

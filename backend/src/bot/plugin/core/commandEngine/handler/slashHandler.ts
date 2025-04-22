@@ -151,16 +151,17 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 
 class SlashContext implements CommandContext {
 	command: Command;
-	get shard(): Shard { return this._interaction.guild.shard; }
-	get guild(): Guild { return this._interaction.guild; }
-	get user(): User { return this._interaction.user; }
-	get member(): Member { return this._interaction.member; }
-	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;
 	_responseID: string | null;
 	_acked: boolean;
 	_deferTimeout: NodeJS.Timeout | null;
 	_deferPromise: Promise<void> | null;
+
+	get shard(): Shard { return this._interaction.guild.shard; }
+	get guild(): Guild { return this._interaction.guild; }
+	get user(): User { return this._interaction.user; }
+	get member(): Member { return this._interaction.member; }
+	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 
 	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>) {
 		this.command = command;

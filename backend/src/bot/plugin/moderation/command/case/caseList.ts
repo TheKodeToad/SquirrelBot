@@ -3,9 +3,9 @@ import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
 import { Colors } from "../../../../common/discord/colors.ts";
 import { formatUserByID } from "../../../../common/discord/format.ts";
-import { defineCommand, OptionType, type ReplyObject } from "../../../core/public/command.ts";
+import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { makePaginator } from "../../../core/public/helper/paginator.ts";
+import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
 import { formatCaseSummary, formatCaseTitle, formatCompactCaseSummary } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
@@ -30,40 +30,46 @@ export const caseListCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.case_read),
 	async run(context, args) {
-		const paginator = await makePaginator(
-			{ limit: args.compact ? 16 : 4, reversed: false },
-
-			async query => {
-				// TODO: permission guarding for now
-				const config = moderationConfig.get(context.guild.id);
-
-				if (config === undefined)
-					return [];
-
-				const permissions = resolvePermissions(config, context.member, context.channel);
-
-				if (!permissions.case_read)
-					return [];
-
-				return await getCases(context.guild.id, {
-					actorIDs: args.actorID !== null ? [args.actorID] : undefined,
-					targetIDs: args.targetID !== null ? [args.targetID] : undefined,
-					limit: query.limit,
-					// default to descending, using ascending when going back
-					reversed: !query.reversed,
-					numberGreaterThan: query.before,
-					numberLessThan: query.after,
-				});
-			},
-
-			cases => formatCases(cases, args.compact ?? false)
+		await respondWithPaginator<CaseInfo, number>(
+			context,
+			{
+				pageSize: args.compact ? 16 : 4,
+				getKey: entry => entry.number,
+				lookUp: (context, query) => lookUpCases(context, query, args.actorID, args.targetID),
+				format: cases => formatCases(cases, args.compact ?? false),
+			}
 		);
-
-		await context.respond(paginator);
 	},
 });
 
-export async function formatCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
+async function lookUpCases(
+	context: BaseContext,
+	query: PaginatorQuery<number>,
+	actorID: string | null,
+	targetID: string | null
+): Promise<CaseInfo[]> {
+	const config = moderationConfig.get(context.guild.id);
+
+	if (config === undefined)
+		return [];
+
+	const permissions = resolvePermissions(config, context.member, context.channel);
+
+	if (!permissions.case_read)
+		return [];
+
+	return await getCases(context.guild.id, {
+		actorIDs: actorID !== null ? [actorID] : undefined,
+		targetIDs: targetID !== null ? [targetID] : undefined,
+		limit: query.limit,
+		// default to descending, using ascending when going back
+		reversed: !query.reversed,
+		numberGreaterThan: query.before,
+		numberLessThan: query.after,
+	});
+}
+
+async function formatCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
 	const embed: Embed = {
 		title: "Cases",
 		color: Colors.blurple,

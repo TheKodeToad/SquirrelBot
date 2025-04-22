@@ -136,13 +136,14 @@ async function handleDelete(message: PossiblyUncachedMessage) {
 
 class PrefixContext implements CommandContext {
 	command: Command;
+	message: Message<AnyTextableGuildChannel>;
+	_response: Message | null;
+
 	get shard(): Shard { return this.message.guild.shard; }
 	get guild(): Guild { return this.message.guild; }
 	get user(): User { return this.message.author; }
 	get member(): Member { return this.message.member; }
 	get channel(): AnyTextableGuildChannel { return this.message.channel; }
-	message: Message<AnyTextableGuildChannel>;
-	_response: Message | null;
 
 	constructor(command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
 		this.command = command;
