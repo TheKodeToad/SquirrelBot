@@ -1,6 +1,7 @@
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { CaseType, createCase } from "../../../../../db/moderation/cases.ts";
-import { formatRESTError, formatUserTagByID } from "../../../../common/discord/format.ts";
+import { getUserCached } from "../../../../common/discord/cache.ts";
+import { formatRESTError } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
@@ -49,13 +50,14 @@ export const unbanCommand = defineCommand({
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
 					unsuccessfulUnbans.push({
 						id: target,
-						name: await formatUserTagByID(target),
+						name: (await getUserCached(target)).tag,
 						error: "User is not banned",
 					});
 				} else {
+					// TODO: temp fix
 					unsuccessfulUnbans.push({
 						id: target,
-						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : await formatUserTagByID(target),
+						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : (await getUserCached(target)).tag,
 						error: `Ban fetch failed: ${formatRESTError(error)}`,
 					});
 				}

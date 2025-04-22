@@ -12,8 +12,6 @@ const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.c
 
 const logger = moduleLogger();
 
-// TODO: escape things lol
-
 export const inviteCommand = defineCommand({
 	name: ["invite", "inv"],
 	trackUpdates: true,
@@ -114,7 +112,7 @@ export const inviteCommand = defineCommand({
 			embed.footer = { text: "" };
 
 			if (guild.vanityURLCode !== null)
-				embed.footer.text += escapeMarkdown("discord.gg/" + guild.vanityURLCode) + " • ";
+				embed.footer.text += "discord.gg/" + guild.vanityURLCode + " • ";
 
 			embed.footer.text += "Server ID: " + guild.id;
 		} else if (type === InviteTypes.FRIEND && inviter !== undefined) {
