@@ -1,10 +1,12 @@
 import { A, useMatch } from "@solidjs/router";
 import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
-import { Match, Switch } from "solid-js";
+import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { logIn, logOut } from "../authFlow";
-import { account, avatarURL } from "../state/account";
+import { account, useAvatarURL } from "../state/account";
+import { useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
+import { GuildIcon } from "./common/GuildIcon";
 
 export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 	const guildMatch = useMatch(() => "/guilds/:guildID/*?");
@@ -13,10 +15,15 @@ export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 		const guildID = guildMatch()?.params.guildID;
 
 		if (guildID !== undefined) {
+			const guild = useGuild(guildID);
+
 			return (
 				<>
 					<IconChevronRight size="1em" />
-					<A href={`/guilds/${guildID}`}>Guild</A>
+					<Show when={guild !== undefined}>
+						<GuildIcon id={guild!.id} iconHash={guild!.iconHash} size={24} />
+					</Show>
+					<A href={`/guilds/${guildID}`}>{guild?.name ?? "<unknown>"}</A>
 				</>
 			);
 		}
@@ -26,7 +33,7 @@ export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 
 	return (<>
 		<nav id="headerBar" class="hbox">
-			<span id="headerBar-breadcrumb"><A href="/">SquirrelBot</A>{breadcrumbChildren()}</span>
+			<span id="headerBar-breadcrumb"><A href="/">SquirrelBot Dashboard</A>{breadcrumbChildren()}</span>
 			<Switch>
 				<Match when={account() === null}>
 					<Button onClick={logIn} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
@@ -35,7 +42,7 @@ export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 				</Match>
 				<Match when={account() !== null}>
 					<Button onClick={() => logOut()} color="transparent" style={{ "margin-left": "auto" }}>
-						<img src={avatarURL()} class="avatar" /> {account()?.username} <IconLogout size="1em" />
+						<img src={useAvatarURL()} class="avatar" /> {account()?.username} <IconLogout size="1em" />
 					</Button>
 				</Match>
 			</Switch>

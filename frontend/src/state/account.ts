@@ -8,7 +8,7 @@ export interface Account {
 
 export const [account, setAccount] = createSignal<Account | null>(loadFromStorage());
 
-export function accountID() {
+export function useAccountID() {
 	const theAccount = account();
 
 	if (theAccount === null)
@@ -36,13 +36,13 @@ export function accountID() {
 	return userID;
 }
 
-export function avatarURL() {
+export function useAvatarURL() {
 	const theAccount = account();
 
 	if (theAccount === null)
 		return undefined;
 
-	return `https://cdn.discordapp.com/avatars/${accountID()!}/${theAccount.avatar}.png?size=64`;
+	return `https://cdn.discordapp.com/avatars/${useAccountID()!}/${theAccount.avatar}.png?size=64`;
 }
 
 createEffect(on(account, account => localStorage.setItem("account", JSON.stringify(account))));

@@ -1,15 +1,13 @@
 import { A } from "@solidjs/router";
-import { createResource, For, Show } from "solid-js";
-import { getGuilds, GuildResponse } from "../client";
+import { For, Show } from "solid-js";
+import { GuildResponse } from "../client";
 import { GuildIcon } from "../component/common/GuildIcon";
 import { LoginGate } from "../component/LoginGate";
-import { account } from "../state/account";
+import { guilds } from "../state/guilds";
 
 export const Home = () => <LoginGate><GuildsComponent /></LoginGate>;
 
 function GuildsComponent() {
-	const [guilds] = createResource(() => account() !== null ? getGuilds(account()!.token) : undefined);
-
 	return (
 		<div class="content mainContent">
 			<h1>Servers</h1>
