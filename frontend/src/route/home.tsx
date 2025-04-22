@@ -1,10 +1,11 @@
 import { A } from "@solidjs/router";
 import { createResource, For, Show } from "solid-js";
 import { getGuilds, GuildResponse } from "../client";
+import { GuildIcon } from "../component/common/GuildIcon";
 import { LoginGate } from "../component/LoginGate";
 import { account } from "../state/account";
 
-export const Servers = () => <LoginGate><GuildsComponent /></LoginGate>;
+export const Home = () => <LoginGate><GuildsComponent /></LoginGate>;
 
 function GuildsComponent() {
 	const [guilds] = createResource(() => account() !== null ? getGuilds(account()!.token) : undefined);
@@ -23,15 +24,10 @@ function GuildsComponent() {
 	);
 }
 
-function GuildCard({ name, iconHash, id }: { name: string; iconHash: string | null; id: string; }) {
-	const icon =
-		iconHash !== null
-			? `https://cdn.discordapp.com/icons/${id}/${iconHash}.png?size=256`
-			: "https://cdn.discordapp.com/embed/avatars/0.png";
-
+function GuildCard({ name, id, iconHash }: { name: string; id: string; iconHash: string | null; }) {
 	return (
-		<A href={`/servers/${id}`} class="guildCard">
-			<img src={icon} />
+		<A href={`/guilds/${id}`} class="guildCard">
+			<GuildIcon id={id} iconHash={iconHash} size={64} />
 			<span class="guildCard-title">{name}</span>
 		</A>
 	);
