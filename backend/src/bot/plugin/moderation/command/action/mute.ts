@@ -1,4 +1,5 @@
 import { CaseType } from "../../../../../db/moderation/cases.ts";
+import { formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { defineCommand, OptionType } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
@@ -77,14 +78,14 @@ export const muteCommand = defineCommand({
 		if (args.user.length === 1) {
 			if (successful.length === 1) {
 				const ban = successful[0]!;
-				await context.respond(`${icons.success} Muted <@${ban.id}> (${escapeMarkdown(ban.name)})${ban.dmDelivered ? " with direct message" : ""} [#${ban.caseNumber}]!`);
+				await context.respond(`${icons.success} Mute ${formatUser(ban.user)} ${ban.dmDelivered ? "with direct message " : ""}[#${ban.caseNumber}]!`);
 			} else if (unsuccessful.length === 1) {
 				const ban = unsuccessful[0]!;
-				await context.respond(`${icons.error} Could not mute <@${ban.id}> (${escapeMarkdown(ban.name ?? "<unknown>")}): ${escapeMarkdown(ban.error)}!`);
+				await context.respond(`${icons.error} Could not mute ${formatUser(ban.user)}: ${escapeMarkdown(ban.error)}!`);
 			}
 		} else {
-			const successfulMessage = successful.map(mute => `- <@${mute.id}> (${escapeMarkdown(mute.name)})${mute.dmDelivered ? " with direct message" : ""} [#${mute.caseNumber}]`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(ban => `- <@${ban.id}> (${escapeMarkdown(ban.name ?? "<unknown>")}): ${escapeMarkdown(ban.error)}`).join("\n");
+			const successfulMessage = successful.map(ban => `- ${formatUser(ban.user)} ${ban.dmDelivered ? "with direct message " : ""}[#${ban.caseNumber}]`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(ban => `- ${formatUser(ban.user)}: ${escapeMarkdown(ban.error)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
@@ -97,11 +98,10 @@ export const muteCommand = defineCommand({
 			} else {
 				await context.respond(
 					`${icons.warning} Only ${successful.length} of ${args.user.length} mutes were successful!\n`
-					+ `Successful mutes:\n${successfulMessage}\n`
-					+ `Unsuccessful mutes:\n${unsuccessfulMessage}`
+					+ `Successful bans:\n${successfulMessage}\n`
+					+ `Unsuccessful bans:\n${unsuccessfulMessage}`
 				);
 			}
 		}
-
 	},
 });

@@ -1,5 +1,5 @@
-import { DiscordRESTError, Member, User } from "oceanic.js";
-import { getUserCached } from "./cache.ts";
+import { DiscordRESTError, Member, User, type Uncached } from "oceanic.js";
+import { fetchUserCachedSupressed } from "./cachedRequest.ts";
 import { escapeMarkdown } from "./markdown.ts";
 
 export function formatRESTError(restError: DiscordRESTError) {
@@ -11,21 +11,21 @@ export function formatRESTError(restError: DiscordRESTError) {
 	return `HTTP Error ${restError.status}: ${escapeMarkdown(restError.statusText)}`;
 }
 
-export async function formatUserTagByID(id: string) {
-	try {
-		return escapeMarkdown((await getUserCached(id)).tag);
-	} catch (error) {
-		if (!(error instanceof DiscordRESTError))
-			throw error;
+export async function formatUserTagByID(id: string): Promise<string> {
+	return formatUserTag(await fetchUserCachedSupressed(id));
+}
 
+export async function formatUserByID(id: string): Promise<string> {
+	return formatUser(await fetchUserCachedSupressed(id));
+}
+
+export function formatUser(user: User | Member | Uncached): string {
+	return `<@${user.id}> (${formatUserTag(user)})`;
+}
+
+export function formatUserTag(user: User | Member | Uncached) {
+	if ("tag" in user)
+		return escapeMarkdown(user.tag);
+	else
 		return "\\<unknown\\>";
-	}
-}
-
-export async function formatUserByID(id: string) {
-	return `<@${id}> (${await formatUserTagByID(id)})`;
-}
-
-export function formatUser(user: User | Member) {
-	return `<@${user.id}> (${escapeMarkdown(user.tag)})`;
 }

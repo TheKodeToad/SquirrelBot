@@ -1,6 +1,6 @@
-import { DiscordRESTError, type CreateMessageOptions, type Guild, type Member, type User } from "oceanic.js";
+import { DiscordRESTError, type CreateMessageOptions, type Guild, type Member, type Uncached, type User } from "oceanic.js";
 import { createCase, type CreateCaseOptions } from "../../../../db/moderation/cases.ts";
-import { createDMCached, getUserCached, requestMembersCached } from "../../../common/discord/cache.ts";
+import { createDMCached, fetchMembersCached, fetchUserCached } from "../../../common/discord/cachedRequest.ts";
 import { formatRESTError } from "../../../common/discord/format.ts";
 import { getHighestRole } from "../../../common/discord/permissions.ts";
 import { bot } from "../../../index.ts";
@@ -28,14 +28,12 @@ type BulkAction =
 
 interface BulkResult {
 	successful: {
-		id: string;
-		name: string;
+		user: User | Member;
 		caseNumber: number | null;
 		dmDelivered: boolean;
 	}[];
 	unsuccessful: {
-		id: string;
-		name: string | null;
+		user: User | Member | Uncached;
 		error: string;
 	}[];
 }
@@ -43,21 +41,20 @@ interface BulkResult {
 export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 	let result: BulkResult = { successful: [], unsuccessful: [] };
 
-	const members = await requestMembersCached(action.guild, action.ids);
+	const members = await fetchMembersCached(action.guild, action.ids);
 
 	for (const targetID of action.ids) {
 		const targetMember = members.get(targetID);
 
 		if (targetMember === undefined) {
 			try {
-				var targetUser = await getUserCached(targetID);
+				var targetUser = await fetchUserCached(targetID);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				result.unsuccessful.push({
-					id: targetID,
-					name: "<unknown>",
+					user: { id: targetID },
 					error: "User fetch failed: " + formatRESTError(error)
 				});
 				continue;
@@ -65,8 +62,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 
 			if (action.membersOnly) {
 				result.unsuccessful.push({
-					id: targetID,
-					name: targetUser.username,
+					user: targetUser,
 					error: "User is not a member of the server",
 				});
 				continue;
@@ -79,8 +75,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 					throw error;
 
 				result.unsuccessful.push({
-					id: targetID,
-					name: targetUser.tag,
+					user: targetUser,
 					error: formatRESTError(error),
 				});
 				continue;
@@ -96,8 +91,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 			}
 
 			result.successful.push({
-				id: targetID,
-				name: targetUser.tag,
+				user: targetUser,
 				caseNumber,
 				dmDelivered: false,
 			});
@@ -110,7 +104,10 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 		if (action.guild.ownerID !== action.actor.id
 			&& (action.guild.ownerID === targetID
 				|| getHighestRole(action.actor).position <= targetPosition)) {
-			result.unsuccessful.push({ id: targetID, name: targetMember.tag, error: "Your highest role is not above target's highest role" });
+			result.unsuccessful.push({
+				user: targetMember,
+				error: "Your highest role is not above target's highest role"
+			});
 			continue;
 		}
 
@@ -118,7 +115,10 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 			&& (action.guild.ownerID === targetID
 				|| getHighestRole(action.guild.clientMember).position <= targetPosition)
 		) {
-			result.unsuccessful.push({ id: targetID, name: targetMember.tag, error: "App's highest role is not above target's highest role" });
+			result.unsuccessful.push({
+				user: targetMember,
+				error: "App's highest role is not above target's highest role"
+			});
 			continue;
 		}
 
@@ -142,8 +142,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 				throw error;
 
 			result.unsuccessful.push({
-				id: targetID,
-				name: targetMember.tag,
+				user: targetMember,
 				error: formatRESTError(error),
 			});
 			continue;
@@ -159,8 +158,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 		}
 
 		result.successful.push({
-			id: targetID,
-			name: targetMember.tag,
+			user: targetMember,
 			caseNumber,
 			dmDelivered,
 		});

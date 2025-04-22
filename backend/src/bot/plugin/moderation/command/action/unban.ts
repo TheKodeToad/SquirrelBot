@@ -1,7 +1,7 @@
-import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
+import { DiscordRESTError, JSONErrorCodes, User, type Uncached } from "oceanic.js";
 import { CaseType, createCase } from "../../../../../db/moderation/cases.ts";
-import { getUserCached } from "../../../../common/discord/cache.ts";
-import { formatRESTError } from "../../../../common/discord/format.ts";
+import { fetchUserCachedSupressed } from "../../../../common/discord/cachedRequest.ts";
+import { formatRESTError, formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
@@ -27,15 +27,14 @@ export const unbanCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.unban),
 	async run(context, args) {
-		let successfulUnbans: { caseNumber: number, id: string, name: string; }[] = [];
-		let unsuccessfulUnbans: { id: string, name: string, error: string; }[] = [];
+		let successfulUnbans: { user: User; caseNumber: number; }[] = [];
+		let unsuccessfulUnbans: { user: User | Uncached; error: string; }[] = [];
 
 		for (const target of args.user) {
 			const cachedMember = context.guild.members.get(target);
 			if (cachedMember !== undefined) {
 				unsuccessfulUnbans.push({
-					id: target,
-					name: cachedMember.tag,
+					user: cachedMember.user,
 					error: "User is not banned",
 				});
 				continue;
@@ -49,15 +48,16 @@ export const unbanCommand = defineCommand({
 
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
 					unsuccessfulUnbans.push({
-						id: target,
-						name: (await getUserCached(target)).tag,
+						user: await fetchUserCachedSupressed(target),
 						error: "User is not banned",
 					});
 				} else {
-					// TODO: temp fix
+					const user = error.code === JSONErrorCodes.UNKNOWN_USER
+						? { id: target }
+						: await fetchUserCachedSupressed(target);
+
 					unsuccessfulUnbans.push({
-						id: target,
-						name: error.code === JSONErrorCodes.UNKNOWN_USER ? "<unknown>" : (await getUserCached(target)).tag,
+						user,
 						error: `Ban fetch failed: ${formatRESTError(error)}`,
 					});
 				}
@@ -71,7 +71,7 @@ export const unbanCommand = defineCommand({
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				unsuccessfulUnbans.push({ id: target, name: ban.user.tag, error: formatRESTError(error) });
+				unsuccessfulUnbans.push({ user: ban.user, error: formatRESTError(error) });
 				continue;
 			}
 
@@ -82,20 +82,20 @@ export const unbanCommand = defineCommand({
 				reason: args.reason ?? undefined,
 			});
 
-			successfulUnbans.push({ caseNumber: caseNumber, id: target, name: ban.user.tag });
+			successfulUnbans.push({ caseNumber: caseNumber, user: ban.user });
 		}
 
 		if (args.user.length === 1) {
 			if (successfulUnbans.length === 1) {
 				const unban = successfulUnbans[0]!;
-				await context.respond(`${icons.success} Unbanned <@${unban.id}> (${escapeMarkdown(unban.name)}) [#${unban.caseNumber}]!`);
+				await context.respond(`${icons.success} Unbanned ${formatUser(unban.user)} [#${unban.caseNumber}]!`);
 			} else if (unsuccessfulUnbans.length === 1) {
 				const unban = unsuccessfulUnbans[0]!;
-				await context.respond(`${icons.error} Could not unban <@${unban.id}> (${escapeMarkdown(unban.name)}): ${escapeMarkdown(unban.error)}!`);
+				await context.respond(`${icons.error} Could not unban ${formatUser(unban.user)}: ${escapeMarkdown(unban.error)}!`);
 			}
 		} else {
-			const successfulMessage = successfulUnbans.map(unban => `- <@${unban.id}> (${escapeMarkdown(unban.name)}) [#${unban.caseNumber}]`).join("\n");
-			const unsuccessfulMessage = unsuccessfulUnbans.map(unban => `- <@${unban.id}> (${escapeMarkdown(unban.name)}): ${unban.error}`).join("\n");
+			const successfulMessage = successfulUnbans.map(unban => `- ${formatUser(unban.user)} [#${unban.caseNumber}]`).join("\n");
+			const unsuccessfulMessage = unsuccessfulUnbans.map(unban => `- ${formatUser(unban.user)}: ${unban.error}`).join("\n");
 
 			if (unsuccessfulUnbans.length === 0) {
 				await context.respond(

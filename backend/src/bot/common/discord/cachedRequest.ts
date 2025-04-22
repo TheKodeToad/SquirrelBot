@@ -1,23 +1,34 @@
-import { type AnyThreadChannel, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, ThreadChannel, User } from "oceanic.js";
+import { type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, ThreadChannel, type Uncached, User } from "oceanic.js";
 import { bot } from "../../index.ts";
 
-export async function getUserCached(userID: string): Promise<User> {
+export async function fetchUserCached(userID: string): Promise<User> {
 	return bot.users.get(userID) ?? await bot.rest.users.get(userID);
 }
 
-export async function getMemberCached(guild: Guild, userID: string): Promise<Member> {
+export async function fetchUserCachedSupressed(userID: string): Promise<User | Uncached> {
+	try {
+		return await fetchUserCached(userID);
+	} catch (error) {
+		if (!(error instanceof DiscordRESTError))
+			throw error;
+
+		return { id: userID };
+	}
+}
+
+export async function fetchMemberCached(guild: Guild, userID: string): Promise<Member> {
 	return guild.members.get(userID) ?? await bot.rest.guilds.getMember(guild.id, userID);
 }
 
-export function getBotUserCached(guild: Guild): Promise<Member> {
-	return getMemberCached(guild, bot.user.id);
+export function fetchBotUserCached(guild: Guild): Promise<Member> {
+	return fetchMemberCached(guild, bot.user.id);
 }
 
 export async function createDMCached(userID: string): Promise<PrivateChannel> {
 	return bot.privateChannels.find(channel => channel.recipient.id === userID) ?? await bot.rest.users.createDM(userID);
 }
 
-export async function getThreadCached(guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
+export async function fetchThreadCached(guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
 	const cached = guild.threads.get(threadID);
 
 	if (cached !== undefined)
@@ -34,7 +45,7 @@ export async function getThreadCached(guild: Guild, threadID: string): Promise<A
 	return null;
 }
 
-export async function requestMembersCached(
+export async function fetchMembersCached(
 	guild: Guild,
 	userIDs: readonly string[],
 	options?: Pick<RequestGuildMembersOptions, "presences" | "timeout">

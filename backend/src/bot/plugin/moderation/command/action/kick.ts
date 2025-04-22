@@ -1,5 +1,6 @@
 import type { CreateMessageOptions } from "oceanic.js";
 import { CaseType } from "../../../../../db/moderation/cases.ts";
+import { formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
@@ -59,17 +60,18 @@ export const kickCommand = defineCommand({
 				};
 			},
 		});
+
 		if (args.user.length === 1) {
 			if (successful.length === 1) {
-				const kick = successful[0]!;
-				await context.respond(`${icons.success} Kicked <@${kick.id}> (${escapeMarkdown(kick.name)})${kick.dmDelivered ? " with direct message" : ""} [#${kick.caseNumber}]!`);
+				const ban = successful[0]!;
+				await context.respond(`${icons.success} Kicked ${formatUser(ban.user)} ${ban.dmDelivered ? "with direct message " : ""}[#${ban.caseNumber}]!`);
 			} else if (unsuccessful.length === 1) {
-				const kick = unsuccessful[0]!;
-				await context.respond(`${icons.error} Could not kick <@${kick.id}> (${escapeMarkdown(kick.name ?? "<unknown>")}): ${escapeMarkdown(kick.error)}!`);
+				const ban = unsuccessful[0]!;
+				await context.respond(`${icons.error} Could not kick ${formatUser(ban.user)}: ${escapeMarkdown(ban.error)}!`);
 			}
 		} else {
-			const successfulMessage = successful.map(kick => `- <@${kick.id}> (${escapeMarkdown(kick.name)}) ${kick.dmDelivered ? " with direct message" : ""} [#${kick.caseNumber}]`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(kick => `- <@${kick.id}> (${escapeMarkdown(kick.name ?? "<unknown>")}): ${escapeMarkdown(kick.error)}`).join("\n");
+			const successfulMessage = successful.map(ban => `- ${formatUser(ban.user)} ${ban.dmDelivered ? "with direct message " : ""}[#${ban.caseNumber}]`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(ban => `- ${formatUser(ban.user)}: ${escapeMarkdown(ban.error)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(

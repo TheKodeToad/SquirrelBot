@@ -1,5 +1,5 @@
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
-import { getMemberCached } from "../../../common/discord/cache.ts";
+import { fetchMemberCached } from "../../../common/discord/cachedRequest.ts";
 import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
 import { coreConfig as coreConfigCache } from "../index.ts";
@@ -31,7 +31,7 @@ export const groupsCommand = defineCommand({
 
 		if (args.user !== null) {
 			try {
-				member = await getMemberCached(context.guild, args.user);
+				member = await fetchMemberCached(context.guild, args.user);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;

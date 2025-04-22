@@ -2,7 +2,7 @@ import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } 
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { dateToHMSString, dateToUnixSeconds } from "../../../common/time.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminders.ts";
-import { getMemberCached, getThreadCached } from "../../common/discord/cache.ts";
+import { fetchMemberCached, fetchThreadCached } from "../../common/discord/cachedRequest.ts";
 import { debugFormatChannel } from "../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../common/discord/permissions.ts";
 import { isTextableChannel, isThreadChannelType } from "../../common/discord/typeGuards.ts";
@@ -70,7 +70,7 @@ async function fire(reminder: Reminder) {
 
 	if (isThreadChannelType(reminder.channelType)) {
 		try {
-			var potentialThread = await getThreadCached(guild, reminder.channelID);
+			var potentialThread = await fetchThreadCached(guild, reminder.channelID);
 		} catch (error) {
 			if (!(error instanceof DiscordRESTError))
 				throw error;
@@ -103,7 +103,7 @@ async function fire(reminder: Reminder) {
 	}
 
 	try {
-		var reminderOwner = await getMemberCached(guild, reminder.ownerID);
+		var reminderOwner = await fetchMemberCached(guild, reminder.ownerID);
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;
