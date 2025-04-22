@@ -17,7 +17,7 @@ export const colorSchema = pipe(
 export const parseIntSchema = pipe(
 	string(),
 	transform(parseInt),
-	check(input => !Number.isSafeInteger(input), "Invalid integer")
+	check(input => Number.isSafeInteger(input), "Invalid integer")
 );
 
 export const parseBooleanSchema = pipe(

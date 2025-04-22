@@ -7,13 +7,13 @@ export function serializeCaseObject(info: CaseInfo) {
 	return {
 		number: info.number,
 		type: caseTypeID(info.type),
-		created_at: info.createdAt.getTime(),
-		expires_at: info.expiresAt?.getTime(),
-		actor_id: info.actorID,
-		target_id: info.targetID,
+		createdAt: info.createdAt.getTime(),
+		expiresAt: info.expiresAt?.getTime(),
+		actorID: info.actorID,
+		targetID: info.targetID,
 		reason: info.reason,
-		delete_message_seconds: info.deleteMessageSeconds,
-		dm_sent: info.dmDelivered,
+		deleteMessageSeconds: info.deleteMessageSeconds,
+		dmSent: info.dmDelivered,
 	};
 }
 

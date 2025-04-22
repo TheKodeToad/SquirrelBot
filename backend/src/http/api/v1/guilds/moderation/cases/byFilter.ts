@@ -21,8 +21,8 @@ const querySchema = pipe(object({
 	"dm-delivered": optional(parseBooleanSchema),
 	order: optional(pipe(
 		string(),
-		check(input => input === "asc" || input === "dec"),
-		transform(input => input === "dec")
+		check(input => input === "asc" || input === "desc"),
+		transform(input => input === "desc")
 	), "desc"),
 	limit: optional(parseIntSchema, "100"),
 }), transform(input => ({
