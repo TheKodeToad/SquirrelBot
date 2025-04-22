@@ -8,7 +8,7 @@ import { moduleLogger } from "../common/logger/index.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
 import { pool } from "../db/index.ts";
 import { checkMigrationsOrExit } from "../db/migration.ts";
-import { CLIENT_ID, REDIRECT_URI } from "../environment.ts";
+import { CLIENT_ID, HTTP_PORT, REDIRECT_URI } from "../environment.ts";
 import api_v1 from "./api/v1/index.ts";
 
 await checkMigrationsOrExit();
@@ -44,10 +44,10 @@ app.onError((error, context) => {
 
 const server = serve({
 	fetch: app.fetch,
-	port: 8080,
+	port: HTTP_PORT,
 }, info => logger.info?.(`Listening on ${info.port}`));
 
-async function deleteLoop() {
+async function deleteTokenLoop() {
 	try {
 		logger.debug?.("Deleting expired tokens");
 
@@ -55,11 +55,11 @@ async function deleteLoop() {
 
 		logger.debug?.(`Deleted ${deletedCount} tokens`);
 	} finally {
-		setTimeout(deleteLoop, 60 * 60 * 1000).unref();
+		setTimeout(deleteTokenLoop, 60 * 60 * 1000).unref();
 	}
 }
 
-await deleteLoop();
+await deleteTokenLoop();
 
 process.on("unhandledRejection", rejection => {
 	logger.error?.("Unhandled Promise rejection!", rejection);
