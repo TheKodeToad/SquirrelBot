@@ -233,8 +233,9 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 						FROM "moderation_cases"
 						WHERE
 							"number" != $1
-							AND ("type" = $2 OR "type" = $3)
-							AND ("expiresAt" IS NULL OR "expiresAt" > $4)
+							AND ("targetID" = $2)
+							AND ("type" = $3 OR "type" = $4)
+							AND ("expiresAt" IS NULL OR "expiresAt" > $5)
 						ORDER BY "number" DESC
 						LIMIT 1
 					)
@@ -245,7 +246,7 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 						"moderation_cases"."guildID" = "shadowed"."guildID"
 						AND "moderation_cases"."number" = "shadowed"."number"
 				`,
-				[newNumber, options.type, reverseType, new Date]
+				[newNumber, options.targetID, options.type, reverseType, new Date]
 			);
 		}
 
