@@ -77,7 +77,7 @@ router.post("/", validator("json", value => value), async context => {
 	const [token, expiresAt] = await generateToken(userJSON.id);
 	return context.json({
 		token,
-		expires_at: expiresAt.getTime(),
+		expiresAt: expiresAt.getTime(),
 		username: userJSON.username,
 		avatar: userJSON.avatar
 	});

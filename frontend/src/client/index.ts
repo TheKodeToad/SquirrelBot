@@ -4,7 +4,7 @@ type HttpMethod = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTI
 
 export interface LogInResponse {
 	token: string;
-	expires_at: number;
+	expiresAt: number;
 	username: string;
 	avatar: string;
 }
@@ -16,8 +16,8 @@ export interface ErrorResponse {
 export interface GuildResponse {
 	id: string;
 	name: string;
-	icon_hash: string;
-	owner_id: string;
+	iconHash: string;
+	ownerID: string;
 }
 
 async function requestJSON<T>(route: string, method: HttpMethod, token?: string, body?: any): Promise<T | ErrorResponse> {
