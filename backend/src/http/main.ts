@@ -47,14 +47,23 @@ const server = serve({
 	port: 8080,
 }, info => logger.info?.(`Listening on ${info.port}`));
 
-setInterval(async () => {
-	logger.debug?.("Deleting expired tokens");
+async function deleteLoop() {
+	try {
+		logger.debug?.("Deleting expired tokens");
 
-	const deletedCount = await deleteExpiredTokens();
+		const deletedCount = await deleteExpiredTokens();
 
-	logger.debug?.(`Deleted ${deletedCount} tokens`);
-}, 1000 * 60 * 60).unref();
-await deleteExpiredTokens();
+		logger.debug?.(`Deleted ${deletedCount} tokens`);
+	} finally {
+		setTimeout(deleteLoop, 60 * 60 * 1000).unref();
+	}
+}
+
+await deleteLoop();
+
+process.on("unhandledRejection", rejection => {
+	logger.error?.("Unhandled Promise rejection!", rejection);
+});
 
 process.on("SIGINT", shutDown);
 process.on("SIGTERM", shutDown);
