@@ -14,6 +14,17 @@ const guildInfoArraySchema = array(guildInfoSchema);
 
 export interface GuildInfo extends InferOutput<typeof guildInfoSchema> { }
 
+const apiGuildInfoSchema = object({
+	id: string(),
+	name: nullable(string()),
+	iconHash: nullable(string()),
+	ownerID: nullable(string()),
+});
+
+const apiGuildInfoArraySchema = array(apiGuildInfoSchema);
+
+export interface APIGuildInfo extends InferOutput<typeof apiGuildInfoSchema> { }
+
 export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 	const result = await pool.query(
 		`
@@ -70,23 +81,21 @@ export async function getGuildOwnerID(id: string): Promise<string | null> {
 	return dbParse(string(), result.rows[0].ownerID);
 }
 
-export async function getGuildInfoByOwner(ownerID: string): Promise<GuildInfo[]> {
+export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildInfo[]> {
 	const result = await pool.query(
 		`
 			SELECT
 				"id",
 				"name",
 				"iconHash",
-				"ownerID",
-				"allowed",
-				"deleteAt"
+				"ownerID"
 			FROM "core_guildInfo"
 			WHERE "ownerID" = $1
 		`,
 		[ownerID]
 	);
 
-	return dbParse(guildInfoArraySchema, result.rows);
+	return dbParse(apiGuildInfoArraySchema, result.rows);
 }
 
 export async function deleteGuildInfo(id: string): Promise<void> {
