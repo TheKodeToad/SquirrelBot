@@ -91,6 +91,7 @@ export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildI
 				"ownerID"
 			FROM "core_guildInfo"
 			WHERE "ownerID" = $1
+			ORDER BY "name" ASC
 		`,
 		[ownerID]
 	);
