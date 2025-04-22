@@ -8,7 +8,7 @@ import { Button } from "./common/Button";
 export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 	return (
 		<>
-			<nav id="header_bar" class="hbox">
+			<nav id="headerBar" class="hbox">
 				SquirrelBot
 				<Switch>
 					<Match when={account() === null}>

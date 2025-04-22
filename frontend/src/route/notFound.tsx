@@ -4,7 +4,7 @@ import { Button } from "../component/common/Button";
 
 export function NotFound() {
 	return (
-		<div class="vbox not_found">
+		<div class="vbox notFound">
 			<h1 style={{ margin: 0 }}>Page Not Found</h1>
 			<p>Are you lost?</p>
 			<div class="hbox">

@@ -10,7 +10,7 @@ function ServersComponent() {
 
 	return (
 		<div class="content">
-			<h3>Servers</h3>
+			<h1>Servers</h1>
 			<Show when={!(guilds() === undefined || "error" in guilds()!)}>
 				<For each={(guilds() as GuildResponse[])!}>
 					{guild => guild.name + "\n"}

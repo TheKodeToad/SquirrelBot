@@ -132,14 +132,14 @@ body {
 }
 
 .not_found,
-.login_gate {
+.loginGate {
 	position: fixed;
 	top: 50%;
 	left: 50%;
 	transform: translateX(-50%) translateY(-50%);
 }
 
-#header_bar {
+#headerBar {
 	background-color: var(--bg2);
 	padding: 8px;
 	width: calc(100% - 16px);
