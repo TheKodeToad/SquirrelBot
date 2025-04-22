@@ -15,6 +15,8 @@
 	--success-dark: hsl(128, 44%, 50%);
 	--success-darker: hsl(128, 43%, 41%);
 	--danger: #ff7979;
+	--base-rounding: 10px;
+
 	color-scheme: dark;
 	font-family:
 		system-ui,
@@ -38,14 +40,13 @@ body {
 }
 
 .button {
+	padding: 0px 10px 0px 10px;
+	height: 32px;
+
 	cursor: pointer;
 	transition: background 0.2s ease-out, filter 0.2s ease-out;
-
 	border: none;
-	border-radius: 10px;
-	padding: 0px 10px 0px 10px;
-
-	height: 32px;
+	border-radius: var(--base-rounding);
 }
 
 .button-small {
@@ -131,7 +132,7 @@ body {
 	flex-direction: column;
 }
 
-.not_found,
+.notFound,
 .loginGate {
 	position: fixed;
 	top: 50%;
@@ -150,8 +151,58 @@ body {
 	height: calc(100vh - 50px);
 }
 
+.mainContent {
+	margin-left: 24px;
+	margin-right: 24px;
+}
+
 .avatar {
 	width: 1.5em;
 	height: 1.5em;
 	border-radius: 100%;
+}
+
+.guilds {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	grid-auto-rows: 80px;
+	gap: 16px;
+	max-width: 800px;
+
+	font-size: 1.5rem;
+}
+
+.guildCard {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	max-width: 300px;
+
+	text-decoration: inherit;
+	color: inherit;
+
+	background-color: var(--bg1);
+	border-radius: var(--base-rounding);
+	transition: background 0.2s ease-out;
+}
+
+.guildCard-title {
+	margin-right: 8px;
+
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.guildCard:hover {
+	background-color: var(--bg2);
+}
+
+.guildCard img {
+	margin-left: 8px;
+	min-width: 64px;
+	min-height: 64px;
+	width: 64px;
+	height: 64px;
+	border-radius: var(--base-rounding);
 }
