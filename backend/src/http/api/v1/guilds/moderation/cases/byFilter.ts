@@ -23,8 +23,8 @@ const querySchema = pipe(object({
 		string(),
 		check(input => input === "asc" || input === "dec"),
 		transform(input => input === "dec")
-	)),
-	limit: optional(parseIntSchema),
+	), "desc"),
+	limit: optional(parseIntSchema, "100"),
 }), transform(input => ({
 	numberLessThan: input.before,
 	numberGreaterThan: input.after,
@@ -34,7 +34,9 @@ const querySchema = pipe(object({
 	actorIDs: input.actor !== undefined ? [input.actor] : undefined,
 	targetIDs: input.target !== undefined ? [input.target] : undefined,
 	deleteMessageSecondsLessThan: input["delete-message-seconds-lt"],
-	deleteMessageSecondsGreaterThan: input["delete-message-seconds-gt"]
+	deleteMessageSecondsGreaterThan: input["delete-message-seconds-gt"],
+	reversed: input.order,
+	limit: input.limit,
 } satisfies CaseQuery)));
 
 router.get("/", vValidator("query", querySchema), async context => {
