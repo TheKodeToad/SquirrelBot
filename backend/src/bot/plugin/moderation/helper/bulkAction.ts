@@ -9,11 +9,11 @@ type BulkAction =
 	(
 		{
 			membersOnly: true;
-			perform: (user: Member) => Promise<void>;
+			perform: (user: Member) => Promise<void> | void;
 		}
 		| {
 			membersOnly: false;
-			perform: (user: Member | User) => Promise<void>;
+			perform: (user: Member | User) => Promise<void> | void;
 		}
 	)
 	& {

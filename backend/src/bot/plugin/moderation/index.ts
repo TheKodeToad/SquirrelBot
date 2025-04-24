@@ -5,6 +5,7 @@ import { banCommand } from "./command/action/ban.ts";
 import { kickCommand } from "./command/action/kick.ts";
 import { muteCommand } from "./command/action/mute.ts";
 import { unbanCommand } from "./command/action/unban.ts";
+import { warnCommand } from "./command/action/warn.ts";
 import { deleteCaseCommand } from "./command/case/caseDelete.ts";
 import { caseListCommand } from "./command/case/caseList.ts";
 import { caseShowCommand } from "./command/case/caseShow.ts";
@@ -20,6 +21,7 @@ export const moderationPlugin = definePlugin({
 		unbanCommand,
 		kickCommand,
 		muteCommand,
+		warnCommand,
 		purgeCommand,
 		caseShowCommand,
 		deleteCaseCommand,

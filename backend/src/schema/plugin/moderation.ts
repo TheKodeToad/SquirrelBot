@@ -39,12 +39,18 @@ export const moderationConfigSchema = object({
 		direct_message: optional(messageSchema),
 		preset_reasons: optional(array(presetReasonSchema), discordReasons), // TODO
 	}), {}),
+	warn: optional(object({
+		send_direct_message: optional(boolean(), false),
+		direct_message: optional(messageSchema),
+		preset_reasons: optional(array(presetReasonSchema), discordReasons),
+	}), {}),
 
 	default_permissions: optional(object({
 		ban: optional(boolean(), false),
 		unban: optional(boolean(), false),
 		kick: optional(boolean(), false),
 		mute: optional(boolean(), false),
+		warn: optional(boolean(), false),
 		purge: optional(boolean(), false),
 		case_read: optional(boolean(), false),
 		case_delete: optional(boolean(), false),
@@ -53,6 +59,7 @@ export const moderationConfigSchema = object({
 		ban: optional(boolean()),
 		unban: optional(boolean()),
 		kick: optional(boolean()),
+		warn: optional(boolean()),
 		mute: optional(boolean()),
 		purge: optional(boolean()),
 		case_read: optional(boolean()),

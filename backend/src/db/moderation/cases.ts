@@ -225,7 +225,7 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 
 		const reverseType = caseReverseType(options.type);
 
-		if (reverseType !== null) {
+		if (!(reverseType === null || reverseType === CaseType.Warn || reverseType === CaseType.Unwarn)) {
 			await client.query(
 				`
 					WITH "shadowed" AS (
