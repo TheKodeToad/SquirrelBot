@@ -3,8 +3,8 @@ import { remindersConfigSchema } from "../../../schema/plugin/reminder.ts";
 import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
 import { definePlugin } from "../../loader/plugin.ts";
 import { ConfigCache } from "../core/public/config.ts";
-import { remindCommand } from "./command/remindCommand.ts";
-import { reminderListCommand } from "./command/reminderListCommand.ts";
+import { remindCommand } from "./command/remind.ts";
+import { reminderListCommand } from "./command/reminderList.ts";
 import { beginPollingReminders } from "./scheduler.ts";
 
 export const remindersConfig = new ConfigCache(remindersConfigSchema);
