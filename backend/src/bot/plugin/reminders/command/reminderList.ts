@@ -10,6 +10,7 @@ import { remindersConfig } from "../index.ts";
 
 export const reminderListCommand = defineCommand({
 	name: ["reminderlist", "reminders", "listreminders"],
+	trackUpdates: true,
 
 	preRun: context => permissionsGuard(context, remindersConfig, permissions => permissions.personal_reminders),
 	async run(context) {
