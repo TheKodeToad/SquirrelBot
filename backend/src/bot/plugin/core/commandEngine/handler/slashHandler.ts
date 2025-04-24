@@ -19,20 +19,24 @@ import { listenForInteractions, unlistenForInteractions } from "./componentHandl
 
 const logger = moduleLogger();
 
+const PLACEHOLDER_DESCRIPTION = "No description provided.";
+
 export async function syncSlashCommands(): Promise<void> {
-	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(({ command }) => ({
-		type: ApplicationCommandTypes.CHAT_INPUT,
-		name: typeof command.name === "string" ? command.name : command.name[0],
-		description: "command",
-		options: command.options ? Object.values(command.options).map(option => (
-			{
-				name: option.name[0],
-				description: "option",
-				required: option.required ?? false,
-				type: mapOptionType(option.type),
-			}
-		)) : [],
-	} satisfies CreateApplicationCommandOptions));
+	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(({ command }) => {
+		return {
+			type: ApplicationCommandTypes.CHAT_INPUT,
+			name: typeof command.name === "string" ? command.name : command.name[0],
+			description: command.description ?? PLACEHOLDER_DESCRIPTION,
+			options: command.options ? Object.values(command.options).map(option => (
+				{
+					name: option.name[0],
+					description: option.description ?? PLACEHOLDER_DESCRIPTION,
+					required: option.required ?? false,
+					type: mapOptionType(option.type),
+				}
+			)) : [],
+		} satisfies CreateApplicationCommandOptions;
+	});
 
 	const cacheFile = path.resolve(CACHE_PATH, "core_syncSlashCommandsHash.bin");
 
@@ -148,7 +152,11 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	try {
 		await commandEntry.command.run(context, args.result as any, data);
 	} catch (error) {
-		await context.respond(`:boom: Failed to execute command`);
+		try {
+			await context.respond(`:boom: Failed to execute command`);
+		} catch (error) {
+			logger.error?.("Error responding with error message", error);
+		}
 		throw error;
 	} finally {
 		context._clearTimeout();

@@ -8,10 +8,12 @@ import { moderationConfig } from "../../index.ts";
 
 export const caseShowCommand = defineCommand({
 	name: ["caseshow", "case", "showcase"],
+	description: "Show details of a specific moderation case",
+
 	options: {
 		number: {
-			name: ["number", "n"],
 			type: OptionType.Integer,
+			name: ["number", "n"],
 			required: true,
 			position: 0,
 		},

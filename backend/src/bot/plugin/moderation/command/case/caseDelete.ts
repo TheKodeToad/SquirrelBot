@@ -6,6 +6,8 @@ import { moderationConfig } from "../../index.ts";
 
 export const deleteCaseCommand = defineCommand({
 	name: ["casedelete", "casedel", "caserm", "deletecase", "delcase", "rmcase"],
+	description: "Delete a recorded moderation case.",
+
 	options: {
 		number: {
 			name: ["number", "n"],

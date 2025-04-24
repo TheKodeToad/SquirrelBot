@@ -6,11 +6,14 @@ import { utilConfig } from "../index.ts";
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 
 export const snowflakeCommand = defineCommand({
-	name: ["snowflake"],
+	name: ["snowflake", "snowflakeinfo", "creation"],
+	description: "Calculate the creation date of something on Discord based on its ID.",
+
 	trackUpdates: true,
 	options: {
 		input: {
 			type: OptionType.Snowflake,
+			description: "The Discord ID of a channel, user or something else.",
 			name: ["input", "i"],
 			required: true,
 			position: 0,

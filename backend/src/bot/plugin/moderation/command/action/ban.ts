@@ -9,6 +9,8 @@ import { moderationConfig } from "../../index.ts";
 
 export const banCommand = defineCommand({
 	name: ["ban"],
+	description: "Ban a user from the server.",
+
 	options: {
 		user: {
 			type: OptionType.User,
@@ -24,11 +26,13 @@ export const banCommand = defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
+			description: "Choose whether to notify the banned user with a direct message - overrides the configured default!",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},
 		purge: {
 			type: OptionType.Number,
+			description: "Request to delete messages in the previous specified days.",
 			name: ["purge", "p", "delete"],
 		},
 	},

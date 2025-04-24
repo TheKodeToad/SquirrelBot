@@ -10,6 +10,8 @@ import { moderationConfig } from "../../index.ts";
 
 export const unbanCommand = defineCommand({
 	name: ["unban"],
+	description: "Remove a ban on a user.",
+
 	options: {
 		user: {
 			type: OptionType.User,

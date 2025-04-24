@@ -5,6 +5,8 @@ import { utilConfig } from "../index.ts";
 
 export const pingCommand = defineCommand({
 	name: ["ping"],
+	description: "Pong!",
+
 	trackUpdates: true, // allow deleting
 
 	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.ping_command),

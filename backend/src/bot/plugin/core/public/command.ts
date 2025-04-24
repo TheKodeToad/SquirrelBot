@@ -8,6 +8,8 @@ export function defineCommand<O extends Record<string, Option>, D extends {}>(co
 
 export interface Command<O extends Record<string, Option> = Record<string, Option>, D extends {} = {}> {
 	name: NameList;
+	description?: string;
+
 	options?: O;
 	supportPrefix?: boolean;
 	supportSlash?: boolean;
@@ -121,6 +123,7 @@ export type Option =
 interface BaseOption {
 	type: OptionType;
 	name: NameList;
+	description?: string;
 	required?: boolean;
 	array?: boolean;
 	position?: number;

@@ -9,6 +9,8 @@ import { moderationConfig } from "../../index.ts";
 
 export const warnCommand = defineCommand({
 	name: ["warn"],
+	description: "Record a warning for a user.",
+
 	options: {
 		user: {
 			type: OptionType.User,
@@ -24,6 +26,7 @@ export const warnCommand = defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
+			description: "Choose whether to notify the warned user with a direct message - overrides the configured default!",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},

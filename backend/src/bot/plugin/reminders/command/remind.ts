@@ -8,7 +8,9 @@ import { remindersConfig } from "../index.ts";
 import { trackNewReminder } from "../scheduler.ts";
 
 export const remindCommand = defineCommand({
-	name: ["remind", "reminderset", "remindme", "reminder"],
+	description: "Set a personal reminder after the specified amount of time.",
+	name: ["remindme", "reminderset", "remind", "reminder"],
+
 	options: {
 		delay: {
 			type: OptionType.Duration,

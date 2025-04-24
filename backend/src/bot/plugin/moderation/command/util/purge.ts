@@ -7,29 +7,32 @@ import { moderationConfig } from "../../index.ts";
 
 export const purgeCommand = defineCommand({
 	name: ["purge", "sweep", "clear"],
+	description: "Delete the specified number of messages in chat starting from the most recent.",
+
 	options: {
 		count: {
-			name: ["count", "c"],
 			type: OptionType.Integer,
+			description: "The limit of messages to delete.",
+			name: ["count", "c"],
 			position: 0,
 			required: true,
 		},
 		match: {
-			name: ["match", "m"],
 			type: OptionType.String,
+			name: ["match", "m"],
 			position: 1,
 		},
 		bots: {
-			name: ["bots"],
 			type: OptionType.Flag,
+			name: ["bots"],
 		},
 		humans: {
-			name: ["humans"],
 			type: OptionType.Flag,
+			name: ["humans"],
 		},
 		author: {
-			name: ["author", "a", "by", "from"],
 			type: OptionType.User,
+			name: ["author", "a", "by", "from"],
 			array: true,
 		}
 	},

@@ -14,8 +14,11 @@ const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.c
 const logger = moduleLogger();
 
 export const inviteCommand = defineCommand({
-	name: ["invite", "inv"],
+	name: ["inviteinfo", "invite", "invinfo", "inv"],
+	description: "Display information about a Discord invite by passing in the code or link.",
+
 	trackUpdates: true,
+
 	options: {
 		link: {
 			type: OptionType.String,
@@ -25,7 +28,8 @@ export const inviteCommand = defineCommand({
 		},
 		hideImages: {
 			type: OptionType.Flag,
-			name: ["hide-images", "hi"]
+			name: ["hide-images", "h", "hi", "no-images"],
+			description: "Do not display images in the invite information."
 		}
 	},
 

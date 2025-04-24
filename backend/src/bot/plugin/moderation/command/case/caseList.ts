@@ -9,18 +9,21 @@ import { moderationConfig } from "../../index.ts";
 
 export const caseListCommand = defineCommand({
 	name: ["caselist", "casesearch", "cases", "listcases", "searchcases"],
+	description: "List and filter moderation cases.",
+
 	options: {
 		actorID: {
-			name: ["actor", "a", "by", "moderator", "mod"],
 			type: OptionType.User,
+			name: ["actor", "a", "by", "moderator", "mod"],
 		},
 		targetID: {
-			name: ["target", "t", "for", "user"],
 			type: OptionType.User,
+			name: ["target", "t", "for", "user"],
 		},
 		compact: {
-			name: ["compact", "c"],
 			type: OptionType.Flag,
+			description: "Display more cases but less information about them.",
+			name: ["compact", "c"],
 		},
 	},
 	trackUpdates: true,

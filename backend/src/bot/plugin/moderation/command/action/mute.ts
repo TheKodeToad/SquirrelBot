@@ -9,6 +9,7 @@ import { moderationConfig } from "../../index.ts";
 
 export const muteCommand = defineCommand({
 	name: ["mute", "timeout"],
+	description: "Prevent a member from talking in the server.",
 
 	options: {
 		user: {
