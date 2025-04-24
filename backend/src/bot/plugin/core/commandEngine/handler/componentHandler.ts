@@ -1,11 +1,11 @@
-import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
+import { ComponentInteraction, ComponentTypes, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
-import type { ActionRowComponent, ComponentCallback, ComponentContext, Reply } from "../../public/command.ts";
+import type { AnyCommandComponentWithCallback, CommandActionRow, CommandComponent, CommandComponentCallback, CommandContainerComponent, CommandSectionComponent, ComponentContext, Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
 
 interface ComponentData {
-	callbacks: Map<string, Required<ComponentCallback>>;
+	callbacks: Map<string, Required<CommandComponentCallback>>;
 	invokerID: string;
 }
 
@@ -52,23 +52,47 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	}
 });
 
-export function listenForInteractions(messageID: string, invokerID: string, components: ActionRowComponent[][]): void {
+export function listenForInteractions(messageID: string, invokerID: string, components: CommandComponent[]): void {
 	const callbacks: ComponentData["callbacks"] = new Map;
 
-	for (const row of components) {
-		for (const component of row) {
-			if (!("callback" in component))
-				continue;
-
-			if (component.disabled)
-				continue;
-
-			const { customID, callback, invokerOnly } = component;
-			callbacks.set(customID, { callback, invokerOnly: invokerOnly ?? true });
+	for (const component of components) {
+		if (component.type === ComponentTypes.ACTION_ROW)
+			putCallbacksForActionRow(callbacks, component);
+		else if (component.type === ComponentTypes.SECTION)
+			putCallbackForSection(callbacks, component);
+		else if (component.type === ComponentTypes.CONTAINER) {
+			putCallbacksForContainer(callbacks, component);
 		}
 	}
 
 	activeComponents.set(messageID, { callbacks, invokerID: invokerID });
+}
+
+export function putCallbacksForActionRow(callbacks: ComponentData["callbacks"], row: CommandActionRow): void {
+	for (const action of row.components)
+		if ("callback" in action)
+			putCallback(callbacks, action);
+}
+
+export function putCallbackForSection(callbacks: ComponentData["callbacks"], section: CommandSectionComponent): void {
+	if ("callback" in section.accessory)
+		putCallback(callbacks, section.accessory);
+}
+export function putCallbacksForContainer(callbacks: ComponentData["callbacks"], section: CommandContainerComponent): void {
+	for (const component of section.components) {
+		if (component.type === ComponentTypes.ACTION_ROW)
+			putCallbacksForActionRow(callbacks, component);
+		else if (component.type === ComponentTypes.SECTION)
+			putCallbackForSection(callbacks, component);
+	}
+}
+
+
+export function putCallback(callbacks: ComponentData["callbacks"], component: AnyCommandComponentWithCallback): void {
+	callbacks.set(
+		component.customID,
+		{ callback: component.callback, invokerOnly: component.invokerOnly ?? true }
+	);
 }
 
 export function unlistenForInteractions(messageID: string): void {

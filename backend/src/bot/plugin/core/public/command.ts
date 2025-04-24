@@ -1,4 +1,4 @@
-import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User } from "oceanic.js";
+import { type ActionRowBase, type AnyTextableGuildChannel, type ButtonComponent, type ContainerComponent, type CreateMessageOptions, Guild, Member, Message, type MessageActionRow, type MessageComponent, type SectionComponent, type SelectMenuComponent, Shard, type TextButton, type ThumbnailComponent, User } from "oceanic.js";
 
 type NameList = [string, ...string[]];
 
@@ -47,13 +47,38 @@ export interface ComponentContext extends BaseContext {
 	edit(reply: Reply): Promise<void>;
 }
 
-export type ReplyObject = Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> & { components: MessageComponent[]; };
-export type Reply = ReplyObject | string;
+export type CommandComponent =
+	| CommandActionRow
+	| CommandSectionComponent
+	| CommandContainerComponent
+	| Exclude<MessageComponent, MessageActionRow | SectionComponent | ContainerComponent>;
 
-export interface ComponentCallback {
+export type CommandActionRow = ActionRowBase<CommandActionRowComponent>;
+export type CommandActionRowComponent = CommandButtonComponent | SelectMenuComponent;
+
+export type CommandContainerComponent = ContainerComponent
+	& {
+		components: (
+			| CommandActionRow
+			| CommandSectionComponent
+			| Exclude<ContainerComponent["components"][number], MessageActionRow | SectionComponent>
+		)[];
+	};
+
+export type CommandSectionComponent = SectionComponent & { accessory: ThumbnailComponent | CommandButtonComponent; };
+
+export type CommandButtonComponent = CommandTextButton | Exclude<ButtonComponent, TextButton>;
+export type CommandTextButton = (TextButton & CommandComponentCallback);
+
+export type AnyCommandComponentWithCallback = CommandTextButton;
+
+export interface CommandComponentCallback {
 	callback: (context: ComponentContext) => Promise<void>;
 	invokerOnly?: boolean;
 }
+
+export type ReplyObject = Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> & { components: CommandComponent[]; };
+export type Reply = ReplyObject | string;
 
 export const enum OptionType {
 	Boolean,

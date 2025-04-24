@@ -15,7 +15,7 @@ import { getCommands, getCommandsByName } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readSlashArgs } from "../parsing/slashParser.ts";
-import { unlistenForInteractions } from "./componentHandler.ts";
+import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 
@@ -200,8 +200,8 @@ class SlashContext implements CommandContext {
 			this._acked = true;
 		}
 
-		// if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
-		// 	listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
+		if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
+			listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
 	}
 
 	_clearTimeout() {

@@ -1,7 +1,8 @@
-import { ButtonStyles, ComponentTypes, User, type ContainerComponent, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel, type TextDisplayComponent } from "oceanic.js";
+import { ButtonStyles, ComponentTypes, User, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel, type TextDisplayComponent } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
+import type { CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 
 export function renderGuildInvite(
@@ -12,8 +13,8 @@ export function renderGuildInvite(
 	totalMembers: number | undefined,
 	expiresAt: Date | undefined,
 	hideImages: boolean
-): ContainerComponent {
-	const result: ContainerComponent = {
+): CommandContainerComponent {
+	const result: CommandContainerComponent = {
 		components: [],
 		type: ComponentTypes.CONTAINER,
 	};

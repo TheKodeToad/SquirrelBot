@@ -1,6 +1,6 @@
-import { ComponentTypes, type ContainerComponent } from "oceanic.js";
+import { ComponentTypes } from "oceanic.js";
 import { getCase } from "../../../../../db/moderation/cases.ts";
-import { OptionType, defineCommand } from "../../../core/public/command.ts";
+import { OptionType, defineCommand, type CommandContainerComponent } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { formatCaseDescription, formatCaseFields } from "../../helper/cases.ts";
@@ -27,7 +27,7 @@ export const caseShowCommand = defineCommand({
 			return;
 		}
 
-		const container: ContainerComponent = {
+		const container: CommandContainerComponent = {
 			components: [],
 			type: ComponentTypes.CONTAINER,
 		};

@@ -1,7 +1,7 @@
-import { ComponentTypes, type ContainerComponent } from "oceanic.js";
+import { ComponentTypes } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { getReminders, type Reminder } from "../../../../db/reminders/reminders.ts";
-import { defineCommand, type BaseContext, type ReplyObject } from "../../core/public/command.ts";
+import { defineCommand, type BaseContext, type CommandContainerComponent, type ReplyObject } from "../../core/public/command.ts";
 import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../core/public/helper/paginator.ts";
 import { icons } from "../../core/public/icons.ts";
@@ -53,7 +53,7 @@ async function renderReminders(reminders: Reminder[]): Promise<ReplyObject> {
 		};
 	}
 
-	const container: ContainerComponent = {
+	const container: CommandContainerComponent = {
 		components: [],
 		type: ComponentTypes.CONTAINER,
 	};

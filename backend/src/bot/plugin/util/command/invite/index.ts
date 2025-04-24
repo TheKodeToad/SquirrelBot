@@ -1,9 +1,9 @@
-import { DiscordRESTError, InviteTypes, JSONErrorCodes, type ContainerComponent } from "oceanic.js";
+import { DiscordRESTError, InviteTypes, JSONErrorCodes } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { formatRESTError } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { bot } from "../../../../index.ts";
-import { defineCommand, OptionType } from "../../../core/public/command.ts";
+import { defineCommand, OptionType, type CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { renderFriendInvite } from "./friend.ts";
 import { renderGroupDMInvite } from "./groupDM.ts";
@@ -59,7 +59,7 @@ export const inviteCommand = defineCommand({
 
 		logger.debug?.(`Resolved invite '${code}'`, invite);
 
-		let container: ContainerComponent;
+		let container: CommandContainerComponent;
 
 		if (invite.type === InviteTypes.GUILD && invite.guild !== null) {
 			container = renderGuildInvite(

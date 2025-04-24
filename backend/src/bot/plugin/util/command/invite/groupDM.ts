@@ -1,7 +1,8 @@
-import { ButtonStyles, ComponentTypes, type ContainerComponent, type PartialInviteChannel, type TextDisplayComponent, type User } from "oceanic.js";
+import { ButtonStyles, ComponentTypes, type PartialInviteChannel, type TextDisplayComponent, type User } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { formatUser } from "../../../../common/discord/format.ts";
 import { getChannelIconURL } from "../../../../common/discord/urls.ts";
+import type { CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 
 export function renderGroupDMInvite(
@@ -10,8 +11,8 @@ export function renderGroupDMInvite(
 	totalMembers: number | undefined,
 	expiresAt: Date | undefined,
 	hideImages: boolean
-): ContainerComponent {
-	const result: ContainerComponent = {
+): CommandContainerComponent {
+	const result: CommandContainerComponent = {
 		components: [],
 		type: ComponentTypes.CONTAINER,
 	};

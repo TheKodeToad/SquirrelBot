@@ -1,6 +1,6 @@
-import { ComponentTypes, type ContainerComponent } from "oceanic.js";
+import { ComponentTypes } from "oceanic.js";
 import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
-import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "../../../core/public/command.ts";
+import { defineCommand, OptionType, type BaseContext, type CommandContainerComponent, type ReplyObject } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
@@ -67,7 +67,7 @@ async function lookUpCases(
 }
 
 async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
-	const container: ContainerComponent = {
+	const container: CommandContainerComponent = {
 		components: [],
 		type: ComponentTypes.CONTAINER,
 	};
@@ -76,8 +76,6 @@ async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyOb
 		content: "## Cases",
 		type: ComponentTypes.TEXT_DISPLAY
 	});
-
-	const now = Date.now();
 
 	if (compact) {
 		let content = "";

@@ -1,7 +1,7 @@
-import { ComponentTypes, type ContainerComponent } from "oceanic.js";
+import { ComponentTypes } from "oceanic.js";
 import { bot } from "../../../index.ts";
 import { coreConfig } from "../index.ts";
-import { defineCommand } from "../public/command.ts";
+import { defineCommand, type CommandContainerComponent } from "../public/command.ts";
 import { permissionsGuard } from "../public/helper/commandGuards.ts";
 
 const DESCRIPTION = `
@@ -38,7 +38,7 @@ export const aboutCommand = defineCommand({
 
 		uptimeString += uptime % 60 + " secs";
 
-		const container: ContainerComponent = {
+		const container: CommandContainerComponent = {
 			components: [],
 			type: ComponentTypes.CONTAINER,
 		};

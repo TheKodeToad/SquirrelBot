@@ -1,8 +1,9 @@
-import { ComponentTypes, type ContainerComponent, type TextDisplayComponent, type User } from "oceanic.js";
+import { ComponentTypes, type TextDisplayComponent, type User } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
+import type { CommandContainerComponent } from "../../../core/public/command.ts";
 
-export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, hideImages: boolean): ContainerComponent {
-	const result: ContainerComponent = {
+export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, hideImages: boolean): CommandContainerComponent {
+	const result: CommandContainerComponent = {
 		components: [],
 		type: ComponentTypes.CONTAINER,
 	};
