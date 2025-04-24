@@ -1,11 +1,11 @@
-import { ButtonStyles, ComponentTypes } from "oceanic.js";
-import type { BaseContext, CommandContext, Component, ReplyObject } from "../command.ts";
+import { ButtonStyles, ComponentTypes, type ButtonComponent } from "oceanic.js";
+import type { BaseContext, CommandContext, ReplyObject } from "../command.ts";
 
 export interface Paginator<E, K> {
 	pageSize: number;
 	getKey(entry: E): K;
 	lookUp(context: BaseContext, query: PaginatorQuery<K>): Promise<E[]>;
-	format(entries: E[]): Promise<ReplyObject>;
+	render(entries: E[]): Promise<ReplyObject>;
 }
 
 export interface PaginatorQuery<K> {
@@ -41,38 +41,41 @@ async function renderPaginator<E, K>(
 	if (reversed)
 		queryResult.reverse();
 
-	const reply = await paginator.format(queryResult);
+	const reply = await paginator.render(queryResult);
 
-	const prevButton: Component = {
+	const prevButton: ButtonComponent = {
 		type: ComponentTypes.BUTTON,
 		label: "←",
 		customID: "paginator-prev",
 		style: ButtonStyles.SECONDARY,
-		async callback(context) {
-			const firstItem = queryResult[0];
-			const before = firstItem !== undefined ? paginator.getKey(firstItem) : undefined;
+		// async callback(context) {
+		// 	const firstItem = queryResult[0];
+		// 	const before = firstItem !== undefined ? paginator.getKey(firstItem) : undefined;
 
-			await context.edit(await renderPaginator(context, paginator, true, before, undefined));
-		},
+		// 	await context.edit(await renderPaginator(context, paginator, true, before, undefined));
+		// },
 		disabled: after === undefined && (!hasMore || before === undefined)
 	};
 
-	const nextButton: Component = {
+	const nextButton: ButtonComponent = {
 		type: ComponentTypes.BUTTON,
 		label: "→",
 		customID: "paginator-next",
 		style: ButtonStyles.SECONDARY,
-		async callback(context) {
-			const lastItem = queryResult[queryResult.length - 1];
-			const after = lastItem !== undefined ? paginator.getKey(lastItem) : undefined;
+		// async callback(context) {
+		// 	const lastItem = queryResult[queryResult.length - 1];
+		// 	const after = lastItem !== undefined ? paginator.getKey(lastItem) : undefined;
 
-			await context.edit(await renderPaginator(context, paginator, false, undefined, after));
-		},
+		// 	await context.edit(await renderPaginator(context, paginator, false, undefined, after));
+		// },
 		disabled: before === undefined && !hasMore,
 	};
 
 	return {
 		...reply,
-		components: [[prevButton, nextButton], ...(reply.components ?? [])]
+		components: [
+			...(reply.components ?? []),
+			{ components: [prevButton, nextButton], type: ComponentTypes.ACTION_ROW }
+		]
 	};
 }

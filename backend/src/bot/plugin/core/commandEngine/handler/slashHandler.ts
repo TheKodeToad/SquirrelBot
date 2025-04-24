@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "fs/promises";
-import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, ComponentTypes, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
 import path from "path";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
@@ -15,7 +15,7 @@ import { getCommands, getCommandsByName } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readSlashArgs } from "../parsing/slashParser.ts";
-import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
+import { unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 
@@ -118,7 +118,10 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
 		await context.respond({
-			content: `${icons.error} You lack permission to execute the command in this channel.`,
+			components: [{
+				content: `${icons.error} You lack permission to execute the command in this channel.`,
+				type: ComponentTypes.TEXT_DISPLAY,
+			}],
 			flags: MessageFlags.EPHEMERAL,
 		});
 		return;
@@ -131,7 +134,10 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 
 	if (args.error !== null) {
 		await context.respond({
-			content: `${icons.error} ${formatArgsParseError(args)}`,
+			components: [{
+				content: `${icons.error} ${formatArgsParseError(args)}`,
+				type: ComponentTypes.TEXT_DISPLAY,
+			}],
 			flags: MessageFlags.EPHEMERAL,
 		});
 		return;
@@ -194,8 +200,8 @@ class SlashContext implements CommandContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
-			listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
+		// if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
+		// 	listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
 	}
 
 	_clearTimeout() {

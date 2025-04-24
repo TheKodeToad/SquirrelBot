@@ -1,6 +1,6 @@
 import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
-import type { Component, ComponentCallback, ComponentContext, Reply } from "../../public/command.ts";
+import type { ActionRowComponent, ComponentCallback, ComponentContext, Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
 
@@ -52,7 +52,7 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	}
 });
 
-export function listenForInteractions(messageID: string, invokerID: string, components: Component[][]): void {
+export function listenForInteractions(messageID: string, invokerID: string, components: ActionRowComponent[][]): void {
 	const callbacks: ComponentData["callbacks"] = new Map;
 
 	for (const row of components) {

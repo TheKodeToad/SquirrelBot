@@ -1,13 +1,10 @@
-import { type Embed } from "oceanic.js";
-import { dateToUnixSeconds } from "../../../../../common/time.ts";
+import { ComponentTypes, type ContainerComponent } from "oceanic.js";
 import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
-import { Colors } from "../../../../common/discord/colors.ts";
-import { formatUserByID } from "../../../../common/discord/format.ts";
 import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
-import { formatCaseSummary, formatCaseTitle, formatCompactCaseSummary } from "../../helper/cases.ts";
+import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "../../helper/cases.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const caseListCommand = defineCommand({
@@ -36,7 +33,7 @@ export const caseListCommand = defineCommand({
 				pageSize: args.compact ? 16 : 4,
 				getKey: entry => entry.number,
 				lookUp: (context, query) => lookUpCases(context, query, args.actorID, args.targetID),
-				format: cases => formatCases(cases, args.compact ?? false),
+				render: cases => renderCases(cases, args.compact ?? false),
 			}
 		);
 	},
@@ -69,41 +66,34 @@ async function lookUpCases(
 	});
 }
 
-async function formatCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
-	const embed: Embed = {
-		title: "Cases",
-		color: Colors.blurple,
+async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
+	const container: ContainerComponent = {
+		components: [],
+		type: ComponentTypes.CONTAINER,
 	};
 
-	embed.description = "";
-	embed.fields = [];
+	container.components.push({
+		content: "## Cases",
+		type: ComponentTypes.TEXT_DISPLAY
+	});
 
 	const now = Date.now();
 
-	for (const info of cases) {
-		const expired = info.expiresAt !== null && info.expiresAt.getTime() <= now;
+	if (compact) {
+		let content = "";
 
-		if (compact)
-			embed.description += await formatCompactCaseSummary(info, expired) + "\n";
-		else {
-			let value = await formatCaseSummary(info) + "\n";
+		for (const info of cases)
+			content += await formatCompactCaseSummary(info) + "\n";
 
-			value += `Moderator: ${await formatUserByID(info.actorID)}\n`;
-
-			const creationSecs = dateToUnixSeconds(info.createdAt);
-			value += `Performed At: <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
-
-			if (info.expiresAt !== null) {
-				const expirySecs = dateToUnixSeconds(info.expiresAt);
-				value += `Expires At: <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
-			}
-
-			embed.fields.push({
-				name: formatCaseTitle(info, expired),
-				value
+		container.components.push({ content, type: ComponentTypes.TEXT_DISPLAY });
+	} else {
+		for (const info of cases) {
+			container.components.push({
+				content: await formatCaseDescription(info, false) + "\n" + await formatCaseFields(info),
+				type: ComponentTypes.TEXT_DISPLAY,
 			});
 		}
 	}
 
-	return { embeds: [embed] };
+	return { components: [container] };
 }

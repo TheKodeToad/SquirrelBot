@@ -3,53 +3,81 @@ import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
 import { formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
 import { makeMarkdownQuote } from "../../../common/discord/markdown.ts";
 
-export function formatCaseTitle(info: CaseInfo, expired: boolean): string {
-	if (info.shadowedBy !== null)
-		return `~~Case #${info.number}~~ (revised/reversed)`;
-	else if (expired)
-		return `~~Case #${info.number}~~ (expired)`;
-	else
-		return "Case #" + info.number.toString();
+
+export function caseExpired(info: CaseInfo, date: number = Date.now()) {
+	return info.expiresAt !== null && info.expiresAt.getTime() <= date;
 }
 
-export async function formatCaseSummary(info: CaseInfo): Promise<string> {
-	let result: string;
+function caseSummaryBase(type: CaseType, target: string) {
+	switch (type) {
+		case CaseType.Note: return `Note added for ${target}`; break;
+		case CaseType.Warn: return `Warned ${target}`; break;
+		case CaseType.Unwarn: return `Unwarned ${target}`; break;
+		case CaseType.VoiceMute: return `Voice-muted ${target}`; break;
+		case CaseType.VoiceUnmute: return `Voice-unmuted ${target}`; break;
+		case CaseType.Mute: return `Muted ${target}`; break;
+		case CaseType.Unmute: return `Unmuted ${target}`; break;
+		case CaseType.Kick: return `Kicked ${target}`; break;
+		case CaseType.Ban: return `Banned ${target}`; break;
+		case CaseType.Unban: return `Unbanned ${target}`; break;
+	}
+}
+
+export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): Promise<string> {
+	let title = "Case #" + info.number;
+
+	if (info.shadowedBy !== null)
+		title = `~~${title}~~ (refined or reversed by #${info.shadowedBy})`;
+	else if (caseExpired(info))
+		title = `~~${title}~~ (expired)`;
+
+	if (bigTitle)
+		title = "## " + title;
+	else
+		title = "### " + title;
 
 	const target = await formatUserByID(info.targetID);
 
-	switch (info.type) {
-		case CaseType.Note: result = `Note added for ${target}`; break;
-		case CaseType.Warn: result = `Warned ${target}`; break;
-		case CaseType.Unwarn: result = `Unwarned ${target}`; break;
-		case CaseType.VoiceMute: result = `Voice-muted ${target}`; break;
-		case CaseType.VoiceUnmute: result = `Voice-unmuted ${target}`; break;
-		case CaseType.Mute: result = `Muted ${target}`; break;
-		case CaseType.Unmute: result = `Unmuted ${target}`; break;
-		case CaseType.Kick: result = `Kicked ${target}`; break;
-		case CaseType.Ban: result = `Banned ${target}`; break;
-		case CaseType.Unban: result = `Unbanned ${target}`; break;
-	}
+	let summary = caseSummaryBase(info.type, target);
 
 	if (info.expiresAt === null)
-		result += " permanently";
+		summary += " permanently";
 	else
-		result += " temporarily";
+		summary += " temporarily";
 
 	if (info.reason === null)
-		result += ".";
+		summary += ".";
 	else
-		result += ":\n " + makeMarkdownQuote(info.reason);
+		summary += ":\n" + makeMarkdownQuote(info.reason);
+
+	return title + "\n" + summary;
+}
+
+export async function formatCaseFields(info: CaseInfo): Promise<string> {
+	let result = "";
+
+	result += `**Moderator:** ${await formatUserByID(info.actorID)}\n`;
+
+	const creationSecs = dateToUnixSeconds(info.createdAt);
+	result += `**Performed At:** <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
+
+
+	if (info.expiresAt !== null) {
+		const expirySecs = dateToUnixSeconds(info.expiresAt);
+		result += `**Expires At:** <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
+	}
 
 	return result;
 }
 
-export async function formatCompactCaseSummary(info: CaseInfo, expired: boolean): Promise<string> {
+
+export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> {
 	const actor = await formatUserTagByID(info.actorID);
 	const target = await formatUserTagByID(info.targetID);
 
 	let result = `<t:${dateToUnixSeconds(info.createdAt)}:d> `;
 
-	if (expired || info.shadowedBy !== null)
+	if (caseExpired(info) || info.shadowedBy !== null)
 		result += `**~~#${info.number}:~~** `;
 	else
 		result += `**#${info.number}:** `;

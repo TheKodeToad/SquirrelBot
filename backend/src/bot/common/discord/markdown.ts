@@ -15,6 +15,9 @@ export function escapeMarkdown(input: string): string {
 }
 
 export function makeMarkdownInlineCodeblock(input: string): string {
+	if (input.length === 0)
+		return "`" + ZWSP + "`";
+
 	return "``" + input.replaceAll("`", ZWSP + "`" + ZWSP) + "``";
 }
 

@@ -1,28 +1,25 @@
-import { Colors } from "../../../common/discord/colors.ts";
+import { ComponentTypes, type ContainerComponent } from "oceanic.js";
 import { bot } from "../../../index.ts";
 import { coreConfig } from "../index.ts";
 import { defineCommand } from "../public/command.ts";
 import { permissionsGuard } from "../public/helper/commandGuards.ts";
 
 const DESCRIPTION = `
+## About SquirrelBot
 Advanced moderation and management bot created by TheKodeToad.
-
 Made in England with [Oceanic.js](https://oceanic.ws/) and love!
-Some inspiration taken from [Zepplin](https://zeppelin.gg/).
-
-Icons from [Tabler](https://tabler.io/icons).
-`.replaceAll("\t", "");
+`;
 
 const LIBRARIES = `
 [Node.js](https://nodejs.org/),
- [TypeScript](https://www.typescriptlang.org/),
- [Oceanic.js](https://oceanic.ws/),
- [PostgreSQL](https://www.postgresql.org/) with [node-postgres](https://node-postgres.com/),
- [Hono](https://hono.dev/),
- [smol-toml](https://github.com/squirrelchat/smol-toml),
- [Valibot](https://valibot.dev/),
- and [more](https://github.com/TheKodeToad/SquirrelBot/blob/develop/backend/package.json)
-`.replaceAll("\n", "");
+[TypeScript](https://www.typescriptlang.org/),
+[Oceanic.js](https://oceanic.ws/),
+[PostgreSQL](https://www.postgresql.org/) with [node-postgres](https://node-postgres.com/),
+[Hono](https://hono.dev/),
+[smol-toml](https://github.com/squirrelchat/smol-toml),
+[Valibot](https://valibot.dev/),
+and [more](https://github.com/TheKodeToad/SquirrelBot/blob/develop/backend/package.json)
+`.substring(1).replaceAll("\n", " ");
 
 export const aboutCommand = defineCommand({
 	name: ["about"],
@@ -41,18 +38,35 @@ export const aboutCommand = defineCommand({
 
 		uptimeString += uptime % 60 + " secs";
 
-		await context.respond({
-			embeds: [{
-				color: Colors.yellow,
-				title: "About SquirrelBot",
-				description: DESCRIPTION,
-				fields: [
-					{ name: "Source Code", value: "https://github.com/TheKodeToad/SquirrelBot (MIT license)" },
-					{ name: "Libraries", value: LIBRARIES },
-					{ name: "Uptime", value: uptimeString }
-				],
-				thumbnail: { url: bot.user.avatarURL(undefined, 128) }
-			}]
+		const container: ContainerComponent = {
+			components: [],
+			type: ComponentTypes.CONTAINER,
+		};
+
+		container.components.push({
+			components: [{ content: DESCRIPTION, type: ComponentTypes.TEXT_DISPLAY }],
+			accessory: { media: { url: bot.user.avatarURL() }, type: ComponentTypes.THUMBNAIL },
+			type: ComponentTypes.SECTION,
 		});
+
+
+		container.components.push({ type: ComponentTypes.SEPARATOR });
+
+		container.components.push({
+			content: "**Source Code**\nhttps://github.com/TheKodeToad/SquirrelBot (MIT license)",
+			type: ComponentTypes.TEXT_DISPLAY,
+		});
+
+		container.components.push({
+			content: "**Libraries**\n" + LIBRARIES,
+			type: ComponentTypes.TEXT_DISPLAY,
+		});
+
+		container.components.push({
+			content: "**Uptime**\n" + uptimeString,
+			type: ComponentTypes.TEXT_DISPLAY,
+		});
+
+		await context.respond({ components: [container] });
 	},
 });

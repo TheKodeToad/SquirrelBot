@@ -13,7 +13,7 @@ import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../i
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readPrefixArgs, readPrefixName } from "../parsing/prefixParser.ts";
 import { StringReader } from "../parsing/stringReader.ts";
-import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
+import { unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 
@@ -189,8 +189,8 @@ class PrefixContext implements CommandContext {
 			await this._response.edit(messageOptions);
 		}
 
-		if (typeof reply !== "string" && reply.components !== undefined)
-			listenForInteractions(this._response.id, this.message.author.id, reply.components);
+		// if (typeof reply !== "string" && reply.components !== undefined)
+		// 	listenForInteractions(this._response.id, this.message.author.id, reply.components);
 	}
 
 	async _delete(): Promise<void> {

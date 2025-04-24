@@ -1,7 +1,6 @@
-import type { Embed } from "oceanic.js";
+import { ComponentTypes, type ContainerComponent } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { getReminders, type Reminder } from "../../../../db/reminders/reminders.ts";
-import { Colors } from "../../../common/discord/colors.ts";
 import { defineCommand, type BaseContext, type ReplyObject } from "../../core/public/command.ts";
 import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../core/public/helper/paginator.ts";
@@ -13,14 +12,14 @@ export const reminderListCommand = defineCommand({
 	name: ["reminderlist", "reminders", "listreminders"],
 
 	preRun: context => permissionsGuard(context, remindersConfig, permissions => permissions.personal_reminders),
-	async run(context, args) {
+	async run(context) {
 		await respondWithPaginator<Reminder, Date>(
 			context,
 			{
-				pageSize: 16,
+				pageSize: 10,
 				getKey: entry => entry.firesAt,
 				lookUp: (context, query) => lookUpReminders(context, query),
-				format: formatReminders,
+				render: renderReminders,
 			}
 		);
 	},
@@ -46,23 +45,33 @@ async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>
 	});
 }
 
-async function formatReminders(reminders: Reminder[]): Promise<ReplyObject> {
+async function renderReminders(reminders: Reminder[]): Promise<ReplyObject> {
 	if (reminders.length === 0) {
-		return { content: `${icons.info} No reminders found!` };
+		return {
+			components: [{ content: `${icons.info} No reminders found!`, type: ComponentTypes.TEXT_DISPLAY }]
+		};
 	}
 
-	const embed: Embed = {
-		title: "Reminders",
-		color: Colors.blurple,
+	const container: ContainerComponent = {
+		components: [],
+		type: ComponentTypes.CONTAINER,
 	};
 
-	embed.description = "";
+	container.components.push({
+		content: "## Reminders",
+		type: ComponentTypes.TEXT_DISPLAY,
+	});
+
+	let content = "";
 
 	for (const reminder of reminders) {
-		embed.description += `<t:${dateToUnixSeconds(reminder.firesAt)}:R>: ${reminder.message} [#${reminder.number}]\n`;
+		content += `<t:${dateToUnixSeconds(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message}\n`;
 	}
 
-	return {
-		embeds: [embed]
-	};
+	container.components.push({
+		content,
+		type: ComponentTypes.TEXT_DISPLAY,
+	});
+
+	return { components: [container] };
 }

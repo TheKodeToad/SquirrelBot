@@ -1,4 +1,4 @@
-import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageActionRowComponent, type SelectMenuComponent, Shard, type TextButton, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User } from "oceanic.js";
 
 type NameList = [string, ...string[]];
 
@@ -47,10 +47,8 @@ export interface ComponentContext extends BaseContext {
 	edit(reply: Reply): Promise<void>;
 }
 
-export type ReplyObject = (Omit<CreateMessageOptions, "messageReference" | "tts" | "components"> & { components?: Component[][]; });
+export type ReplyObject = Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> & { components: MessageComponent[]; };
 export type Reply = ReplyObject | string;
-
-export type Component = ((TextButton | SelectMenuComponent) & ComponentCallback) | MessageActionRowComponent;
 
 export interface ComponentCallback {
 	callback: (context: ComponentContext) => Promise<void>;

@@ -1,4 +1,4 @@
-import { ComponentTypes, type MessageActionRow } from "oceanic.js";
+import { ComponentTypes, MessageFlags } from "oceanic.js";
 import type { Reply } from "../public/command.ts";
 
 /**
@@ -13,16 +13,18 @@ export const STATE_CLEANUP_INTERVAL = 1000 * 60;
 export const AUTO_DEFER_AFTER = 1000;
 
 export function transformReply(reply: Reply) {
-	if (typeof reply === "string")
-		reply = { content: reply };
+	if (typeof reply === "string") {
+		reply = {
+			components: [{
+				type: ComponentTypes.TEXT_DISPLAY,
+				content: reply
+			}],
+		};
+	}
 
-	return {
-		attachments: [],
-		content: "",
-		embeds: [],
-		files: [],
-		...reply,
-		components: reply.components?.map(components => ({ type: ComponentTypes.ACTION_ROW, components } satisfies MessageActionRow)) ?? []
-	};
+	reply.flags ??= 0;
+	reply.flags |= MessageFlags.IS_COMPONENTS_V2;
+
+	return reply;
 }
 
