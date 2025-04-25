@@ -10,15 +10,14 @@ export interface CommandCacheEntry {
 }
 
 const all: CommandCacheEntry[] = [];
-const lookup: Map<string, CommandCacheEntry[]> = new Map;
+const lookup: Map<string, CommandCacheEntry> = new Map;
 
 export function getCommands(): CommandCacheEntry[] {
 	return all;
 }
 
-// TODO: only have one command per name
-export function getCommandsByName(name: string): CommandCacheEntry[] {
-	return lookup.get(name) ?? [];
+export function getCommandByName(name: string): CommandCacheEntry | undefined {
+	return lookup.get(name);
 }
 
 export function initCommandCache() {
@@ -29,17 +28,13 @@ export function initCommandCache() {
 		for (const command of plugin.commands) {
 			const entry = makeCacheEntry(command);
 
-			for (let name of command.name) {
-				name = name.toLowerCase();
+			for (const name of command.name) {
+				const nameLower = name.toLowerCase();
 
-				let array = lookup.get(name);
+				if (lookup.has(nameLower))
+					throw new Error(`Conflicting commands with name ${name}!`);
 
-				if (array === undefined) {
-					array = [];
-					lookup.set(name, array);
-				}
-
-				array.push(entry);
+				lookup.set(name.toLowerCase(), entry);
 			}
 
 			all.push(entry);

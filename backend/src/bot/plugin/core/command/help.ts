@@ -1,7 +1,7 @@
 import { ButtonStyles, ComponentTypes } from "oceanic.js";
 import { makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
 import { getPlugin, getPlugins } from "../../../loader/index.ts";
-import { getCommandsByName } from "../commandEngine/commandCache.ts";
+import { getCommandByName } from "../commandEngine/commandCache.ts";
 import { canRunCommand } from "../helper/commands.ts";
 import { coreConfig } from "../index.ts";
 import { defineCommand, type BaseContext, type CommandContainerComponent, type CommandSelectMenuComponent, type CommandTextButton, type Reply } from "../public/command.ts";
@@ -85,7 +85,7 @@ function renderMainPage(context: BaseContext, state: State): Reply {
 			if (command.description !== undefined)
 				summary += command.description + "\n";
 
-			const entry = getCommandsByName(command.name[0]).find(entry => entry.command === command);
+			const entry = getCommandByName(command.name[0]);
 
 			if (entry === undefined)
 				throw new Error("Command in registered plugin not cached!");

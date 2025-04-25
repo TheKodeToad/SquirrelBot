@@ -10,7 +10,7 @@ import { type Command, type CommandContext, type Reply } from "../../public/comm
 import { defineEventListener } from "../../public/eventListener.ts";
 import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
-import { getCommandsByName } from "../commandCache.ts";
+import { getCommandByName } from "../commandCache.ts";
 import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readPrefixArgs, readPrefixName } from "../parsing/prefixParser.ts";
@@ -62,14 +62,12 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	if (!perms.prefix_commands)
 		return false;
 
-	const matches = getCommandsByName(name).filter(({ command }) => command.supportPrefix ?? true);
+	const commandEntry = getCommandByName(name);
 
-	if (matches.length !== 1) {
-		logger.debug?.(`${matches.length} commands found matching '${name}' (ignored)`);
+	if (commandEntry === undefined) {
+		logger.debug?.(`No command found matching '${name}' (ignored)`);
 		return false;
 	}
-
-	const commandEntry = matches[0]!;
 
 	const context = new PrefixContext(commandEntry.command, message, prevResponse);
 

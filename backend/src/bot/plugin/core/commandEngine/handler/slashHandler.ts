@@ -12,7 +12,7 @@ import { type Command, type CommandContext, OptionType, type Reply } from "../..
 import { defineEventListener } from "../../public/eventListener.ts";
 import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
-import { getCommands, getCommandsByName } from "../commandCache.ts";
+import { getCommandByName, getCommands } from "../commandCache.ts";
 import { AUTO_DEFER_AFTER } from "../index.ts";
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readSlashArgs } from "../parsing/slashParser.ts";
@@ -106,16 +106,13 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	if (!perms.slash_commands)
 		return;
 
-	const matches = getCommandsByName(interaction.data.name).filter(({ command }) => command.supportSlash ?? true);
+	const commandEntry = getCommandByName(interaction.data.name);
 
-	if (matches.length !== 1) {
-		if (matches.length === 0)
-			logger.warn?.(`Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
-
+	if (commandEntry === undefined) {
+		logger.warn?.(`Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
 		return;
 	}
 
-	const commandEntry = matches[0]!;
 	const context = new SlashContext(commandEntry.command, interaction);
 
 	const data = commandEntry.command.preRun(context);
