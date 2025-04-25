@@ -11,6 +11,9 @@ export const remindersConfig = new ConfigCache(remindersConfigSchema);
 
 export const remindersPlugin = definePlugin({
 	id: "reminders",
+	name: "Reminders",
+	description: "Set reminders for yourself.",
+
 	config: remindersConfig,
 	commands: [remindCommand, reminderListCommand],
 

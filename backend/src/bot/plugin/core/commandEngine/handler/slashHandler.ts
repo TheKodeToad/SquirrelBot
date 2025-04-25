@@ -6,13 +6,14 @@ import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
 import { CACHE_PATH } from "../../../../../environment.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { bot } from "../../../../index.ts";
+import { transformReply } from "../../helper/commands.ts";
 import { coreConfig } from "../../index.ts";
 import { type Command, type CommandContext, OptionType, type Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
 import { getCommands, getCommandsByName } from "../commandCache.ts";
-import { AUTO_DEFER_AFTER, transformReply } from "../index.ts";
+import { AUTO_DEFER_AFTER } from "../index.ts";
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readSlashArgs } from "../parsing/slashParser.ts";
 import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
@@ -155,7 +156,7 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 		try {
 			await context.respond(`:boom: Failed to execute command`);
 		} catch (error) {
-			logger.error?.("Error responding with error message", error);
+			logger.error?.("Error responding with error message for slash command", error);
 		}
 		throw error;
 	} finally {

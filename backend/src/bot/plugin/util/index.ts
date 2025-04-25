@@ -9,6 +9,9 @@ export const utilConfig = new ConfigCache(utilConfigSchema);
 
 export const utilPlugin = definePlugin({
 	id: "util",
+	name: "Utility",
+	description: "Useful general purpose utilities.",
+
 	config: utilConfig,
 	commands: [pingCommand, snowflakeCommand, inviteCommand],
 });

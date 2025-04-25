@@ -56,7 +56,7 @@ export type CommandComponent =
 	| Exclude<MessageComponent, MessageActionRow | SectionComponent | ContainerComponent>;
 
 export type CommandActionRow = ActionRowBase<CommandActionRowComponent>;
-export type CommandActionRowComponent = CommandButtonComponent | SelectMenuComponent;
+export type CommandActionRowComponent = CommandButtonComponent | CommandSelectMenuComponent;
 
 export type CommandContainerComponent = ContainerComponent
 	& {
@@ -70,12 +70,15 @@ export type CommandContainerComponent = ContainerComponent
 export type CommandSectionComponent = SectionComponent & { accessory: ThumbnailComponent | CommandButtonComponent; };
 
 export type CommandButtonComponent = CommandTextButton | Exclude<ButtonComponent, TextButton>;
-export type CommandTextButton = (TextButton & CommandComponentCallback);
+export type CommandTextButton = TextButton & CommandComponentCallback<false>;
+export type CommandSelectMenuComponent = SelectMenuComponent & CommandComponentCallback<true>;
 
-export type AnyCommandComponentWithCallback = CommandTextButton;
+export type AnyCommandComponentWithCallback = CommandTextButton | CommandSelectMenuComponent;
 
-export interface CommandComponentCallback {
-	callback: (context: ComponentContext) => Promise<void>;
+export interface CommandComponentCallback<WithValues extends boolean = boolean> {
+	callback: WithValues extends true
+	? (context: ComponentContext, values: string[]) => Promise<void>
+	: (context: ComponentContext) => Promise<void>;
 	invokerOnly?: boolean;
 }
 

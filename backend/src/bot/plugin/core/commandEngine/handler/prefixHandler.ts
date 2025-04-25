@@ -3,13 +3,14 @@ import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
 import { canWriteInChannel } from "../../../../common/discord/permissions.ts";
+import { transformReply } from "../../helper/commands.ts";
 import { coreConfig } from "../../index.ts";
 import { type Command, type CommandContext, type Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { icons } from "../../public/icons.ts";
 import { resolvePermissions } from "../../public/permissionResolution.ts";
 import { getCommandsByName } from "../commandCache.ts";
-import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
+import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
 import { formatArgsParseError } from "../parsing/index.ts";
 import { readPrefixArgs, readPrefixName } from "../parsing/prefixParser.ts";
 import { StringReader } from "../parsing/stringReader.ts";
@@ -100,7 +101,11 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 		if (commandEntry.command.trackUpdates && context._response !== null)
 			trackedMessages.set(message.id, context._response);
 	} catch (error) {
-		await context.respond(`:boom: Failed to execute command`);
+		try {
+			await context.respond(`:boom: Failed to execute command`);
+		} catch (error) {
+			logger.error?.("Error responding with error message for prefix command", error);
+		}
 		throw error;
 	}
 

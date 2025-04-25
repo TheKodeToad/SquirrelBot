@@ -15,6 +15,7 @@ export function getCommands(): CommandCacheEntry[] {
 	return all;
 }
 
+// TODO: only have one command per name
 export function getCommandsByName(name: string): CommandCacheEntry[] {
 	return lookup.get(name) ?? [];
 }
@@ -43,8 +44,7 @@ export function initCommandCache() {
 	}
 }
 
-// TODO: remove this!
-export function makeCacheEntry(command: Command): CommandCacheEntry {
+function makeCacheEntry(command: Command): CommandCacheEntry {
 	const optionsByPosition: [string, Option][] = [];
 	const optionsByName: Map<string, [string, Option]> = new Map;
 	const optionsByNegativeName: Map<string, string> = new Map;

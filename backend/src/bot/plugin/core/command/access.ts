@@ -13,7 +13,9 @@ function checkForMe(context: CommandContext): boolean {
 
 export const grantAccessCommand = defineCommand({
 	name: ["grantaccess", "whitelist"],
+	description: "Give a server access to the app.",
 	supportSlash: false, // don't want this cluttering the command list
+
 	options: {
 		guild: {
 			type: OptionType.Snowflake,
@@ -36,7 +38,9 @@ export const grantAccessCommand = defineCommand({
 
 export const revokeAccessCommand = defineCommand({
 	name: ["revokeaccess", "unwhitelist"],
+	description: "Remove a server's access to the app and schedule its data for deletion.",
 	supportSlash: false,
+
 	options: {
 		guild: {
 			type: OptionType.Snowflake,

@@ -32,12 +32,14 @@ export const coreConfigSchema = object({
 		prefix_commands: optional(boolean(), true),
 		slash_commands: optional(boolean(), true),
 		about_command: optional(boolean(), true),
+		help_command: optional(boolean(), true),
 		groups_command: optional(boolean(), false)
 	}), {}),
 	permission_overrides: optional(array(object({
 		prefix_commands: optional(boolean()),
 		slash_commands: optional(boolean()),
 		about_command: optional(boolean()),
+		help_command: optional(boolean()),
 		groups_command: optional(boolean()),
 		...permissionsFilterSchema.entries
 	})), []),

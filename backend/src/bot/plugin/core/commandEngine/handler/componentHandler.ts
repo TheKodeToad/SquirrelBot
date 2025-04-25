@@ -1,13 +1,17 @@
 import { ComponentInteraction, ComponentTypes, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
+import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
+import { transformReply } from "../../helper/commands.ts";
 import type { AnyCommandComponentWithCallback, CommandActionRow, CommandComponent, CommandComponentCallback, CommandContainerComponent, CommandSectionComponent, ComponentContext, Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
-import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER, transformReply } from "../index.ts";
+import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
 
 interface ComponentData {
 	callbacks: Map<string, Required<CommandComponentCallback>>;
 	invokerID: string;
 }
+
+const logger = moduleLogger();
 
 const activeComponents: TTLMap<string, ComponentData> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => activeComponents.cleanup(), STATE_CLEANUP_INTERVAL).unref();
@@ -38,12 +42,18 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	const context = new ComponentContextImpl(interaction, componentData.invokerID);
 
 	try {
-		await callback.callback(context);
+		const values = "values" in interaction.data ? interaction.data.values.raw : [];
+
+		await callback.callback(context, values);
 	} catch (error) {
-		await interaction.createFollowup({
-			content: ":boom: Something went wrong while processing your action",
-			flags: MessageFlags.EPHEMERAL
-		});
+		try {
+			await interaction.createFollowup({
+				content: ":boom: Something went wrong while processing your action",
+				flags: MessageFlags.EPHEMERAL
+			});
+		} catch (error) {
+			logger.error?.("Error responding with error to component", error);
+		}
 		// HACK for now
 		context._acked = true;
 		throw error;
@@ -78,6 +88,7 @@ export function putCallbackForSection(callbacks: ComponentData["callbacks"], sec
 	if ("callback" in section.accessory)
 		putCallback(callbacks, section.accessory);
 }
+
 export function putCallbacksForContainer(callbacks: ComponentData["callbacks"], section: CommandContainerComponent): void {
 	for (const component of section.components) {
 		if (component.type === ComponentTypes.ACTION_ROW)
@@ -86,7 +97,6 @@ export function putCallbacksForContainer(callbacks: ComponentData["callbacks"], 
 			putCallbackForSection(callbacks, component);
 	}
 }
-
 
 export function putCallback(callbacks: ComponentData["callbacks"], component: AnyCommandComponentWithCallback): void {
 	callbacks.set(

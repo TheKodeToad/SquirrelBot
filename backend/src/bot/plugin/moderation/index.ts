@@ -15,6 +15,9 @@ export const moderationConfig = new ConfigCache(moderationConfigSchema);
 
 export const moderationPlugin = definePlugin({
 	id: "moderation",
+	name: "Moderation",
+	description: "Perform and record moderation actions.",
+
 	config: moderationConfig,
 	commands: [
 		banCommand,

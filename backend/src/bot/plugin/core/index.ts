@@ -5,6 +5,7 @@ import { definePlugin } from "../../loader/plugin.ts";
 import { aboutCommand } from "./command/about.ts";
 import { grantAccessCommand, revokeAccessCommand } from "./command/access.ts";
 import { groupsCommand } from "./command/groups.ts";
+import { helpCommand } from "./command/help.ts";
 import { initCommandCache } from "./commandEngine/commandCache.ts";
 import { componentInterationHandler } from "./commandEngine/handler/componentHandler.ts";
 import { prefixDeleteHandler, prefixEditHandler, prefixSendHandler } from "./commandEngine/handler/prefixHandler.ts";
@@ -21,8 +22,11 @@ export const coreConfig = new ConfigCache(coreConfigSchema);
 
 export const corePlugin = definePlugin({
 	id: "core",
+	name: "Core",
+	description: "Core app functionality.",
+
 	config: coreConfig,
-	commands: [aboutCommand, grantAccessCommand, revokeAccessCommand, groupsCommand],
+	commands: [helpCommand, aboutCommand, grantAccessCommand, revokeAccessCommand, groupsCommand],
 	listeners: [
 		prefixSendHandler,
 		prefixEditHandler,
@@ -32,6 +36,7 @@ export const corePlugin = definePlugin({
 		guildInfoSyncGuildCreateHandler,
 		guildInfoSyncGuildUpdateHandler,
 	],
+
 	async apply() {
 		initCommandCache();
 

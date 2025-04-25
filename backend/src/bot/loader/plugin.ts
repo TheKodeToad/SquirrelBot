@@ -4,6 +4,8 @@ import type { EventListener } from "../plugin/core/public/eventListener.ts";
 
 export interface Plugin {
 	id: string;
+	name: string;
+	description?: string;
 	config?: ConfigCache;
 	commands?: Command[];
 	listeners?: EventListener[];

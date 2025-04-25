@@ -44,9 +44,9 @@ async function renderPaginator<E, K>(
 	const reply = await paginator.render(queryResult);
 
 	const prevButton: CommandTextButton = {
-		type: ComponentTypes.BUTTON,
 		label: "←",
 		customID: "paginator-prev",
+		type: ComponentTypes.BUTTON,
 		style: ButtonStyles.SECONDARY,
 		async callback(context) {
 			const firstItem = queryResult[0];
@@ -58,9 +58,9 @@ async function renderPaginator<E, K>(
 	};
 
 	const nextButton: CommandTextButton = {
-		type: ComponentTypes.BUTTON,
 		label: "→",
 		customID: "paginator-next",
+		type: ComponentTypes.BUTTON,
 		style: ButtonStyles.SECONDARY,
 		async callback(context) {
 			const lastItem = queryResult[queryResult.length - 1];

@@ -23,6 +23,7 @@ and [more](https://github.com/TheKodeToad/SquirrelBot/blob/develop/backend/packa
 
 export const aboutCommand = defineCommand({
 	name: ["about"],
+	description: "Display information about the app.",
 	trackUpdates: true,
 
 	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.about_command),
