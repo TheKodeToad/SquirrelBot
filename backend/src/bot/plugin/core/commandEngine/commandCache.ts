@@ -29,7 +29,9 @@ export function initCommandCache() {
 		for (const command of plugin.commands) {
 			const entry = makeCacheEntry(command);
 
-			for (const name of command.name) {
+			for (let name of command.name) {
+				name = name.toLowerCase();
+
 				let array = lookup.get(name);
 
 				if (array === undefined) {
@@ -60,11 +62,11 @@ function makeCacheEntry(command: Command): CommandCacheEntry {
 			optionsByPosition[option.position] = [key, option];
 
 		for (const name of option.name)
-			optionsByName.set(name, [key, option]);
+			optionsByName.set(name.toLowerCase(), [key, option]);
 
 		if ("negativeName" in option && option.negativeName !== undefined)
 			for (const negativeName of option.negativeName)
-				optionsByNegativeName.set(negativeName, key);
+				optionsByNegativeName.set(negativeName.toLowerCase(), key);
 	}
 
 	const usage = formatCommandUsage(command.options, optionsByPosition);

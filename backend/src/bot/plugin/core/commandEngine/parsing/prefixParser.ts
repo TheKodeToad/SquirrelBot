@@ -16,7 +16,7 @@ export function readPrefixName(reader: StringReader, prefix: string): string | n
 	if (!reader.canRead())
 		return null;
 
-	return reader.readWord();
+	return reader.readWord().toLowerCase();
 }
 
 const GREEDY_VALUE_TERMINATOR = /\s+--?[\w\-]/g;
@@ -88,7 +88,10 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 	if (!reader.canRead())
 		return { error: ArgsParseError.BareNamedKey };
 
-	const optionName = reader.readWord();
+	const optionName = reader.readWord().toLowerCase();
+
+	if (optionName.length === 0)
+		return { error: ArgsParseError.BareNamedKey };
 
 	const foundByName = commandEntry.optionsByName.get(optionName);
 
