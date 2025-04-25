@@ -1,7 +1,8 @@
 import { ButtonStyles, ComponentTypes } from "oceanic.js";
 import { makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
 import { getPlugin, getPlugins } from "../../../loader/index.ts";
-import { canRunCommand, formatCommandUsage } from "../helper/commands.ts";
+import { getCommandsByName } from "../commandEngine/commandCache.ts";
+import { canRunCommand } from "../helper/commands.ts";
 import { coreConfig } from "../index.ts";
 import { defineCommand, type BaseContext, type CommandContainerComponent, type CommandSelectMenuComponent, type CommandTextButton, type Reply } from "../public/command.ts";
 import { permissionsGuard } from "../public/helper/commandGuards.ts";
@@ -9,7 +10,7 @@ import { icons } from "../public/icons.ts";
 
 export const helpCommand = defineCommand({
 	name: ["help"],
-	description: "View available commands and usage information.",
+	description: "View available commands and prefixed usage information.",
 	trackUpdates: true,
 
 	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.help_command),
@@ -71,6 +72,9 @@ function renderMainPage(context: BaseContext, state: State): Reply {
 		const prefix = coreConfig.get(context.guild.id)?.prefix_commands.prefix ?? "";
 
 		for (const command of plugin.commands ?? []) {
+			if (!(command.supportPrefix ?? true))
+				continue;
+
 			let summary = "### " + command.name[0] + "\n";
 
 			if (!canRunCommand(command, context.member, context.channel)) {
@@ -81,7 +85,12 @@ function renderMainPage(context: BaseContext, state: State): Reply {
 			if (command.description !== undefined)
 				summary += command.description + "\n";
 
-			summary += "**Usage:** " + makeMarkdownInlineCodeblock(formatCommandUsage(command, prefix));
+			const entry = getCommandsByName(command.name[0]).find(entry => entry.command === command);
+
+			if (entry === undefined)
+				throw new Error("Command in registered plugin not cached!");
+
+			summary += "**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage);
 
 			entries.push(summary);
 		}

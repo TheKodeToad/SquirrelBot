@@ -2,6 +2,7 @@ import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, Mes
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
+import { makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
 import { canWriteInChannel } from "../../../../common/discord/permissions.ts";
 import { transformReply } from "../../helper/commands.ts";
 import { coreConfig } from "../../index.ts";
@@ -85,7 +86,11 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	const args = readPrefixArgs(reader, commandEntry);
 
 	if (args.error !== null) {
-		await context.respond(`${icons.error} ${formatArgsParseError(args)}`);
+		await context.respond(
+			`${icons.error} ${formatArgsParseError(args)}\n`
+			+ `${icons.tip} Edit your original message to fix the error!\n`
+			+ `${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`
+		);
 
 		if (context._response !== null)
 			trackedMessages.set(message.id, context._response);
