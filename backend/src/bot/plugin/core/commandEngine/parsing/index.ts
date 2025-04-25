@@ -6,14 +6,15 @@ export const enum ArgsParseError {
 	BadNamedValue,
 	BareNamedKey,
 	BadPositionalIndex,
-	BadPoisitionValue,
+	BadPoisitionalValue,
 }
 
 export type ArgsParseResultWithError =
 	| { error: ArgsParseError.MissingOptions; options: Set<string>; }
 	| { error: ArgsParseError.BadNamedKey | ArgsParseError.BadNamedValue; name: string; }
 	| { error: ArgsParseError.BareNamedKey; }
-	| { error: ArgsParseError.BadPositionalIndex | ArgsParseError.BadPoisitionValue; index: number; };
+	| { error: ArgsParseError.BadPositionalIndex; index: number; }
+	| { error: ArgsParseError.BadPoisitionalValue; index: number; name: string; };
 
 export type ArgsParseResult =
 	| { error: null; result: Record<string, AnyArgsValue>; }
@@ -36,7 +37,7 @@ export function formatArgsParseError(error: ArgsParseResultWithError): string {
 		case ArgsParseError.BadPositionalIndex:
 			return "Too many unlabeled options provided.";
 
-		case ArgsParseError.BadPoisitionValue:
-			return `Invalid value passed for unlabeled option #${error.index + 1}.`;
+		case ArgsParseError.BadPoisitionalValue:
+			return `Invalid value passed for '${error.name}' (unlabeled option #${error.index + 1}).`;
 	}
 }

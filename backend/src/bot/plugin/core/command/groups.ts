@@ -10,7 +10,7 @@ import { resolveGroups } from "../public/permissionResolution.ts";
 
 export const groupsCommand = defineCommand({
 	name: ["groups"],
-	description: "View the group a user is in.",
+	description: "View the groups a user is in.",
 	trackUpdates: true,
 
 	options: {

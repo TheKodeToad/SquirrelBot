@@ -53,8 +53,9 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 
 		if (value === null) {
 			return {
-				error: ArgsParseError.BadPoisitionValue,
-				index: positionalIndex
+				error: ArgsParseError.BadPoisitionalValue,
+				index: positionalIndex,
+				name: option.name[0],
 			};
 		}
 
