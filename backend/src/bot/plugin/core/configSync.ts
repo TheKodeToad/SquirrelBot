@@ -59,7 +59,7 @@ export async function createAndLoadConfigs(guildID: string) {
 	await configUpdateLock.acquire(guildID, async () => {
 		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
-				return;
+				continue;
 
 			await insertGuildConfig(guildID, plugin.id, "");
 			await loadConfig(guildID, plugin);

@@ -119,10 +119,8 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 
 			let summary = "### " + command.name[0] + "\n";
 
-			if (!canRunCommand(command, context.member, context.channel)) {
-				console.error("Cannot run " + command.name + "!");
+			if (!canRunCommand(command, context.member, context.channel))
 				continue;
-			}
 
 			if (command.description !== undefined)
 				summary += command.description + "\n";
