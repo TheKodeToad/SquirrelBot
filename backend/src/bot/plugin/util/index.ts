@@ -9,7 +9,7 @@ export const utilConfig = new ConfigCache(utilConfigSchema);
 
 export const utilPlugin = definePlugin({
 	id: "util",
-	name: "Utility",
+	name: "Utilities",
 	description: "Useful general purpose utilities.",
 
 	config: utilConfig,
