@@ -47,15 +47,14 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 		await callback.callback(context, values);
 	} catch (error) {
 		try {
-			await interaction.createFollowup({
-				content: ":boom: Something went wrong while processing your action",
+			await context.respond({
+				components: [{ content: ":boom: Something went wrong while processing your action", type: ComponentTypes.TEXT_DISPLAY }],
 				flags: MessageFlags.EPHEMERAL
 			});
 		} catch (error) {
 			logger.error?.("Error responding with error to component", error);
 		}
 		// HACK for now
-		context._acked = true;
 		throw error;
 	} finally {
 		await context._abandon();
@@ -112,14 +111,18 @@ export function unlistenForInteractions(messageID: string): void {
 class ComponentContextImpl implements ComponentContext {
 	private _interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
 	private _originalInvoker: string;
-	_acked: boolean;
+	private _responseID: string | null;
+	private _acked: boolean;
+	private _edited: boolean;
 	private _ackPromise: Promise<void> | null;
 	private _ackTimeout: NodeJS.Timeout | null;
 
 	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalInvoker: string) {
 		this._interaction = interaction;
 		this._originalInvoker = originalInvoker;
+		this._responseID = null;
 		this._acked = false;
+		this._edited = false;
 		this._ackTimeout = setTimeout(() => {
 			this._ackTimeout = null;
 			this._acked = true;
@@ -134,18 +137,45 @@ class ComponentContextImpl implements ComponentContext {
 	get member(): Member { return this._interaction.member; }
 	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 
+	async respond(reply: Reply): Promise<void> {
+		const messageOptions = transformReply(reply);
+
+		if (this._responseID !== null) {
+			unlistenForInteractions(this._responseID);
+
+			await this._interaction.editFollowup(this._responseID, messageOptions).then(message => this._responseID ??= message?.id ?? null);
+		} else {
+			if (this._acked)
+				await this._ackPromise;
+			else
+				this._clearTimeout();
+
+			if (this._edited)
+				this._interaction.createFollowup(messageOptions).then(response => this._responseID = response.message.id);
+			else {
+				await this._interaction.createMessage(messageOptions).then(
+					({ callback }) => this._responseID ??= callback.resource?.message?.id ?? null
+				);
+			}
+
+			this._acked = true;
+		}
+
+		if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
+			listenForInteractions(this._responseID, this._originalInvoker, reply.components);
+	}
+
 	async edit(reply: Reply): Promise<void> {
 		const messageOptions = transformReply(reply);
 
 		unlistenForInteractions(this._interaction.message.id);
 
 		if (this._acked) {
-			if (this._ackPromise !== null)
-				await this._ackPromise;
-
+			await this._ackPromise;
 			await this._interaction.message.edit(messageOptions);
 		} else {
-			this._removeTimeout();
+			this._clearTimeout();
+			this._edited = true;
 			await this._interaction.editParent(messageOptions);
 			this._acked = true;
 		}
@@ -154,7 +184,7 @@ class ComponentContextImpl implements ComponentContext {
 			listenForInteractions(this._interaction.message.id, this._originalInvoker, reply.components);
 	}
 
-	_removeTimeout() {
+	_clearTimeout() {
 		if (this._ackTimeout !== null) {
 			clearTimeout(this._ackTimeout);
 			this._ackTimeout = null;
@@ -162,7 +192,7 @@ class ComponentContextImpl implements ComponentContext {
 	}
 
 	async _abandon() {
-		this._removeTimeout();
+		this._clearTimeout();
 
 		if (!this._acked)
 			await this._interaction.deferUpdate();

@@ -37,12 +37,12 @@ export interface BaseContext {
 	user: User;
 	member: Member;
 	channel: AnyTextableGuildChannel;
+	respond(reply: Reply): Promise<void>;
 }
 
 export interface CommandContext extends BaseContext {
 	command: Command;
 	message?: Message<AnyTextableGuildChannel>;
-	respond(reply: Reply): Promise<void>;
 }
 
 export interface ComponentContext extends BaseContext {

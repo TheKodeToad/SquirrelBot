@@ -1,10 +1,10 @@
-import { ButtonStyles, ComponentTypes } from "oceanic.js";
+import { ButtonStyles, ComponentTypes, MessageFlags, type SelectOption } from "oceanic.js";
 import { makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
 import { getPlugin, getPlugins } from "../../../loader/index.ts";
 import { getCommandByName } from "../commandEngine/commandCache.ts";
 import { canRunCommand } from "../helper/commands.ts";
 import { coreConfig } from "../index.ts";
-import { defineCommand, type BaseContext, type CommandContainerComponent, type CommandSelectMenuComponent, type CommandTextButton, type Reply } from "../public/command.ts";
+import { defineCommand, OptionType, type BaseContext, type CommandContainerComponent, type CommandSelectMenuComponent, type CommandTextButton, type ComponentContext, type Reply, type ReplyObject } from "../public/command.ts";
 import { permissionsGuard } from "../public/helper/commandGuards.ts";
 import { icons } from "../public/icons.ts";
 
@@ -13,23 +13,79 @@ export const helpCommand = defineCommand({
 	description: "View available commands and prefixed usage information.",
 	trackUpdates: true,
 
+	options: {
+		command: {
+			type: OptionType.String,
+			name: ["command", "c"],
+			position: 0,
+		}
+	},
+
 	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.help_command),
 	async run(context) {
-		await context.respond(renderMainPage(context, { selected: "core", page: 0 }));
+		await context.respond(renderSelectPage());
 	},
 });
 
-interface State {
-	selected: string;
+function renderPluginSelection(selected: string | null, callback: (context: ComponentContext, value: string) => Promise<void>): CommandSelectMenuComponent {
+	const options: SelectOption[] = [];
+
+	for (const plugin of getPlugins()) {
+		options.push({
+			label: plugin.name,
+			value: plugin.id,
+			description: plugin.description,
+			default: selected === plugin.id,
+		});
+	}
+
+	return {
+		customID: "plugin",
+		options,
+		type: ComponentTypes.STRING_SELECT,
+		async callback(context, values) {
+			await callback(context, values[0]!);
+		},
+	};
+}
+
+function renderSelectPage(): Reply {
+	return {
+		components: [
+			{
+				content: "**Select a plugin to view the commands of**",
+				type: ComponentTypes.TEXT_DISPLAY,
+			},
+			{
+				components: [
+					renderPluginSelection(null, async (context, value) => {
+						const page = renderCommandListPage(context, { plugin: value, page: 0 });
+						page.flags ??= MessageFlags.EPHEMERAL;
+						await context.respond(page);
+
+						await context.edit(renderSelectPage());
+					})
+				],
+				type: ComponentTypes.ACTION_ROW,
+			}
+		]
+	};
+}
+
+interface CommandListState {
+	plugin: string;
 	page: number;
 	entries?: string[];
 }
 
-function renderMainPage(context: BaseContext, state: State): Reply {
-	const plugin = getPlugin(state.selected);
+function renderCommandListPage(context: BaseContext, state: CommandListState): ReplyObject {
+	const plugin = getPlugin(state.plugin);
 
-	if (plugin === undefined)
-		return `${icons.error} No such plugin - '${plugin}'!`;
+	if (plugin === undefined) {
+		return {
+			components: [{ content: `${icons.error} No such plugin - '${plugin}'!`, type: ComponentTypes.TEXT_DISPLAY }]
+		};
+	}
 
 	const container: CommandContainerComponent = {
 		components: [],
@@ -41,26 +97,12 @@ function renderMainPage(context: BaseContext, state: State): Reply {
 		type: ComponentTypes.TEXT_DISPLAY,
 	});
 
-	const selection: CommandSelectMenuComponent = {
-		customID: "plugin",
-		options: [],
-		type: ComponentTypes.STRING_SELECT,
-		async callback(context, values) {
-			await context.edit(renderMainPage(context, { selected: values[0]!, page: 0 }));
-		},
-	};
-
-	for (const plugin of getPlugins()) {
-		selection.options.push({
-			label: plugin.name,
-			value: plugin.id,
-			description: plugin.description,
-			default: state.selected === plugin.id,
-		});
-	}
-
 	container.components.push({
-		components: [selection],
+		components: [
+			renderPluginSelection(state.plugin, async (context, value) => {
+				await context.edit(renderCommandListPage(context, { plugin: value, page: 0 }));
+			})
+		],
 		type: ComponentTypes.ACTION_ROW,
 	});
 
@@ -124,7 +166,7 @@ function renderMainPage(context: BaseContext, state: State): Reply {
 			style: ButtonStyles.SECONDARY,
 			type: ComponentTypes.BUTTON,
 			async callback(context) {
-				await context.edit(renderMainPage(context, { selected: state.selected, entries, page: state.page - 1 }));
+				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page - 1 }));
 			},
 		};
 
@@ -135,7 +177,7 @@ function renderMainPage(context: BaseContext, state: State): Reply {
 			style: ButtonStyles.SECONDARY,
 			type: ComponentTypes.BUTTON,
 			async callback(context) {
-				await context.edit(renderMainPage(context, { selected: state.selected, entries, page: state.page + 1 }));
+				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page + 1 }));
 			},
 		};
 
