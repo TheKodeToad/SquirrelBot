@@ -7,7 +7,7 @@
 		"http": "npm run _node src/http/main.ts",
 		"migrate": "npm run _node src/db/main.ts migrate --",
 		"check-migrations": "npm run _node src/db/main.ts check --",
-		"_node": "node --disable-proto=delete --experimental-transform-types"
+		"_node": "node --disable-proto=throw --experimental-transform-types"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.1",
