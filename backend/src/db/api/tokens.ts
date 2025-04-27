@@ -15,7 +15,7 @@ export async function generateToken(userID: string): Promise<[token: string, exp
 
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret));
 
-	pool.query(
+	await pool.query(
 		`
 			INSERT INTO "api_tokens" (
 				"userID",

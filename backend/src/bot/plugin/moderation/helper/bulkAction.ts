@@ -127,7 +127,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 		if (action.directMessage !== undefined && !targetMember.bot) {
 			const dmChannel = await createDMCached(targetMember.id);
 			try {
-				dmChannel.createMessage(action.directMessage);
+				await dmChannel.createMessage(action.directMessage);
 				dmDelivered = true;
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))

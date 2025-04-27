@@ -16,8 +16,8 @@ const TIMEOUT_POLL_RATE = 60 * 1000;
 
 let nextExpiryStartTime = new Date(0);
 
-export function beginPollingReminders(): void {
-	poll();
+export async function beginPollingReminders(): Promise<void> {
+	await poll();
 	setInterval(poll, TIMEOUT_POLL_RATE).unref();
 }
 

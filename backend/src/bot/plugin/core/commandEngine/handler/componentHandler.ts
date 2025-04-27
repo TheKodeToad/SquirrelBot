@@ -35,7 +35,7 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 
 	if (callback.invokerOnly && interaction.user.id !== componentData.invokerID) {
 		// just ignore
-		interaction.deferUpdate();
+		await interaction.deferUpdate();
 		return;
 	}
 
@@ -151,7 +151,7 @@ class ComponentContextImpl implements ComponentContext {
 				this._clearTimeout();
 
 			if (this._edited)
-				this._interaction.createFollowup(messageOptions).then(response => this._responseID = response.message.id);
+				await this._interaction.createFollowup(messageOptions).then(response => this._responseID = response.message.id);
 			else {
 				await this._interaction.createMessage(messageOptions).then(
 					({ callback }) => this._responseID ??= callback.resource?.message?.id ?? null

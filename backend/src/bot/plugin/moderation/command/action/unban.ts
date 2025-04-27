@@ -68,7 +68,7 @@ export const unbanCommand = defineCommand({
 			}
 
 			try {
-				context.guild.removeBan(target, args.reason ?? undefined);
+				await context.guild.removeBan(target, args.reason ?? undefined);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;

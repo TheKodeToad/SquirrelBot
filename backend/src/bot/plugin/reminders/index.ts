@@ -17,8 +17,8 @@ export const remindersPlugin = definePlugin({
 	config: remindersConfig,
 	commands: [remindCommand, reminderListCommand],
 
-	apply() {
-		beginPollingReminders();
+	async apply() {
+		await beginPollingReminders();
 	},
 });
 
