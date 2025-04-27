@@ -68,7 +68,7 @@ async function renderReminders(reminders: Reminder[]): Promise<ReplyObject> {
 	let content = "";
 
 	for (const reminder of reminders) {
-		content += `<t:${dateToUnixSeconds(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message}\n`;
+		content += `<t:${dateToUnixSeconds(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message ?? "*No message provided.*"}\n`;
 	}
 
 	container.components.push({

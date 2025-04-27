@@ -18,6 +18,8 @@ export default defineConfig([
 			"@typescript-eslint/no-empty-object-type": "off",
 			"@typescript-eslint/explicit-function-return-type": ["warn", { allowExpressions: true }],
 			"@typescript-eslint/no-floating-promises": "error",
+			"@typescript-eslint/restrict-plus-operands": ["error", { allowNullish: false }],
+			"@typescript-eslint/restrict-template-expressions": ["error", { allow: [], allowNullish: false }],
 			"no-var": "off",
 			"no-console": "warn",
 			"prefer-const": "warn"

@@ -23,13 +23,13 @@ type BulkAction =
 		actor: Member;
 		directMessage?: CreateMessageOptions;
 
-		makeCase(actor: string, target: string, dmDelivered: boolean): CreateCaseOptions | null;
+		makeCase(actor: string, target: string, dmDelivered: boolean): CreateCaseOptions;
 	};
 
 interface BulkResult {
 	successful: {
 		user: User | Member;
-		caseNumber: number | null;
+		caseNumber: number;
 		dmDelivered: boolean;
 	}[];
 	unsuccessful: {
@@ -81,14 +81,8 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 				continue;
 			}
 
-			let caseNumber: number | null = null;
-
-			if (action.makeCase !== undefined) {
-				const newCase = action.makeCase(action.actor.id, targetID, false);
-
-				if (newCase !== null)
-					caseNumber = await createCase(action.guild.id, newCase);
-			}
+			const caseOptions = action.makeCase(action.actor.id, targetID, false);
+			const caseNumber = await createCase(action.guild.id, caseOptions);
 
 			result.successful.push({
 				user: targetUser,
@@ -148,14 +142,8 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 			continue;
 		}
 
-		let caseNumber: number | null = null;
-
-		if (action.makeCase !== undefined) {
-			const newCase = action.makeCase(action.actor.id, targetID, dmDelivered);
-
-			if (newCase !== null)
-				caseNumber = await createCase(action.guild.id, newCase);
-		}
+		const caseOptions = action.makeCase(action.actor.id, targetID, false);
+		const caseNumber = await createCase(action.guild.id, caseOptions);
 
 		result.successful.push({
 			user: targetMember,

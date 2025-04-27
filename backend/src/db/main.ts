@@ -30,6 +30,6 @@ switch (command) {
 		break;
 	}
 	default:
-		console.error(`Usage: node ${script} <migrate|check> [--ignore-errors]`);
+		console.error(`Usage: node ${script!} (migrate|check) [--ignore-errors]`);
 		break;
 }

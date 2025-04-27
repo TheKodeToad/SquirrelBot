@@ -11,7 +11,7 @@ export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, h
 	const mainInfo: TextDisplayComponent[] = [];
 
 	mainInfo.push({
-		content: "## " + (inviter.username || inviter.globalName) + "\n**Friend Invite**",
+		content: "## " + (inviter.username || inviter.globalName || "<unknown>") + "\n**Friend Invite**",
 		type: ComponentTypes.TEXT_DISPLAY,
 	});
 

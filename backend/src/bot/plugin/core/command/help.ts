@@ -83,7 +83,7 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 
 	if (plugin === undefined) {
 		return {
-			components: [{ content: `${icons.error} No such plugin - '${plugin}'!`, type: ComponentTypes.TEXT_DISPLAY }]
+			components: [{ content: `${icons.error} No such plugin - '${state.plugin}'!`, type: ComponentTypes.TEXT_DISPLAY }]
 		};
 	}
 

@@ -19,7 +19,7 @@ export function renderGroupDMInvite(
 
 	const mainInfo: TextDisplayComponent[] = [];
 
-	mainInfo.push({ content: "## " + channel.name + "\n**Group Invite**", type: ComponentTypes.TEXT_DISPLAY });
+	mainInfo.push({ content: "## " + (channel.name ?? "<unknown>") + "\n**Group Invite**", type: ComponentTypes.TEXT_DISPLAY });
 
 	if (totalMembers !== undefined) {
 		const total = totalMembers.toLocaleString("en-US");

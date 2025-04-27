@@ -51,7 +51,7 @@ export const groupsCommand = defineCommand({
 
 		if (result.groups.size !== 0) {
 			const groups = Array.from(result.groups).toSorted().map(makeMarkdownInlineCodeblock);
-			await context.respond(`${icons.info} Groups for ${formatUser(context.user)}: ${groups} (permission level ${result.level})`);
+			await context.respond(`${icons.info} Groups for ${formatUser(context.user)}: ${groups.join(", ")} (permission level ${result.level})`);
 		} else
 			await context.respond(`${icons.info} ${formatUser(context.user)} is not in any groups!`);
 	},

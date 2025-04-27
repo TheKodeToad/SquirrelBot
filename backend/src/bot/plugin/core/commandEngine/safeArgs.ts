@@ -47,8 +47,10 @@ export class SafeArgs {
 
 		const option = this._schema[key];
 
-		if (typeof option !== "object")
+		if (typeof option !== "object") {
+			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			throw new Error(`typeof options['${key}'] is '${option}'`);
+		}
 
 		return option;
 	}
