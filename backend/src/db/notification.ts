@@ -25,7 +25,7 @@ export async function connectChannelListener(): Promise<void> {
 	});
 }
 
-export function disconnectChannelListener() {
+export function disconnectChannelListener(): void {
 	listenerClient?.release();
 }
 
@@ -33,7 +33,7 @@ export async function addChannelListener(channel: string, listener: Listener): P
 	if (listenerClient === null)
 		throw new Error("connectListener() not called");
 
-	let listeners = listenersLookup.get(channel);
+	const listeners = listenersLookup.get(channel);
 
 	if (listeners === undefined) {
 		await listenerClient.query("SELECT pg_temp.listen($1)", [channel]);

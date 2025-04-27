@@ -100,7 +100,7 @@ export const messageLoggerDeleteListener = defineEventListener("messageDelete", 
 	});
 });
 
-export async function beginMessageCleanupLoop() {
+export async function beginMessageCleanupLoop(): Promise<void> {
 	try {
 		logger.debug?.("Cleaning up old message cache entries");
 

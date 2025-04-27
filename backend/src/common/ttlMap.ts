@@ -11,18 +11,18 @@ export class TTLMap<K, V> {
 		this._ttl = ttl;
 	}
 
-	cleanup() {
+	cleanup(): void {
 		const now = Date.now();
 
 		for (const [key, [_, date]] of this._map) {
-			if (!this._is_expired(now, date))
+			if (!this._isExpired(now, date))
 				break;
 
 			this._map.delete(key);
 		}
 	}
 
-	private _is_expired(now: number, date: number) {
+	private _isExpired(now: number, date: number): boolean {
 		return (now - date) > this._ttl;
 	}
 
@@ -31,7 +31,7 @@ export class TTLMap<K, V> {
 		let count = 0;
 
 		for (const [_, date] of this._map.values())
-			if (!this._is_expired(now, date))
+			if (!this._isExpired(now, date))
 				++count;
 
 		return count;
@@ -59,7 +59,7 @@ export class TTLMap<K, V> {
 			return undefined;
 
 		const [value, date] = this._map.get(key)!;
-		if (this._is_expired(Date.now(), date))
+		if (this._isExpired(Date.now(), date))
 			return undefined;
 
 		return value;
@@ -70,7 +70,7 @@ export class TTLMap<K, V> {
 			return false;
 
 		const [_, date] = this._map.get(key)!;
-		return this._is_expired(Date.now(), date);
+		return this._isExpired(Date.now(), date);
 	}
 
 	set(key: K, value: V): this {
@@ -82,7 +82,7 @@ export class TTLMap<K, V> {
 		const now = Date.now();
 
 		for (const [key, [value, date]] of this._map)
-			if (!this._is_expired(now, date))
+			if (!this._isExpired(now, date))
 				yield [key, value];
 	}
 
@@ -94,7 +94,7 @@ export class TTLMap<K, V> {
 		const now = Date.now();
 
 		for (const [value, date] of this._map.values())
-			if (!this._is_expired(now, date))
+			if (!this._isExpired(now, date))
 				yield value;
 	}
 
@@ -102,7 +102,7 @@ export class TTLMap<K, V> {
 		const now = Date.now();
 
 		for (const [key, [value, date]] of this._map)
-			if (!this._is_expired(now, date))
+			if (!this._isExpired(now, date))
 				yield [key, value];
 	}
 

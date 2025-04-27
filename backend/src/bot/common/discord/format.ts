@@ -2,7 +2,7 @@ import { DiscordRESTError, Member, User, type Uncached } from "oceanic.js";
 import { fetchUserCachedSupressed } from "./cachedRequest.ts";
 import { escapeMarkdown } from "./markdown.ts";
 
-export function formatRESTError(restError: DiscordRESTError) {
+export function formatRESTError(restError: DiscordRESTError): string {
 	if (restError.resBody !== null
 		&& typeof restError.resBody.message === "string") {
 		return `API Error ${restError.code}: ${escapeMarkdown(restError.resBody.message)}`;
@@ -23,7 +23,7 @@ export function formatUser(user: User | Member | Uncached): string {
 	return `<@${user.id}> (${formatUserTag(user)})`;
 }
 
-export function formatUserTag(user: User | Member | Uncached) {
+export function formatUserTag(user: User | Member | Uncached): string {
 	if ("tag" in user)
 		return escapeMarkdown(user.tag);
 	else

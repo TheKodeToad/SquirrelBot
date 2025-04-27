@@ -115,7 +115,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	return true;
 }
 
-async function handleEdit(message: Message) {
+async function handleEdit(message: Message): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response)
@@ -130,7 +130,7 @@ async function handleEdit(message: Message) {
 		await response.delete();
 }
 
-async function handleDelete(message: PossiblyUncachedMessage) {
+async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response)
@@ -160,7 +160,7 @@ class PrefixContext implements CommandContext {
 	}
 
 	async respond(reply: Reply): Promise<void> {
-		let messageOptions = transformReply(reply);
+		const messageOptions = transformReply(reply);
 
 		if ((this.message.flags & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0) {
 			messageOptions.flags ??= 0;

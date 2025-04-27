@@ -154,8 +154,8 @@ type OptionValue<F extends Option> =
 	F["required"] extends true ? NullableValue<OptionTypeValue<F["type"]>, F["required"]> :
 	OptionTypeValue<F["type"]> | null;
 
-type ArrayValue<O extends any, Required extends boolean | undefined> = Required extends true ? readonly [O, ...O[]] : readonly O[];
-type NullableValue<O extends any, Required extends boolean | undefined> = Required extends true ? O : O | null;
+type ArrayValue<O, Required extends boolean | undefined> = Required extends true ? readonly [O, ...O[]] : readonly O[];
+type NullableValue<O, Required extends boolean | undefined> = Required extends true ? O : O | null;
 
 type OptionTypeValue<T extends OptionType> =
 	T extends OptionType.Flag ? boolean :

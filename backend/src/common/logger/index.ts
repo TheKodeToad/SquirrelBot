@@ -1,3 +1,5 @@
+/* eslint no-console: 0 */
+
 import path from "path";
 import { fileURLToPath } from "url";
 import { getCallSites } from "util";
@@ -89,8 +91,6 @@ export class Logger {
 			return undefined;
 
 		return (message, data) => {
-			const now = new Date;
-
 			// you mean you DON'T know ansi escape codes off by heart
 			// too bad!
 			console.error(`\x1b[2m${dateToHMSString()} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);

@@ -9,7 +9,7 @@ const allowedGuilds: Set<string> = new Set;
 const grantListeners: Listener[] = [];
 const revokeListeners: Listener[] = [];
 
-export async function initGuildInfo() {
+export async function initGuildInfo(): Promise<void> {
 	const guildsInfo = await getAllGuildInfo();
 	// guilds from env var, remove those which are already present
 	const missing = [...BOT_ALLOWED_GUILDS];
@@ -60,7 +60,7 @@ export async function initGuildInfo() {
 	}
 }
 
-export function isGuildAllowed(id: string) {
+export function isGuildAllowed(id: string): boolean {
 	return allowedGuilds.has(id) || BOT_ALLOWED_GUILDS.includes(id);
 }
 

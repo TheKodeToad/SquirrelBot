@@ -1,7 +1,7 @@
 import { isSnowflake } from "../../../../../common/snowflake.ts";
 import type { StringReader } from "./stringReader.ts";
 
-export function readBoolean(reader: StringReader) {
+export function readBoolean(reader: StringReader): boolean | null {
 	const result = reader.readWord().toLowerCase();
 
 	if (result === "false" || result === "f" || result === "0")
@@ -12,7 +12,7 @@ export function readBoolean(reader: StringReader) {
 	return null;
 }
 
-export function readInteger(reader: StringReader) {
+export function readInteger(reader: StringReader): number | null {
 	const result = parseInt(reader.readWord());
 
 	if (!Number.isSafeInteger(result))
@@ -35,7 +35,7 @@ export function readNumber(reader: StringReader): number | null {
  * @param reader StringReader instance
  * @param terminator The pattern to terminate the string if unquoted - defaults to space
  */
-export function readString(reader: StringReader, terminator?: RegExp) {
+export function readString(reader: StringReader, terminator?: RegExp): string | null {
 	if (!(reader.peek() === "'" || reader.peek() === '"') || reader.peek() === "`") {
 		if (terminator !== undefined)
 			return reader.readUntil(terminator);

@@ -19,8 +19,8 @@ export function readPrefixName(reader: StringReader, prefix: string): string | n
 	return reader.readWord().toLowerCase();
 }
 
-const GREEDY_VALUE_TERMINATOR = /\s+--?[\w\-]/g;
-const ARRAY_TERMINATOR = /--?[\w\-]/y;
+const GREEDY_VALUE_TERMINATOR = /\s+--?[\w-]/g;
+const ARRAY_TERMINATOR = /--?[\w-]/y;
 
 export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheEntry): ArgsParseResult {
 	const output = new SafeArgs(commandEntry.command.options ?? {});
@@ -148,7 +148,7 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 		return result;
 	}
 
-	let result: AnyArgsValueItem[] = [];
+	const result: AnyArgsValueItem[] = [];
 
 	while (reader.canRead() && !reader.match(ARRAY_TERMINATOR)) {
 		reader.mark();

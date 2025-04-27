@@ -47,7 +47,7 @@ const server = serve({
 	port: HTTP_PORT,
 }, info => logger.info?.(`Listening on ${info.port}`));
 
-async function deleteTokenLoop() {
+async function beginDeleteTokenLoop(): Promise<void> {
 	try {
 		logger.debug?.("Deleting expired tokens");
 
@@ -55,11 +55,11 @@ async function deleteTokenLoop() {
 
 		logger.debug?.(`Deleted ${deletedCount} tokens`);
 	} finally {
-		setTimeout(deleteTokenLoop, 60 * 60 * 1000).unref();
+		setTimeout(beginDeleteTokenLoop, 60 * 60 * 1000).unref();
 	}
 }
 
-await deleteTokenLoop();
+await beginDeleteTokenLoop();
 
 process.on("unhandledRejection", rejection => {
 	logger.error?.("Unhandled Promise rejection!", rejection);
@@ -70,7 +70,7 @@ process.on("SIGTERM", shutDown);
 
 let exitingAfter = 0;
 
-async function shutDown(signal: NodeJS.Signals) {
+async function shutDown(signal: NodeJS.Signals): Promise<void> {
 	if (exitingAfter !== 0) {
 		logger.warn?.(`Already attempting shutdown - exit will be forced after ${exitingAfter} seconds`);
 		return;

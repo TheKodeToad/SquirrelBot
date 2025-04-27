@@ -22,6 +22,6 @@ export const remindersPlugin = definePlugin({
 	},
 });
 
-export function debugFormatReminder(reminder: Reminder) {
+export function debugFormatReminder(reminder: Reminder): string {
 	return `#${reminder.number} in ${debugFormatGuildByID(reminder.guildID)}`;
 }

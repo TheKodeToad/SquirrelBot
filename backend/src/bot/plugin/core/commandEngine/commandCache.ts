@@ -20,7 +20,7 @@ export function getCommandByName(name: string): CommandCacheEntry | undefined {
 	return lookup.get(name);
 }
 
-export function initCommandCache() {
+export function initCommandCache(): void {
 	for (const plugin of getPlugins()) {
 		if (plugin.commands === undefined)
 			continue;
@@ -124,7 +124,7 @@ function formatCommandUsage(options: Command["options"], optionsByPosition: Comm
 	return result;
 }
 
-function formatOptionValue(option: Option) {
+function formatOptionValue(option: Option): string {
 	switch (option.type) {
 		case OptionType.Boolean: return option.array ? "boolean(s)" : "(true|false)";
 		case OptionType.Flag: return "";

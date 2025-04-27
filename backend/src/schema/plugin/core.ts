@@ -48,6 +48,7 @@ export interface CoreConfig extends InferOutput<typeof coreConfigSchema> { }
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function transformCoreGroups() {
 	return rawTransform<Record<string, CoreGroup>, Map<string, CoreGroup>>(({ dataset, addIssue, NEVER }) => {
 		if (!dataset.typed)
@@ -80,7 +81,7 @@ function transformCoreGroups() {
 		if (hasIssues)
 			return NEVER;
 
-		let result: Map<string, CoreGroup> = new Map;
+		const result: Map<string, CoreGroup> = new Map;
 
 		for (const key in dataset.value) {
 			if (!Object.hasOwn(dataset.value, key))

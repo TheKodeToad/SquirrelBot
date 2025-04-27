@@ -29,8 +29,8 @@ export const unbanCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.unban),
 	async run(context, args) {
-		let successfulUnbans: { user: User; caseNumber: number; }[] = [];
-		let unsuccessfulUnbans: { user: User | Uncached; error: string; }[] = [];
+		const successfulUnbans: { user: User; caseNumber: number; }[] = [];
+		const unsuccessfulUnbans: { user: User | Uncached; error: string; }[] = [];
 
 		for (const target of args.user) {
 			const cachedMember = context.guild.members.get(target);
@@ -68,7 +68,7 @@ export const unbanCommand = defineCommand({
 			}
 
 			try {
-				await context.guild.removeBan(target, args.reason ?? undefined);
+				context.guild.removeBan(target, args.reason ?? undefined);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;

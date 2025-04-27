@@ -33,7 +33,7 @@ export class SafeArgs {
 	}
 
 	// TODO: biggest bottleneck of parser lol
-	private _resultDefine(key: string, value: AnyArgsValue) {
+	private _resultDefine(key: string, value: AnyArgsValue): void {
 		Object.defineProperty(this._result, key, {
 			configurable: true,
 			enumerable: true,
@@ -53,7 +53,7 @@ export class SafeArgs {
 		return option;
 	}
 
-	set(key: string, value: AnyArgsValue) {
+	set(key: string, value: AnyArgsValue): void {
 		if (this._frozen)
 			throw new Error("set cannot be called after getFrozenResult");
 
@@ -68,7 +68,7 @@ export class SafeArgs {
 		this._missing.delete(key);
 	}
 
-	pushTo(key: string, ...value: AnyArgsValueItem[]) {
+	pushTo(key: string, ...value: AnyArgsValueItem[]): void {
 		if (this._frozen)
 			throw new Error("pushTo cannot be called after getFrozenResult");
 
@@ -95,11 +95,11 @@ export class SafeArgs {
 		this._missing.delete(key);
 	}
 
-	getMissing() {
+	getMissing(): Set<string> {
 		return this._missing;
 	}
 
-	getFrozenResult() {
+	getFrozenResult(): Readonly<SafeArgs["_result"]> {
 		if (!this._frozen) {
 			this._frozen = true;
 

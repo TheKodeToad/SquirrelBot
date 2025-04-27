@@ -48,7 +48,7 @@ export function resolveGroups(member: Member): GroupsResult {
 	return { groups, level };
 }
 
-function groupLevel(group: CoreGroup) {
+function groupLevel(group: CoreGroup): number {
 	return group.level ?? 0;
 }
 
@@ -104,7 +104,7 @@ export function resolvePermissions<P extends Record<string, boolean>>(
 	return result;
 }
 
-function testFilter(filter: PermissionsFilter, groups: GroupsResult, channel: Exclude<AnyGuildChannel, CategoryChannel>) {
+function testFilter(filter: PermissionsFilter, groups: GroupsResult, channel: Exclude<AnyGuildChannel, CategoryChannel>): boolean {
 	const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
 
 	if (baseChannel === undefined)

@@ -39,7 +39,7 @@ interface BulkResult {
 }
 
 export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
-	let result: BulkResult = { successful: [], unsuccessful: [] };
+	const result: BulkResult = { successful: [], unsuccessful: [] };
 
 	const members = await fetchMembersCached(action.guild, action.ids);
 

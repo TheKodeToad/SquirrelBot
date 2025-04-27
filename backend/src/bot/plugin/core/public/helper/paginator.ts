@@ -15,7 +15,7 @@ export interface PaginatorQuery<K> {
 	reversed: boolean;
 }
 
-export async function respondWithPaginator<E, K>(context: CommandContext, paginator: Paginator<E, K>) {
+export async function respondWithPaginator<E, K>(context: CommandContext, paginator: Paginator<E, K>): Promise<void> {
 	await context.respond(await renderPaginator(context, paginator, false, undefined, undefined));
 }
 

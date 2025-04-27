@@ -13,11 +13,11 @@ export class ConfigCache<S extends BaseSchema<unknown, unknown, BaseIssue<unknow
 		return this._cache.get(guildID);
 	}
 
-	set(guildID: string, value: InferOutput<S>) {
+	set(guildID: string, value: InferOutput<S>): void {
 		this._cache.set(guildID, value);
 	}
 
-	delete(guildID: string) {
+	delete(guildID: string): void {
 		this._cache.delete(guildID);
 	}
 }

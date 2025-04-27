@@ -55,9 +55,9 @@ export async function fetchMembersCached(
 ): Promise<Map<string, Member>> {
 	const result: Map<string, Member> = new Map;
 	const queue: string[] = [];
-	let promises: Promise<unknown>[] = [];
+	const promises: Promise<unknown>[] = [];
 
-	const request = () => {
+	const request = (): void => {
 		promises.push(
 			guild.shard.requestGuildMembers(guild.id, {
 				userIDs: queue,

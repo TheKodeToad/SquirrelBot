@@ -20,11 +20,6 @@ interface UserResponse {
 	global_name: string;
 }
 
-interface ErrorResponse {
-	error: string;
-	error_description: string;
-}
-
 const router = new Hono;
 router.post("/", validator("json", value => value), async context => {
 	const { code } = context.req.valid("json");

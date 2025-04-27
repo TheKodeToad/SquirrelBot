@@ -30,7 +30,7 @@ export function getPlugin(id: string): Plugin | undefined {
 	return plugins.get(id);
 }
 
-export function loadPlugins() {
+export function loadPlugins(): void {
 	// only support first-party plugins for now :)
 	registerPlugin(corePlugin);
 	registerPlugin(moderationPlugin);

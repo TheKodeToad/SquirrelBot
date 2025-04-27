@@ -1,18 +1,20 @@
+/* eslint no-console: 0 */
+
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import "../environment.ts";
 import { pool } from "./index.ts";
 
-export async function migrate(ignoreChanges: boolean) {
+export async function migrate(ignoreChanges: boolean): Promise<number> {
 	return await processMigrations(false, ignoreChanges);
 }
 
-export async function checkMigrations() {
+export async function checkMigrations(): Promise<number> {
 	return await processMigrations(true, false);
 }
 
-export async function checkMigrationsOrExit() {
+export async function checkMigrationsOrExit(): Promise<void> {
 	const migrationsNeeded = await checkMigrations();
 
 	if (migrationsNeeded === null)

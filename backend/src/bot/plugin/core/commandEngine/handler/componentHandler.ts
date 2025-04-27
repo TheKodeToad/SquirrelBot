@@ -184,14 +184,14 @@ class ComponentContextImpl implements ComponentContext {
 			listenForInteractions(this._interaction.message.id, this._originalInvoker, reply.components);
 	}
 
-	_clearTimeout() {
+	_clearTimeout(): void {
 		if (this._ackTimeout !== null) {
 			clearTimeout(this._ackTimeout);
 			this._ackTimeout = null;
 		}
 	}
 
-	async _abandon() {
+	async _abandon(): Promise<void> {
 		this._clearTimeout();
 
 		if (!this._acked)

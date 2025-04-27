@@ -1,7 +1,7 @@
 import { ComponentTypes, Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
-import { type Command, type Reply } from "../public/command.ts";
+import { type Command, type Reply, type ReplyObject } from "../public/command.ts";
 
-export function transformReply(reply: Reply) {
+export function transformReply(reply: Reply): ReplyObject {
 	if (typeof reply === "string") {
 		reply = {
 			components: [{

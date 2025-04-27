@@ -1,7 +1,7 @@
 // everything where an escape is valid and the character sometimes affects formatting
 // (all punctuation seems to be possible to escape?)
 // perhaps this is not the best way to do this but it should work everywhere apart from inside codeblocks
-const FORMATTING_REGEX = /[\\/*_\-`#@<>.~|:\[\]\(\)]/g;
+const FORMATTING_REGEX = /[\\/*_\-`#@<>.~|:[\]()]/g;
 const ZWSP = "\u200B";
 
 /**
@@ -25,6 +25,6 @@ export function makeMarkdownMultilineCodeblock(input: string): string {
 	return "```\n" + input.replaceAll("`", ZWSP + "`" + ZWSP) + "\n```";
 }
 
-export function makeMarkdownQuote(input: string) {
+export function makeMarkdownQuote(input: string): string {
 	return "> " + input.replaceAll("\n", "\n> ");
 }

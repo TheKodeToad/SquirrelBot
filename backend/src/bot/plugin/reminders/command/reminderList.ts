@@ -28,7 +28,7 @@ export const reminderListCommand = defineCommand({
 	},
 });
 
-async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>) {
+async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>): Promise<Reminder[]> {
 	const config = remindersConfig.get(context.guild.id);
 
 	if (config === undefined)

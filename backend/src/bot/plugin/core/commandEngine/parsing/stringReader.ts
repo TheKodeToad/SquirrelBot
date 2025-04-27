@@ -15,7 +15,7 @@ export class StringReader {
 		this._ops = 100_000;
 	}
 
-	private _trackOp() {
+	private _trackOp(): void {
 		if (--this._ops < 0)
 			throw new Error("Operation limit exceeded; infinite loop assumed");
 	}
@@ -38,7 +38,7 @@ export class StringReader {
 		return this._canRead(offset);
 	}
 
-	read() {
+	read(): string {
 		this._trackOp();
 
 		return this._read();
@@ -53,18 +53,18 @@ export class StringReader {
 		return this._input[this._cursor + offset]!;
 	}
 
-	mark() {
+	mark(): void {
 		if (this._markedCursor !== null)
 			throw new Error("Already marked");
 
 		this._markedCursor = this._cursor;
 	}
 
-	unmark() {
+	unmark(): void {
 		this._markedCursor = null;
 	}
 
-	reset() {
+	reset(): void {
 		if (this._markedCursor === null)
 			throw new Error("No mark set");
 

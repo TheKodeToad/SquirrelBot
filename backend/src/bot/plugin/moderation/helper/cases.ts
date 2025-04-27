@@ -3,23 +3,22 @@ import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
 import { formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
 import { makeMarkdownQuote } from "../../../common/discord/markdown.ts";
 
-
-export function caseExpired(info: CaseInfo, date: number = Date.now()) {
+export function caseExpired(info: CaseInfo, date: number = Date.now()): boolean {
 	return info.expiresAt !== null && info.expiresAt.getTime() <= date;
 }
 
-function caseSummaryBase(type: CaseType, target: string) {
+function caseSummaryBase(type: CaseType, target: string): string {
 	switch (type) {
-		case CaseType.Note: return `Note added for ${target}`; break;
-		case CaseType.Warn: return `Warned ${target}`; break;
-		case CaseType.Unwarn: return `Unwarned ${target}`; break;
-		case CaseType.VoiceMute: return `Voice-muted ${target}`; break;
-		case CaseType.VoiceUnmute: return `Voice-unmuted ${target}`; break;
-		case CaseType.Mute: return `Muted ${target}`; break;
-		case CaseType.Unmute: return `Unmuted ${target}`; break;
-		case CaseType.Kick: return `Kicked ${target}`; break;
-		case CaseType.Ban: return `Banned ${target}`; break;
-		case CaseType.Unban: return `Unbanned ${target}`; break;
+		case CaseType.Note: return `Note added for ${target}`;
+		case CaseType.Warn: return `Warned ${target}`;
+		case CaseType.Unwarn: return `Unwarned ${target}`;
+		case CaseType.VoiceMute: return `Voice-muted ${target}`;
+		case CaseType.VoiceUnmute: return `Voice-unmuted ${target}`;
+		case CaseType.Mute: return `Muted ${target}`;
+		case CaseType.Unmute: return `Unmuted ${target}`;
+		case CaseType.Kick: return `Kicked ${target}`;
+		case CaseType.Ban: return `Banned ${target}`;
+		case CaseType.Unban: return `Unbanned ${target}`;
 	}
 }
 

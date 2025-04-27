@@ -3,6 +3,7 @@ import { caseTypeID, type CaseInfo } from "../../../../../../db/moderation/cases
 import byFilter from "./byFilter.ts";
 import byNumber from "./byNumber.ts";
 
+// TODO Just don't bother =)
 export function serializeCaseObject(info: CaseInfo) {
 	return {
 		number: info.number,

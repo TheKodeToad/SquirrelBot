@@ -11,7 +11,7 @@ import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds } fro
 
 const logger = moduleLogger();
 
-export async function initConfigs() {
+export async function initConfigs(): Promise<void> {
 	await Promise.all(mapIterable(getAllowedGuilds(), createAndLoadConfigs));
 	addGrantAccessListener(createAndLoadConfigs);
 	addRevokeAccessListener(unloadConfigs);
@@ -55,7 +55,7 @@ async function installConfigChangeListener(): Promise<void> {
 	});
 }
 
-export async function createAndLoadConfigs(guildID: string) {
+export async function createAndLoadConfigs(guildID: string): Promise<void> {
 	await configUpdateLock.acquire(guildID, async () => {
 		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
@@ -67,7 +67,7 @@ export async function createAndLoadConfigs(guildID: string) {
 	});
 }
 
-export async function unloadConfigs(guildID: string) {
+export async function unloadConfigs(guildID: string): Promise<void> {
 	await configUpdateLock.acquire(guildID, async () => {
 		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)

@@ -16,19 +16,19 @@ const TIMEOUT_POLL_RATE = 60 * 1000;
 
 let nextExpiryStartTime = new Date(0);
 
-export function beginPollingReminders() {
+export function beginPollingReminders(): void {
 	poll();
 	setInterval(poll, TIMEOUT_POLL_RATE).unref();
 }
 
-export function trackNewReminder(reminder: Reminder) {
+export function trackNewReminder(reminder: Reminder): void {
 	if (reminder.firesAt.getTime() >= nextExpiryStartTime.getTime())
 		return;
 
 	setTimeout(() => fire(reminder), Math.max(0, reminder.firesAt.getTime() - Date.now())).unref();
 }
 
-async function poll() {
+async function poll(): Promise<void> {
 	const end = new Date(Date.now() + TIMEOUT_POLL_RATE);
 
 	logger.debug?.(
@@ -44,14 +44,14 @@ async function poll() {
 		setFireTimeout(reminder);
 }
 
-function setFireTimeout(reminder: Reminder) {
+function setFireTimeout(reminder: Reminder): void {
 	const delay = Math.max(0, reminder.firesAt.getTime() - Date.now());
 	setTimeout(() => fire(reminder), delay);
 
 	logger.debug?.(`Setting up timeout for reminder ${debugFormatReminder(reminder)} with delay ${delay}`);
 }
 
-async function fire(reminder: Reminder) {
+async function fire(reminder: Reminder): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!
 	if (!await deleteReminder(reminder.guildID, reminder.number))
 		return;

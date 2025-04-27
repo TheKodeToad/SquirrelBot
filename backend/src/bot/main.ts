@@ -49,7 +49,7 @@ await bot.connect();
 
 let exitingAfter = 0;
 
-async function shutDown(signal: NodeJS.Signals) {
+async function shutDown(signal: NodeJS.Signals): Promise<void> {
 	if (exitingAfter !== 0) {
 		logger.warn?.(`Already attempting shutdown - exit will be forced after ${exitingAfter} seconds`);
 		return;

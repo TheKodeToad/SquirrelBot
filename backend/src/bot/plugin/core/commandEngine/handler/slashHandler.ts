@@ -63,6 +63,8 @@ export async function syncSlashCommands(): Promise<void> {
 	await writeFile(cacheFile, newHash);
 }
 
+// so union of everything returned is not needed :)
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function mapOptionType(type: OptionType) {
 	switch (type) {
 		case OptionType.Flag:
@@ -210,7 +212,7 @@ class SlashContext implements CommandContext {
 			listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
 	}
 
-	_clearTimeout() {
+	_clearTimeout(): void {
 		if (this._deferTimeout !== null) {
 			clearTimeout(this._deferTimeout);
 			this._deferTimeout = null;

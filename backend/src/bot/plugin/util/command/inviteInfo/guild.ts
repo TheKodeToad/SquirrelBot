@@ -112,7 +112,7 @@ export function renderGuildInvite(
 	return result;
 }
 
-export function calculateLevel(boosts: number) {
+export function calculateLevel(boosts: number): number {
 	if (boosts < 2)
 		return 0;
 	else if (boosts < 7)
