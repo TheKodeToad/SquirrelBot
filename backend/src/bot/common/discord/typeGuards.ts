@@ -1,4 +1,4 @@
-import { Channel, ChannelTypes, MessageTypes, TextableChannelTypes, ThreadChannelTypes, UndeletableMessageTypes, type AnyTextableChannel, type AnyThreadChannel, type TextableChannels, type ThreadChannels } from "oceanic.js";
+import { Channel, ChannelTypes, MessageTypes, TextableChannelTypes, TextableGuildChannelTypes, ThreadChannelTypes, UndeletableMessageTypes, type AnyTextableChannel, type AnyTextableGuildChannel, type AnyThreadChannel, type TextableChannels, type TextableGuildChannels, type ThreadChannels } from "oceanic.js";
 
 export function isThreadChannel(channel: Channel): channel is AnyThreadChannel {
 	return isThreadChannelType(channel.type);
@@ -14,6 +14,14 @@ export function isTextableChannel(channel: Channel): channel is AnyTextableChann
 
 export function isTextableChannelType(type: ChannelTypes): type is TextableChannels {
 	return TextableChannelTypes.includes(type as TextableChannels);
+}
+
+export function isTextableGuildChannel(channel: Channel): channel is AnyTextableGuildChannel {
+	return isTextableGuildChannelType(channel.type);
+}
+
+export function isTextableGuildChannelType(type: ChannelTypes): type is TextableGuildChannels {
+	return TextableGuildChannelTypes.includes(type as TextableGuildChannels);
 }
 
 export function isUndeletableMessageType(type: MessageTypes): type is typeof UndeletableMessageTypes[number] {

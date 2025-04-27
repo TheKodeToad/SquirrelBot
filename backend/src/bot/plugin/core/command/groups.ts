@@ -22,7 +22,6 @@ export const groupsCommand = defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, coreConfigCache, permissions => permissions.groups_command),
-
 	async run(context, args) {
 		const coreConfig = coreConfigCache.get(context.guild.id);
 

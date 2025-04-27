@@ -4,6 +4,7 @@ import { testNumberFilter } from "../../../../schema/common/numberFilter.ts";
 import type { PermissionsFilter } from "../../../../schema/common/permissionsFilter.ts";
 import type { CoreConfig, CoreGroup } from "../../../../schema/plugin/core.ts";
 import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "../../../common/discord/debugFormat.ts";
+import { isThreadChannel } from "../../../common/discord/typeGuards.ts";
 import { coreConfig } from "../index.ts";
 
 const logger = moduleLogger();
@@ -104,7 +105,11 @@ export function resolvePermissions<P extends Record<string, boolean>>(
 }
 
 function testFilter(filter: PermissionsFilter, groups: GroupsResult, channel: Exclude<AnyGuildChannel, CategoryChannel>) {
-	const baseChannel = channel instanceof ThreadChannel ? channel.parent! : channel;
+	const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
+
+	if (baseChannel === undefined)
+		throw new Error("Uncached thread parent channel");
+
 	const categoryChannel = baseChannel.parent ?? null;
 
 	if (filter.in_group !== undefined && filter.in_group.some(group => groups.groups.has(group)))

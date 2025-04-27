@@ -39,10 +39,13 @@ export async function fetchThreadCached(guild: Guild, threadID: string): Promise
 
 	const fetched = await bot.rest.channels.get(threadID);
 
-	if (fetched instanceof ThreadChannel)
-		return fetched;
+	if (!(fetched instanceof ThreadChannel))
+		return null;
 
-	return null;
+	if (fetched.guildID !== guild.id)
+		return null;
+
+	return fetched;
 }
 
 export async function fetchMembersCached(

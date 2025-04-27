@@ -4,7 +4,9 @@ import { formatRESTError } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { bot } from "../../../../index.ts";
 import { defineCommand, OptionType, type CommandContainerComponent } from "../../../core/public/command.ts";
+import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
+import { utilConfig } from "../../index.ts";
 import { renderFriendInvite } from "./friend.ts";
 import { renderGroupDMInvite } from "./groupDM.ts";
 import { renderGuildInvite } from "./guild.ts";
@@ -33,7 +35,7 @@ export const inviteCommand = defineCommand({
 		}
 	},
 
-	preRun: () => true,
+	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.invite_command),
 	async run(context, args) {
 		const matches = REGEX.exec(args.link);
 
