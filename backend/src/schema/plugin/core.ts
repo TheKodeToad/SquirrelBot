@@ -70,7 +70,7 @@ function transformCoreGroups() {
 						path: [
 							{ type: "object", origin: "value", input: dataset.value, key, value },
 							{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
-							{ type: "array", origin: "value", input: value.inherits!, key: index, value: reference }
+							{ type: "array", origin: "value", input: value.inherits, key: index, value: reference }
 						]
 					});
 					hasIssues = true;
