@@ -9,7 +9,7 @@ import { moduleLogger } from "../common/logger/index.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
 import { pool } from "../db/index.ts";
 import { checkMigrationsOrExit } from "../db/migration.ts";
-import { CLIENT_ID, HTTP_PORT, REDIRECT_URI } from "../environment.ts";
+import { CLIENT_ID, HTTP_PORT, INVITE_PERMISSIONS, REDIRECT_URI } from "../environment.ts";
 import api_v1 from "./api/v1/index.ts";
 
 await checkMigrationsOrExit();
@@ -25,9 +25,12 @@ app.use(nortonAntivirusPlus({
 app.route("/api/v1", api_v1);
 
 const staticRoot = "../frontend/static";
+
 app.use("/*", serveStatic({ root: staticRoot })); // yea
+
 app.get("/env.js", context => {
-	const env = JSON.stringify({ CLIENT_ID, REDIRECT_URI });
+	const env = JSON.stringify({ CLIENT_ID, REDIRECT_URI, INVITE_PERMISSIONS });
+
 	return context.body(`window.SQUIRREL_ENV=${env}`, 200, { "Content-Type": "text/javascript" });
 });
 

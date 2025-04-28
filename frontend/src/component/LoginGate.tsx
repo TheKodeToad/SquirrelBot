@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { IconArrowRight } from "@tabler/icons-solidjs";
 import { JSX, Show } from "solid-js";
-import { LOGIN_URL } from "../authFlow";
+import { LOGIN_URL } from "../helper/auth";
 import { account } from "../state/account";
 import { Button } from "./common/Button";
 

@@ -1,3 +1,3 @@
-declare const SQUIRREL_ENV: { CLIENT_ID: string, REDIRECT_URI: string; };
+declare const SQUIRREL_ENV: { CLIENT_ID: string, REDIRECT_URI: string; INVITE_PERMISSIONS: string; };
 
-export const { CLIENT_ID, REDIRECT_URI } = SQUIRREL_ENV;
+export const { CLIENT_ID, REDIRECT_URI, INVITE_PERMISSIONS } = SQUIRREL_ENV;

@@ -1,7 +1,7 @@
-import { logIn as requestLogIn, logOut as requestLogOut } from "./client";
+import { logIn as requestLogIn, logOut as requestLogOut } from "../client";
 
-import { CLIENT_ID, REDIRECT_URI } from "./environment";
-import { account, setAccount } from "./state/account";
+import { CLIENT_ID, REDIRECT_URI } from "../environment";
+import { account, setAccount } from "../state/account";
 
 export const LOGIN_URL = `https://discord.com/oauth2/authorize?` + new URLSearchParams({
 	client_id: CLIENT_ID,

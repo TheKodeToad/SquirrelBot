@@ -2,7 +2,7 @@ import { A, useMatch } from "@solidjs/router";
 import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
 import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { LOGIN_URL, logOut } from "../authFlow";
+import { LOGIN_URL, logOut } from "../helper/auth";
 import { account, useAvatarURL } from "../state/account";
 import { useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
