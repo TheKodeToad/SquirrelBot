@@ -11,7 +11,7 @@ const router = new Hono<{ Variables: GuildAuthVars; }>;
 const querySchema = pipe(object({
 	before: optional(parseIntSchema),
 	after: optional(parseIntSchema),
-	type: enum_(CaseType),
+	type: optional(pipe(parseIntSchema, enum_(CaseType))),
 	"created-before": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
 	"created-after": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
 	actor: optional(snowflakeSchema),
