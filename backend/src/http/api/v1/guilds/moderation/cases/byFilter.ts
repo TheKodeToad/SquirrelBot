@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
-import { check, object, optional, pipe, string, transform } from "valibot";
-import { caseTypeByID, getCases, type CaseQuery } from "../../../../../../db/moderation/cases.ts";
+import { check, enum_, object, optional, pipe, string, transform } from "valibot";
+import { CaseType, getCases, type CaseQuery } from "../../../../../../db/moderation/cases.ts";
 import { parseBooleanSchema, parseIntSchema, snowflakeSchema } from "../../../../../../schema/common/index.ts";
 import type { GuildAuthVars } from "../../../../../middleware/guildAuth.ts";
 import { serializeCaseObject } from "./index.ts";
@@ -11,7 +11,7 @@ const router = new Hono<{ Variables: GuildAuthVars; }>;
 const querySchema = pipe(object({
 	before: optional(parseIntSchema),
 	after: optional(parseIntSchema),
-	type: optional(pipe(string(), transform(caseTypeByID), check(id => id !== undefined, "Invalid case type"))),
+	type: enum_(CaseType),
 	"created-before": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
 	"created-after": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
 	actor: optional(snowflakeSchema),

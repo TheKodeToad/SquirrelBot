@@ -15,36 +15,6 @@ export enum CaseType {
 	Unban = 9,
 }
 
-export function caseTypeByID(id: string): CaseType | undefined {
-	switch (id) {
-		case "note": return CaseType.Note;
-		case "warn": return CaseType.Warn;
-		case "unwarn": return CaseType.Unwarn;
-		case "voice_mute": return CaseType.VoiceMute;
-		case "voice_unmute": return CaseType.VoiceUnmute;
-		case "mute": return CaseType.Mute;
-		case "unmute": return CaseType.Unmute;
-		case "kick": return CaseType.Kick;
-		case "ban": return CaseType.Ban;
-		default: return undefined;
-	}
-}
-
-export function caseTypeID(type: CaseType): string {
-	switch (type) {
-		case CaseType.Note: return "note";
-		case CaseType.Warn: return "warn";
-		case CaseType.Unwarn: return "unwarn";
-		case CaseType.VoiceMute: return "voice_mute";
-		case CaseType.VoiceUnmute: return "voice_unmute";
-		case CaseType.Mute: return "mute";
-		case CaseType.Unmute: return "unmute";
-		case CaseType.Kick: return "kick";
-		case CaseType.Ban: return "ban";
-		case CaseType.Unban: return "unban";
-	}
-}
-
 export function caseReverseType(type: CaseType): CaseType | null {
 	switch (type) {
 		case CaseType.Note: return null;

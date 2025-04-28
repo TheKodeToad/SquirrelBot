@@ -1,15 +1,26 @@
 import { Hono } from "hono";
-import { caseTypeID, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
+import { CaseType, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
 import byFilter from "./byFilter.ts";
 import byNumber from "./byNumber.ts";
 
-// TODO Just don't bother =)
-export function serializeCaseObject(info: CaseInfo) {
+export interface SerializedCaseObject {
+	number: number;
+	type: CaseType;
+	createdAt: number;
+	expiresAt: number | null;
+	actorID: string;
+	targetID: string;
+	reason: string | null;
+	deleteMessageSeconds: number | null;
+	dmSent: boolean | null;
+}
+
+export function serializeCaseObject(info: CaseInfo): SerializedCaseObject {
 	return {
 		number: info.number,
-		type: caseTypeID(info.type),
+		type: info.type,
 		createdAt: info.createdAt.getTime(),
-		expiresAt: info.expiresAt?.getTime(),
+		expiresAt: info.expiresAt?.getTime() ?? null,
 		actorID: info.actorID,
 		targetID: info.targetID,
 		reason: info.reason,
