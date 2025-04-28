@@ -13,12 +13,13 @@ The overall goal is to implement a set of plugins focused on moderation and util
 - 🚧 Moderation
   - [x] Ban
   - [x] Kick
-  - [x] Mute
+  - [x] Mute (probably should be changed just to timeout and role functionality moved to `?restrict` command)
   - [ ] Voice Mute
   - [ ] Warn
   - [x] Case recording
   - [ ] Case editing
-- ❌ Logging
+  - [ ] Restrictions (stop posting in certain channel etc.)
+- 🚧 Logging
 - 🚧 Utility - invite info, user info, server info, grant role, set channel props without needing manage channel perm, emoji helper
 - ❌ Automator - automatic actions focused on moderation but could also be replying to keywords without taking action
 - 🚧 Reminders
@@ -30,3 +31,5 @@ The overall goal is to implement a set of plugins focused on moderation and util
 - ❌ Persistent Nickname and Roles
 - ❌ Starboard
 - ❌ Welcome DM
+- ❌ Command Rate Limit
+- 
