@@ -66,8 +66,8 @@ importers:
   frontend:
     dependencies:
       '@solid-primitives/deep':
-        specifier: ^0.3.0
-        version: 0.3.1(solid-js@1.9.5)
+        specifier: ^0.3.2
+        version: 0.3.2(solid-js@1.9.5)
       '@solidjs/router':
         specifier: ^0.15.3
         version: 0.15.3(solid-js@1.9.5)
@@ -477,23 +477,23 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@solid-primitives/deep@0.3.1':
-    resolution: {integrity: sha512-DaJ2iuHmYmHyGhA5EACfqVKXNivGlLA+zYborz1pLzKOpyMZq0LvmNoBgwFwN/ncOq5FhGP0Hvr6U7QP+hmLXw==}
+  '@solid-primitives/deep@0.3.2':
+    resolution: {integrity: sha512-DBZ4gxNCsV+0Mzx3yXL8aeQgGGOkzyAToiyh6Qios/rKdYa7kxQDRIACKybX/gXlicuJ5oK5Zv3xP4RrPPrWhQ==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/memo@1.4.1':
-    resolution: {integrity: sha512-MzNCJNpXidQdLOZUsEkwpuq52uwT8zrFrBxEVMEr9N35yIIvGhjqwrI1M6xzPmJGzuVUe8anCk57q+N5gyRk0Q==}
+  '@solid-primitives/memo@1.4.2':
+    resolution: {integrity: sha512-1w2MoD/25tZOImCI+dEL08n8dyyc6sg6o0zc14sZXBBa4XSz6TDuPYgQ24r+dQerXWoP6OgZ1VZz+Mo7c1Lmvg==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/scheduled@1.5.0':
-    resolution: {integrity: sha512-RVw24IRNh1FQ4DCMb3OahB70tXIwc5vH8nhR4nNPsXwUPQeuOkLsDI5BlxaPk0vyZgqw9lDpufgI3HnPwplgDw==}
+  '@solid-primitives/scheduled@1.5.1':
+    resolution: {integrity: sha512-WKg/zvAyDIgQ/Xo48YaUY7ISaPyWTZNDzIVWP2R84CuLH+nZN/2O0aFn/gQlWY6y/Bfi/LdDt6Og2/PRzPY7mA==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/utils@6.3.0':
-    resolution: {integrity: sha512-e7hTlJ1Ywh2+g/Qug+n4L1mpfxsikoIS4/sHE2EK9WatQt8UJqop/vE6bsLnXlU1xuhb/jo94Ah5Y27rd4wP7A==}
+  '@solid-primitives/utils@6.3.1':
+    resolution: {integrity: sha512-4/Z59nnwu4MPR//zWZmZm2yftx24jMqQ8CSd/JobL26TPfbn4Ph8GKNVJfGJWShg1QB98qObJSskqizbTvcLLA==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -1579,22 +1579,22 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@solid-primitives/deep@0.3.1(solid-js@1.9.5)':
+  '@solid-primitives/deep@0.3.2(solid-js@1.9.5)':
     dependencies:
-      '@solid-primitives/memo': 1.4.1(solid-js@1.9.5)
+      '@solid-primitives/memo': 1.4.2(solid-js@1.9.5)
       solid-js: 1.9.5
 
-  '@solid-primitives/memo@1.4.1(solid-js@1.9.5)':
+  '@solid-primitives/memo@1.4.2(solid-js@1.9.5)':
     dependencies:
-      '@solid-primitives/scheduled': 1.5.0(solid-js@1.9.5)
-      '@solid-primitives/utils': 6.3.0(solid-js@1.9.5)
+      '@solid-primitives/scheduled': 1.5.1(solid-js@1.9.5)
+      '@solid-primitives/utils': 6.3.1(solid-js@1.9.5)
       solid-js: 1.9.5
 
-  '@solid-primitives/scheduled@1.5.0(solid-js@1.9.5)':
+  '@solid-primitives/scheduled@1.5.1(solid-js@1.9.5)':
     dependencies:
       solid-js: 1.9.5
 
-  '@solid-primitives/utils@6.3.0(solid-js@1.9.5)':
+  '@solid-primitives/utils@6.3.1(solid-js@1.9.5)':
     dependencies:
       solid-js: 1.9.5
 
