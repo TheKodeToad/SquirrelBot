@@ -26,7 +26,7 @@ async function installConfigChangeListener(): Promise<void> {
 			return;
 
 		try {
-			var { key, guildID } = JSON.parse(payload);
+			var payloadObject: unknown = JSON.parse(payload);
 		} catch (error) {
 			if (!(error instanceof SyntaxError))
 				throw error;
@@ -35,8 +35,25 @@ async function installConfigChangeListener(): Promise<void> {
 			return;
 		}
 
+		if (typeof payloadObject !== "object") {
+			logger.warn?.("configUpdate payload is not an object");
+			return;
+		}
+
+		if (typeof payloadObject !== "object" || payloadObject === null) {
+			logger.warn?.("configUpdate payload is not an object");
+			return;
+		}
+
+		if (!("key" in payloadObject && "guildID" in payloadObject)) {
+			logger.warn?.("configUpdate payload does not contain key and guildID");
+			return;
+		}
+
+		const { key, guildID } = payloadObject;
+
 		if (!(typeof key === "string" && typeof guildID === "string")) {
-			logger.warn?.("configUpdate payload does not conform to { key: string, guildID: string; }");
+			logger.warn?.("configUpdate payload contains non string values");
 			return;
 		}
 
@@ -68,7 +85,7 @@ export async function createAndLoadConfigs(guildID: string): Promise<void> {
 }
 
 export async function unloadConfigs(guildID: string): Promise<void> {
-	await configUpdateLock.acquire(guildID, async () => {
+	await configUpdateLock.acquire(guildID, () => {
 		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
 				return;

@@ -99,6 +99,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	logger.debug?.(`Parsed arguments; running '${name}'`, args);
 
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		await commandEntry.command.run(context, args.result as any, data);
 
 		if (commandEntry.command.trackUpdates && context._response !== null)

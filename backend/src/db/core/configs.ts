@@ -1,5 +1,7 @@
-import { string } from "valibot";
+import { object, string } from "valibot";
 import { dbParse, pool } from "../index.ts";
+
+const justValueSchema = object({ value: string() });
 
 export async function getGuildConfig(guildID: string, key: string): Promise<string | null> {
 	const result = await pool.query(
@@ -14,7 +16,7 @@ export async function getGuildConfig(guildID: string, key: string): Promise<stri
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(string(), result.rows[0].value);
+	return dbParse(justValueSchema, result.rows[0]).value;
 }
 
 export async function insertGuildConfig(guildID: string, key: string, value: string): Promise<boolean> {

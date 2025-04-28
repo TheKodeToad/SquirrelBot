@@ -48,7 +48,7 @@ async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>
 	});
 }
 
-async function renderReminders(reminders: Reminder[]): Promise<ReplyObject> {
+function renderReminders(reminders: Reminder[]): ReplyObject {
 	if (reminders.length === 0) {
 		return {
 			components: [{ content: `${icons.info} No reminders found!`, type: ComponentTypes.TEXT_DISPLAY }]

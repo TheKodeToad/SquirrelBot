@@ -5,7 +5,7 @@ export interface Paginator<E, K> {
 	pageSize: number;
 	getKey(entry: E): K;
 	lookUp(context: BaseContext, query: PaginatorQuery<K>): Promise<E[]>;
-	render(entries: E[]): Promise<ReplyObject>;
+	render(entries: E[]): Promise<ReplyObject> | ReplyObject;
 }
 
 export interface PaginatorQuery<K> {

@@ -3,8 +3,9 @@
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
+import { instance, object } from "valibot";
 import "../environment.ts";
-import { pool } from "./index.ts";
+import { dbParse, pool } from "./index.ts";
 
 export async function migrate(ignoreChanges: boolean): Promise<number> {
 	return await processMigrations(false, ignoreChanges);
@@ -34,6 +35,8 @@ class MigrationError extends Error {
 		this.name = "MigrationError";
 	}
 }
+
+const justChecksumBufferSchema = object({ checksum: instance(Buffer) });
 
 async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
 	await pool.query(`
@@ -86,7 +89,7 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 
 		// already run
 		if (rows.length !== 0) {
-			const { checksum }: { checksum: Buffer; } = rows[0];
+			const { checksum } = dbParse(justChecksumBufferSchema, rows[0]);
 
 			if (!checksum.equals(contentChecksum)) {
 				const message = `"${file}" contents changed after it has already been run`;
@@ -97,7 +100,8 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 						`
 							UPDATE "migration_files"
 							SET "checksum" = $2
-							WHERE "number" = $1`,
+							WHERE "number" = $1
+						`,
 						[number, contentChecksum]
 					);
 					continue;

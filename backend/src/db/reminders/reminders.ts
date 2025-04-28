@@ -44,6 +44,8 @@ export interface ReminderQuery {
 	limit: number;
 }
 
+const justNumberSchema = object({ number: number() });
+
 export async function getReminder(guildID: string, number: number): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
@@ -138,7 +140,7 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 
 	return {
 		guildID,
-		number: dbParse(number(), result.rows[0].number),
+		number: dbParse(justNumberSchema, result.rows[0]).number,
 		...options
 	} satisfies Reminder;
 }

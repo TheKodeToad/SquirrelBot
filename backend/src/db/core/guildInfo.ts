@@ -25,6 +25,8 @@ const apiGuildInfoArraySchema = array(apiGuildInfoSchema);
 
 export interface APIGuildInfo extends InferOutput<typeof apiGuildInfoSchema> { }
 
+const justOwnerIDSchema = object({ ownerID: string() });
+
 export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 	const result = await pool.query(
 		`
@@ -78,7 +80,7 @@ export async function getGuildOwnerID(id: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(string(), result.rows[0].ownerID);
+	return dbParse(justOwnerIDSchema, result.rows[0]).ownerID;
 }
 
 export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildInfo[]> {

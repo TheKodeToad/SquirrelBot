@@ -150,6 +150,7 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	logger.debug?.(`Parsed arguments; running '${interaction.data.name}'`, args);
 
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		await commandEntry.command.run(context, args.result as any, data);
 	} catch (error) {
 		try {

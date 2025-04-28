@@ -116,6 +116,8 @@ export interface CaseQuery {
 	limit: number;
 }
 
+export const justNumberSchema = object({ number: number() });
+
 export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
@@ -221,7 +223,7 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 				options.dmDelivered ?? null,
 			]
 		);
-		const newNumber = dbParse(number(), result.rows[0].number);
+		const newNumber = dbParse(justNumberSchema, result.rows[0]).number;
 
 		const reverseType = caseReverseType(options.type);
 

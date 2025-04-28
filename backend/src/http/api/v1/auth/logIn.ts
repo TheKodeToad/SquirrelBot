@@ -1,6 +1,7 @@
+import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { validator } from "hono/validator";
+import { object, string } from "valibot";
 import { generateToken } from "../../../../db/api/tokens.ts";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment.ts";
 
@@ -20,8 +21,10 @@ interface UserResponse {
 	global_name: string;
 }
 
+const logInPayloadSchema = object({ code: string() });
+
 const router = new Hono;
-router.post("/", validator("json", value => value), async context => {
+router.post("/", vValidator("json", logInPayloadSchema), async context => {
 	const { code } = context.req.valid("json");
 
 	if (typeof code !== "string")
@@ -45,6 +48,7 @@ router.post("/", validator("json", value => value), async context => {
 	if (!tokenResponse.ok)
 		throw new HTTPException(500, { message: "Failed fetching OAuth token" });
 
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const tokenJSON: TokenResponse = await tokenResponse.json();
 	const auth = tokenJSON.token_type + " " + tokenJSON.access_token;
 
@@ -56,6 +60,7 @@ router.post("/", validator("json", value => value), async context => {
 	if (!userResponse.ok)
 		throw new HTTPException(500, { message: "Failed fetching Discord user" });
 
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const userJSON: UserResponse = await userResponse.json();
 
 	await fetch("https://discord.com/api/v10/oauth2/token/revoke", {

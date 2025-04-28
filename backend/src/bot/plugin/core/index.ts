@@ -53,6 +53,6 @@ export const corePlugin = definePlugin({
 		for (const plugin of getPlugins())
 			if (plugin.listeners !== undefined)
 				for (const listener of plugin.listeners)
-					installWrappedListener(listener.type, listener.listener);
+					installWrappedListener(listener.type, listener.listener.bind(plugin));
 	},
 });
