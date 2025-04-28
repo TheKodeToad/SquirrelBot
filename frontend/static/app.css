@@ -185,8 +185,6 @@ body {
 	grid-auto-rows: 80px;
 	gap: 16px;
 	max-width: 1000px;
-
-	font-size: 1.5rem;
 }
 
 .guildCard {
@@ -204,6 +202,8 @@ body {
 }
 
 .guildCard-title {
+	font-size: 1.4em;
+	font-weight: bold;
 	margin-right: 8px;
 
 	text-overflow: ellipsis;
