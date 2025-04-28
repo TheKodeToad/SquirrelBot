@@ -4,7 +4,6 @@ import { useGuild } from "../state/guilds";
 
 export const Guild = () => <LoginGate><GuildComponent /></LoginGate>;
 
-
 export function GuildComponent() {
 	const guildID = () => useParams().guildID!;
 

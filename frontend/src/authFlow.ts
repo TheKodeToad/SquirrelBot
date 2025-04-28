@@ -1,58 +1,37 @@
 import { logIn as requestLogIn, logOut as requestLogOut } from "./client";
 
-import { buildURI } from "./common/uri";
 import { CLIENT_ID, REDIRECT_URI } from "./environment";
 import { account, setAccount } from "./state/account";
 
-let authWindow: WindowProxy | null = null;
-
-window.addEventListener("beforeunload", () => authWindow?.close());
-window.addEventListener("message", async event => {
-	if (!(event.source === authWindow && event.origin === location.origin)) {
-		console.warn("Message from unknown window @ " + event.origin);
-		return;
-	}
-
-	const { code } = event.data;
-
-	if (typeof code !== "string") {
-		console.warn("Malformed data object:");
-		console.warn(event.data);
-		return;
-	}
-
-	await loginCallback(code);
+export const LOGIN_URL = `https://discord.com/oauth2/authorize?` + new URLSearchParams({
+	client_id: CLIENT_ID,
+	response_type: "code",
+	redirect_uri: REDIRECT_URI,
+	scope: "identify",
+	prompt: "none"
 });
 
-export function logIn() {
-	if (!(authWindow === null || authWindow.closed)) {
-		authWindow.focus();
+export function handleLoginCallback() {
+	if (location.pathname !== "/log-in")
 		return;
-	}
 
-	const login_uri = buildURI`https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=identify&prompt=none`;
+	const params = new URLSearchParams(location.search);
+	const code = params.get("code");
 
-	const width = 1000;
-	const height = 800;
-	const left = screen.width / 2 - width / 2;
-	const top = screen.height / 2 - height / 2;
+	if (code === null)
+		return;
 
-	authWindow = open(login_uri, undefined, `popup=true,width=${width},height=${height},left=${left},top=${top}`);
+	history.replaceState(null, "", "/");
 
-	if (authWindow === null)
-		location.href = login_uri;
-}
+	requestLogIn(code).then(response => {
+		if ("error" in response)
+			return; // TODO handle errors
 
-async function loginCallback(code: string) {
-	const response = await requestLogIn(code);
-
-	if ("error" in response)
-		return; // TODO handle errors
-
-	setAccount({
-		token: response.token,
-		username: response.username,
-		avatar: response.avatar
+		setAccount({
+			token: response.token,
+			username: response.username,
+			avatar: response.avatar
+		});
 	});
 }
 

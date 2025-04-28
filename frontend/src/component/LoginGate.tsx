@@ -1,6 +1,7 @@
+import { A } from "@solidjs/router";
 import { IconArrowRight } from "@tabler/icons-solidjs";
 import { JSX, Show } from "solid-js";
-import { logIn } from "../authFlow";
+import { LOGIN_URL } from "../authFlow";
 import { account } from "../state/account";
 import { Button } from "./common/Button";
 
@@ -10,9 +11,11 @@ export function LoginGate({ children }: { children: JSX.Element; }) {
 			<div class="vbox loginGate">
 				<h1 style={{ margin: 0 }}>Login Required</h1>
 				<p>Please authorize with Discord.</p>
-				<Button onClick={logIn} color="primary" icon={IconArrowRight}>
-					Continue
-				</Button>
+				<A href={LOGIN_URL}>
+					<Button color="primary" icon={IconArrowRight}>
+						Continue
+					</Button>
+				</A>
 			</div>
 		}>
 			{children}
