@@ -1,8 +1,11 @@
-import { createResource } from "solid-js";
+import { createEffect, createResource, on } from "solid-js";
 import { getGuilds, GuildResponse } from "../client";
 import { account } from "./account";
 
-export const [guilds] = createResource(() => account() !== null ? getGuilds(account()!.token) : undefined);
+const [guilds, guildsActions] = createResource(() => account() !== null ? getGuilds(account()!.token) : undefined);
+export { guilds };
+
+createEffect(on(account, () => guildsActions.refetch()));
 
 export function useGuild(id: string): GuildResponse | undefined {
 	const guildArray = guilds();

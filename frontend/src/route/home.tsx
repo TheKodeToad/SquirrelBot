@@ -1,6 +1,5 @@
 import { A } from "@solidjs/router";
-import { For, Show } from "solid-js";
-import { GuildResponse } from "../client";
+import { For } from "solid-js";
 import { GuildIcon } from "../component/common/GuildIcon";
 import { LoginGate } from "../component/LoginGate";
 import { guilds } from "../state/guilds";
@@ -8,16 +7,28 @@ import { guilds } from "../state/guilds";
 export const Home = () => <LoginGate><GuildsComponent /></LoginGate>;
 
 function GuildsComponent() {
+	const guildsChildren = () => {
+		const guildList = guilds();
+
+		if (guildList === undefined)
+			return;
+
+		if ("error" in guildList)
+			return;
+
+		return (
+			<For each={guildList}>
+				{guild => <GuildCard {...guild} />}
+			</For>
+		);
+	};
+
 	return (
 		<div class="content mainContent">
 			<h1>Servers</h1>
-			<Show when={!(guilds() === undefined || "error" in guilds()!)}>
-				<div class={"guilds"}>
-					<For each={guilds() as GuildResponse[]}>
-						{guild => <GuildCard {...guild} />}
-					</For>
-				</div>
-			</Show>
+			<div class={"guilds"}>
+				{guildsChildren()}
+			</div>
 		</div>
 	);
 }
