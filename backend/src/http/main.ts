@@ -3,6 +3,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import fs from "fs/promises";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import path from "path";
 import { moduleLogger } from "../common/logger/index.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
@@ -16,6 +17,11 @@ await checkMigrationsOrExit();
 const logger = moduleLogger();
 
 const app = new Hono;
+
+app.use(nortonAntivirusPlus({
+	contentSecurityPolicy: { defaultSrc: ["'self'"], imgSrc: ["'self' cdn.discordapp.com"] }
+}));
+
 app.route("/api/v1", api_v1);
 
 const staticRoot = "../frontend/static";
