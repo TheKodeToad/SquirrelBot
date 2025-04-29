@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import fs from "fs/promises";
 import { Hono } from "hono";
+import { compress } from "hono/compress";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import path from "path";
@@ -19,12 +20,14 @@ const logger = moduleLogger();
 const app = new Hono;
 
 app.use(nortonAntivirusPlus({
-	contentSecurityPolicy: { defaultSrc: ["'self'"], imgSrc: ["'self' cdn.discordapp.com"] }
+	contentSecurityPolicy: { defaultSrc: ["'self'"], imgSrc: ["'self' cdn.discordapp.com"], styleSrc: ["'self' 'unsafe-inline'"] }
 }));
 
 app.route("/api/v1", api_v1);
 
 const staticRoot = "../frontend/static";
+
+app.use(compress());
 
 app.use("/*", serveStatic({ root: staticRoot })); // yea
 

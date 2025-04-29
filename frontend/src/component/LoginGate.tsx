@@ -5,7 +5,7 @@ import { LOGIN_URL } from "../helper/auth";
 import { account } from "../state/account";
 import { Button } from "./common/Button";
 
-export function LoginGate({ children }: { children: JSX.Element; }) {
+export function LoginGate(props: { children: JSX.Element; }) {
 	return (
 		<Show when={account() !== null} fallback={
 			<div class="vbox loginGate">
@@ -18,7 +18,7 @@ export function LoginGate({ children }: { children: JSX.Element; }) {
 				</A>
 			</div>
 		}>
-			{children}
+			{props.children}
 		</Show>
 	);
 }

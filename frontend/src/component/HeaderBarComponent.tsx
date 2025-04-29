@@ -8,7 +8,7 @@ import { useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
 import { GuildIcon } from "./common/GuildIcon";
 
-export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
+export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 	const guildMatch = useMatch(() => "/guilds/:guildID/*?");
 
 	const breadcrumbChildren = () => {
@@ -53,6 +53,6 @@ export function HeaderBarComponent({ children }: { children?: JSX.Element; }) {
 			</Button>
 		</nav>
 
-		{children}
+		{props.children}
 	</>);
 };

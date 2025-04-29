@@ -46,11 +46,11 @@ function GuildsComponent() {
 	);
 }
 
-function GuildCard({ name, id, iconHash }: { name: string; id: string; iconHash: string | null; }) {
+function GuildCard(props: { name: string; id: string; iconHash: string | null; }) {
 	return (
-		<A href={`/guilds/${id}`} class="guildCard">
-			<GuildIcon id={id} iconHash={iconHash} size={64} />
-			<span class="guildCard-title">{name}</span>
+		<A href={`/guilds/${props.id}`} class="guildCard">
+			<GuildIcon id={props.id} iconHash={props.iconHash} size={64} />
+			<span class="guildCard-title">{props.name}</span>
 		</A>
 	);
 }
