@@ -1,7 +1,6 @@
-import { StreamLanguage } from "@codemirror/language";
-import { toml } from "@codemirror/legacy-modes/mode/toml";
 import { oneDark } from "@codemirror/theme-one-dark";
-import { minimalSetup } from "codemirror";
+import { basicSetup } from "codemirror";
+import { tomlHighlighting as tomlLanguage } from "../codemirror/toml";
 import { CodeMirror } from "../component/common/CodeMirror";
 import { LoginGate } from "../component/LoginGate";
 
@@ -21,7 +20,7 @@ reply = true
 groups_command = true
 help_command = true
 	`;
-	const extensions = [minimalSetup, oneDark, StreamLanguage.define(toml)];
+	const extensions = [basicSetup, oneDark, tomlLanguage];
 	return (
 		<div>
 			<CodeMirror value={config} extensions={extensions} />
