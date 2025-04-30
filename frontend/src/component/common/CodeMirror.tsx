@@ -32,5 +32,5 @@ export function CodeMirror(props: CodeMirrorProps) {
 		}, { defer: true }));
 	});
 
-	return <div ref={ref}></div>;
+	return <div ref={ref} />;
 }

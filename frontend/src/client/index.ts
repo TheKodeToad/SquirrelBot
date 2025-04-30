@@ -1,6 +1,26 @@
-import { AUTH_LOG_IN, AUTH_LOG_OUT, GUILDS } from "./routes";
+import { AUTH_LOG_IN, AUTH_LOG_OUT, GUILD_CONFIG, GUILDS } from "./routes";
 
-type HttpMethod = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | "PATCH";
+type HTTPMethod = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | "PATCH";
+
+function extractMessage(body: unknown) {
+	if (typeof body === "string")
+		return body;
+
+	if (typeof body === "object" && body !== null && "error" in body)
+		return body.error;
+
+	return "No message";
+}
+
+export class RESTError extends Error {
+	body: unknown;
+
+	constructor(status: number, body: unknown) {
+		super(`${status} - ${extractMessage(body)}`);
+		this.name = "RESTError";
+		this.body = body;
+	}
+}
 
 export interface LogInResponse {
 	token: string;
@@ -20,9 +40,11 @@ export interface GuildResponse {
 	ownerID: string;
 }
 
-async function requestJSON<T>(route: string, method: HttpMethod, token?: string, body?: any): Promise<T | ErrorResponse> {
+async function request<T>(route: string, method: HTTPMethod, token?: string, body?: any): Promise<T> {
 	const headers = new Headers;
-	headers.set("Content-Type", "application/json");
+
+	if (body != null)
+		headers.set("Content-Type", "application/json");
 
 	if (token !== undefined)
 		headers.set("Authorization", token);
@@ -33,22 +55,30 @@ async function requestJSON<T>(route: string, method: HttpMethod, token?: string,
 		headers,
 	});
 
-	const text = await response.text();
-
-	if (text.length === 0)
+	if (response.status === 204)
 		return null as T;
 
-	return JSON.parse(text);
+	const isJson = response.headers.get("Content-Type") === "application/json";
+	const responseBody = isJson ? await response.json() : await response.text();
+
+	if (!response.ok)
+		throw new RESTError(response.status, responseBody);
+
+	return responseBody;
 }
 
 export function logIn(code: string) {
-	return requestJSON<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code });
+	return request<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code });
 }
 
 export function logOut(token: string) {
-	return requestJSON<null>(AUTH_LOG_OUT, "GET", token);
+	return request<null>(AUTH_LOG_OUT, "GET", token);
 }
 
 export function getGuilds(token: string) {
-	return requestJSON<GuildResponse[]>(GUILDS, "GET", token);
+	return request<GuildResponse[]>(GUILDS, "GET", token);
+}
+
+export async function getGuildConfig(token: string, guildID: string, config: string) {
+	return request<string>(GUILD_CONFIG(guildID, config), "GET", token);
 }

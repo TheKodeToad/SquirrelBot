@@ -21,9 +21,6 @@ function GuildsComponent() {
 		if (guildList === undefined)
 			return;
 
-		if ("error" in guildList)
-			return;
-
 		return (
 			<For each={guildList}>
 				{guild => <GuildCard {...guild} />}

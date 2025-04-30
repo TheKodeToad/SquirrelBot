@@ -65,18 +65,21 @@ importers:
 
   frontend:
     dependencies:
+      '@codemirror/commands':
+        specifier: ^6.8.1
+        version: 6.8.1
       '@codemirror/language':
         specifier: ^6.11.0
         version: 6.11.0
-      '@codemirror/legacy-modes':
-        specifier: ^6.5.1
-        version: 6.5.1
       '@codemirror/state':
         specifier: ^6.5.2
         version: 6.5.2
       '@codemirror/theme-one-dark':
         specifier: ^6.1.2
         version: 6.1.2
+      '@codemirror/view':
+        specifier: ^6.36.6
+        version: 6.36.6
       '@solid-primitives/deep':
         specifier: ^0.3.2
         version: 0.3.2(solid-js@1.9.5)
@@ -89,6 +92,9 @@ importers:
       codemirror:
         specifier: ^6.0.1
         version: 6.0.1
+      lezer-toml:
+        specifier: ^1.0.0
+        version: 1.0.0
       solid-js:
         specifier: ^1.9.5
         version: 1.9.5
@@ -246,9 +252,6 @@ packages:
 
   '@codemirror/language@6.11.0':
     resolution: {integrity: sha512-A7+f++LodNNc1wGgoRDTt78cOwWm9KVezApgjOMp1W4hM0898nsqBXwF+sbePE7ZRcjN7Sa1Z5m2oN27XkmEjQ==}
-
-  '@codemirror/legacy-modes@6.5.1':
-    resolution: {integrity: sha512-DJYQQ00N1/KdESpZV7jg9hafof/iBNp9h7TYo1SLMk86TWl9uDsVdho2dzd81K+v4retmK6mdC7WpuOQDytQqw==}
 
   '@codemirror/lint@6.8.5':
     resolution: {integrity: sha512-s3n3KisH7dx3vsoeGMxsbRAgKe4O1vbrnKBClm99PU0fWxmxsx5rR2PfqQgIt+2MMJBHbiJ5rfIdLYfB9NNvsA==}
@@ -937,6 +940,9 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  lezer-toml@1.0.0:
+    resolution: {integrity: sha512-WRzDzRWuXUU2L0RLUSkb5o9nRhMntko8Z2PF6QIHZV+y81RNSZ3XsmECyevYHazA5S9Q4iRLM7njyXNngzILyQ==}
+
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
@@ -1481,10 +1487,6 @@ snapshots:
       '@lezer/highlight': 1.2.1
       '@lezer/lr': 1.4.2
       style-mod: 4.1.2
-
-  '@codemirror/legacy-modes@6.5.1':
-    dependencies:
-      '@codemirror/language': 6.11.0
 
   '@codemirror/lint@6.8.5':
     dependencies:
@@ -2167,6 +2169,11 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  lezer-toml@1.0.0:
+    dependencies:
+      '@lezer/highlight': 1.2.1
+      '@lezer/lr': 1.4.2
 
   locate-path@6.0.0:
     dependencies:

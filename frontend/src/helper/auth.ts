@@ -24,8 +24,7 @@ export function handleLoginCallback() {
 	history.replaceState(null, "", "/");
 
 	requestLogIn(code).then(response => {
-		if ("error" in response)
-			return; // TODO handle errors
+		// TODO handle errors
 
 		setAccount({
 			token: response.token,
