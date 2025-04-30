@@ -175,31 +175,14 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 
 function readCommandArgValue(reader: StringReader, type: Exclude<OptionType, OptionType.Flag>, terminator?: RegExp): AnyArgsValueItem | null {
 	switch (type) {
-		case OptionType.Boolean:
-			return readBoolean(reader);
-
-		case OptionType.Integer:
-			return readInteger(reader);
-
-		case OptionType.Number:
-			return readNumber(reader);
-
-		case OptionType.String:
-			return readString(reader, terminator);
-
-		case OptionType.Snowflake:
-			return readSnowflake(reader);
-
-		case OptionType.User:
-			return readUser(reader);
-
-		case OptionType.Role:
-			return readRole(reader);
-
-		case OptionType.Channel:
-			return readChannel(reader);
-
-		case OptionType.Duration:
-			return readDuration(reader);
+		case OptionType.Boolean: return readBoolean(reader);
+		case OptionType.Integer: return readInteger(reader);
+		case OptionType.Number: return readNumber(reader);
+		case OptionType.String: return readString(reader, terminator);
+		case OptionType.Snowflake: return readSnowflake(reader);
+		case OptionType.User: return readUser(reader);
+		case OptionType.Role: return readRole(reader);
+		case OptionType.Channel: return readChannel(reader);
+		case OptionType.Duration: return readDuration(reader);
 	}
 }
