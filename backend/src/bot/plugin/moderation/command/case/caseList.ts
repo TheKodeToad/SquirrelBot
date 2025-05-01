@@ -89,8 +89,15 @@ async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyOb
 		container.components.push({ content, type: ComponentTypes.TEXT_DISPLAY });
 	} else {
 		for (const info of cases) {
+			container.components.push({ type: ComponentTypes.SEPARATOR });
+
 			container.components.push({
-				content: await formatCaseDescription(info, false) + "\n" + await formatCaseFields(info),
+				content: await formatCaseDescription(info, false),
+				type: ComponentTypes.TEXT_DISPLAY,
+			});
+
+			container.components.push({
+				content: await formatCaseFields(info),
 				type: ComponentTypes.TEXT_DISPLAY,
 			});
 		}

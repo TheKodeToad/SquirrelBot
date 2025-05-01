@@ -59,11 +59,15 @@ export function renderGuildInvite(
 
 	result.components.push({ type: ComponentTypes.SEPARATOR });
 
+	let fields = "";
+
 	if (inviter !== undefined)
-		result.components.push({ content: `**Invited By:** ${formatUser(inviter)}`, type: ComponentTypes.TEXT_DISPLAY });
+		fields += `**Invited By:** ${formatUser(inviter)}\n`;
 
 	if (channel !== null)
-		result.components.push({ content: `**Channel:** #${escapeMarkdown(channel.name ?? "<unknown>")} (${channel.id})`, type: ComponentTypes.TEXT_DISPLAY });
+		fields += `**Channel:** #${escapeMarkdown(channel.name ?? "<unknown>")} (${channel.id})\n`;
+
+	result.components.push({ content: fields, type: ComponentTypes.TEXT_DISPLAY });
 
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSeconds(expiresAt);

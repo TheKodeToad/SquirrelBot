@@ -69,7 +69,6 @@ export async function formatCaseFields(info: CaseInfo): Promise<string> {
 	return result;
 }
 
-
 export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> {
 	const actor = await formatUserTagByID(info.actorID);
 	const target = await formatUserTagByID(info.targetID);

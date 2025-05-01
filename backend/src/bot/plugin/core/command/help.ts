@@ -142,6 +142,7 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 	const visibleEntries = entries.slice(sliceStart, sliceEnd);
 
 	for (const entry of visibleEntries) {
+		container.components.push({ type: ComponentTypes.SEPARATOR });
 		container.components.push({
 			content: entry,
 			type: ComponentTypes.TEXT_DISPLAY,
@@ -151,10 +152,7 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 	const prevDisabled = sliceStart === 0;
 	const nextDisabled = sliceEnd >= entries.length;
 
-	container.components.push({
-		type: ComponentTypes.SEPARATOR,
-		divider: false,
-	});
+	container.components.push({ type: ComponentTypes.SEPARATOR });
 
 	if (!prevDisabled || !nextDisabled) {
 		const prevButton: CommandTextButton = {

@@ -71,11 +71,13 @@ async function renderPaginator<E, K>(
 		disabled: before === undefined && !hasMore,
 	};
 
-	return {
-		...reply,
-		components: [
-			...(reply.components ?? []),
-			{ components: [prevButton, nextButton], type: ComponentTypes.ACTION_ROW }
-		]
-	};
+	const componentTarget =
+		reply.components.length === 1 && reply.components[0]!.type === ComponentTypes.CONTAINER
+			? reply.components[0]!.components
+			: reply.components;
+
+	componentTarget.push({ type: ComponentTypes.SEPARATOR });
+	componentTarget.push({ components: [prevButton, nextButton], type: ComponentTypes.ACTION_ROW });
+
+	return reply;
 }
