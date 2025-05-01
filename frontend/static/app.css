@@ -9,8 +9,8 @@
 	--accent-dark: hsl(15, 44%, 50%);
 	--accent-darker: hsl(15, 43%, 41%);
 	--secondary: hsl(0, 0%, 28%);
-	--secondary-dark: hsl(0, 0%, 35%);
-	--secondary-darker: hsl(0, 0%, 40%);
+	--secondary-dark: hsl(0, 0%, 37%);
+	--secondary-darker: hsl(0, 0%, 45%);
 	--success: hsl(128, 100%, 68%);
 	--success-dark: hsl(128, 44%, 50%);
 	--success-darker: hsl(128, 43%, 41%);
@@ -31,12 +31,58 @@
 		"Helvetica Neue",
 		sans-serif;
 	font-size: 12px !important;
+
+	height: 100%;
 }
 
 body {
+	display: flex;
+	margin: 0;
+	height: 100%;
+	flex-direction: column;
+
 	background-color: var(--bg0);
 	color: var(--fg);
-	margin: 0;
+}
+
+.content {
+	overflow-y: auto;
+	flex: 1;
+}
+
+.mainContent {
+	padding-left: 24px;
+	padding-right: 24px;
+}
+
+#headerBar {
+	background-color: var(--bg2);
+	padding: 8px;
+	height: 32px;
+	width: calc(100% - 16px);
+
+	overflow-x: auto;
+	overflow-y: hidden;
+
+	text-overflow: clip;
+	white-space: nowrap;
+}
+
+#headerBar-breadcrumb {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+
+	font-size: 1.3em;
+}
+
+#headerBar-breadcrumb a {
+	color: inherit;
+	text-decoration: none;
+}
+
+#headerBar-breadcrumb a[aria-current=page] {
+	font-weight: bold;
 }
 
 .button {
@@ -138,39 +184,6 @@ body {
 	top: 50%;
 	left: 50%;
 	transform: translateX(-50%) translateY(-50%);
-}
-
-#headerBar {
-	background-color: var(--bg2);
-	padding: 8px;
-	width: calc(100% - 16px);
-}
-
-#headerBar-breadcrumb {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	font-size: 1.3em;
-}
-
-#headerBar-breadcrumb a {
-	color: inherit;
-	text-decoration: none;
-}
-
-#headerBar-breadcrumb a[aria-current=page] {
-	font-weight: bold;
-}
-
-.content {
-	overflow: auto;
-	height: calc(100vh - 50px);
-}
-
-.mainContent {
-	margin-left: 24px;
-	margin-right: 24px;
 }
 
 .avatar {
