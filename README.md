@@ -6,6 +6,25 @@ Work in progress advanced moderation and management bot - aiming to be lightweig
 
 The overall goal is to implement a set of plugins focused on moderation and utility - but keeping focused on Discord without getting carried away with third party integrations. Essentially, this bot *should not* and *will not* try to do everything.
 
+## License
+
+> SquirrelBot - Discord moderation and management bot
+>
+> Copyright (C) 2024-2025 TheKodeToad and SquirrelBot contributors
+>
+> This program is free software: you can redistribute it and/or modify
+> it under the terms of the GNU Affero General Public License as published
+> by the Free Software Foundation, either version 3 of the License, or
+> (at your option) any later version.
+>
+> This program is distributed in the hope that it will be useful,
+> but WITHOUT ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU Affero General Public License for more details.
+>
+> You should have received a copy of the GNU Affero General Public License
+> along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ## To-do
 - [ ] Support for non-English languages
 - [x] Log things properly instead of just using console
@@ -32,4 +51,4 @@ The overall goal is to implement a set of plugins focused on moderation and util
 - ❌ Starboard
 - ❌ Welcome DM
 - ❌ Command Rate Limit
-- 
+-
