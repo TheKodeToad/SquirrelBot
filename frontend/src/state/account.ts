@@ -47,6 +47,11 @@ export function useAvatarURL() {
 
 createEffect(on(account, account => localStorage.setItem("account", JSON.stringify(account))));
 
+addEventListener("storage", event => {
+	if (event.key === "account")
+		setAccount(loadFromStorage());
+});
+
 function loadFromStorage(): Account | null {
 	const string = localStorage.getItem("account");
 
