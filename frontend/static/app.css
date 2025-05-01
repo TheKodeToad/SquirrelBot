@@ -8,9 +8,9 @@
 	--accent: hsl(15, 100%, 68%);
 	--accent-dark: hsl(15, 44%, 50%);
 	--accent-darker: hsl(15, 43%, 41%);
-	--secondary: hsl(0, 0%, 35%);
-	--secondary-dark: hsl(0, 0%, 29%);
-	--secondary-darker: hsl(0, 0%, 25%);
+	--secondary: hsl(0, 0%, 28%);
+	--secondary-dark: hsl(0, 0%, 35%);
+	--secondary-darker: hsl(0, 0%, 40%);
 	--success: hsl(128, 100%, 68%);
 	--success-dark: hsl(128, 44%, 50%);
 	--success-darker: hsl(128, 43%, 41%);
@@ -196,7 +196,7 @@ body {
 	text-decoration: inherit;
 	color: inherit;
 
-	background-color: var(--bg1);
+	background-color: var(--secondary);
 	border-radius: var(--base-rounding);
 	transition: background 0.2s ease-out;
 }
@@ -212,7 +212,7 @@ body {
 }
 
 .guildCard:hover {
-	background-color: var(--bg2);
+	background-color: var(--secondary-dark);
 }
 
 .guildCard .guildIcon {
