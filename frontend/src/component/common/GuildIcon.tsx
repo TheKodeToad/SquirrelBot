@@ -1,4 +1,4 @@
-import { buildURI } from "../../common/uri";
+import { buildURI } from "../../common/uris";
 
 export function GuildIcon(props: { id: string; iconHash: string | null; size: number; }) {
 	const icon =

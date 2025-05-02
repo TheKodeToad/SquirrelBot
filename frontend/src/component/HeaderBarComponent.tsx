@@ -2,7 +2,7 @@ import { A, useMatch } from "@solidjs/router";
 import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
 import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { LOGIN_URL, logOut } from "../helper/auth";
+import { logIn, logOut } from "../helper/auth";
 import { account, useAvatarURL } from "../state/account";
 import { useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
@@ -36,11 +36,9 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 			<span id="headerBar-breadcrumb"><A href="/">SquirrelBot Dashboard</A>{breadcrumbChildren()}</span>
 			<Switch>
 				<Match when={account() === null}>
-					<A href={LOGIN_URL} style={{ "margin-left": "auto" }}>
-						<Button color="primary" icon={IconLogin}>
-							Log In
-						</Button>
-					</A>
+					<Button onClick={logIn} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
+						Log In
+					</Button>
 				</Match>
 				<Match when={account() !== null}>
 					<Button onClick={() => logOut()} color="transparent" style={{ "margin-left": "auto" }}>

@@ -21,11 +21,14 @@ interface UserResponse {
 	global_name: string;
 }
 
-const logInPayloadSchema = object({ code: string() });
+const logInPayloadSchema = object({
+	code: string(),
+	codeVerifier: string(),
+});
 
 const router = new Hono;
 router.post("/", vValidator("json", logInPayloadSchema), async context => {
-	const { code } = context.req.valid("json");
+	const { code, codeVerifier } = context.req.valid("json");
 
 	if (typeof code !== "string")
 		throw new HTTPException(400, { message: "Missing code" });
@@ -40,6 +43,7 @@ router.post("/", vValidator("json", logInPayloadSchema), async context => {
 			client_secret: CLIENT_SECRET,
 			grant_type: "authorization_code",
 			code,
+			code_verifier: codeVerifier,
 			redirect_uri: REDIRECT_URI,
 			scope: "identify"
 		}),
@@ -75,6 +79,7 @@ router.post("/", vValidator("json", logInPayloadSchema), async context => {
 	});
 
 	const [token, expiresAt] = await generateToken(userJSON.id);
+
 	return context.json({
 		token,
 		expiresAt: expiresAt.getTime(),

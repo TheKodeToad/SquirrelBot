@@ -1,29 +1,57 @@
 import { logIn as requestLogIn, logOut as requestLogOut } from "../client";
+import { Uint8Array_toBase64 } from "../common/polyfill";
 
 import { CLIENT_ID, REDIRECT_URI } from "../environment";
 import { account, setAccount } from "../state/account";
 
-export const LOGIN_URL = `https://discord.com/oauth2/authorize?` + new URLSearchParams({
-	client_id: CLIENT_ID,
-	response_type: "code",
-	redirect_uri: REDIRECT_URI,
-	scope: "identify",
-	prompt: "none"
-});
+export async function logIn(): Promise<void> {
+	const buffer = new Uint8Array(64);
+	crypto.getRandomValues(buffer);
+
+	const verifier = Uint8Array_toBase64(buffer, { alphabet: "base64url", omitPadding: true });
+
+	const verifierHash = new Uint8Array(await crypto.subtle.digest("sha-256", new TextEncoder().encode(verifier)));
+	const challenge = Uint8Array_toBase64(verifierHash, { alphabet: "base64url", omitPadding: true });
+
+	sessionStorage.setItem("authVerifier", verifier);
+
+	const url = `https://discord.com/oauth2/authorize?` + new URLSearchParams({
+		client_id: CLIENT_ID,
+		response_type: "code",
+		redirect_uri: REDIRECT_URI,
+		scope: "identify",
+		prompt: "none",
+		code_challenge: challenge,
+		code_challenge_method: "S256",
+		state: window.location.pathname + window.location.search + window.location.hash
+	});
+
+	window.location.assign(url);
+}
 
 export function handleLoginCallback() {
-	if (location.pathname !== "/log-in")
+	if (window.location.pathname !== "/log-in")
 		return;
 
-	const params = new URLSearchParams(location.search);
+	const params = new URLSearchParams(window.location.search);
+
 	const code = params.get("code");
 
 	if (code === null)
-		return;
+		throw new Error("Missing code in URL");
 
-	history.replaceState(null, "", "/");
+	const state = params.get("state");
 
-	requestLogIn(code).then(response => {
+	if (state !== null)
+		history.replaceState(null, "", state);
+
+	const verifier = sessionStorage.getItem("authVerifier");
+	sessionStorage.removeItem("authVerifier");
+
+	if (verifier === null)
+		throw new Error("Login was not initiated in the same session");
+
+	requestLogIn(code, verifier).then(response => {
 		// TODO handle errors
 
 		setAccount({

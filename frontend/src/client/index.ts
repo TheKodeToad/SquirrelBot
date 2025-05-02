@@ -67,8 +67,8 @@ async function request<T>(route: string, method: HTTPMethod, token?: string, bod
 	return responseBody;
 }
 
-export function logIn(code: string) {
-	return request<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code });
+export function logIn(code: string, codeVerifier: string) {
+	return request<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code, codeVerifier });
 }
 
 export function logOut(token: string) {
