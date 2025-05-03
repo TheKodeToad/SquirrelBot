@@ -1,22 +1,4 @@
 :root {
-	--bg0: hsl(0, 0%, 19%);
-	--bg1: hsl(0, 0%, 22%);
-	--bg2: hsl(0, 0%, 25%);
-	--fg: var(--dark-fg);
-	--dark-fg: hsl(0, 0%, 96%);
-	--light-fg: hsl(0, 0%, 10%);
-	--accent: hsl(15, 100%, 68%);
-	--accent-dark: hsl(15, 44%, 50%);
-	--accent-darker: hsl(15, 43%, 41%);
-	--secondary: hsl(0, 0%, 28%);
-	--secondary-dark: hsl(0, 0%, 37%);
-	--secondary-darker: hsl(0, 0%, 45%);
-	--success: hsl(128, 100%, 68%);
-	--success-dark: hsl(128, 44%, 50%);
-	--success-darker: hsl(128, 43%, 41%);
-	--danger: #ff7979;
-	--base-rounding: 10px;
-
 	color-scheme: dark;
 	font-family:
 		system-ui,
@@ -33,6 +15,38 @@
 	font-size: 12px !important;
 
 	height: 100%;
+
+	--base-rounding: 10px;
+}
+
+body.gruvbox {
+	--bg0: #282828;
+	--bg1: #3c3836;
+	--bg2: #504945;
+	--bg3: #665c54;
+	--fg: #ebdbb2;
+	--dark-fg: var(--fg);
+	--light-fg: var(--bg1);
+	--accent: #fe8019;
+	--accent-dark: #d65d0e;
+	--success: #b8bb26;
+	--success-dark: #98971a;
+	--danger: #fb4934;
+}
+
+body.tokyo-night {
+	--bg0: #1a1b26;
+	--bg1: #24283b;
+	--bg2: #414868;
+	--bg3: #565f89;
+	--fg: #a9b1d6;
+	--dark-fg: var(--fg);
+	--light-fg: #343b58;
+	--accent: #ff9e64;
+	--accent-dark: #965027;
+	--success: #9ece6a;
+	--success-dark: #385f0d;
+	--danger: #f7768e;
 }
 
 body {
@@ -56,7 +70,7 @@ body {
 }
 
 #headerBar {
-	background-color: var(--bg2);
+	background-color: var(--bg1);
 	padding: 8px;
 	height: 32px;
 	width: calc(100% - 16px);
@@ -117,11 +131,6 @@ body {
 	transition: none;
 }
 
-.button-transparent {
-	color: var(--dark-fg);
-	background-color: transparent;
-}
-
 .button-primary {
 	color: var(--light-fg);
 	background-color: var(--accent);
@@ -131,23 +140,13 @@ body {
 	background-color: var(--accent-dark);
 }
 
-.button-primary:not(:disabled):active {
-	background-color: var(--accent-darker);
+.button-secondary {
+	color: var(--fg);
+	background-color: var(--bg1);
 }
 
-.button-secondary,
-.button-transparent:not(:disabled):hover {
-	color: var(--dark-fg);
-	background-color: var(--secondary);
-}
-
-.button-secondary:not(:disabled):hover,
-.button-transparent:not(:disabled):active {
-	background-color: var(--secondary-dark);
-}
-
-.button-secondary:not(:disabled):active {
-	background-color: var(--secondary-darker);
+.button-secondary:not(:disabled):hover {
+	background-color: var(--bg2);
 }
 
 .button-success {
@@ -159,8 +158,13 @@ body {
 	background-color: var(--success-dark);
 }
 
-.button-success:not(:disabled):active {
-	background-color: var(--success-darker);
+.button-transparent {
+	color: var(--fg);
+	background-color: transparent;
+}
+
+.button-transparent:not(:disabled):hover {
+	background-color: var(--bg3);
 }
 
 .hbox,
@@ -209,7 +213,7 @@ body {
 	text-decoration: inherit;
 	color: inherit;
 
-	background-color: var(--secondary);
+	background-color: var(--bg1);
 	border-radius: var(--base-rounding);
 	transition: background 0.2s ease-out;
 }
@@ -225,7 +229,7 @@ body {
 }
 
 .guildCard:hover {
-	background-color: var(--secondary-dark);
+	background-color: var(--bg2);
 }
 
 .guildCard .guildIcon {

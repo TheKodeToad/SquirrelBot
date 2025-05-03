@@ -14,13 +14,12 @@
 		"@codemirror/commands": "^6.8.1",
 		"@codemirror/language": "^6.11.0",
 		"@codemirror/state": "^6.5.2",
-		"@codemirror/theme-one-dark": "^6.1.2",
 		"@codemirror/view": "^6.36.6",
 		"@solid-primitives/deep": "^0.3.2",
 		"@solidjs/router": "^0.15.3",
 		"@tabler/icons-solidjs": "^3.31.0",
 		"codemirror": "^6.0.1",
-		"lezer-toml": "^1.0.0",
+		"lezer-toml": "1.0.0",
 		"solid-js": "^1.9.5"
 	}
 }

@@ -1,6 +1,5 @@
 import { indentLess, insertTab } from "@codemirror/commands";
 import { continuedIndent, indentNodeProp, LRLanguage } from "@codemirror/language";
-import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorView, keymap } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { parser } from "lezer-toml";
@@ -13,7 +12,6 @@ const parserWithMetadata = parser.configure({
 
 export const baseExtensions = [
 	basicSetup,
-	oneDark,
 	LRLanguage.define({
 		parser: parserWithMetadata,
 	}),
