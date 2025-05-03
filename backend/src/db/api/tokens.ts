@@ -3,6 +3,8 @@ import { date, object, string } from "valibot";
 import { dbParse, pool } from "../index.ts";
 
 const ALGORITHM = "sha-256";
+const TOKEN_LIFETIME = 30 * 24 * 60 * 60 * 1000;
+const TOKEN_REFRESH_THRESHOLD = 7 * 24 * 60 * 60 * 1000;
 
 const tokenInfoSchema = object({
 	userID: string(),
@@ -11,7 +13,7 @@ const tokenInfoSchema = object({
 
 export async function generateToken(userID: string): Promise<[token: string, expiry: Date]> {
 	const secret = crypto.randomBytes(16);
-	const expiresAt = new Date(Date.now() + (1000 * 60 * 60 * 24 * 7));
+	const expiresAt = new Date(Date.now() + TOKEN_LIFETIME);
 
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret));
 
@@ -30,11 +32,38 @@ export async function generateToken(userID: string): Promise<[token: string, exp
 	return [BigInt(userID).toString(16) + "." + secret.toString("hex"), expiresAt];
 }
 
+async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
+	const splitIndex = token.indexOf(".");
+
+	if (splitIndex === -1)
+		return null;
+
+	const userIDPart = token.slice(0, splitIndex);
+	const secretPart = token.slice(splitIndex + 1);
+
+	if (userIDPart.length === 0 || secretPart.length === 0)
+		return null;
+
+	try {
+		var userID = BigInt("0x" + userIDPart);
+	} catch (error) {
+		if (!(error instanceof SyntaxError))
+			throw error;
+
+		return null;
+	}
+
+	const secretBuffer = Buffer.from(secretPart, "hex");
+	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secretBuffer));
+
+	return [userID, hash];
+}
+
 /**
  * @returns user ID if valid
  */
 export async function validateToken(token: string): Promise<string | null> {
-	const key = await tokenKey(token);
+	const key: [bigint, Buffer] | null = await tokenKey(token);
 
 	if (key === null)
 		return null;
@@ -64,6 +93,17 @@ export async function validateToken(token: string): Promise<string | null> {
 		return null;
 	}
 
+	if (Date.now() - expiresAt.getTime() >= TOKEN_REFRESH_THRESHOLD) {
+		await pool.query(
+			`
+				UPDATE "api_tokens"
+				SET "expiresAt" = $1
+				WHERE "userID" = $2 AND "hash" = $3
+			`,
+			[new Date(Date.now() + TOKEN_LIFETIME), userID, key[1]]
+		);
+	}
+
 	return userID;
 }
 
@@ -82,33 +122,6 @@ export async function deleteToken(token: string): Promise<boolean> {
 	);
 
 	return result.rowCount === 1;
-}
-
-async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
-	const splitIndex = token.indexOf(".");
-
-	if (splitIndex === -1)
-		return null;
-
-	const userIDPart = token.slice(0, splitIndex);
-	const secretPart = token.slice(splitIndex + 1);
-
-	if (userIDPart.length === 0 || secretPart.length === 0)
-		return null;
-
-	try {
-		var userID = BigInt("0x" + userIDPart);
-	} catch (error) {
-		if (!(error instanceof SyntaxError))
-			throw error;
-
-		return null;
-	}
-
-	const secretBuffer = Buffer.from(secretPart, "hex");
-	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secretBuffer));
-
-	return [userID, hash];
 }
 
 export async function deleteExpiredTokens(): Promise<number> {
