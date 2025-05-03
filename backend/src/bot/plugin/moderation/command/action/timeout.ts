@@ -7,9 +7,9 @@ import { icons } from "../../../core/public/icons.ts";
 import { doBulkAction } from "../../helper/bulkAction.ts";
 import { moderationConfig } from "../../index.ts";
 
-export const muteCommand = defineCommand({
-	name: ["mute", "timeout"],
-	description: "Prevent a member from talking in the server.",
+export const timeoutCommand = defineCommand({
+	name: ["timeout", "mute", "chatmute"],
+	description: "Prevent a member from chatting - or doing anything other than reading messages - in the server .",
 
 	options: {
 		user: {

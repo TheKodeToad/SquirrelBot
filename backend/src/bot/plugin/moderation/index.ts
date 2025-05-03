@@ -3,7 +3,7 @@ import { definePlugin } from "../../loader/plugin.ts";
 import { ConfigCache } from "../core/public/config.ts";
 import { banCommand } from "./command/action/ban.ts";
 import { kickCommand } from "./command/action/kick.ts";
-import { muteCommand } from "./command/action/mute.ts";
+import { timeoutCommand } from "./command/action/timeout.ts";
 import { unbanCommand } from "./command/action/unban.ts";
 import { warnCommand } from "./command/action/warn.ts";
 import { deleteCaseCommand } from "./command/case/caseDelete.ts";
@@ -23,7 +23,7 @@ export const moderationPlugin = definePlugin({
 		banCommand,
 		unbanCommand,
 		kickCommand,
-		muteCommand,
+		timeoutCommand,
 		warnCommand,
 		purgeCommand,
 		caseShowCommand,
