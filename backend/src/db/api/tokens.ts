@@ -53,8 +53,16 @@ export async function validateToken(token: string): Promise<string | null> {
 
 	const { expiresAt, userID } = dbParse(tokenInfoSchema, result.rows[0]);
 
-	if (Date.now() >= expiresAt.getTime())
+	if (Date.now() >= expiresAt.getTime()) {
+		await pool.query(
+			`
+				DELETE FROM "api_tokens"
+				WHERE "userID" = $1 AND "hash" = $2
+			`,
+			key
+		);
 		return null;
+	}
 
 	return userID;
 }
