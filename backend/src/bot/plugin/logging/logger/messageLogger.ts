@@ -1,11 +1,13 @@
 import { Routes } from "oceanic.js";
 import { moduleLogger } from "../../../../common/logger/index.ts";
-import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry } from "../../../../db/logger/messageCache.ts";
+import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "../../../../db/logger/messageCache.ts";
+import { fetchTextableGuildChannelCached } from "../../../common/discord/cachedRequest.ts";
 import { Colors } from "../../../common/discord/colors.ts";
-import { isTextableGuildChannel } from "../../../common/discord/typeGuards.ts";
 import { bot } from "../../../index.ts";
 import { defineEventListener } from "../../core/public/eventListener.ts";
-import { loggingConfig, logToChannel } from "../index.ts";
+import { isEventConfigEnabled } from "../helper/config.ts";
+import { logToChannel } from "../helper/webhooks.ts";
+import { loggingConfig } from "../index.ts";
 
 const logger = moduleLogger();
 
@@ -14,6 +16,16 @@ const MESSAGE_CLEANUP_THRESHOLD = 6 * 60 * 60 * 1000;
 
 export const messageLoggerCreateListener = defineEventListener("messageCreate", async message => {
 	if (message.guildID === null)
+		return;
+
+	const config = loggingConfig.get(message.guildID);
+
+	if (config === undefined)
+		return;
+
+	const shouldTrack = config.loggers.some(logger => isEventConfigEnabled(logger.events.message_edit) || isEventConfigEnabled(logger.events.message_delete));
+
+	if (!shouldTrack)
 		return;
 
 	await upsertMessageCacheEntry(message.guildID, message.channelID, message.id, {
@@ -33,38 +45,46 @@ export const messageLoggerUpdateListener = defineEventListener("messageUpdate", 
 	if (config === undefined)
 		return;
 
-	const channel = message.guild.channels.get(config.channel);
+	let entry: MessageCacheEntry | null | undefined;
 
-	if (channel === undefined || !isTextableGuildChannel(channel))
-		return;
+	for (const logger of config.loggers) {
+		const { message_edit } = logger.events;
 
-	const entry = await getMessageCacheEntry(message.guild.id, message.channelID, message.id);
+		if (!isEventConfigEnabled(message_edit))
+			continue;
 
-	await upsertMessageCacheEntry(message.guild.id, message.channelID, message.id, {
-		authorID: message.author.id,
-		authorName: message.author.tag,
-		authorAvatarHash: message.author.avatar,
-		content: message.content,
-	});
+		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel_id);
 
-	await logToChannel(channel, {
-		embeds: [{
-			title: "Message Edited",
-			author: { name: message.author.tag, iconURL: message.author.avatarURL() },
-			fields: [
-				{
-					name: "Old Content",
-					value: entry?.content ?? "*Not available.*",
-				},
-				{
-					name: "New Content",
-					value: message.content,
-				}
-			],
-			color: Colors.yellow,
-		}]
-	});
+		if (channel === null)
+			continue;
 
+		entry ??= await getMessageCacheEntry(message.guild.id, message.channelID, message.id);
+
+		await upsertMessageCacheEntry(message.guild.id, message.channelID, message.id, {
+			authorID: message.author.id,
+			authorName: message.author.tag,
+			authorAvatarHash: message.author.avatar,
+			content: message.content,
+		});
+
+		await logToChannel(channel, {
+			embeds: [{
+				title: "Message Edited",
+				author: { name: message.author.tag, iconURL: message.author.avatarURL() },
+				fields: [
+					{
+						name: "Old Content",
+						value: entry?.content ?? "*Not available.*",
+					},
+					{
+						name: "New Content",
+						value: message.content,
+					}
+				],
+				color: Colors.yellow,
+			}]
+		});
+	}
 });
 
 export const messageLoggerDeleteListener = defineEventListener("messageDelete", async message => {
@@ -76,11 +96,6 @@ export const messageLoggerDeleteListener = defineEventListener("messageDelete", 
 	if (config === undefined)
 		return;
 
-	const channel = message.guild.channels.get(config.channel);
-
-	if (channel === undefined || !isTextableGuildChannel(channel))
-		return;
-
 	const entry = await takeMessageCacheEntry(message.guild.id, message.channelID, message.id);
 
 	if (entry === null)
@@ -90,14 +105,28 @@ export const messageLoggerDeleteListener = defineEventListener("messageDelete", 
 		bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
 		: undefined;
 
-	await logToChannel(channel, {
-		embeds: [{
-			title: "Message Deleted",
-			author: { name: entry.authorName, iconURL },
-			description: entry.content,
-			color: Colors.red,
-		}]
-	});
+	for (const logger of config.loggers) {
+		const { message_edit } = logger.events;
+
+		if (!isEventConfigEnabled(message_edit))
+			continue;
+
+		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel_id);
+
+		if (channel === null)
+			continue;
+
+		await logToChannel(channel, {
+			embeds: [{
+				title: "Message Deleted",
+				author: { name: entry.authorName, iconURL },
+				description: entry.content,
+				color: Colors.red,
+				footer: { text: `Author ID: ${entry.authorID} • Message ID: ${entry.id}` }
+			}]
+		});
+	}
+
 });
 
 export async function beginMessageCleanupLoop(): Promise<void> {

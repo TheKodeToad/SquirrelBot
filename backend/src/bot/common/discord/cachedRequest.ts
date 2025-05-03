@@ -1,5 +1,6 @@
-import { type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, ThreadChannel, type Uncached, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User } from "oceanic.js";
 import { bot } from "../../index.ts";
+import { isTextableGuildChannel, isThreadChannel } from "./typeGuards.ts";
 
 export async function fetchUserCached(userID: string): Promise<User> {
 	return bot.users.get(userID) ?? await bot.rest.users.get(userID);
@@ -34,12 +35,42 @@ export async function fetchThreadCached(guild: Guild, threadID: string): Promise
 	if (cached !== undefined)
 		return cached;
 
-	if (guild.channels.has(threadID))
+	if (bot.getChannel(threadID) !== undefined)
 		return null;
 
 	const fetched = await bot.rest.channels.get(threadID);
 
-	if (!(fetched instanceof ThreadChannel))
+	if (!isThreadChannel(fetched))
+		return null;
+
+	if (fetched.guildID !== guild.id)
+		return null;
+
+	return fetched;
+}
+
+export async function fetchTextableGuildChannelCached(guild: Guild, channelID: string): Promise<AnyTextableGuildChannel | null> {
+	const cachedRegularChannel = guild.channels.get(channelID);
+
+	if (cachedRegularChannel !== undefined) {
+		if (isTextableGuildChannel(cachedRegularChannel))
+			return cachedRegularChannel;
+		else
+			return null;
+	}
+
+	const cachedThreadChannel = guild.threads.get(channelID);
+
+	if (cachedThreadChannel !== undefined)
+		return cachedThreadChannel;
+
+	// must belong to another guild
+	if (bot.getChannel(channelID))
+		return null;
+
+	const fetched = await bot.rest.channels.get(channelID);
+
+	if (!isTextableGuildChannel(fetched))
 		return null;
 
 	if (fetched.guildID !== guild.id)

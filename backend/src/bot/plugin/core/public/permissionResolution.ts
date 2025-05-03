@@ -1,6 +1,6 @@
-import { type AnyGuildChannel, CategoryChannel, Member, ThreadChannel } from "oceanic.js";
+import { CategoryChannel, Member, ThreadChannel, type AnyGuildChannel } from "oceanic.js";
 import { moduleLogger } from "../../../../common/logger/index.ts";
-import { testNumberFilter } from "../../../../schema/common/numberFilter.ts";
+import { NumberFilterMode, type NumberFilter } from "../../../../schema/common/numberFilter.ts";
 import type { PermissionsFilter } from "../../../../schema/common/permissionsFilter.ts";
 import type { CoreConfig, CoreGroup } from "../../../../schema/plugin/core.ts";
 import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "../../../common/discord/debugFormat.ts";
@@ -128,4 +128,15 @@ function testFilter(filter: PermissionsFilter, groups: GroupsResult, channel: Ex
 		return true;
 
 	return false;
+}
+
+function testNumberFilter(filter: NumberFilter, number: number): boolean {
+	switch (filter.mode) {
+		case NumberFilterMode.Equals: return number === filter.number;
+		case NumberFilterMode.NotEquals: return number !== filter.number;
+		case NumberFilterMode.LessThan: return number < filter.number;
+		case NumberFilterMode.LessThanOrEqual: return number <= filter.number;
+		case NumberFilterMode.GreaterThan: return number > filter.number;
+		case NumberFilterMode.GreaterThanOrEqual: return number >= filter.number;
+	}
 }
