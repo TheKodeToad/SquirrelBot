@@ -9,7 +9,7 @@ import { moderationConfig } from "../../index.ts";
 
 export const timeoutCommand = defineCommand({
 	name: ["timeout", "mute", "chatmute"],
-	description: "Prevent a member from chatting - or doing anything other than reading messages - in the server .",
+	description: "Prevent a member from chatting - or doing anything other than reading messages - in the server.",
 
 	options: {
 		user: {
@@ -33,7 +33,7 @@ export const timeoutCommand = defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
-			description: "Choose whether to notify the timed out user with a direct message - overrides the configured default!",
+			description: "Choose whether to notify the affected user with a direct message - overrides the configured default!",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		}
