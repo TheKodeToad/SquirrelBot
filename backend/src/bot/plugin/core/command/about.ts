@@ -28,17 +28,6 @@ export const aboutCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.about_command),
 	async run(context) {
-		const uptime = Math.floor(process.uptime());
-		let uptimeString = "";
-
-		if (uptime >= 3600)
-			uptimeString += Math.floor(uptime / 3600) + " hours ";
-
-		if (uptime >= 60)
-			uptimeString += Math.floor(uptime / 60) % 60 + " mins ";
-
-		uptimeString += uptime % 60 + " secs";
-
 		const container: CommandContainerComponent = {
 			components: [],
 			type: ComponentTypes.CONTAINER,
@@ -49,7 +38,6 @@ export const aboutCommand = defineCommand({
 			accessory: { media: { url: bot.user.avatarURL() }, type: ComponentTypes.THUMBNAIL },
 			type: ComponentTypes.SECTION,
 		});
-
 
 		container.components.push({ type: ComponentTypes.SEPARATOR });
 
@@ -63,10 +51,26 @@ export const aboutCommand = defineCommand({
 			type: ComponentTypes.TEXT_DISPLAY,
 		});
 
+		container.components.push({ type: ComponentTypes.SEPARATOR });
+
+		const uptime = Math.floor(process.uptime());
+		let uptimeString = "";
+
+		uptimeString += Math.floor(uptime / 3600).toString() + "h ";
+		uptimeString += (Math.floor(uptime / 60) % 60).toString().padStart(2, "0") + "m ";
+		uptimeString += (uptime % 60).toString().padStart(2, "0") + "s ";
+
+		const rssMiB = process.memoryUsage().rss / 1024 / 1024;
+		const usedMiB = (process.memoryUsage().heapUsed + process.memoryUsage().arrayBuffers + process.memoryUsage().external) / 1024 / 1024;
+
 		container.components.push({
-			content: "**Uptime**\n" + uptimeString,
+			content:
+				`**Uptime:** ${uptimeString}\n`
+				+ `**Used Memory**: ${usedMiB.toLocaleString("en-US")} MiB (\`heapUsed\` + \`arrayBuffers\` + \`external\`)\n`
+				+ `**Total Memory**: ${rssMiB.toLocaleString("en-US")} MiB (\`rss\`)`,
 			type: ComponentTypes.TEXT_DISPLAY,
 		});
+
 
 		await context.respond({ components: [container] });
 	},
