@@ -42,7 +42,7 @@ export const aboutCommand = defineCommand({
 		container.components.push({ type: ComponentTypes.SEPARATOR });
 
 		container.components.push({
-			content: "**Source Code**\nhttps://github.com/TheKodeToad/SquirrelBot (MIT license)",
+			content: "**Source Code**\nhttps://github.com/TheKodeToad/SquirrelBot (GNU AGPL license)",
 			type: ComponentTypes.TEXT_DISPLAY,
 		});
 
