@@ -20,7 +20,11 @@ export async function formatUserByID(id: string): Promise<string> {
 }
 
 export function formatUser(user: User | Member | Uncached): string {
-	return `<@${user.id}> (${formatUserTag(user)})`;
+	return `${formatUserTag(user)} (<@${user.id}>)`;
+}
+
+export function formatUserBold(user: User | Member | Uncached): string {
+	return `**${formatUserTag(user)}** (<@${user.id}>)`;
 }
 
 export function formatUserTag(user: User | Member | Uncached): string {

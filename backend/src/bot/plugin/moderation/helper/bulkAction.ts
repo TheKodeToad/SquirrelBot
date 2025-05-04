@@ -26,7 +26,7 @@ type BulkAction =
 		makeCase(actor: string, target: string, dmDelivered: boolean): CreateCaseOptions;
 	};
 
-interface BulkResult {
+export interface BulkResult {
 	successful: {
 		user: User | Member;
 		caseNumber: number;

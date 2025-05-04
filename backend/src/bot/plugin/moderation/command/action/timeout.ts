@@ -1,10 +1,10 @@
 import { CaseType } from "../../../../../db/moderation/cases.ts";
-import { formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { defineCommand, OptionType } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { doBulkAction } from "../../helper/bulkAction.ts";
+import { formatBulkError, formatBulkSuccess } from "../../helper/format.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const timeoutCommand = defineCommand({
@@ -78,28 +78,25 @@ export const timeoutCommand = defineCommand({
 		});
 
 		if (args.user.length === 1) {
-			if (successful.length === 1) {
-				const ban = successful[0]!;
-				await context.respond(`${icons.success} Mute ${formatUser(ban.user)} ${ban.dmDelivered ? "with direct message " : ""}[#${ban.caseNumber}]!`);
-			} else if (unsuccessful.length === 1) {
-				const ban = unsuccessful[0]!;
-				await context.respond(`${icons.error} Could not mute ${formatUser(ban.user)}: ${escapeMarkdown(ban.error)}!`);
-			}
+			if (successful.length === 1)
+				await context.respond(`${icons.success} Banned ${formatBulkSuccess(successful[0]!)}!`);
+			else if (unsuccessful.length === 1)
+				await context.respond(`${icons.error} Could not ban ${formatBulkError(unsuccessful[0]!)}!`);
 		} else {
-			const successfulMessage = successful.map(ban => `- ${formatUser(ban.user)} ${ban.dmDelivered ? "with direct message " : ""}[#${ban.caseNumber}]`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(ban => `- ${formatUser(ban.user)}: ${escapeMarkdown(ban.error)}`).join("\n");
+			const successfulMessage = successful.map(item => `- ${formatBulkSuccess(item)}`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatBulkError(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Muted all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Banned all ${args.user.length} users:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were muted:\n${unsuccessfulMessage}`
+					`${icons.error} None of ${args.user.length} users were banned:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful.length} of ${args.user.length} mutes were successful!\n`
+					`${icons.warning} Only ${successful.length} of ${args.user.length} bans were successful!\n`
 					+ `Successful bans:\n${successfulMessage}\n`
 					+ `Unsuccessful bans:\n${unsuccessfulMessage}`
 				);

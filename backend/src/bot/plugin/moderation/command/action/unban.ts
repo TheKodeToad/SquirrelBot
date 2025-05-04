@@ -1,7 +1,7 @@
 import { DiscordRESTError, JSONErrorCodes, User, type Uncached } from "oceanic.js";
 import { CaseType, createCase } from "../../../../../db/moderation/cases.ts";
 import { fetchUserCachedSupressed } from "../../../../common/discord/cachedRequest.ts";
-import { formatRESTError, formatUser } from "../../../../common/discord/format.ts";
+import { formatRESTError, formatUserBold } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
@@ -90,14 +90,14 @@ export const unbanCommand = defineCommand({
 		if (args.user.length === 1) {
 			if (successfulUnbans.length === 1) {
 				const unban = successfulUnbans[0]!;
-				await context.respond(`${icons.success} Unbanned ${formatUser(unban.user)} [#${unban.caseNumber}]!`);
+				await context.respond(`${icons.success} Unbanned ${formatUserBold(unban.user)} [#${unban.caseNumber}]!`);
 			} else if (unsuccessfulUnbans.length === 1) {
 				const unban = unsuccessfulUnbans[0]!;
-				await context.respond(`${icons.error} Could not unban ${formatUser(unban.user)}: ${escapeMarkdown(unban.error)}!`);
+				await context.respond(`${icons.error} Could not unban ${formatUserBold(unban.user)}: ${escapeMarkdown(unban.error)}!`);
 			}
 		} else {
-			const successfulMessage = successfulUnbans.map(unban => `- ${formatUser(unban.user)} [#${unban.caseNumber}]`).join("\n");
-			const unsuccessfulMessage = unsuccessfulUnbans.map(unban => `- ${formatUser(unban.user)}: ${unban.error}`).join("\n");
+			const successfulMessage = successfulUnbans.map(unban => `- ${formatUserBold(unban.user)} [#${unban.caseNumber}]`).join("\n");
+			const unsuccessfulMessage = unsuccessfulUnbans.map(unban => `- ${formatUserBold(unban.user)}: ${unban.error}`).join("\n");
 
 			if (unsuccessfulUnbans.length === 0) {
 				await context.respond(

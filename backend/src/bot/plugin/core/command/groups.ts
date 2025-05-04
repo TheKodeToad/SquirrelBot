@@ -1,6 +1,6 @@
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 import { fetchMemberCached } from "../../../common/discord/cachedRequest.ts";
-import { formatRESTError, formatUser } from "../../../common/discord/format.ts";
+import { formatRESTError, formatUserBold } from "../../../common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
 import { coreConfig as coreConfigCache } from "../index.ts";
 import { defineCommand, OptionType } from "../public/command.ts";
@@ -51,8 +51,8 @@ export const groupsCommand = defineCommand({
 
 		if (result.groups.size !== 0) {
 			const groups = Array.from(result.groups).toSorted().map(makeMarkdownInlineCodeblock);
-			await context.respond(`${icons.info} Groups for ${formatUser(context.user)}: ${groups.join(", ")} (permission level ${result.level})`);
+			await context.respond(`${icons.info} Groups for ${formatUserBold(context.user)}: ${groups.join(", ")} (permission level ${result.level})`);
 		} else
-			await context.respond(`${icons.info} ${formatUser(context.user)} is not in any groups!`);
+			await context.respond(`${icons.info} ${formatUserBold(context.user)} is not in any groups!`);
 	},
 });
