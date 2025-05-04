@@ -4,7 +4,7 @@ import { defineCommand, OptionType, type BaseContext, type CommandContainerCompo
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
-import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "../../helper/cases.ts";
+import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "../../helper/format.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const caseListCommand = defineCommand({

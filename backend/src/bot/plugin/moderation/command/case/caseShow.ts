@@ -3,7 +3,7 @@ import { getCase } from "../../../../../db/moderation/cases.ts";
 import { OptionType, defineCommand, type CommandContainerComponent } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
-import { formatCaseDescription, formatCaseFields } from "../../helper/cases.ts";
+import { formatCaseDescription, formatCaseFields } from "../../helper/format.ts";
 import { moderationConfig } from "../../index.ts";
 
 export const caseShowCommand = defineCommand({

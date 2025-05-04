@@ -19,6 +19,10 @@ export async function formatUserByID(id: string): Promise<string> {
 	return formatUser(await fetchUserCachedSupressed(id));
 }
 
+export async function formatUserBoldByID(id: string): Promise<string> {
+	return formatUserBold(await fetchUserCachedSupressed(id));
+}
+
 export function formatUser(user: User | Member | Uncached): string {
 	return `${formatUserTag(user)} (<@${user.id}>)`;
 }
