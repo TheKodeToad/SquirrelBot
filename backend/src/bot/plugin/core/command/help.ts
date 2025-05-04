@@ -23,14 +23,17 @@ export const helpCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.help_command),
 	async run(context) {
-		await context.respond(renderSelectPage());
+		await context.respond(renderSelectPage(context.guild.id));
 	},
 });
 
-function renderPluginSelection(selected: string | null, callback: (context: ComponentContext, value: string) => Promise<void>): CommandSelectMenuComponent {
+function renderPluginSelection(selected: string | null, guildID: string, callback: (context: ComponentContext, value: string) => Promise<void>): CommandSelectMenuComponent {
 	const options: SelectOption[] = [];
 
 	for (const plugin of getPlugins()) {
+		if (!(plugin.config === undefined || plugin.config.store.has(guildID)))
+			continue;
+
 		options.push({
 			label: plugin.name,
 			value: plugin.id,
@@ -49,7 +52,7 @@ function renderPluginSelection(selected: string | null, callback: (context: Comp
 	};
 }
 
-function renderSelectPage(): Reply {
+function renderSelectPage(guildID: string): Reply {
 	return {
 		components: [
 			{
@@ -58,12 +61,12 @@ function renderSelectPage(): Reply {
 			},
 			{
 				components: [
-					renderPluginSelection(null, async (context, value) => {
+					renderPluginSelection(null, guildID, async (context, value) => {
 						const page = renderCommandListPage(context, { plugin: value, page: 0 });
 						page.flags ??= MessageFlags.EPHEMERAL;
 						await context.respond(page);
 
-						await context.edit(renderSelectPage());
+						await context.edit(renderSelectPage(guildID));
 					})
 				],
 				type: ComponentTypes.ACTION_ROW,
@@ -99,7 +102,7 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 
 	container.components.push({
 		components: [
-			renderPluginSelection(state.plugin, async (context, value) => {
+			renderPluginSelection(state.plugin, context.guild.id, async (context, value) => {
 				await context.edit(renderCommandListPage(context, { plugin: value, page: 0 }));
 			})
 		],
@@ -145,6 +148,13 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 		container.components.push({ type: ComponentTypes.SEPARATOR });
 		container.components.push({
 			content: entry,
+			type: ComponentTypes.TEXT_DISPLAY,
+		});
+	}
+
+	if (entries.length === 0) {
+		container.components.push({
+			content: `${icons.info} You do not have access to any commands for this plugin!`,
 			type: ComponentTypes.TEXT_DISPLAY,
 		});
 	}
