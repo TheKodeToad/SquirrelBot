@@ -1,12 +1,12 @@
 import type { Command } from "../plugin/core/public/command.ts";
-import type { ConfigCache } from "../plugin/core/public/config.ts";
+import type { ConfigStore } from "../plugin/core/public/config.ts";
 import type { EventListener } from "../plugin/core/public/eventListener.ts";
 
 export interface Plugin {
 	id: string;
 	name: string;
 	description?: string;
-	config?: ConfigCache;
+	config?: ConfigStore;
 	commands?: Command[];
 	listeners?: EventListener[];
 	apply?(): Promise<void> | void;

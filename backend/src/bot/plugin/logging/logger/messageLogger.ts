@@ -53,7 +53,7 @@ export const messageLoggerUpdateListener = defineEventListener("messageUpdate", 
 		if (!isEventConfigEnabled(message_edit))
 			continue;
 
-		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel_id);
+		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel);
 
 		if (channel === null)
 			continue;
@@ -111,7 +111,7 @@ export const messageLoggerDeleteListener = defineEventListener("messageDelete", 
 		if (!isEventConfigEnabled(message_edit))
 			continue;
 
-		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel_id);
+		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel);
 
 		if (channel === null)
 			continue;

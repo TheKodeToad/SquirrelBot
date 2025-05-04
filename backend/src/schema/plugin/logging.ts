@@ -6,7 +6,7 @@ export type EventConfigSchema = InferOutput<typeof eventConfigSchema>;
 
 export const loggingConfigSchema = object({
 	loggers: array(object({
-		channel_id: snowflakeSchema,
+		channel: snowflakeSchema,
 		// for now you can't customise each event
 		events: object({
 			message_edit: eventConfigSchema,

@@ -1,13 +1,15 @@
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
-import { safeParse } from "valibot";
+import { parse, safeParse, type InferInput } from "valibot";
 import { mapIterable } from "../../../common/iterators.ts";
 import { moduleLogger } from "../../../common/logger/index.ts";
 import { getGuildConfig, insertGuildConfig } from "../../../db/core/configs.ts";
 import { addChannelListener } from "../../../db/notification.ts";
+import { coreConfigSchema } from "../../../schema/plugin/core.ts";
+import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
 import { getPlugin, getPlugins } from "../../loader/index.ts";
-import type { Plugin } from "../../loader/plugin.ts";
 import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds } from "./guildInfoSync.ts";
+import type { ConfigStore } from "./public/config.ts";
 
 const logger = moduleLogger();
 
@@ -19,6 +21,11 @@ export async function initConfigs(): Promise<void> {
 }
 
 const configUpdateLock = new AsyncLock;
+
+
+function formatPluginInGuild(pluginID: string, guildID: string): string {
+	return `#${pluginID} in ${debugFormatGuildByID(guildID)}`;
+}
 
 async function installConfigChangeListener(): Promise<void> {
 	await addChannelListener("core_configUpdate", async payload => {
@@ -65,26 +72,30 @@ async function installConfigChangeListener(): Promise<void> {
 				return;
 			}
 
-			logger.debug?.(`Updating config for plugin '${key}' in guild ${guildID}`);
+			logger.debug?.(`Updating config for plugin ${formatPluginInGuild(key, guildID)}`);
 
-			await loadConfig(guildID, plugin);
+			await loadConfig(guildID, plugin.id, plugin.config);
 		});
 	});
 }
 
-export async function createAndLoadConfigs(guildID: string): Promise<void> {
+async function createAndLoadConfigs(guildID: string): Promise<void> {
 	await configUpdateLock.acquire(guildID, async () => {
 		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
 				continue;
 
-			await insertGuildConfig(guildID, plugin.id, "");
-			await loadConfig(guildID, plugin);
+			const inserted = await insertGuildConfig(guildID, plugin.id, plugin.config.defaultValue);
+
+			if (inserted)
+				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(guildID)}`);
+
+			await loadConfig(guildID, plugin.id, plugin.config);
 		}
 	});
 }
 
-export async function unloadConfigs(guildID: string): Promise<void> {
+async function unloadConfigs(guildID: string): Promise<void> {
 	await configUpdateLock.acquire(guildID, () => {
 		for (const plugin of getPlugins()) {
 			if (plugin.config === undefined)
@@ -95,41 +106,60 @@ export async function unloadConfigs(guildID: string): Promise<void> {
 	});
 }
 
-async function loadConfig(guildID: string, plugin: Plugin): Promise<void> {
-	if (plugin.config === undefined)
-		return;
+const coreConfigDefault = parse(coreConfigSchema, {} satisfies InferInput<typeof coreConfigSchema>);
 
-	const rawValue = await getGuildConfig(guildID, plugin.id);
+async function loadConfig(guildID: string, pluginID: string, configCache: ConfigStore): Promise<void> {
+	const value = await parseConfig(guildID, pluginID, configCache);
 
-	if (rawValue === null) {
-		plugin.config.delete(guildID);
-		return;
+	if (value !== null)
+		configCache.set(guildID, value);
+	else {
+		if (pluginID === "core")
+			configCache.set(guildID, coreConfigDefault);
+		else
+			configCache.delete(guildID);
 	}
+}
+
+async function parseConfig(guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
+	const rawValue = await getGuildConfig(guildID, pluginID);
+
+	if (rawValue === null)
+		return null;
 
 	try {
 		var table = parseToml(rawValue);
 	} catch (error) {
 		if (!(error instanceof TomlError))
 			logger.error?.("Unexpected error parsing TOML (bug)", error);
+		else
+			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatPluginInGuild(pluginID, guildID)}`, error);
 
-		plugin.config.delete(guildID);
-		return;
+		return null;
+	}
+
+	if (pluginID !== "core") {
+		if (typeof table.enabled !== "boolean") {
+			logger.debug?.(`Missing { enabled: boolean; } in plugin config of ${formatPluginInGuild(pluginID, guildID)}`);
+			return null;
+		}
+
+		if (table.enabled !== true)
+			return null;
 	}
 
 	try {
-		var result = safeParse(plugin.config.schema, table);
+		var result = safeParse(configCache.schema, table);
 	} catch (error) {
 		// if our code is broken it might throw
 		logger.error?.("Unexpected error in valibot safeParse (bug)", error);
-
-		plugin.config.delete(guildID);
-		return;
+		return null;
 	}
 
 	if (!result.success || !result.typed) {
-		plugin.config.delete(guildID);
-		return;
+		logger.debug?.(`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(guildID)}`, result.issues);
+		return null;
 	}
 
-	plugin.config.set(guildID, result.output);
+	return result.output;
 }

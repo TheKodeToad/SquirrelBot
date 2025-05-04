@@ -8,7 +8,7 @@ import { canWriteInChannel } from "../../common/discord/permissions.ts";
 import { isTextableChannel, isThreadChannelType } from "../../common/discord/typeGuards.ts";
 import { bot } from "../../index.ts";
 import { icons } from "../core/public/icons.ts";
-import { debugFormatReminder } from "./index.ts";
+import { debugFormatReminder, remindersConfig } from "./index.ts";
 
 const logger = moduleLogger();
 
@@ -33,7 +33,7 @@ async function poll(): Promise<void> {
 
 	logger.debug?.(
 		nextExpiryStartTime.getTime() === 0
-			? "Setting initial timeouts for missed reminders and upcoming reminders until " + dateToHMSString(end)
+			? "Setting initial timeouts for missed and upcoming reminders until " + dateToHMSString(end)
 			: "Setting timeouts for reminders from " + dateToHMSString(nextExpiryStartTime) + " to " + dateToHMSString(end)
 	);
 
@@ -54,6 +54,9 @@ function setFireTimeout(reminder: Reminder): void {
 async function fire(reminder: Reminder): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!
 	if (!await deleteReminder(reminder.guildID, reminder.number))
+		return;
+
+	if (!remindersConfig.has(reminder.guildID))
 		return;
 
 	const guild = bot.guilds.get(reminder.guildID);

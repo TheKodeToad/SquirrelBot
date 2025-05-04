@@ -15,7 +15,7 @@ const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.c
 
 const logger = moduleLogger();
 
-export const inviteCommand = defineCommand({
+export const inviteInfoCommand = defineCommand({
 	name: ["inviteinfo", "invite", "invinfo", "inv"],
 	description: "Display information about a Discord invite by passing in the code or link.",
 
@@ -35,7 +35,7 @@ export const inviteCommand = defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.invite_command),
+	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.invite_info_command),
 	async run(context, args) {
 		const matches = REGEX.exec(args.link);
 

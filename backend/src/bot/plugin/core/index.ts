@@ -14,11 +14,26 @@ import { initConfigs } from "./configSync.ts";
 import { installWrappedListener } from "./eventWrapper.ts";
 import { guildInfoSyncGuildCreateHandler, guildInfoSyncGuildUpdateHandler, initGuildInfo } from "./guildInfoSync.ts";
 import { initIcons } from "./iconSync.ts";
-import { ConfigCache } from "./public/config.ts";
+import { ConfigStore } from "./public/config.ts";
 
 const logger = moduleLogger();
 
-export const coreConfig = new ConfigCache(coreConfigSchema);
+const defaultConfig = `prefix_commands.prefix = "?" # Customize the prefix
+
+# Example: Basic groups
+# [groups.admin]
+# roles = ["roleid"]
+# inherits = ["moderator"]
+#
+# [groups.moderator]
+# roles = ["roleid"]
+
+[default_permissions]
+# Uncomment to disable:
+# prefix_commands = false
+# slash_commands = false`;
+
+export const coreConfig = new ConfigStore(coreConfigSchema, defaultConfig);
 
 export const corePlugin = definePlugin({
 	id: "core",
