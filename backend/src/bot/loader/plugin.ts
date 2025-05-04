@@ -6,10 +6,15 @@ export interface Plugin {
 	id: string;
 	name: string;
 	description?: string;
-	config?: ConfigStore;
+	config?: PluginConfig;
 	commands?: Command[];
 	listeners?: EventListener[];
 	apply?(): Promise<void> | void;
+}
+
+export interface PluginConfig {
+	store: ConfigStore;
+	defaultValue: string;
 }
 
 export function definePlugin(plugin: Plugin): Plugin {

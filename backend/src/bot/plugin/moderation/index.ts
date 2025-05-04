@@ -11,6 +11,8 @@ import { caseListCommand } from "./command/case/caseList.ts";
 import { caseShowCommand } from "./command/case/caseShow.ts";
 import { purgeCommand } from "./command/util/purge.ts";
 
+export const moderationConfig = new ConfigStore(moderationConfigSchema);
+
 const defaultConfig = `enabled = false
 
 # Example: Allow users in the moderator group to delete reminders of other users
@@ -26,14 +28,12 @@ const defaultConfig = `enabled = false
 # case_delete = true
 `;
 
-export const moderationConfig = new ConfigStore(moderationConfigSchema, defaultConfig);
-
 export const moderationPlugin = definePlugin({
 	id: "moderation",
 	name: "Moderation",
 	description: "Perform and record moderation actions.",
 
-	config: moderationConfig,
+	config: { store: moderationConfig, defaultValue: defaultConfig },
 	commands: [
 		banCommand,
 		unbanCommand,

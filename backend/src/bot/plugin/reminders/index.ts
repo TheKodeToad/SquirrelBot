@@ -18,14 +18,14 @@ const defaultConfig = `enabled = false
 # in_group = ["moderator"]
 `;
 
-export const remindersConfig = new ConfigStore(remindersConfigSchema, defaultConfig);
+export const remindersConfig = new ConfigStore(remindersConfigSchema);
 
 export const remindersPlugin = definePlugin({
 	id: "reminders",
 	name: "Reminders",
 	description: "Set reminders for yourself.",
 
-	config: remindersConfig,
+	config: { store: remindersConfig, defaultValue: defaultConfig },
 	commands: [remindCommand, reminderListCommand],
 
 	async apply() {

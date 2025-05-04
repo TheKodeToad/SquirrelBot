@@ -33,14 +33,14 @@ const defaultConfig = `prefix_commands.prefix = "?" # Customize the prefix
 # prefix_commands = false
 # slash_commands = false`;
 
-export const coreConfig = new ConfigStore(coreConfigSchema, defaultConfig);
+export const coreConfig = new ConfigStore(coreConfigSchema);
 
 export const corePlugin = definePlugin({
 	id: "core",
 	name: "Core",
 	description: "Core app functionality.",
 
-	config: coreConfig,
+	config: { store: coreConfig, defaultValue: defaultConfig },
 	commands: [helpCommand, aboutCommand, grantAccessCommand, revokeAccessCommand, groupsCommand],
 	listeners: [
 		prefixSendHandler,

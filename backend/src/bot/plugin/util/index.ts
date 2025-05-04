@@ -5,6 +5,8 @@ import { inviteInfoCommand } from "./command/inviteInfo/index.ts";
 import { pingCommand } from "./command/ping.ts";
 import { snowflakeCommand } from "./command/snowflake.ts";
 
+export const utilConfig = new ConfigStore(utilConfigSchema);
+
 const defaultConfig = `enabled = false
 
 [default_permissions]
@@ -14,13 +16,11 @@ const defaultConfig = `enabled = false
 # snowflake_command = true
 `;
 
-export const utilConfig = new ConfigStore(utilConfigSchema, defaultConfig);
-
 export const utilPlugin = definePlugin({
 	id: "util",
 	name: "Utilities",
 	description: "Useful general purpose utilities.",
 
-	config: utilConfig,
+	config: { store: utilConfig, defaultValue: defaultConfig },
 	commands: [inviteInfoCommand, pingCommand, snowflakeCommand],
 });;

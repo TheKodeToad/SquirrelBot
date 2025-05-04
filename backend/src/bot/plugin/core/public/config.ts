@@ -3,11 +3,9 @@ import type { BaseIssue, BaseSchema, InferOutput } from "valibot";
 export class ConfigStore<S extends BaseSchema<unknown, {}, BaseIssue<unknown>> = BaseSchema<unknown, {}, BaseIssue<unknown>>> implements ConfigStore<S> {
 	private _cache: Map<string, InferOutput<S>>;
 	schema: S;
-	defaultValue: string;
 
-	constructor(schema: S, defaultValue: string = "enabled = false\n") {
+	constructor(schema: S) {
 		this.schema = schema;
-		this.defaultValue = defaultValue + "\n";
 		this._cache = new Map;
 	}
 

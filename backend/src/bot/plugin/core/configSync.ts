@@ -74,7 +74,7 @@ async function installConfigChangeListener(): Promise<void> {
 
 			logger.debug?.(`Updating config for plugin ${formatPluginInGuild(key, guildID)}`);
 
-			await loadConfig(guildID, plugin.id, plugin.config);
+			await loadConfig(guildID, plugin.id, plugin.config.store);
 		});
 	});
 }
@@ -90,7 +90,7 @@ async function createAndLoadConfigs(guildID: string): Promise<void> {
 			if (inserted)
 				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(guildID)}`);
 
-			await loadConfig(guildID, plugin.id, plugin.config);
+			await loadConfig(guildID, plugin.id, plugin.config.store);
 		}
 	});
 }
@@ -101,23 +101,23 @@ async function unloadConfigs(guildID: string): Promise<void> {
 			if (plugin.config === undefined)
 				return;
 
-			plugin.config.delete(guildID);
+			plugin.config.store.delete(guildID);
 		}
 	});
 }
 
 const coreConfigDefault = parse(coreConfigSchema, {} satisfies InferInput<typeof coreConfigSchema>);
 
-async function loadConfig(guildID: string, pluginID: string, configCache: ConfigStore): Promise<void> {
-	const value = await parseConfig(guildID, pluginID, configCache);
+async function loadConfig(guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
+	const value = await parseConfig(guildID, pluginID, configStore);
 
 	if (value !== null)
-		configCache.set(guildID, value);
+		configStore.set(guildID, value);
 	else {
 		if (pluginID === "core")
-			configCache.set(guildID, coreConfigDefault);
+			configStore.set(guildID, coreConfigDefault);
 		else
-			configCache.delete(guildID);
+			configStore.delete(guildID);
 	}
 }
 
