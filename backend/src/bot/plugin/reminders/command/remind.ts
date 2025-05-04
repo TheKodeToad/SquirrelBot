@@ -50,7 +50,7 @@ export const remindCommand = defineCommand({
 
 		await context.respond(
 			`${icons.success} Reminder set for <t:${firesAtSecs}> (<t:${firesAtSecs}:R>) [#${reminder.number}]!\n`
-			+ `${icons.tip} No notification will be sent if you are muted or not present in the server.`
+			+ `${icons.tip} No notification will be sent if you are timed out or not present in the server.`
 		);
 	}
 });

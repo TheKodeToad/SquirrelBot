@@ -33,18 +33,18 @@ export const timeoutCommand = defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
-			description: "Choose whether to notify the kicked user with a direct message - overrides the configured default!",
+			description: "Choose whether to notify the timed out user with a direct message - overrides the configured default!",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		}
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.mute),
+	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.timeout),
 	async run(context, args, { config }) {
-		const sendDirectMessage = args.dm ?? config.mute.send_direct_message;
+		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.mute.direct_message ?? {
-				content: `You are temporarily muted in ${escapeMarkdown(context.guild.name)}.`
+			? config.timeout.direct_message ?? {
+				content: `You are temporarily timed out in ${escapeMarkdown(context.guild.name)}.`
 			}
 			: undefined;
 
@@ -67,7 +67,7 @@ export const timeoutCommand = defineCommand({
 			},
 			makeCase(actor, target, dmDelivered) {
 				return {
-					type: CaseType.Mute,
+					type: CaseType.Timeout,
 					expiresAt,
 					actorID: actor,
 					targetID: target,
@@ -79,26 +79,26 @@ export const timeoutCommand = defineCommand({
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Banned ${formatBulkSuccess(successful[0]!)}!`);
+				await context.respond(`${icons.success} Timed out ${formatBulkSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not ban ${formatBulkError(unsuccessful[0]!)}!`);
+				await context.respond(`${icons.error} Could not timeout ${formatBulkError(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatBulkSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatBulkError(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Banned all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Timed out all ${args.user.length} users:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were banned:\n${unsuccessfulMessage}`
+					`${icons.error} None of ${args.user.length} users were timed out:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful.length} of ${args.user.length} bans were successful!\n`
-					+ `Successful bans:\n${successfulMessage}\n`
-					+ `Unsuccessful bans:\n${unsuccessfulMessage}`
+					`${icons.warning} Only ${successful.length} of ${args.user.length} timeouts were successful!\n`
+					+ `Successful timeouts:\n${successfulMessage}\n`
+					+ `Unsuccessful timeouts:\n${unsuccessfulMessage}`
 				);
 			}
 		}

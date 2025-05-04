@@ -8,8 +8,8 @@ export enum CaseType {
 	Unwarn = 2,
 	VoiceMute = 3,
 	VoiceUnmute = 4,
-	Mute = 5,
-	Unmute = 6,
+	Timeout = 5,
+	ClearTimeout = 6,
 	Kick = 7,
 	Ban = 8,
 	Unban = 9,
@@ -22,8 +22,8 @@ export function caseReverseType(type: CaseType): CaseType | null {
 		case CaseType.Unwarn: return CaseType.Warn;
 		case CaseType.VoiceMute: return CaseType.VoiceUnmute;
 		case CaseType.VoiceUnmute: return CaseType.VoiceMute;
-		case CaseType.Mute: return CaseType.Unmute;
-		case CaseType.Unmute: return CaseType.Mute;
+		case CaseType.Timeout: return CaseType.ClearTimeout;
+		case CaseType.ClearTimeout: return CaseType.Timeout;
 		case CaseType.Kick: return null;
 		case CaseType.Ban: return CaseType.Unban;
 		case CaseType.Unban: return CaseType.Ban;

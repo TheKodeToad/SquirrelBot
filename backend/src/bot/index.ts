@@ -8,6 +8,8 @@ export const bot = new Client({
 			Constants.AllNonPrivilegedIntents
 			| Constants.Intents.MESSAGE_CONTENT
 			| Constants.Intents.GUILD_MEMBERS,
+		lookupDisallowedIntents: true,
 	},
+
 	allowedMentions: {},
 });
