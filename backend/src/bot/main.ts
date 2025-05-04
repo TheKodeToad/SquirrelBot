@@ -38,6 +38,14 @@ bot.on("error", (error, shard) => {
 		logger.error?.("Oceanic emitted error", error);
 });
 
+bot.on("warn", (info, shard) => {
+	if (shard !== undefined) {
+		logger.warn?.(`Oceanic warning (shard #${shard}): ${info}`);
+	} else {
+		logger.warn?.(`Oceanic warning: ${info}`);
+	}
+});
+
 process.on("unhandledRejection", error => {
 	logger.error?.("Unhandled Promise rejection!", error);
 });
