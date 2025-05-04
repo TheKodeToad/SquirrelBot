@@ -6,6 +6,7 @@ import { compress } from "hono/compress";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import path from "path";
+import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "../brand.ts";
 import { moduleLogger } from "../common/logger/index.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
 import { pool } from "../db/index.ts";
@@ -32,9 +33,25 @@ app.use(compress());
 app.use("/*", serveStatic({ root: staticRoot })); // yea
 
 app.get("/env.js", context => {
-	const env = JSON.stringify({ CLIENT_ID, REDIRECT_URI, INVITE_PERMISSIONS });
+	const env = JSON.stringify({
+		CLIENT_ID,
+		REDIRECT_URI,
+		INVITE_PERMISSIONS,
 
-	return context.body(`window.SQUIRREL_ENV=${env}`, 200, { "Content-Type": "text/javascript" });
+		APP_NAME,
+		APP_DESCRIPTION,
+		APP_SOURCE_CODE,
+		APP_LIBRARIES_LINK,
+	});
+
+	const title = JSON.stringify(APP_NAME + " Dashboard");
+
+	return context.body(
+		`window.SQUIRREL_ENV=${env}\n`
+		+ `document.querySelector("title").innerText=${title}`,
+		200,
+		{ "Content-Type": "text/javascript" }
+	);
 });
 
 app.notFound(
