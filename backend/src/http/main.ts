@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
+import type { ResponseHeader } from "hono/utils/headers";
 import { moduleLogger } from "../common/logger/index.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
 import { pool } from "../db/index.ts";
@@ -17,14 +18,22 @@ const logger = moduleLogger();
 const app = new Hono;
 
 app.use(nortonAntivirusPlus());
+app.use(async (context, next) => {
+	await next();
+
+	const cspHeader: ResponseHeader = "Content-Security-Policy";
+
+	if (!context.res.headers.has(cspHeader))
+		context.res.headers.set(cspHeader, "self-src 'none'");
+});
+
+const ROBOTS = `User-agent: *
+Disallow: /api/`;
 
 app.get("/robots.txt", context => context.text(ROBOTS));
 
 app.route("/api", api);
 app.route("/", frontend);
-
-const ROBOTS = `User-agent: *
-Disallow: /api/`;
 
 app.onError((error, context) => {
 	if (error instanceof HTTPException) {

@@ -49,7 +49,7 @@ router.get("/*", context => {
   </body>
 </html>`;
 
-	return context.html(generated, 200, { "Content-Security-Policy": csp.join(";") });
+	return context.html(generated, 200, { "Content-Security-Policy": csp.join("; ") });
 });
 
 export default router;
