@@ -67,6 +67,9 @@ export const unbanCommand = defineCommand({
 				continue;
 			}
 
+			// consistent with bulkAction
+			const createdAt = new Date;
+
 			try {
 				await context.guild.removeBan(target, args.reason ?? undefined);
 			} catch (error) {
@@ -78,6 +81,7 @@ export const unbanCommand = defineCommand({
 			}
 
 			const caseNumber = await createCase(context.guild.id, {
+				createdAt,
 				type: CaseType.Unban,
 				actorID: context.user.id,
 				targetID: target,
