@@ -51,7 +51,7 @@ export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): 
 	if (info.expiresAt === null)
 		summary += " permanently";
 	else
-		summary += ` temporarily (${humanizeDuration(info.expiresAt.getTime() - info.createdAt.getTime())})`;
+		summary += ` for ${humanizeDuration(info.expiresAt.getTime() - info.createdAt.getTime())}`;
 
 	if (info.reason === null)
 		summary += ".";

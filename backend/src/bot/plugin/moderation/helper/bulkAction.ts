@@ -100,18 +100,29 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 		const createdAt = new Date;
 		const expiresAt = action.duration !== undefined ? new Date(createdAt.getTime() + action.duration) : undefined;
 
-		if (action.membersOnly) {
-			if (!(target instanceof Member)) {
-				result.unsuccessful.push({
-					error: "The user is not a member of the server",
-					user: target,
-				});
-				continue;
-			}
+		try {
+			if (action.membersOnly) {
+				if (!(target instanceof Member)) {
+					result.unsuccessful.push({
+						error: "The user is not a member of the server",
+						user: target,
+					});
+					continue;
+				}
 
-			await action.perform(target, expiresAt);
-		} else
-			await action.perform(target, expiresAt);
+				await action.perform(target, expiresAt);
+			} else
+				await action.perform(target, expiresAt);
+		} catch (error) {
+			if (!(error instanceof DiscordRESTError))
+				throw error;
+
+			result.unsuccessful.push({
+				user: target,
+				error: formatRESTError(error),
+			});
+			continue;
+		}
 
 		const caseOptions = action.makeCase({
 			createdAt,

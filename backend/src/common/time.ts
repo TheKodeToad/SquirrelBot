@@ -83,6 +83,7 @@ function humanizeDurationSegments(duration: number): string[] {
 	return result;
 }
 
+/** Markdown safe */
 export function humanizeDuration(duration: number): string {
 	let result = "";
 	const segments = humanizeDurationSegments(duration);

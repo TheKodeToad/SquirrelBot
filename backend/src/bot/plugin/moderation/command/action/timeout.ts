@@ -76,20 +76,20 @@ export const timeoutCommand = defineCommand({
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Timed out ${formatBulkSuccess(successful[0]!)} for ${humanizeDuration(args.duration)}!`);
+				await context.respond(`${icons.success} Timed out ${formatBulkSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not timeout ${formatBulkError(unsuccessful[0]!)} for ${humanizeDuration(args.duration)}!`);
+				await context.respond(`${icons.error} Could not timeout ${formatBulkError(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatBulkSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatBulkError(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Timed out all ${args.user.length} users for ${humanizeDuration(args.duration)}:\n${successfulMessage}`
+					`${icons.success} Timed out all ${args.user.length} users:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were timed out for ${humanizeDuration(args.duration)}:\n${unsuccessfulMessage}`
+					`${icons.error} None of ${args.user.length} users were timed out:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
