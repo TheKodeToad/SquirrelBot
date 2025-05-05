@@ -35,7 +35,7 @@ router.get("/*", context => {
 	csp.push("style-src 'self' 'unsafe-inline'");
 
 	const generated = html`<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>${APP_NAME} Dashboard</title>

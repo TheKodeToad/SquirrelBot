@@ -16,12 +16,15 @@ const logger = moduleLogger();
 
 const app = new Hono;
 
-app.use(nortonAntivirusPlus({
-	// contentSecurityPolicy: { defaultSrc: ["'none'"] }
-}));
+app.use(nortonAntivirusPlus());
+
+app.get("/robots.txt", context => context.text(ROBOTS));
 
 app.route("/api", api);
 app.route("/", frontend);
+
+const ROBOTS = `User-agent: *
+Disallow: /api/`;
 
 app.onError((error, context) => {
 	if (error instanceof HTTPException) {
