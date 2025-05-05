@@ -63,14 +63,12 @@ export const banCommand = defineCommand({
 					deleteMessageSeconds: deleteMessageSeconds,
 				});
 			},
-			makeCase(actor, target, dmDelivered) {
+			makeCase(options) {
 				return {
+					...options,
 					type: CaseType.Ban,
-					actorID: actor,
-					targetID: target,
 					reason: args.reason ?? undefined,
 					deleteMessageSeconds,
-					dmDelivered,
 				};
 			},
 		});

@@ -49,31 +49,27 @@ export const timeoutCommand = defineCommand({
 			}
 			: undefined;
 
-		const expiresAt = new Date(Date.now() + args.duration);
-
 		const { successful, unsuccessful } = await doBulkAction({
 			guild: context.guild,
 			ids: args.user,
 
 			actor: context.member,
 			directMessage,
+			duration: args.duration,
 
 			membersOnly: true,
 
-			async perform(member) {
+			async perform(member, calculatedExpiry) {
 				await context.guild.editMember(member.id, {
-					communicationDisabledUntil: expiresAt.toISOString(),
+					communicationDisabledUntil: calculatedExpiry!.toISOString(),
 					reason: args.reason ?? undefined,
 				});
 			},
-			makeCase(actor, target, dmDelivered) {
+			makeCase(options) {
 				return {
+					...options,
 					type: CaseType.Timeout,
-					expiresAt,
-					actorID: actor,
-					targetID: target,
 					reason: args.reason ?? undefined,
-					dmDelivered,
 				};
 			},
 		});

@@ -53,7 +53,7 @@ export interface CaseInfo extends InferOutput<typeof caseInfoSchema> { }
 
 export interface CreateCaseOptions {
 	type: CaseType;
-	createdAt?: Date;
+	createdAt: Date;
 	expiresAt?: Date;
 
 	actorID: string;
@@ -157,8 +157,6 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 
 export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
 	// TODO: might have edge cases but it's pretty darn unlikely
-
-	options.createdAt ??= new Date;
 
 	const client = await pool.connect();
 

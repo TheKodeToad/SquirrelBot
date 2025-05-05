@@ -53,13 +53,11 @@ export const kickCommand = defineCommand({
 			membersOnly: true,
 
 			perform: async member => await context.guild.removeMember(member.id, args.reason ?? undefined),
-			makeCase(actor, target, dmDelivered) {
+			makeCase(options) {
 				return {
+					...options,
 					type: CaseType.Kick,
-					actorID: actor,
-					targetID: target,
 					reason: args.reason ?? undefined,
-					dmDelivered,
 				};
 			},
 		});

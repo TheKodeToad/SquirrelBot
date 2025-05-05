@@ -51,13 +51,11 @@ export const warnCommand = defineCommand({
 			membersOnly: false,
 
 			perform() { },
-			makeCase(actor, target, dmDelivered) {
+			makeCase(options) {
 				return {
+					...options,
 					type: CaseType.Warn,
-					actorID: actor,
-					targetID: target,
 					reason: args.reason ?? undefined,
-					dmDelivered,
 				};
 			},
 		});

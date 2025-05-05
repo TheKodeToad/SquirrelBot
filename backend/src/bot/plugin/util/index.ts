@@ -22,5 +22,5 @@ export const utilPlugin = definePlugin({
 	description: "Useful general purpose utilities.",
 
 	config: { store: utilConfig, defaultValue: defaultConfig },
-	commands: [inviteInfoCommand, pingCommand, snowflakeCommand],
-});;
+	commands: [inviteInfoCommand, pingCommand, snowflakeCommand]
+});
