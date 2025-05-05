@@ -31,11 +31,22 @@ bot.once("ready", async () => {
 	process.on("SIGTERM", shutDown);
 });
 
+bot.on("shardPreReady", id => logger.debug?.(`Shard #${id} received READY packet`));
+bot.on("shardReady", id => logger.info?.(`Shard #${id} ready`));
+bot.on("shardResume", id => logger.info?.(`Shard #${id} resumed`));
+bot.on("shardDisconnect", (error, id) => {
+	if (error === undefined)
+		logger.info?.(`Shard #${id} disconnected`);
+	else
+		logger.error?.(`Shard #${id} disconnected with error`, error);
+});
+bot.on("connect", id => logger.info?.(`Shard #${id} connected`));
+
 bot.on("error", (error, shard) => {
 	if (shard !== undefined)
-		logger.error?.(`Oceanic emitted error in shard #${shard}`, error);
+		logger.error?.(`Oceanic error (shard #${shard})`, error);
 	else
-		logger.error?.("Oceanic emitted error", error);
+		logger.error?.("Oceanic error", error);
 });
 
 bot.on("warn", (info, shard) => {
