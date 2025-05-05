@@ -2,14 +2,14 @@ import { A } from "@solidjs/router";
 import { For } from "solid-js";
 import { GuildIcon } from "../component/common/GuildIcon";
 import { LoginGate } from "../component/LoginGate";
-import { CLIENT_ID, INVITE_PERMISSIONS } from "../environment";
+import { APP_INVITE_PERMISSIONS, CLIENT_ID } from "../constants";
 import { guilds } from "../state/guilds";
 
 export const Home = () => <LoginGate><GuildsComponent /></LoginGate>;
 
 const INVITE_URL = "https://discord.com/oauth2/authorize?" + new URLSearchParams({
 	client_id: CLIENT_ID,
-	permissions: INVITE_PERMISSIONS,
+	permissions: APP_INVITE_PERMISSIONS,
 	integration_type: "0",
 	scope: "bot",
 });

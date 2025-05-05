@@ -13,7 +13,7 @@ const context = await esbuild.context({
 	outfile: "static/app.js",
 	bundle: true,
 	treeShaking: true,
-	minify: !watch,
+	minify: true,
 	plugins: [solidPlugin()],
 	logLevel: "info",
 });

@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { Permissions } from "oceanic.js";
 import process from "process";
 import { LogLevel, logLevelByName } from "./common/logger/level.ts";
 
@@ -7,12 +6,6 @@ export const CLIENT_ID = process.env["CLIENT_ID"] || "";
 export const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";
 export const REDIRECT_URI = process.env["REDIRECT_URI"] || "";
 export const BOT_TOKEN = process.env["BOT_DISCORD_TOKEN"] || "";
-export const INVITE_PERMISSIONS = process.env["INVITE_PERMISSIONS"] || (
-	Permissions.VIEW_AUDIT_LOG | Permissions.KICK_MEMBERS | Permissions.BAN_MEMBERS
-	| Permissions.MANAGE_WEBHOOKS | Permissions.VIEW_CHANNEL | Permissions.MODERATE_MEMBERS
-	| Permissions.SEND_MESSAGES | Permissions.SEND_MESSAGES_IN_THREADS | Permissions.MANAGE_MESSAGES
-	| Permissions.EMBED_LINKS | Permissions.READ_MESSAGE_HISTORY | Permissions.MUTE_MEMBERS | Permissions.DEAFEN_MEMBERS
-).toString();
 export const BOT_ALLOWED_GUILDS = process.env["BOT_ALLOWED_GUILDS"]?.split(",") ?? [];
 export const HTTP_PORT = Number(process.env["PORT"]) || 8080;
 export const LOG_LEVEL = logLevelByName(process.env["LOG_LEVEL"] || "info") ?? LogLevel.Info;

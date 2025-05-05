@@ -1,18 +1,14 @@
 import { serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
-import fs from "fs/promises";
 import { Hono } from "hono";
-import { compress } from "hono/compress";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
-import path from "path";
-import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "../brand.ts";
 import { moduleLogger } from "../common/logger/index.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
 import { pool } from "../db/index.ts";
 import { checkMigrationsOrExit } from "../db/migration.ts";
-import { CLIENT_ID, HTTP_PORT, INVITE_PERMISSIONS, REDIRECT_URI } from "../environment.ts";
-import api_v1 from "./api/v1/index.ts";
+import { HTTP_PORT } from "../environment.ts";
+import api from "./route/api/index.ts";
+import frontend from "./route/frontend.ts";
 
 await checkMigrationsOrExit();
 
@@ -21,43 +17,11 @@ const logger = moduleLogger();
 const app = new Hono;
 
 app.use(nortonAntivirusPlus({
-	contentSecurityPolicy: { defaultSrc: ["'self'"], imgSrc: ["'self' cdn.discordapp.com"], styleSrc: ["'self' 'unsafe-inline'"] }
+	// contentSecurityPolicy: { defaultSrc: ["'none'"] }
 }));
 
-app.route("/api/v1", api_v1);
-
-const staticRoot = "../frontend/static";
-
-app.use(compress());
-
-app.use("/*", serveStatic({ root: staticRoot })); // yea
-
-app.get("/env.js", context => {
-	const env = JSON.stringify({
-		CLIENT_ID,
-		REDIRECT_URI,
-		INVITE_PERMISSIONS,
-
-		APP_NAME,
-		APP_DESCRIPTION,
-		APP_SOURCE_CODE,
-		APP_LIBRARIES_LINK,
-	});
-
-	const title = JSON.stringify(APP_NAME + " Dashboard");
-
-	return context.body(
-		`window.SQUIRREL_ENV=${env}\n`
-		+ `document.querySelector("title").innerText=${title}`,
-		200,
-		{ "Content-Type": "text/javascript" }
-	);
-});
-
-app.notFound(
-	async context =>
-		context.html(await fs.readFile(path.join(staticRoot, "app.html"), "utf-8"))
-);
+app.route("/api", api);
+app.route("/", frontend);
 
 app.onError((error, context) => {
 	if (error instanceof HTTPException) {
@@ -71,10 +35,10 @@ app.onError((error, context) => {
 	return context.json({ message: "Internal server error" }, 500);
 });
 
-const server = serve({
-	fetch: app.fetch,
-	port: HTTP_PORT,
-}, info => logger.info?.(`Listening on ${info.port}`));
+const server = serve(
+	{ fetch: app.fetch, port: HTTP_PORT },
+	info => logger.info?.(`Listening on ${info.port}`)
+);
 
 async function beginDeleteTokenLoop(): Promise<void> {
 	try {

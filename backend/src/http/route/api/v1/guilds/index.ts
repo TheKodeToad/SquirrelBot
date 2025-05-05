@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { getAPIGuildInfoByOwner } from "../../../../db/core/guildInfo.ts";
-import { authMiddleware } from "../../../middleware/auth.ts";
-import { guildAuthMiddleware } from "../../../middleware/guildAuth.ts";
+import { getAPIGuildInfoByOwner } from "../../../../../db/core/guildInfo.ts";
+import { authMiddleware } from "../../../../middleware/auth.ts";
+import { guildAuthMiddleware } from "../../../../middleware/guildAuth.ts";
 import config from "./config.ts";
 import moderation from "./moderation/index.ts";
 

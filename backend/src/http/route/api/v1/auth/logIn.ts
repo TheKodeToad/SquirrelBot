@@ -2,8 +2,8 @@ import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { object, string } from "valibot";
-import { generateToken } from "../../../../db/api/tokens.ts";
-import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../environment.ts";
+import { generateToken } from "../../../../../db/api/tokens.ts";
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../../../../../environment.ts";
 
 interface TokenResponse {
 	token_type: string;

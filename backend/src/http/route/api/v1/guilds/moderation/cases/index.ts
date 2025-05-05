@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { CaseType, type CaseInfo } from "../../../../../../db/moderation/cases.ts";
+import { CaseType, type CaseInfo } from "../../../../../../../db/moderation/cases.ts";
 import byFilter from "./byFilter.ts";
 import byNumber from "./byNumber.ts";
 
