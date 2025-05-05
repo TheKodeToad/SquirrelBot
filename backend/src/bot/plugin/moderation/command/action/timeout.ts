@@ -1,3 +1,4 @@
+import humanizeDuration from "humanize-duration";
 import { CaseType } from "../../../../../db/moderation/cases.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { defineCommand, OptionType } from "../../../core/public/command.ts";
@@ -44,7 +45,7 @@ export const timeoutCommand = defineCommand({
 		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
 			? config.timeout.direct_message ?? {
-				content: `You are temporarily timed out in ${escapeMarkdown(context.guild.name)}.`
+				content: `You are timed out for ${humanizeDuration(args.duration)} in ${escapeMarkdown(context.guild.name)}.`
 			}
 			: undefined;
 

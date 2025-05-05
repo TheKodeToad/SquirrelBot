@@ -1,3 +1,4 @@
+import humanizeDuration from "humanize-duration";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
 import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
@@ -51,7 +52,7 @@ export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): 
 	if (info.expiresAt === null)
 		summary += " permanently";
 	else
-		summary += " temporarily";
+		summary += ` temporarily (${humanizeDuration(info.expiresAt.getTime() - info.createdAt.getTime())})`;
 
 	if (info.reason === null)
 		summary += ".";
