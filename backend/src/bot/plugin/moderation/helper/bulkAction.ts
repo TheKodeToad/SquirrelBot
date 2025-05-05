@@ -8,7 +8,7 @@ type BulkAction =
 	(
 		{
 			membersOnly: true;
-			perform: (user: Member, calculatedExpiry: Date | undefined) => Promise<void> | void;
+			perform: (member: Member, calculatedExpiry: Date | undefined) => Promise<void> | void;
 		}
 		| {
 			membersOnly: false;
@@ -23,6 +23,7 @@ type BulkAction =
 		directMessage?: CreateMessageOptions;
 		duration?: number;
 
+		canPerform?(member: Member): Promise<boolean> | boolean;
 		makeCase(options: Pick<CreateCaseOptions, "createdAt" | "expiresAt" | "actorID" | "targetID" | "dmDelivered">): CreateCaseOptions;
 	};
 
@@ -47,6 +48,9 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 
 	const members = await fetchMembersCached(action.guild, action.ids);
 
+	// eslint-disable-next-line @typescript-eslint/unbound-method
+	action.canPerform ??= () => true;
+
 	for (const targetID of action.ids) {
 		let target: Member | User;
 		let dmDelivered = false;
@@ -64,7 +68,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 				continue;
 			}
 
-			if (!canModerate(action.guild.clientMember, target)) {
+			if (!action.canPerform(target) || !canModerate(action.guild.clientMember, target)) {
 				result.unsuccessful.push({
 					error: "App lacks permission to moderate the user",
 					user: target,

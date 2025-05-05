@@ -26,7 +26,7 @@ export const warnCommand = defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
-			description: "Choose whether to notify the warned user with a direct message - overrides the configured default!",
+			description: "Choose whether to notify the warned user with a DM (overrides the configured default).",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},

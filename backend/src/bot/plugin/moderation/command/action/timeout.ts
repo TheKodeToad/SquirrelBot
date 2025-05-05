@@ -1,3 +1,4 @@
+import { Permissions } from "oceanic.js";
 import { humanizeDuration } from "../../../../../common/time.ts";
 import { CaseType } from "../../../../../db/moderation/cases.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
@@ -10,7 +11,7 @@ import { moderationConfig } from "../../index.ts";
 
 export const timeoutCommand = defineCommand({
 	name: ["timeout", "mute", "chatmute"],
-	description: "Prevent a member from chatting - or doing anything other than reading messages - in the server.",
+	description: "Time out a member (only allow them to read messages).",
 
 	options: {
 		user: {
@@ -34,7 +35,7 @@ export const timeoutCommand = defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
-			description: "Choose whether to notify the affected user with a direct message - overrides the configured default!",
+			description: "Choose whether to notify the timed out user with a DM (overrides the configured default).",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		}
@@ -59,6 +60,7 @@ export const timeoutCommand = defineCommand({
 
 			membersOnly: true,
 
+			canPerform: member => member.permissions.has(Permissions.ADMINISTRATOR),
 			async perform(member, calculatedExpiry) {
 				await context.guild.editMember(member.id, {
 					communicationDisabledUntil: calculatedExpiry!.toISOString(),
@@ -78,7 +80,7 @@ export const timeoutCommand = defineCommand({
 			if (successful.length === 1)
 				await context.respond(`${icons.success} Timed out ${formatBulkSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not timeout ${formatBulkError(unsuccessful[0]!)}!`);
+				await context.respond(`${icons.error} Could not time out ${formatBulkError(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatBulkSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatBulkError(item)}`).join("\n");

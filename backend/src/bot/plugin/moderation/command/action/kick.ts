@@ -28,7 +28,7 @@ export const kickCommand = defineCommand({
 		dm: {
 			type: OptionType.Flag,
 			name: ["dm", "d", "direct-message"],
-			description: "Choose whether to notify the kicked user with a direct message - overrides the configured default!",
+			description: "Choose whether to notify the kicked user with a DM (overrides the configured default).",
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},
 	},
