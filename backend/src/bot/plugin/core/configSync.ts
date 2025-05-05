@@ -8,7 +8,7 @@ import { addChannelListener } from "../../../db/notification.ts";
 import { coreConfigSchema } from "../../../schema/plugin/core.ts";
 import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
 import { getPlugin, getPlugins } from "../../loader/index.ts";
-import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds } from "./guildInfoSync.ts";
+import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds, isGuildAllowed } from "./guildInfoSync.ts";
 import type { ConfigStore } from "./public/config.ts";
 
 const logger = moduleLogger();
@@ -61,6 +61,11 @@ async function installConfigChangeListener(): Promise<void> {
 
 		if (!(typeof key === "string" && typeof guildID === "string")) {
 			logger.warn?.("configUpdate payload contains non string values");
+			return;
+		}
+
+		if (!isGuildAllowed(guildID)) {
+			logger.debug?.(`${debugFormatGuildByID(guildID)} not allowed; not updating config`);
 			return;
 		}
 
