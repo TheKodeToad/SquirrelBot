@@ -1,10 +1,11 @@
 import crypto from "crypto";
 import { date, object, string } from "valibot";
+import { DAY } from "../../common/time.ts";
 import { dbParse, pool } from "../index.ts";
 
 const ALGORITHM = "sha-256";
-const TOKEN_LIFETIME = 30 * 24 * 60 * 60 * 1000;
-const TOKEN_REFRESH_THRESHOLD = 7 * 24 * 60 * 60 * 1000;
+const TOKEN_LIFETIME = 30 * DAY;
+const TOKEN_REFRESH_THRESHOLD = 7 * DAY;
 
 const tokenInfoSchema = object({
 	userID: string(),

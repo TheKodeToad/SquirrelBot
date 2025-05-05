@@ -1,5 +1,4 @@
-import humanizeDuration from "humanize-duration";
-import { dateToUnixSeconds } from "../../../../common/time.ts";
+import { dateToUnixSeconds, humanizeDuration } from "../../../../common/time.ts";
 import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
 import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownQuote } from "../../../common/discord/markdown.ts";
@@ -108,4 +107,3 @@ export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> 
 
 	return result;
 }
-

@@ -1,4 +1,5 @@
 import { isSnowflake } from "../../../../../common/snowflake.ts";
+import { CENTURY, DAY, DECADE, HOUR, MILLENIUM, MINUTE, MONTH, SECOND, WEEK, YEAR } from "../../../../../common/time.ts";
 import type { StringReader } from "./stringReader.ts";
 
 export function readBoolean(reader: StringReader): boolean | null {
@@ -153,14 +154,6 @@ export function readDuration(reader: StringReader): number | null {
 	return total;
 }
 
-const SECOND = 1000;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-const DAY = HOUR * 24;
-const WEEK = DAY * 7;
-const YEAR = DAY * 365.25;
-const MONTH = YEAR / 12;
-
 function durationToMS(length: number, unit: string): number | null {
 	switch (unit) {
 		case "ms":
@@ -186,6 +179,15 @@ function durationToMS(length: number, unit: string): number | null {
 
 		case "y": case "yr": case "yrs": case "year": case "years":
 			return length * YEAR;
+
+		case "dc": case "dcs": case "dec": case "decs": case "decade": case "decades":
+			return length * DECADE;
+
+		case "c": case "cs": case "cent": case "cents": case "century": case "centuries":
+			return length * CENTURY;
+
+		case "mi": case "mis": case "mil": case "mils": case "mill": case "mills": case "millenium": case "millenia":
+			return length * MILLENIUM;
 
 		default:
 			return null;

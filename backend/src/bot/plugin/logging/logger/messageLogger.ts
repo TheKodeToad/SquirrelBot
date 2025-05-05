@@ -1,5 +1,6 @@
 import { Routes } from "oceanic.js";
 import { moduleLogger } from "../../../../common/logger/index.ts";
+import { HOUR, MINUTE } from "../../../../common/time.ts";
 import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "../../../../db/logger/messageCache.ts";
 import { fetchTextableGuildChannelCached } from "../../../common/discord/cachedRequest.ts";
 import { Colors } from "../../../common/discord/colors.ts";
@@ -11,8 +12,8 @@ import { loggingConfig } from "../index.ts";
 
 const logger = moduleLogger();
 
-const MESSAGE_CLEANUP_INTERVAL = 30 * 60 * 1000;
-const MESSAGE_CLEANUP_THRESHOLD = 6 * 60 * 60 * 1000;
+const MESSAGE_CLEANUP_INTERVAL = 30 * MINUTE;
+const MESSAGE_CLEANUP_THRESHOLD = 6 * HOUR;
 
 export const messageLoggerCreateListener = defineEventListener("messageCreate", async message => {
 	if (message.guildID === null)

@@ -1,3 +1,4 @@
+import { HOUR } from "../../../../../common/time.ts";
 import { CaseType } from "../../../../../db/moderation/cases.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
@@ -46,7 +47,7 @@ export const banCommand = defineCommand({
 			}
 			: undefined;
 
-		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages) * (1000 * 60 * 60 * 24);
+		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages) * (24 * HOUR);
 
 		const { successful, unsuccessful } = await doBulkAction({
 			guild: context.guild,

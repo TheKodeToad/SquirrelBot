@@ -1,3 +1,4 @@
+import { WEEK } from "../../../../../common/time.ts";
 import { isUndeletableMessageType } from "../../../../common/discord/typeGuards.ts";
 import { bot } from "../../../../index.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
@@ -50,7 +51,7 @@ export const purgeCommand = defineCommand({
 			let stop = false;
 
 			const toDelete: string[] = [];
-			const twoWeeksAgo = Date.now() - (1000 * 60 * 60 * 24 * 14);
+			const twoWeeksAgo = Date.now() - (2 * WEEK);
 
 			for (const message of messages) {
 				if (message.createdAt.getTime() < twoWeeksAgo) {

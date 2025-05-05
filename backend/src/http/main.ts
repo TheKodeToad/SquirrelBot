@@ -4,6 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
 import { moduleLogger } from "../common/logger/index.ts";
+import { HOUR } from "../common/time.ts";
 import { deleteExpiredTokens } from "../db/api/tokens.ts";
 import { pool } from "../db/index.ts";
 import { checkMigrationsOrExit } from "../db/migration.ts";
@@ -60,7 +61,7 @@ async function beginDeleteTokenLoop(): Promise<void> {
 
 		logger.debug?.(`Deleted ${deletedCount} tokens`);
 	} finally {
-		setTimeout(beginDeleteTokenLoop, 60 * 60 * 1000).unref();
+		setTimeout(beginDeleteTokenLoop, 1 * HOUR).unref();
 	}
 }
 
