@@ -56,6 +56,8 @@ function humanizeDurationSegments(duration: number): string[] {
 	if (duration >= WEEK)
 		return result;
 
+	// TODO: looks like I forgot something
+
 	if (remainder >= HOUR) {
 		result.push(Math.floor(remainder / HOUR) + " hours");
 		remainder %= HOUR;

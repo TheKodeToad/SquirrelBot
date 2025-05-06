@@ -1,4 +1,4 @@
-import { DiscordRESTError, Member, User, type Uncached } from "oceanic.js";
+import { DiscordRESTError, type Uncached } from "oceanic.js";
 import { fetchUserCachedSupressed } from "./cachedRequest.ts";
 import { escapeMarkdown } from "./markdown.ts";
 
@@ -23,15 +23,17 @@ export async function formatUserBoldByID(id: string): Promise<string> {
 	return formatUserBold(await fetchUserCachedSupressed(id));
 }
 
-export function formatUser(user: User | Member | Uncached): string {
+type UserLike = { id: string; tag: string; } | Uncached;
+
+export function formatUser(user: UserLike): string {
 	return `${formatUserTag(user)} (<@${user.id}>)`;
 }
 
-export function formatUserBold(user: User | Member | Uncached): string {
+export function formatUserBold(user: UserLike): string {
 	return `**${formatUserTag(user)}** (<@${user.id}>)`;
 }
 
-export function formatUserTag(user: User | Member | Uncached): string {
+export function formatUserTag(user: UserLike): string {
 	if ("tag" in user)
 		return escapeMarkdown(user.tag);
 	else
