@@ -1,26 +1,33 @@
-import { format } from "./formatting.ts";
-import { parseTemplateTokens, type Token } from "./parsing.ts";
+/*
+ * Parsing and formatting for templates for config values like 'Hello {{user#tag}}'.
+ *
+ * The message is split in to "tokens" and validated based on the passed schema.
+ * This is a loose usage of the term, but in this case tokens consist of:
+ * - Any literal text
+ * - Parsed expressions inside {{}}
+ *
+ * These tokens are then rejoined in the formatting stage, based on the passed parameters.
+ */
 
-export class Template<P extends Record<string, ParameterType>> {
-	private _tokens: Token[];
+import { formatTokens } from "./formatting.ts";
+import { parseTemplateTokens } from "./parsing.ts";
 
-	public static parse<P extends Record<string, ParameterType>>(template: string, params: P): Template<P> | string {
-		const tokens = parseTemplateTokens(template, params);
+/**
+ * @returns A function to call to format data with the template,
+ * or an error denoting something that went wrong with parsing.
+ */
+export function parseTemplate<S extends TemplateSchema>(template: string, schema: S): ((params: ParameterRecord<S>) => string) | string {
+	// just a typed wrapper
+	const tokens = parseTemplateTokens(template, schema);
 
-		if (typeof tokens === "string")
-			return tokens;
+	if (typeof tokens === "string")
+		return tokens;
 
-		return new Template(tokens);
-	}
-
-	private constructor(tokens: Token[]) {
-		this._tokens = tokens;
-	}
-
-	public format(params: { readonly [K in keyof P]: ParameterValue<P[K]> }): string {
-		return format(params, this._tokens);
-	}
+	return params => formatTokens(params, tokens);
 }
+
+export type TemplateSchema = Record<string, ParameterType>;
+export type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]: ParameterValue<S[K]> };
 
 export const enum FormattingWrapper {
 	BlockQuote,
@@ -64,8 +71,6 @@ export const enum TimestampPresentationType {
 }
 
 export type UserParameter = { id: string; tag: string; };
-
-export type AnyParameterValue = ParameterValue<any>;
 
 type ParameterValue<T extends ParameterType = any> =
 	T extends ParameterType.User ? UserParameter :

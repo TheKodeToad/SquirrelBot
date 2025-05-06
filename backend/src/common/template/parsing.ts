@@ -8,7 +8,7 @@ interface FormatGroups {
 	presentation?: string;
 };
 
-export function parseTemplateTokens(template: string, params: Record<string, ParameterType>): Token[] | string {
+export function parseTemplateTokens(template: string, schema: Record<string, ParameterType>): Token[] | string {
 	const result: Token[] = [];
 
 	let match = FORMAT_PATTERN.exec(template);
@@ -23,7 +23,7 @@ export function parseTemplateTokens(template: string, params: Record<string, Par
 		}
 
 		const groups = match.groups as unknown as FormatGroups;
-		const token = parseFormatToken(groups, params);
+		const token = parseFormatToken(groups, schema);
 
 		if (typeof token === "string")
 			return token;
