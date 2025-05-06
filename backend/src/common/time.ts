@@ -40,7 +40,7 @@ function humanizeDurationSegments(duration: number): string[] {
 
 	if (remainder >= WEEK) {
 		const weeks = Math.floor(remainder / WEEK);
-		result.push(weeks + (weeks === 1 ? " years" : " weeks"));
+		result.push(weeks + (weeks === 1 ? " week" : " weeks"));
 		remainder %= WEEK;
 	}
 
@@ -49,17 +49,16 @@ function humanizeDurationSegments(duration: number): string[] {
 
 	if (remainder >= DAY) {
 		const days = Math.floor(remainder / DAY);
-		result.push(days + " days");
+		result.push(days + (days === 1 ? " day" : " days"));
 		remainder %= DAY;
 	}
 
 	if (duration >= WEEK)
 		return result;
 
-	// TODO: looks like I forgot something
-
 	if (remainder >= HOUR) {
-		result.push(Math.floor(remainder / HOUR) + " hours");
+		const hours = Math.floor(remainder / HOUR);
+		result.push(hours + (hours === 1 ? " hour" : " hours"));
 		remainder %= HOUR;
 	}
 
@@ -67,7 +66,8 @@ function humanizeDurationSegments(duration: number): string[] {
 		return result;
 
 	if (remainder >= MINUTE) {
-		result.push(Math.floor(remainder / MINUTE) + " minutes");
+		const minutes = Math.floor(remainder / MINUTE);
+		result.push(minutes + (minutes === 1 ? " minute" : " minutes"));
 		remainder %= MINUTE;
 	}
 
@@ -75,7 +75,8 @@ function humanizeDurationSegments(duration: number): string[] {
 		return result;
 
 	if (remainder >= SECOND) {
-		result.push(Math.floor(remainder / SECOND) + " seconds");
+		const seconds = Math.floor(remainder / SECOND);
+		result.push(seconds + (seconds === 1 ? " second" : " seconds"));
 		remainder %= SECOND;
 	}
 
