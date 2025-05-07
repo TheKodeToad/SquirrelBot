@@ -1,4 +1,4 @@
-import { type AnyGuildChannel, ChannelTypes, Member, Permissions, Role } from "oceanic.js";
+import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role } from "oceanic.js";
 import { requireExhaustiveSwitch } from "../../../common/types.ts";
 import { bot } from "../../index.ts";
 
@@ -19,9 +19,17 @@ export function getHighestRole(member: Member): Role {
 		.reduce((prev, cur) => prev?.position > cur.position ? prev : cur);
 }
 
+const QUARANTINE = GuildMemberFlags.AUTOMOD_QUARANTINED_BIO | GuildMemberFlags.AUTOMOD_QUARANTINED_CLAN_TAG | GuildMemberFlags.AUTOMOD_QUARANTINED_USERNAME_OR_GUILD_NICKNAME;
+
 export function canWriteInChannel(channel: AnyGuildChannel, member: Member): boolean {
 	// channel was deleted
 	if (bot.getChannel(channel.id) === undefined)
+		return false;
+
+	if (member.pending)
+		return false;
+
+	if ((member.flags & QUARANTINE) !== 0)
 		return false;
 
 	if (member.permissions.has(Permissions.ADMINISTRATOR))
