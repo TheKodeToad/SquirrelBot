@@ -3,7 +3,7 @@ import { moduleLogger } from "../../../../common/logger/index.ts";
 import { HOUR, MINUTE } from "../../../../common/time.ts";
 import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "../../../../db/logger/messageCache.ts";
 import { fetchTextableGuildChannelCached } from "../../../common/discord/cachedRequest.ts";
-import { Colors } from "../../../common/discord/colors.ts";
+import { colors } from "../../../common/discord/colors.ts";
 import { bot } from "../../../index.ts";
 import { defineEventListener } from "../../core/public/eventListener.ts";
 import { isEventConfigEnabled } from "../helper/config.ts";
@@ -82,7 +82,7 @@ export const messageLoggerUpdateListener = defineEventListener("messageUpdate", 
 						value: message.content,
 					}
 				],
-				color: Colors.yellow,
+				color: colors.yellow,
 			}]
 		});
 	}
@@ -122,7 +122,7 @@ export const messageLoggerDeleteListener = defineEventListener("messageDelete", 
 				title: "Message Deleted",
 				author: { name: entry.authorName, iconURL },
 				description: entry.content,
-				color: Colors.red,
+				color: colors.red,
 				footer: { text: `Author ID: ${entry.authorID} • Message ID: ${entry.id}` }
 			}]
 		});

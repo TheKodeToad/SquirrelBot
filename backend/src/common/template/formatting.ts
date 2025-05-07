@@ -1,7 +1,7 @@
 import { formatUser, formatUserBold } from "../../bot/common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownInlineCodeblock, makeMarkdownMultilineCodeblock, makeMarkdownQuote } from "../../bot/common/discord/markdown.ts";
 import { dateToUnixSeconds, humanizeDuration } from "../time.ts";
-import { DurationPresentationType, FormattingWrapper, ParameterType, TimestampPresentationType, UserPresentationType, type ParameterRecord, type UserParameter } from "./index.ts";
+import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType, type GuildParameter, type ParameterRecord, type UserParameter } from "./index.ts";
 import { TokenType, type Token } from "./parsing.ts";
 
 export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
@@ -28,6 +28,15 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 				}
 
 				output = formatUserParam(value, token.presentation);
+				break;
+			case ParameterType.Guild:
+				if (!(typeof value === "object"
+					&& "id" in value && typeof value.id === "string"
+					&& "name" in value && typeof value.name === "string")) {
+					throw new Error(`params['${token.parameter}'] is not a user!`);
+				}
+
+				output = formatGuildParam(value, token.presentation);
 				break;
 			case ParameterType.Duration:
 				if (typeof value !== "number")
@@ -70,7 +79,17 @@ function formatUserParam(user: UserParameter, presentation: UserPresentationType
 		case UserPresentationType.Tag: return escapeMarkdown(user.tag);
 		case UserPresentationType.Mention: return `<@${user.id}>`;
 		case UserPresentationType.ID: return user.id;
-		case UserPresentationType.URL: return `https://discord.com/users/${user.id}`;
+		case UserPresentationType.Link: return `https://discord.com/users/${user.id}`;
+		case UserPresentationType.MaskedLink: return `[${escapeMarkdown(user.tag)}](https://discord.com/users/${user.id})`;
+	}
+}
+
+function formatGuildParam(guild: GuildParameter, presentation: GuildPresentationType): string {
+	switch (presentation) {
+		case GuildPresentationType.Name: return escapeMarkdown(guild.name);
+		case GuildPresentationType.ID: return guild.id;
+		case GuildPresentationType.Link: return `https://discord.com/channels/${guild.id}`;
+		case GuildPresentationType.MaskedLink: return `[${escapeMarkdown(guild.name)}](https://discord.com/channels/${guild.id})`;
 	}
 }
 

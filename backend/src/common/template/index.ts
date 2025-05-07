@@ -10,7 +10,7 @@
  */
 
 import { formatTokens } from "./formatting.ts";
-import { parseTemplateTokens } from "./parsing.ts";
+import { parseTemplateTokens, TokenType } from "./parsing.ts";
 
 /**
  * @returns A function to call to format data with the template,
@@ -22,6 +22,14 @@ export function parseTemplate<S extends TemplateSchema>(template: string, schema
 
 	if (typeof tokens === "string")
 		return tokens;
+
+	if (tokens.length === 0)
+		return () => "";
+
+	if (tokens.length === 1 && tokens[0]!.type === TokenType.Literal) {
+		const { value } = tokens[0]!;
+		return () => value;
+	}
 
 	return params => formatTokens(params, tokens);
 }
@@ -37,6 +45,7 @@ export const enum FormattingWrapper {
 
 export const enum ParameterType {
 	User,
+	Guild,
 	Duration,
 	Timestamp,
 	RawString,
@@ -49,7 +58,15 @@ export const enum UserPresentationType {
 	Tag,
 	Mention,
 	ID,
-	URL,
+	Link,
+	MaskedLink,
+}
+
+export const enum GuildPresentationType {
+	Name,
+	ID,
+	Link,
+	MaskedLink,
 }
 
 export const enum DurationPresentationType {
@@ -71,9 +88,11 @@ export const enum TimestampPresentationType {
 }
 
 export type UserParameter = { id: string; tag: string; };
+export type GuildParameter = { id: string; name: string; };
 
 type ParameterValue<T extends ParameterType = any> =
 	T extends ParameterType.User ? UserParameter :
+	T extends ParameterType.Guild ? GuildParameter :
 	T extends ParameterType.RawString ? string :
 	T extends ParameterType.MarkdownString ? string :
 	T extends ParameterType.Duration ? number :

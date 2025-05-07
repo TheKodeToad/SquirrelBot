@@ -1,63 +1,102 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
-import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type InferOutput } from "valibot";
-import { colorSchema, snowflakeSchema } from "./index.ts";
+import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type BaseIssue, type BaseSchema } from "valibot";
+import type { ParameterRecord, TemplateSchema } from "../../common/template/index.ts";
+import { hexColorSchema, snowflakeSchema } from "./index.ts";
+import { template } from "./template.ts";
 
-export const embedSchema = object({
-	title: optional(string()),
-	description: optional(string()),
-	url: optional(string()),
-	timestamp: optional(pipe(instance(TomlDate), transform(date => date.toISOString()))), // TODO is this filter consistent with Discord's
-	color: optional(colorSchema),
-	footer: optional(object({
-		text: string(),
-		icon: string()
-	})),
-	image: optional(pipe(string(), transform(url => ({ url })))),
-	thumbnail: optional(pipe(string(), transform(url => ({ url })))),
-	author: optional(pipe(object({
-		name: string(),
-		url: optional(string()),
-		icon_url: optional(string())
-	}), transform(({ icon_url, ...input }) => ({ iconURL: icon_url, ...input })))),
-	fields: optional(array(object({
-		name: string(),
-		value: string(),
-		inline: boolean()
-	})))
-});
+export const messageLiteral = message(string());
 
-export const messageSchema = pipe(
-	object({
-		content: optional(pipe(string(), maxLength(2000))),
-		allowed_mentions: optional(pipe(
-			optional(object({
-				everyone: optional(boolean()),
-				replied_user: optional(boolean()),
-				users: optional(union(
-					[
-						boolean(),
-						pipe(array(snowflakeSchema), maxLength(100))
-					]
-				)),
-				roles: optional(union(
-					[
-						boolean(),
-						pipe(array(snowflakeSchema), maxLength(100))
-					]
-				)),
-			}), {}),
-			transform(({ replied_user, ...input }) => ({ repliedUser: replied_user, ...input }))
-		), {}),
-		embeds: optional(array(embedSchema)),
-		silent: optional(boolean())
-	}),
-	transform(({ allowed_mentions, silent, ...input }) => ({
-		allowedMentions: allowed_mentions,
-		flags: silent ? MessageFlags.SUPPRESS_NOTIFICATIONS : 0,
-		...input
-	}))
-);
+export function messageTemplate<S extends TemplateSchema>(schema: S) {
+	return pipe(
+		message(template(schema)),
+		transform(({ content, embeds, ...message }) => (params: ParameterRecord<S>) => ({
+			content: content?.(params),
+			embeds: embeds?.map(
+				({ author, description, fields, footer, image, thumbnail, title, url, ...embed }) => ({
+					author: author !== undefined
+						? {
+							name: author.name(params),
+							url: author.url?.(params),
+							iconURL: author.iconURL?.(params),
+						}
+						: undefined,
+					description: description?.(params),
+					fields: fields?.map(({ name, value, ...field }) => ({
+						name: name?.(params),
+						value: value?.(params),
+						...field
+					})) ?? [],
+					footer: footer !== undefined
+						? { text: footer.text(params), icon: footer.icon(params) }
+						: undefined,
+					image: image !== undefined ? { url: image.url(params) } : undefined,
+					thumbnail: thumbnail !== undefined ? { url: thumbnail.url(params) } : undefined,
+					title: title?.(params),
+					url: url?.(params),
+					...embed
+				})
+			) ?? [],
+			...message
+		}))
+	);
+}
 
-export interface Message extends InferOutput<typeof messageSchema> { }
-export interface Embed extends InferOutput<typeof embedSchema> { }
+function message<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(stringSchema: S) {
+	return pipe(
+		object({
+			content: optional(stringSchema),
+			allowed_mentions: optional(pipe(
+				optional(object({
+					everyone: optional(boolean()),
+					replied_user: optional(boolean()),
+					users: optional(union(
+						[
+							boolean(),
+							pipe(array(snowflakeSchema), maxLength(100))
+						]
+					)),
+					roles: optional(union(
+						[
+							boolean(),
+							pipe(array(snowflakeSchema), maxLength(100))
+						]
+					)),
+				}), {}),
+				transform(({ replied_user, ...input }) => ({ repliedUser: replied_user, ...input }))
+			), {}),
+			embeds: optional(array(embed(stringSchema))),
+			silent: optional(boolean())
+		}),
+		transform(({ allowed_mentions, silent, ...input }) => ({
+			allowedMentions: allowed_mentions,
+			flags: silent ? MessageFlags.SUPPRESS_NOTIFICATIONS : 0,
+			...input
+		}))
+	);
+}
+
+function embed<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(stringSchema: S) {
+	return object({
+		title: optional(stringSchema),
+		description: optional(stringSchema),
+		url: optional(stringSchema),
+		timestamp: optional(pipe(instance(TomlDate), transform(date => date.toISOString()))), // TODO is this filter consistent with Discord's
+		color: optional(hexColorSchema),
+		footer: optional(object({ text: stringSchema, icon: stringSchema })),
+		image: optional(pipe(stringSchema, transform(url => ({ url })))),
+		thumbnail: optional(pipe(stringSchema, transform(url => ({ url })))),
+		author: optional(pipe(object({
+			name: stringSchema,
+			url: optional(stringSchema),
+			icon_url: optional(stringSchema)
+		}), transform(({ icon_url, ...input }) => ({ iconURL: icon_url, ...input })))),
+		fields: optional(array(object({
+			name: stringSchema,
+			value: stringSchema,
+			inline: boolean()
+		})))
+	});
+}
+

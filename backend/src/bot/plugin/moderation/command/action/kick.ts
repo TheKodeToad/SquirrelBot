@@ -38,7 +38,11 @@ export const kickCommand = defineCommand({
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage: CreateMessageOptions | undefined =
 			sendDirectMessage ?
-				config.ban.direct_message ?? {
+				config.ban.direct_message?.({
+					server: context.guild,
+					moderator: context.user,
+					reason: args.reason ?? "*No reason provided.*",
+				}) ?? {
 					content: `You were kicked from ${escapeMarkdown(context.guild.name)}.`
 				} :
 				undefined;

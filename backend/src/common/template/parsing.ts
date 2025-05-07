@@ -1,4 +1,4 @@
-import { DurationPresentationType, FormattingWrapper, ParameterType, TimestampPresentationType, UserPresentationType } from "./index.ts";
+import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType } from "./index.ts";
 
 const FORMAT_PATTERN = /\{\{(?<wrapper>>|`|```)?(?<parameter>\w+)(?:#(?<presentation>\w+))?\}\}?/g;
 
@@ -62,6 +62,14 @@ function parseFormatToken(input: FormatGroups, params: Record<string, ParameterT
 
 			return { ...result, valueType, presentation };
 		}
+		case ParameterType.Guild: {
+			const presentation = parseGuildPresentation(input.presentation);
+
+			if (presentation === null)
+				return `Invalid guild presentation: '${input.presentation!}'`;
+
+			return { ...result, valueType, presentation };
+		}
 		case ParameterType.Duration: {
 			const presentation = parseDurationPresentation(input.presentation);
 
@@ -99,7 +107,18 @@ function parseUserPresentation(input: string | undefined): UserPresentationType 
 		case "tag": return UserPresentationType.Tag;
 		case "mention": return UserPresentationType.Mention;
 		case "id": return UserPresentationType.ID;
-		case "url": return UserPresentationType.URL;
+		case "link": return UserPresentationType.Link;
+		case "masked_link": return UserPresentationType.MaskedLink;
+		default: return null;
+	}
+}
+
+function parseGuildPresentation(input: string | undefined): GuildPresentationType | null {
+	switch (input) {
+		case "name": case undefined: return GuildPresentationType.Name;
+		case "id": return GuildPresentationType.ID;
+		case "link": return GuildPresentationType.Link;
+		case "masked_link": return GuildPresentationType.MaskedLink;
 		default: return null;
 	}
 }
@@ -107,8 +126,8 @@ function parseUserPresentation(input: string | undefined): UserPresentationType 
 function parseDurationPresentation(input: string | undefined): DurationPresentationType | null {
 	switch (input) {
 		case "readable": case undefined: return DurationPresentationType.Readable;
-		case "seconds": case undefined: return DurationPresentationType.Seconds;
-		case "milliseconds": case undefined: return DurationPresentationType.Milliseconds;
+		case "seconds": return DurationPresentationType.Seconds;
+		case "milliseconds": return DurationPresentationType.Milliseconds;
 		default: return null;
 	}
 }
@@ -116,14 +135,14 @@ function parseDurationPresentation(input: string | undefined): DurationPresentat
 function parseTimestampPresentation(input: string | undefined): TimestampPresentationType | null {
 	switch (input) {
 		case "date_time": case "f": case undefined: return TimestampPresentationType.DateTime;
-		case "date_time_long": case "F": case undefined: return TimestampPresentationType.DateTimeLong;
-		case "time": case "t": case undefined: return TimestampPresentationType.Time;
-		case "time_long": case "T": case undefined: return TimestampPresentationType.TimeLong;
-		case "date": case "d": case undefined: return TimestampPresentationType.Date;
-		case "date_long": case "D": case undefined: return TimestampPresentationType.DateLong;
-		case "relative": case "r": case "R": case undefined: return TimestampPresentationType.Relative;
-		case "unix": case undefined: return TimestampPresentationType.Unix;
-		case "unix_seconds": case undefined: return TimestampPresentationType.UnixSeconds;
+		case "date_time_long": case "F": return TimestampPresentationType.DateTimeLong;
+		case "time": case "t": return TimestampPresentationType.Time;
+		case "time_long": case "T": return TimestampPresentationType.TimeLong;
+		case "date": case "d": return TimestampPresentationType.Date;
+		case "date_long": case "D": return TimestampPresentationType.DateLong;
+		case "relative": case "r": case "R": return TimestampPresentationType.Relative;
+		case "unix": return TimestampPresentationType.Unix;
+		case "unix_seconds": return TimestampPresentationType.UnixSeconds;
 		default: return null;
 	}
 }
@@ -144,6 +163,7 @@ export type FormatToken =
 	{ type: TokenType.Format; parameter: string; }
 	& (
 		| { valueType: ParameterType.User; presentation: UserPresentationType; }
+		| { valueType: ParameterType.Guild; presentation: GuildPresentationType; }
 		| { valueType: ParameterType.Duration; presentation: DurationPresentationType; }
 		| { valueType: ParameterType.Timestamp; presentation: TimestampPresentationType; }
 		| { valueType: ParameterType.MarkdownString | ParameterType.RawString; }

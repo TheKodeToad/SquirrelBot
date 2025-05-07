@@ -1,5 +1,6 @@
 import type { BaseIssue, BaseSchema } from "valibot";
 
+export type Schema = SchemaWithOutput<unknown>;
 export type SchemaWithOutput<O> = BaseSchema<unknown, O, BaseIssue<unknown>>;
 
 /**

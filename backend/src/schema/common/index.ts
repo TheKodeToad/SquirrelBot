@@ -1,4 +1,5 @@
-import { check, pipe, string, transform } from "valibot";
+import { check, pipe, string, transform, union } from "valibot";
+import { colors } from "../../bot/common/discord/colors.ts";
 import { isSnowflake } from "../../common/snowflake.ts";
 
 export const snowflakeSchema = pipe(
@@ -8,11 +9,19 @@ export const snowflakeSchema = pipe(
 
 const colorPattern = /#[a-fA-F0-9]{6}/;
 
-export const colorSchema = pipe(
+export const hexColorSchema = pipe(
 	string(),
-	check(input => colorPattern.test(input)),
+	check(input => colorPattern.test(input), "Not a valid hex colour"),
 	transform(input => parseInt(input.substring(1), 16))
 );
+
+export const namedColourSchema = pipe(
+	string(),
+	check(input => Object.hasOwn(colors, input), "Not a valid color name"),
+	transform(input => colors[input as keyof typeof colors])
+);
+
+export const colorSchema = union([hexColorSchema, namedColourSchema]);
 
 export const parseIntSchema = pipe(
 	string(),

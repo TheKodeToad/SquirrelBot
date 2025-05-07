@@ -36,8 +36,12 @@ export const warnCommand = defineCommand({
 	async run(context, args, { config }): Promise<void> {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.warn.direct_message ?? {
-				content: `You received a warning in **${escapeMarkdown(context.guild.name)}**: >>> ${args.reason ?? "*No reason provided*"}`
+			? config.warn.direct_message?.({
+				server: context.guild,
+				moderator: context.user,
+				reason: args.reason ?? "*No reason provided.*",
+			}) ?? {
+				content: `You received a warning in **${escapeMarkdown(context.guild.name)}**:\n>>> ${args.reason ?? "*No reason provided*"}`
 			}
 			: undefined;
 

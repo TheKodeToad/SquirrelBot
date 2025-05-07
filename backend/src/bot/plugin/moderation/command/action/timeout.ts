@@ -1,5 +1,4 @@
 import { Permissions } from "oceanic.js";
-import { humanizeDuration } from "../../../../../common/time.ts";
 import { CaseType } from "../../../../../db/moderation/cases.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
 import { defineCommand, OptionType } from "../../../core/public/command.ts";
@@ -45,9 +44,12 @@ export const timeoutCommand = defineCommand({
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.timeout.direct_message ?? {
-				content: `You are timed out for ${humanizeDuration(args.duration)} in ${escapeMarkdown(context.guild.name)}.`
-			}
+			? config.timeout.direct_message?.({
+				server: context.guild,
+				moderator: context.user,
+				reason: args.reason ?? "*No reason provided.*",
+				duration: args.duration,
+			}) ?? { content: `You were timed out for **${args.duration}** in **${escapeMarkdown(context.guild.name)}**` }
 			: undefined;
 
 		const { successful, unsuccessful } = await doBulkAction({
@@ -60,7 +62,7 @@ export const timeoutCommand = defineCommand({
 
 			membersOnly: true,
 
-			canPerform: member => member.permissions.has(Permissions.ADMINISTRATOR),
+			canPerform: member => !member.permissions.has(Permissions.ADMINISTRATOR),
 			async perform(member, calculatedExpiry) {
 				await context.guild.editMember(member.id, {
 					communicationDisabledUntil: calculatedExpiry!.toISOString(),

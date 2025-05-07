@@ -42,9 +42,11 @@ export const banCommand = defineCommand({
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.ban.direct_message ?? {
-				content: `You are permanently banned from ${escapeMarkdown(context.guild.name)}.`
-			}
+			? config.ban.direct_message?.({
+				server: context.guild,
+				moderator: context.user,
+				reason: args.reason ?? "*No reason provided.*",
+			}) ?? { content: `You were banned from **${escapeMarkdown(context.guild.name)}**.` }
 			: undefined;
 
 		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages) * (24 * HOUR);

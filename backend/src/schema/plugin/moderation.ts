@@ -1,5 +1,6 @@
 import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
-import { messageSchema } from "../common/message.ts";
+import { ParameterType } from "../../common/template/index.ts";
+import { messageTemplate } from "../common/message.ts";
 import { permissionsFilterSchema } from "../common/permissionsFilter.ts";
 
 export const presetReasonSchema = object({
@@ -16,13 +17,19 @@ const discordReasons: PresetReason[] = [
 	{ name: "rules", replacement: "" /* Breaking server rules */ },
 ];
 
+const actionParams = {
+	moderator: ParameterType.User,
+	server: ParameterType.Guild,
+	reason: ParameterType.MarkdownString,
+} as const;
+
 export const moderationConfigSchema = object({
 	preset_reasons: optional(array(presetReasonSchema), []), // TODO
 	preset_prefix: optional(string(), "!"), // TODO
 
 	ban: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageSchema),
+		direct_message: optional(messageTemplate(actionParams)),
 		purge_messages: optional(number(), 0),
 		preset_reasons: optional(array(presetReasonSchema), discordReasons) // TODO
 	}), {}),
@@ -31,17 +38,17 @@ export const moderationConfigSchema = object({
 	}), {}),
 	kick: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageSchema),
+		direct_message: optional(messageTemplate(actionParams)),
 		preset_reasons: optional(array(presetReasonSchema), discordReasons), // TODO
 	}), {}),
 	timeout: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageSchema),
+		direct_message: optional(messageTemplate({ ...actionParams, duration: ParameterType.Duration })),
 		preset_reasons: optional(array(presetReasonSchema), discordReasons), // TODO
 	}), {}),
 	warn: optional(object({
 		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageSchema),
+		direct_message: optional(messageTemplate(actionParams)),
 		preset_reasons: optional(array(presetReasonSchema), discordReasons),
 	}), {}),
 
