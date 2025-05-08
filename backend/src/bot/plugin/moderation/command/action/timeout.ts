@@ -89,15 +89,15 @@ export const timeoutCommand = defineCommand({
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Timed out all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Timed out all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were timed out:\n${unsuccessfulMessage}`
+					`${icons.error} None of **${args.user.length} users** were timed out:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful.length} of ${args.user.length} timeouts were successful!\n`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were timed out!\n`
 					+ `Successful timeouts:\n${successfulMessage}\n`
 					+ `Unsuccessful timeouts:\n${unsuccessfulMessage}`
 				);

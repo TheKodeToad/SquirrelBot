@@ -74,15 +74,15 @@ export const warnCommand = defineCommand({
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Warned all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Warned all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were warned:\n${unsuccessfulMessage}`
+					`${icons.error} None of **${args.user.length} users** were warned:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful.length} of ${args.user.length} warns were successful!\n`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** warned!\n`
 					+ `Successful warns:\n${successfulMessage}\n`
 					+ `Unsuccessful warns:\n${unsuccessfulMessage}`
 				);

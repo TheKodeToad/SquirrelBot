@@ -29,13 +29,13 @@ export const unbanCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.unban),
 	async run(context, args) {
-		const successfulUnbans: { user: User; caseNumber: number; }[] = [];
-		const unsuccessfulUnbans: { user: User | Uncached; error: string; }[] = [];
+		const successful: { user: User; caseNumber: number; }[] = [];
+		const unsuccessful: { user: User | Uncached; error: string; }[] = [];
 
 		for (const target of args.user) {
 			const cachedMember = context.guild.members.get(target);
 			if (cachedMember !== undefined) {
-				unsuccessfulUnbans.push({
+				unsuccessful.push({
 					user: cachedMember.user,
 					error: "User is not banned",
 				});
@@ -49,7 +49,7 @@ export const unbanCommand = defineCommand({
 					throw error;
 
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
-					unsuccessfulUnbans.push({
+					unsuccessful.push({
 						user: await fetchUserCachedSupressed(target),
 						error: "User is not banned",
 					});
@@ -58,7 +58,7 @@ export const unbanCommand = defineCommand({
 						? { id: target }
 						: await fetchUserCachedSupressed(target);
 
-					unsuccessfulUnbans.push({
+					unsuccessful.push({
 						user,
 						error: `Ban fetch failed: ${formatRESTError(error)}`,
 					});
@@ -76,7 +76,7 @@ export const unbanCommand = defineCommand({
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
-				unsuccessfulUnbans.push({ user: ban.user, error: formatRESTError(error) });
+				unsuccessful.push({ user: ban.user, error: formatRESTError(error) });
 				continue;
 			}
 
@@ -88,32 +88,32 @@ export const unbanCommand = defineCommand({
 				reason: args.reason ?? undefined,
 			});
 
-			successfulUnbans.push({ caseNumber: caseNumber, user: ban.user });
+			successful.push({ caseNumber: caseNumber, user: ban.user });
 		}
 
 		if (args.user.length === 1) {
-			if (successfulUnbans.length === 1) {
-				const unban = successfulUnbans[0]!;
-				await context.respond(`${icons.success} Unbanned ${formatUserBold(unban.user)} [#${unban.caseNumber}]!`);
-			} else if (unsuccessfulUnbans.length === 1) {
-				const unban = unsuccessfulUnbans[0]!;
+			if (successful.length === 1) {
+				const unban = successful[0]!;
+				await context.respond(`${icons.success} Unbanned ${formatUserBold(unban.user)} (case #${unban.caseNumber})!`);
+			} else if (unsuccessful.length === 1) {
+				const unban = unsuccessful[0]!;
 				await context.respond(`${icons.error} Could not unban ${formatUserBold(unban.user)}: ${escapeMarkdown(unban.error)}!`);
 			}
 		} else {
-			const successfulMessage = successfulUnbans.map(unban => `- ${formatUserBold(unban.user)} [#${unban.caseNumber}]`).join("\n");
-			const unsuccessfulMessage = unsuccessfulUnbans.map(unban => `- ${formatUserBold(unban.user)}: ${unban.error}`).join("\n");
+			const successfulMessage = successful.map(unban => `- ${formatUserBold(unban.user)} (case #${unban.caseNumber})`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(unban => `- ${formatUserBold(unban.user)}: ${unban.error}`).join("\n");
 
-			if (unsuccessfulUnbans.length === 0) {
+			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Unbanned all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Unbanned all **${args.user.length} users**:\n${successfulMessage}`
 				);
-			} else if (successfulUnbans.length === 0) {
+			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were unbanned:\n${unsuccessfulMessage}`
+					`${icons.error} None of **${args.user.length} users** were unbanned:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successfulUnbans.length} of ${args.user.length} unbans were successful!\n`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** unbanned!\n`
 					+ `Successful unbans:\n${successfulMessage}\n`
 					+ `Unsuccessful unbans:\n${unsuccessfulMessage}`
 				);

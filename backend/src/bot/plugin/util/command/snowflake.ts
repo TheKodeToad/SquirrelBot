@@ -24,6 +24,6 @@ export const snowflakeCommand = defineCommand({
 	async run(context, args) {
 		const snowflake = BigInt(args.input);
 		const timestamp = DISCORD_EPOCH + (snowflake >> 22n);
-		await context.respond(`${icons.info} <t:${timestamp / 1000n}> (${timestamp} unix time)`);
+		await context.respond(`${icons.info} **<t:${timestamp / 1000n}>** (${timestamp} unix time)`);
 	},
 });

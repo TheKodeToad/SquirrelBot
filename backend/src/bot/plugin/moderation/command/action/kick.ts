@@ -75,15 +75,15 @@ export const kickCommand = defineCommand({
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Kicked all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Kicked all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were kicked:\n${unsuccessfulMessage}`
+					`${icons.error} None of **${args.user.length} users** were kicked:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful.length} of ${args.user.length} kicks were successful!\n`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were kicked!\n`
 					+ `Successful kicks:\n${successfulMessage}\n`
 					+ `Unsuccessful kicks:\n${unsuccessfulMessage}`
 				);

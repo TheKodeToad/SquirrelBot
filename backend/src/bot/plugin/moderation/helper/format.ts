@@ -5,7 +5,7 @@ import { escapeMarkdown, makeMarkdownQuote } from "../../../common/discord/markd
 import type { BulkResult } from "./bulkAction.ts";
 
 export function formatBulkSuccess(item: BulkResult["successful"][number]): string {
-	return `${formatUserBold(item.user)} ${item.dmDelivered ? "with direct message " : ""}[#${item.caseNumber}]`;
+	return `${formatUserBold(item.user)} ${item.dmDelivered ? "with direct message " : ""}(case #${item.caseNumber})`;
 }
 
 export function formatBulkError(item: BulkResult["unsuccessful"][number]): string {

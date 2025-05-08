@@ -89,6 +89,6 @@ export const purgeCommand = defineCommand({
 		if (purged === 0)
 			await context.respond(`${icons.error} No messages were purged!`);
 		else
-			await context.respond(`${icons.success} Purged ${purged} messages!`);
+			await context.respond(`${icons.success} Purged **${purged}** messages!`);
 	},
 });

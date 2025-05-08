@@ -87,17 +87,17 @@ export const banCommand = defineCommand({
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
-					`${icons.success} Banned all ${args.user.length} users:\n${successfulMessage}`
+					`${icons.success} Banned all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
 				await context.respond(
-					`${icons.error} None of ${args.user.length} users were banned:\n${unsuccessfulMessage}`
+					`${icons.error} None of **${args.user.length} users** were banned:\n${unsuccessfulMessage}`
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only ${successful.length} of ${args.user.length} bans were successful!\n`
-					+ `Successful bans:\n${successfulMessage}\n`
-					+ `Unsuccessful bans:\n${unsuccessfulMessage}`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n`
+					+ `Successful:\n${successfulMessage}\n`
+					+ `Unsuccessful:\n${unsuccessfulMessage}`
 				);
 			}
 		}

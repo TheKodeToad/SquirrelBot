@@ -25,7 +25,7 @@ export const caseShowCommand = defineCommand({
 		const info = await getCase(context.guild.id, number);
 
 		if (info === null) {
-			await context.respond(`${icons.error} Case #${number} not found!`);
+			await context.respond(`${icons.error} Case **#${number}** not found!`);
 			return;
 		}
 
