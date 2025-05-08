@@ -39,10 +39,8 @@ export const warnCommand = defineCommand({
 			? config.warn.direct_message?.({
 				server: context.guild,
 				moderator: context.user,
-				reason: args.reason ?? "*No reason provided.*",
-			}) ?? {
-				content: `You received a warning in **${escapeMarkdown(context.guild.name)}**:\n>>> ${args.reason ?? "*No reason provided*"}`
-			}
+				reason: args.reason ?? undefined,
+			}) ?? { content: `You received a warning in **${escapeMarkdown(context.guild.name)}**:\n>>> ${args.reason ?? "*No reason provided*"}` }
 			: undefined;
 
 		const { successful, unsuccessful } = await doBulkAction({

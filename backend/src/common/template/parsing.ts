@@ -102,10 +102,10 @@ function parseWrapper(input: FormatGroups["wrapper"]): FormattingWrapper | null 
 
 function parseUserPresentation(input: string | undefined): UserPresentationType | null {
 	switch (input) {
-		case "tag_mention": case undefined: return UserPresentationType.TagMention;
-		case "tag_mention_bold": return UserPresentationType.TagMentionBold;
-		case "tag": return UserPresentationType.Tag;
+		case "tag": case undefined: return UserPresentationType.Tag;
 		case "mention": return UserPresentationType.Mention;
+		case "tag_mention": return UserPresentationType.TagMention;
+		case "tag_mention_bold": return UserPresentationType.TagMentionBold;
 		case "id": return UserPresentationType.ID;
 		case "link": return UserPresentationType.Link;
 		case "masked_link": return UserPresentationType.MaskedLink;

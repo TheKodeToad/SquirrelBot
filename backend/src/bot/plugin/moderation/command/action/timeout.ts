@@ -47,7 +47,7 @@ export const timeoutCommand = defineCommand({
 			? config.timeout.direct_message?.({
 				server: context.guild,
 				moderator: context.user,
-				reason: args.reason ?? "*No reason provided.*",
+				reason: args.reason ?? undefined,
 				duration: args.duration,
 			}) ?? { content: `You were timed out for **${args.duration}** in **${escapeMarkdown(context.guild.name)}**` }
 			: undefined;

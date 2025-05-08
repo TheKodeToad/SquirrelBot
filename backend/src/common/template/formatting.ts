@@ -13,51 +13,55 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 			continue;
 		}
 
-		if (!Object.hasOwn(params, token.parameter))
-			throw new Error(`Missing params['${token.parameter}']`);
+		const escaped = !(token.wrapper === FormattingWrapper.InlineCodeblock || token.wrapper === FormattingWrapper.MultilineCodeblock);
 
-		const value = params[token.parameter];
 		let output: string;
 
-		switch (token.valueType) {
-			case ParameterType.User:
-				if (!(typeof value === "object"
-					&& "id" in value && typeof value.id === "string"
-					&& "tag" in value && typeof value.tag === "string")) {
-					throw new Error(`params['${token.parameter}'] is not a user!`);
-				}
+		if (Object.hasOwn(params, token.parameter) && params[token.parameter] !== undefined) {
+			const value = params[token.parameter];
 
-				output = formatUserParam(value, token.presentation);
-				break;
-			case ParameterType.Guild:
-				if (!(typeof value === "object"
-					&& "id" in value && typeof value.id === "string"
-					&& "name" in value && typeof value.name === "string")) {
-					throw new Error(`params['${token.parameter}'] is not a user!`);
-				}
+			switch (token.valueType) {
+				case ParameterType.User:
+					if (!(typeof value === "object"
+						&& "id" in value && typeof value.id === "string"
+						&& "tag" in value && typeof value.tag === "string")) {
+						throw new Error(`params['${token.parameter}'] is not a user!`);
+					}
 
-				output = formatGuildParam(value, token.presentation);
-				break;
-			case ParameterType.Duration:
-				if (typeof value !== "number")
-					throw new Error(`params['${token.parameter}'] is not a number!`);
+					output = formatUserParam(value, token.presentation, escaped);
+					break;
+				case ParameterType.Guild:
+					if (!(typeof value === "object"
+						&& "id" in value && typeof value.id === "string"
+						&& "name" in value && typeof value.name === "string")) {
+						throw new Error(`params['${token.parameter}'] is not a user!`);
+					}
 
-				output = formatDurationParam(value, token.presentation);
-				break;
-			case ParameterType.Timestamp:
-				if (!(value instanceof Date))
-					throw new Error(`params['${token.parameter}'] is not a Date!`);
+					output = formatGuildParam(value, token.presentation, escaped);
+					break;
+				case ParameterType.Duration:
+					if (typeof value !== "number")
+						throw new Error(`params['${token.parameter}'] is not a number!`);
 
-				output = formatTimestampParam(value, token.presentation);
-				break;
-			case ParameterType.RawString:
-			case ParameterType.MarkdownString:
-				if (typeof value !== "string")
-					throw new Error(`params['${token.parameter}'] is not a string!`);
+					output = formatDurationParam(value, token.presentation);
+					break;
+				case ParameterType.Timestamp:
+					if (!(value instanceof Date))
+						throw new Error(`params['${token.parameter}'] is not a Date!`);
 
-				output = value;
-				break;
-		}
+					output = formatTimestampParam(value, token.presentation);
+					break;
+				case ParameterType.RawString:
+				case ParameterType.MarkdownString:
+					if (typeof value !== "string")
+						throw new Error(`params['${token.parameter}'] is not a string!`);
+
+					output = value;
+					break;
+
+			}
+		} else
+			output = escaped ? "*None*" : "None";
 
 		switch (token.wrapper) {
 			case FormattingWrapper.BlockQuote: output = makeMarkdownQuote(output); break;
@@ -72,11 +76,11 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 
 }
 
-function formatUserParam(user: UserParameter, presentation: UserPresentationType): string {
+function formatUserParam(user: UserParameter, presentation: UserPresentationType, escaped: boolean): string {
 	switch (presentation) {
 		case UserPresentationType.TagMention: return formatUser(user);
 		case UserPresentationType.TagMentionBold: return formatUserBold(user);
-		case UserPresentationType.Tag: return escapeMarkdown(user.tag);
+		case UserPresentationType.Tag: return escaped ? escapeMarkdown(user.tag) : user.tag;
 		case UserPresentationType.Mention: return `<@${user.id}>`;
 		case UserPresentationType.ID: return user.id;
 		case UserPresentationType.Link: return `https://discord.com/users/${user.id}`;
@@ -84,9 +88,9 @@ function formatUserParam(user: UserParameter, presentation: UserPresentationType
 	}
 }
 
-function formatGuildParam(guild: GuildParameter, presentation: GuildPresentationType): string {
+function formatGuildParam(guild: GuildParameter, presentation: GuildPresentationType, escaped: boolean): string {
 	switch (presentation) {
-		case GuildPresentationType.Name: return escapeMarkdown(guild.name);
+		case GuildPresentationType.Name: return escaped ? escapeMarkdown(guild.name) : guild.name;
 		case GuildPresentationType.ID: return guild.id;
 		case GuildPresentationType.Link: return `https://discord.com/channels/${guild.id}`;
 		case GuildPresentationType.MaskedLink: return `[${escapeMarkdown(guild.name)}](https://discord.com/channels/${guild.id})`;

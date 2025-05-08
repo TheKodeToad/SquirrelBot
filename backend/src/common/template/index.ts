@@ -35,7 +35,7 @@ export function parseTemplate<S extends TemplateSchema>(template: string, schema
 }
 
 export type TemplateSchema = Record<string, ParameterType>;
-export type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]: ParameterValue<S[K]> };
+export type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]?: ParameterValue<S[K]> };
 
 export const enum FormattingWrapper {
 	BlockQuote,
@@ -53,10 +53,10 @@ export const enum ParameterType {
 }
 
 export const enum UserPresentationType {
-	TagMention,
-	TagMentionBold,
 	Tag,
 	Mention,
+	TagMention,
+	TagMentionBold,
 	ID,
 	Link,
 	MaskedLink,

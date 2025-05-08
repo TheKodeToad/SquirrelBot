@@ -41,10 +41,8 @@ export const kickCommand = defineCommand({
 				config.ban.direct_message?.({
 					server: context.guild,
 					moderator: context.user,
-					reason: args.reason ?? "*No reason provided.*",
-				}) ?? {
-					content: `You were kicked from ${escapeMarkdown(context.guild.name)}.`
-				} :
+					reason: args.reason ?? undefined,
+				}) ?? { content: `You were kicked from **${escapeMarkdown(context.guild.name)}**.` } :
 				undefined;
 
 		const { successful, unsuccessful } = await doBulkAction({

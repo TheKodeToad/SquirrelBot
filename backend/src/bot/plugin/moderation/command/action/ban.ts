@@ -45,7 +45,7 @@ export const banCommand = defineCommand({
 			? config.ban.direct_message?.({
 				server: context.guild,
 				moderator: context.user,
-				reason: args.reason ?? "*No reason provided.*",
+				reason: args.reason ?? undefined,
 			}) ?? { content: `You were banned from **${escapeMarkdown(context.guild.name)}**.` }
 			: undefined;
 
