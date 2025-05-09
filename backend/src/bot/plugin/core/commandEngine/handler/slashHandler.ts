@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "fs/promises";
-import { type AnyTextableGuildChannel, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, ComponentTypes, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, type ApplicationCommandOptions, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
 import path from "path";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
@@ -24,18 +24,35 @@ const PLACEHOLDER_DESCRIPTION = "No description provided.";
 
 export async function syncSlashCommands(): Promise<void> {
 	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(({ command }) => {
-		return {
-			type: ApplicationCommandTypes.CHAT_INPUT,
-			name: typeof command.name === "string" ? command.name : command.name[0],
-			description: command.description ?? PLACEHOLDER_DESCRIPTION,
-			options: command.options ? Object.values(command.options).map(option => (
-				{
+		const options: ApplicationCommandOptions[] = [];
+
+		if (command.options !== undefined) {
+			for (const key in command.options) {
+				if (!Object.hasOwn(command.options, key))
+					continue;
+
+				const option = command.options[key]!;
+
+				options.push({
 					name: option.name[0],
 					description: option.description ?? PLACEHOLDER_DESCRIPTION,
 					required: option.required ?? false,
 					type: mapOptionType(option.type),
-				}
-			)) : [],
+				});
+			}
+		}
+
+		options.push({
+			name: "private",
+			description: "Send the response privately.",
+			type: ApplicationCommandOptionTypes.BOOLEAN,
+		});
+
+		return {
+			type: ApplicationCommandTypes.CHAT_INPUT,
+			name: typeof command.name === "string" ? command.name : command.name[0],
+			description: command.description ?? PLACEHOLDER_DESCRIPTION,
+			options,
 		} satisfies CreateApplicationCommandOptions;
 	});
 
@@ -105,19 +122,15 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 		return;
 	}
 
-	const context = new SlashContext(commandEntry.command, interaction);
+	const ephemeral = perms.ephemeral_response && (interaction.data.options.getBoolean("private") ?? false);
+	const context = new SlashContext(commandEntry.command, interaction, ephemeral);
 
 	const data = commandEntry.command.preRun(context);
 
 	if (data === false) {
 		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
-		await context.respond({
-			components: [{
-				content: `${icons.error} You lack permission to execute the command in this channel.`,
-				type: ComponentTypes.TEXT_DISPLAY,
-			}],
-			flags: MessageFlags.EPHEMERAL,
-		});
+		context._ephemeral = true;
+		await context.respond(`${icons.error} You lack permission to execute the command in this channel.`);
 		return;
 	}
 
@@ -127,13 +140,8 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
 
 	if (args.error !== null) {
-		await context.respond({
-			components: [{
-				content: `${icons.error} ${formatArgsParseError(args)}`,
-				type: ComponentTypes.TEXT_DISPLAY,
-			}],
-			flags: MessageFlags.EPHEMERAL,
-		});
+		context._ephemeral = true;
+		await context.respond(`${icons.error} ${formatArgsParseError(args)}`);
 		return;
 	}
 
@@ -161,6 +169,7 @@ class SlashContext implements CommandContext {
 	_acked: boolean;
 	_deferTimeout: NodeJS.Timeout | null;
 	_deferPromise: Promise<void> | null;
+	_ephemeral: boolean;
 
 	get shard(): Shard { return this._interaction.guild.shard; }
 	get guild(): Guild { return this._interaction.guild; }
@@ -168,7 +177,7 @@ class SlashContext implements CommandContext {
 	get member(): Member { return this._interaction.member; }
 	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 
-	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>) {
+	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, ephemeral: boolean) {
 		this.command = command;
 		this._interaction = interaction;
 		this._responseID = null;
@@ -177,12 +186,18 @@ class SlashContext implements CommandContext {
 		this._deferTimeout = setTimeout(() => {
 			this._deferTimeout = null;
 			this._acked = true;
-			this._deferPromise = interaction.defer().then();
+			this._deferPromise = interaction.defer(this._ephemeral ? MessageFlags.EPHEMERAL : 0).then();
 		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
+		this._ephemeral = ephemeral;
 	}
 
 	async respond(reply: Reply): Promise<void> {
 		const messageOptions = transformReply(reply);
+
+		if (this._ephemeral)
+			messageOptions.flags |= MessageFlags.EPHEMERAL;
+		else
+			messageOptions.flags &= ~MessageFlags.EPHEMERAL;
 
 		if (this._acked) {
 			await this._deferPromise;

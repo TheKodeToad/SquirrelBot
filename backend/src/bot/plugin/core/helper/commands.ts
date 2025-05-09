@@ -1,7 +1,7 @@
 import { ComponentTypes, Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
 import { type Command, type Reply, type ReplyObject } from "../public/command.ts";
 
-export function transformReply(reply: Reply): ReplyObject {
+export function transformReply(reply: Reply): ReplyObject & { flags: number; } {
 	if (typeof reply === "string") {
 		reply = {
 			components: [{
@@ -14,7 +14,8 @@ export function transformReply(reply: Reply): ReplyObject {
 	reply.flags ??= 0;
 	reply.flags |= MessageFlags.IS_COMPONENTS_V2;
 
-	return reply;
+	// need to do this to please typechecker
+	return { ...reply, flags: reply.flags };
 }
 
 export function canRunCommand(command: Command, member: Member, channel: AnyTextableGuildChannel): boolean {

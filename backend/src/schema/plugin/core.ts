@@ -31,6 +31,7 @@ export const coreConfigSchema = object({
 	default_permissions: optional(object({
 		prefix_commands: optional(boolean(), true),
 		slash_commands: optional(boolean(), true),
+		ephemeral_response: optional(boolean(), true),
 		about_command: optional(boolean(), true),
 		help_command: optional(boolean(), true),
 		groups_command: optional(boolean(), false)
@@ -38,6 +39,7 @@ export const coreConfigSchema = object({
 	permission_overrides: optional(array(object({
 		prefix_commands: optional(boolean()),
 		slash_commands: optional(boolean()),
+		ephemeral_response: optional(boolean()),
 		about_command: optional(boolean()),
 		help_command: optional(boolean()),
 		groups_command: optional(boolean()),
