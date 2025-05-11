@@ -34,7 +34,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 		return false;
 
 	// yes, non-bot webhook is/has been possible
-	if (message.author.bot || message.webhookID !== undefined)
+	if (message.author.bot || message.author.system || message.webhookID !== undefined)
 		return false;
 
 	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
