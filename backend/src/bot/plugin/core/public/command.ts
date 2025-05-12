@@ -42,6 +42,7 @@ export interface BaseContext {
 
 export interface CommandContext extends BaseContext {
 	command: Command;
+	ephemeral?: boolean;
 	message?: Message<AnyTextableGuildChannel>;
 }
 

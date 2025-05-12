@@ -171,6 +171,8 @@ class SlashContext implements CommandContext {
 	_deferPromise: Promise<void> | null;
 	_ephemeral: boolean;
 
+	get ephemeral(): boolean { return this._ephemeral; }
+
 	get shard(): Shard { return this._interaction.guild.shard; }
 	get guild(): Guild { return this._interaction.guild; }
 	get user(): User { return this._interaction.user; }

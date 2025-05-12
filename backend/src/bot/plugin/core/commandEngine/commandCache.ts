@@ -64,19 +64,17 @@ function makeCacheEntry(command: Command): CommandCacheEntry {
 				optionsByNegativeName.set(negativeName.toLowerCase(), key);
 	}
 
-	const usage = formatCommandUsage(command.options, optionsByPosition);
-
 	return {
 		command,
 		optionsByPosition,
 		optionsByName,
 		optionsByNegativeName,
-		usage,
+		usage: formatCommandPrefixUsage(command.options, optionsByPosition),
 	};
 }
 
 
-function formatCommandUsage(options: Command["options"], optionsByPosition: CommandCacheEntry["optionsByPosition"]): string {
+function formatCommandPrefixUsage(options: Command["options"], optionsByPosition: CommandCacheEntry["optionsByPosition"]): string {
 	let result = "";
 
 	const alreadyDisplayed = new Set;
@@ -128,16 +126,15 @@ function formatOptionValue(option: Option): string {
 	switch (option.type) {
 		case OptionType.Boolean: return option.array ? "boolean(s)" : "(true|false)";
 		case OptionType.Flag: return "";
-		case OptionType.Integer: return option.array ? "whole number(s)" : "whole number";
+		case OptionType.Integer: return option.array ? "integer(s)" : "integer";
 		case OptionType.Number: return option.array ? "number(s)" : "number";
-		case OptionType.String: return option.array ? "text value(s)" : "text";
-		case OptionType.Snowflake: return option.array ? "snowflake(s)" : "snowflake";
+		case OptionType.String: return option.array ? "text(s)" : "text";
+		case OptionType.Snowflake: return option.array ? "id(s)" : "id";
 		case OptionType.User: return option.array ? "user(s)" : "user";
 		case OptionType.Role: return option.array ? "role(s)" : "role";
 		case OptionType.Channel: return option.array ? "channel(s)" : "channel";
 		case OptionType.Duration: return option.array ? "duration(s)" : "duration";
 	}
-
 }
 
 

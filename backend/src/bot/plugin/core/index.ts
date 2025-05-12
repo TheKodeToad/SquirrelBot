@@ -5,7 +5,7 @@ import { definePlugin } from "../../loader/plugin.ts";
 import { aboutCommand } from "./command/about.ts";
 import { grantAccessCommand, revokeAccessCommand } from "./command/access.ts";
 import { groupsCommand } from "./command/groups.ts";
-import { helpCommand } from "./command/help.ts";
+import { helpCommand } from "./command/help/index.ts";
 import { initCommandCache } from "./commandEngine/commandCache.ts";
 import { componentInterationHandler } from "./commandEngine/handler/componentHandler.ts";
 import { prefixDeleteHandler, prefixEditHandler, prefixSendHandler } from "./commandEngine/handler/prefixHandler.ts";

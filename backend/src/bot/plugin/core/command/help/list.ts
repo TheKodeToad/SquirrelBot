@@ -1,33 +1,47 @@
-import { ButtonStyles, ComponentTypes, MessageFlags, type SelectOption } from "oceanic.js";
-import { makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
-import { getPlugin, getPlugins } from "../../../loader/index.ts";
-import { getCommandByName } from "../commandEngine/commandCache.ts";
-import { canRunCommand } from "../helper/commands.ts";
-import { coreConfig } from "../index.ts";
-import { defineCommand, OptionType, type BaseContext, type CommandContainerComponent, type CommandSelectMenuComponent, type CommandTextButton, type ComponentContext, type Reply, type ReplyObject } from "../public/command.ts";
-import { permissionsGuard } from "../public/helper/commandGuards.ts";
-import { icons } from "../public/icons.ts";
+import { ButtonStyles, ComponentTypes, MessageFlags, type SelectOption, type TextDisplayComponent } from "oceanic.js";
+import { moduleLogger } from "../../../../../common/logger/index.ts";
+import { makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
+import { getPlugin, getPlugins } from "../../../../loader/index.ts";
+import { getCommandByName } from "../../commandEngine/commandCache.ts";
+import { canRunCommand } from "../../helper/commands.ts";
+import { coreConfig } from "../../index.ts";
+import type { BaseContext, CommandContainerComponent, CommandSelectMenuComponent, CommandTextButton, ComponentContext, Reply, ReplyObject } from "../../public/command.ts";
+import { icons } from "../../public/icons.ts";
 
-export const helpCommand = defineCommand({
-	name: ["help"],
-	description: "View available commands and prefixed usage information.",
-	trackUpdates: true,
+const logger = moduleLogger();
 
-	options: {
-		command: {
-			type: OptionType.String,
-			name: ["command", "c"],
-			position: 0,
-		}
-	},
+interface CommandListState {
+	plugin: string;
+	page: number;
+	entries?: CommandContainerComponent["components"][];
+}
 
-	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.help_command),
-	async run(context) {
-		await context.respond(renderSelectPage(context.guild.id));
-	},
-});
+export function renderCommandListPageMinimal(guildID: string): Reply {
+	return {
+		components: [
+			{
+				content: "**Select a plugin to view commands**",
+				type: ComponentTypes.TEXT_DISPLAY,
+			},
+			{
+				components: [
+					renderPluginSelection(null, guildID, async (context, value) => {
+						const page = renderCommandListPage(context, { plugin: value, page: 0 });
+						page.flags ??= MessageFlags.EPHEMERAL;
+						await context.respond(page);
+					})
+				],
+				type: ComponentTypes.ACTION_ROW,
+			},
+			{
+				content: `${icons.tip} You can also pass in the name of a command to view it directly.`,
+				type: ComponentTypes.TEXT_DISPLAY,
+			},
+		],
+	};
+}
 
-function renderPluginSelection(selected: string | null, guildID: string, callback: (context: ComponentContext, value: string) => Promise<void>): CommandSelectMenuComponent {
+export function renderPluginSelection(selected: string | null, guildID: string, callback: (context: ComponentContext, value: string) => Promise<void>): CommandSelectMenuComponent {
 	const options: SelectOption[] = [];
 
 	for (const plugin of getPlugins()) {
@@ -52,36 +66,7 @@ function renderPluginSelection(selected: string | null, guildID: string, callbac
 	};
 }
 
-function renderSelectPage(guildID: string): Reply {
-	return {
-		components: [
-			{
-				content: "**Select a plugin to view the commands of**",
-				type: ComponentTypes.TEXT_DISPLAY,
-			},
-			{
-				components: [
-					renderPluginSelection(null, guildID, async (context, value) => {
-						const page = renderCommandListPage(context, { plugin: value, page: 0 });
-						page.flags ??= MessageFlags.EPHEMERAL;
-						await context.respond(page);
-
-						await context.edit(renderSelectPage(guildID));
-					})
-				],
-				type: ComponentTypes.ACTION_ROW,
-			}
-		]
-	};
-}
-
-interface CommandListState {
-	plugin: string;
-	page: number;
-	entries?: string[];
-}
-
-function renderCommandListPage(context: BaseContext, state: CommandListState): ReplyObject {
+export function renderCommandListPage(context: BaseContext, state: CommandListState): ReplyObject {
 	const plugin = getPlugin(state.plugin);
 
 	if (plugin === undefined) {
@@ -117,25 +102,35 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 		const prefix = coreConfig.get(context.guild.id)?.prefix_commands.prefix ?? "";
 
 		for (const command of plugin.commands ?? []) {
-			if (!(command.supportPrefix ?? true))
+			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true)))
 				continue;
-
-			let summary = "### " + command.name[0] + "\n";
 
 			if (!canRunCommand(command, context.member, context.channel))
 				continue;
 
+			const summaryComponent: TextDisplayComponent = {
+				content: "### " + command.name[0] + "\n",
+				type: ComponentTypes.TEXT_DISPLAY,
+			};
+
 			if (command.description !== undefined)
-				summary += command.description + "\n";
+				summaryComponent.content += command.description + "\n";
 
 			const entry = getCommandByName(command.name[0]);
 
-			if (entry === undefined)
-				throw new Error("Command in registered plugin not cached!");
+			if (entry === undefined) {
+				logger.warn?.(`Command '${command.name[0]}' not cached!`);
+				continue;
+			}
 
-			summary += "**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage);
-
-			entries.push(summary);
+			if (command.supportPrefix ?? true) {
+				entries.push([
+					summaryComponent,
+					{ content: "**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage), type: ComponentTypes.TEXT_DISPLAY },
+				]);
+			}
+			else
+				entries.push([summaryComponent]);
 		}
 	}
 
@@ -146,17 +141,15 @@ function renderCommandListPage(context: BaseContext, state: CommandListState): R
 
 	for (const entry of visibleEntries) {
 		container.components.push({ type: ComponentTypes.SEPARATOR });
-		container.components.push({
-			content: entry,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
+		container.components.push(...entry);
 	}
 
 	if (entries.length === 0) {
 		container.components.push({
-			content: `${icons.info} You do not have access to any commands for this plugin!`,
+			content: `**${icons.info} You do not have access to any commands for this plugin!**`,
 			type: ComponentTypes.TEXT_DISPLAY,
 		});
+		return { components: [container] };
 	}
 
 	const prevDisabled = sliceStart === 0;
