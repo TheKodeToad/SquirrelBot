@@ -2,6 +2,7 @@ import { ComponentInteraction, ComponentTypes, Guild, Member, MessageFlags, Shar
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { transformReply } from "../../helper/commands.ts";
+import { Text } from "../../helper/componentSugar.ts";
 import type { AnyCommandComponentWithCallback, CommandActionRow, CommandComponent, CommandComponentCallback, CommandContainerComponent, CommandSectionComponent, ComponentContext, Reply } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
@@ -48,7 +49,7 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	} catch (error) {
 		try {
 			await context.respond({
-				components: [{ content: ":boom: Something went wrong while processing your action", type: ComponentTypes.TEXT_DISPLAY }],
+				components: [Text(":boom: Something went wrong while processing your action")],
 				flags: MessageFlags.EPHEMERAL
 			});
 		} catch (error) {

@@ -1,6 +1,6 @@
-import { ComponentTypes } from "oceanic.js";
 import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
-import { defineCommand, OptionType, type BaseContext, type CommandContainerComponent, type ReplyObject } from "../../../core/public/command.ts";
+import { Container, Separator, Text } from "../../../core/helper/componentSugar.ts";
+import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
 import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
@@ -70,15 +70,7 @@ async function lookUpCases(
 }
 
 async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
-	const container: CommandContainerComponent = {
-		components: [],
-		type: ComponentTypes.CONTAINER,
-	};
-
-	container.components.push({
-		content: "## Cases",
-		type: ComponentTypes.TEXT_DISPLAY
-	});
+	const container = Container([Text("## Cases")]);
 
 	if (compact) {
 		let content = "";
@@ -86,20 +78,12 @@ async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyOb
 		for (const info of cases)
 			content += await formatCompactCaseSummary(info) + "\n";
 
-		container.components.push({ content, type: ComponentTypes.TEXT_DISPLAY });
+		container.components.push(Text(content));
 	} else {
 		for (const info of cases) {
-			container.components.push({ type: ComponentTypes.SEPARATOR });
-
-			container.components.push({
-				content: await formatCaseDescription(info, false),
-				type: ComponentTypes.TEXT_DISPLAY,
-			});
-
-			container.components.push({
-				content: await formatCaseFields(info),
-				type: ComponentTypes.TEXT_DISPLAY,
-			});
+			container.components.push(Separator());
+			container.components.push(Text(await formatCaseDescription(info, false)));
+			container.components.push(Text(await formatCaseFields(info)));
 		}
 	}
 

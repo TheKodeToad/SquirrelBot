@@ -1,7 +1,8 @@
-import { ButtonStyles, ComponentTypes, type PartialInviteChannel, type TextDisplayComponent, type User } from "oceanic.js";
+import { type PartialInviteChannel, type TextDisplayComponent, type User } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { formatUser } from "../../../../common/discord/format.ts";
 import { getChannelIconURL } from "../../../../common/discord/urls.ts";
+import { ActionRow, Container, LinkButton, Section, Separator, Text, Thumbnail } from "../../../core/helper/componentSugar.ts";
 import type { CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 
@@ -12,57 +13,40 @@ export function renderGroupDMInvite(
 	expiresAt: Date | undefined,
 	hideImages: boolean
 ): CommandContainerComponent {
-	const result: CommandContainerComponent = {
-		components: [],
-		type: ComponentTypes.CONTAINER,
-	};
+	const result = Container();
 
 	const mainInfo: TextDisplayComponent[] = [];
 
-	mainInfo.push({ content: "## " + (channel.name ?? "<unknown>") + "\n**Group Invite**", type: ComponentTypes.TEXT_DISPLAY });
+	mainInfo.push(Text("## " + (channel.name ?? "<unknown>") + "\n**Group Invite**"));
 
 	if (totalMembers !== undefined) {
 		const total = totalMembers.toLocaleString("en-US");
-		mainInfo.push({ content: `${icons.online} ${total} Members`, type: ComponentTypes.TEXT_DISPLAY });
+		mainInfo.push(Text(`${icons.online} ${total} Members`));
 	}
 
 	const iconURL: string | null = getChannelIconURL(channel);
 
 	if (iconURL === null || hideImages) {
 		result.components.push(...mainInfo);
-	} else {
-		result.components.push({
-			components: mainInfo,
-			accessory: { media: { url: iconURL }, type: ComponentTypes.THUMBNAIL },
-			type: ComponentTypes.SECTION,
-		});
-	}
+	} else
+		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
 
-	result.components.push({ type: ComponentTypes.SEPARATOR });
+	result.components.push(Separator());
 
 	if (inviter !== undefined)
-		result.components.push({ content: "**Invited By:** " + formatUser(inviter), type: ComponentTypes.TEXT_DISPLAY });
+		result.components.push(Text("**Invited By:** " + formatUser(inviter)));
 
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSeconds(expiresAt);
 
-		result.components.push({
-			content: `**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
+		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}
 
 	if (iconURL !== null) {
-		result.components.push({
-			type: ComponentTypes.ACTION_ROW,
-			components: [{ label: "Icon", url: iconURL, type: ComponentTypes.BUTTON, style: ButtonStyles.LINK }]
-		});
+		result.components.push(ActionRow([LinkButton("Icon", iconURL)]));
 	}
 
-	result.components.push({
-		content: "-# Group Channel ID: " + channel.id,
-		type: ComponentTypes.TEXT_DISPLAY,
-	});
+	result.components.push(Text("-# Group Channel ID: " + channel.id));
 
 	return result;
 }

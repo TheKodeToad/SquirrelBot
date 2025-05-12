@@ -1,44 +1,27 @@
-import { ComponentTypes, type TextDisplayComponent, type User } from "oceanic.js";
+import { type TextDisplayComponent, type User } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
+import { Container, Section, Separator, Text, Thumbnail } from "../../../core/helper/componentSugar.ts";
 import type { CommandContainerComponent } from "../../../core/public/command.ts";
 
 export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, hideImages: boolean): CommandContainerComponent {
-	const result: CommandContainerComponent = {
-		components: [],
-		type: ComponentTypes.CONTAINER,
-	};
+	const result = Container();
 
 	const mainInfo: TextDisplayComponent[] = [];
 
-	mainInfo.push({
-		content: "## " + (inviter.username || inviter.globalName || "<unknown>") + "\n**Friend Invite**",
-		type: ComponentTypes.TEXT_DISPLAY,
-	});
-
-	mainInfo.push({
-		content: `<@${inviter.id}>`,
-		type: ComponentTypes.TEXT_DISPLAY,
-	});
+	mainInfo.push(Text("## " + (inviter.username || inviter.globalName || "<unknown>") + "\n**Friend Invite**"));
+	mainInfo.push(Text(`<@${inviter.id}>`));
 
 	if (hideImages)
 		result.components.push(...mainInfo);
-	else {
-		result.components.push({
-			components: mainInfo,
-			accessory: { media: { url: inviter.avatarURL() }, type: ComponentTypes.THUMBNAIL },
-			type: ComponentTypes.SECTION,
-		});
-	}
+	else
+		result.components.push(Section(mainInfo, Thumbnail(inviter.avatarURL())));
 
-	result.components.push({ type: ComponentTypes.SEPARATOR });
+	result.components.push(Separator());
 
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSeconds(expiresAt);
 
-		result.components.push({
-			content: `**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
+		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}
 
 	return result;

@@ -1,8 +1,8 @@
-import { ComponentTypes } from "oceanic.js";
 import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "../../../../brand.ts";
 import { bot } from "../../../index.ts";
+import { Container, Section, Separator, Text, Thumbnail } from "../helper/componentSugar.ts";
 import { coreConfig } from "../index.ts";
-import { defineCommand, type CommandContainerComponent } from "../public/command.ts";
+import { defineCommand } from "../public/command.ts";
 import { permissionsGuard } from "../public/helper/commandGuards.ts";
 
 const LIBRARIES = `
@@ -23,31 +23,6 @@ export const aboutCommand = defineCommand({
 
 	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.about_command),
 	async run(context) {
-		const container: CommandContainerComponent = {
-			components: [],
-			type: ComponentTypes.CONTAINER,
-		};
-
-		container.components.push({
-			components: [{ content: `## About ${APP_NAME}\n${APP_DESCRIPTION}`, type: ComponentTypes.TEXT_DISPLAY }],
-			accessory: { media: { url: bot.user.avatarURL() }, type: ComponentTypes.THUMBNAIL },
-			type: ComponentTypes.SECTION,
-		});
-
-		container.components.push({ type: ComponentTypes.SEPARATOR });
-
-		container.components.push({
-			content: "**Source Code**\n" + APP_SOURCE_CODE,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
-
-		container.components.push({
-			content: "**Libraries**\n" + LIBRARIES,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
-
-		container.components.push({ type: ComponentTypes.SEPARATOR });
-
 		const uptime = Math.floor(process.uptime());
 		let uptimeString = "";
 
@@ -58,14 +33,22 @@ export const aboutCommand = defineCommand({
 		const rssMiB = process.memoryUsage().rss / 1024 / 1024;
 		const usedMiB = (process.memoryUsage().heapUsed + process.memoryUsage().arrayBuffers + process.memoryUsage().external) / 1024 / 1024;
 
-		container.components.push({
-			content:
-				`**Uptime:** ${uptimeString}\n`
-				+ `**Used Memory**: ${usedMiB.toLocaleString("en-US")} MiB (\`heapUsed\` + \`arrayBuffers\` + \`external\`)\n`
-				+ `**Total Memory**: ${rssMiB.toLocaleString("en-US")} MiB (\`rss\`)`,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
+		const uptimeComponent = Text(
+			`**Uptime:** ${uptimeString}\n`
+			+ `**Used Memory**: ${usedMiB.toLocaleString("en-US")} MiB (\`heapUsed\` + \`arrayBuffers\` + \`external\`)\n`
+			+ `**Total Memory**: ${rssMiB.toLocaleString("en-US")} MiB (\`rss\`)`
+		);
 
+		const container = Container([
+			Section(
+				[Text(`## About ${APP_NAME}\n${APP_DESCRIPTION}`)],
+				Thumbnail(bot.user.avatarURL())
+			),
+			Separator(),
+			Text("**Source Code**\n" + APP_SOURCE_CODE),
+			Text("**Libraries**\n" + LIBRARIES),
+			uptimeComponent
+		]);
 
 		await context.respond({ components: [container] });
 	},

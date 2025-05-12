@@ -1,7 +1,7 @@
-import { ComponentTypes } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { getReminders, type Reminder } from "../../../../db/reminders/reminders.ts";
-import { defineCommand, type BaseContext, type CommandContainerComponent, type ReplyObject } from "../../core/public/command.ts";
+import { Container, Text } from "../../core/helper/componentSugar.ts";
+import { defineCommand, type BaseContext, type ReplyObject } from "../../core/public/command.ts";
 import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../core/public/helper/paginator.ts";
 import { icons } from "../../core/public/icons.ts";
@@ -49,32 +49,15 @@ async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>
 }
 
 function renderReminders(reminders: Reminder[]): ReplyObject {
-	if (reminders.length === 0) {
-		return {
-			components: [{ content: `${icons.info} No reminders found!`, type: ComponentTypes.TEXT_DISPLAY }]
-		};
-	}
-
-	const container: CommandContainerComponent = {
-		components: [],
-		type: ComponentTypes.CONTAINER,
-	};
-
-	container.components.push({
-		content: "## Reminders",
-		type: ComponentTypes.TEXT_DISPLAY,
-	});
+	if (reminders.length === 0)
+		return { components: [Text(`${icons.info} No reminders found!`)] };
 
 	let content = "";
 
-	for (const reminder of reminders) {
+	for (const reminder of reminders)
 		content += `<t:${dateToUnixSeconds(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message ?? "*No message provided.*"}\n`;
-	}
 
-	container.components.push({
-		content,
-		type: ComponentTypes.TEXT_DISPLAY,
-	});
-
-	return { components: [container] };
+	return {
+		components: [Container([Text("## Reminders"), Text(content)])]
+	};
 }

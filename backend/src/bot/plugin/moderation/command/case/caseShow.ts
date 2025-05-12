@@ -1,6 +1,6 @@
-import { ComponentTypes } from "oceanic.js";
 import { getCase } from "../../../../../db/moderation/cases.ts";
-import { OptionType, defineCommand, type CommandContainerComponent } from "../../../core/public/command.ts";
+import { Container, Separator, Text } from "../../../core/helper/componentSugar.ts";
+import { OptionType, defineCommand } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
 import { formatCaseDescription, formatCaseFields } from "../../helper/format.ts";
@@ -29,23 +29,12 @@ export const caseShowCommand = defineCommand({
 			return;
 		}
 
-		const container: CommandContainerComponent = {
-			components: [],
-			type: ComponentTypes.CONTAINER,
-		};
-
-		container.components.push({
-			content: await formatCaseDescription(info, true),
-			type: ComponentTypes.TEXT_DISPLAY,
+		await context.respond({
+			components: [Container([
+				Text(await formatCaseDescription(info, true)),
+				Separator(),
+				Text(await formatCaseFields(info)),
+			])]
 		});
-
-		container.components.push({ type: ComponentTypes.SEPARATOR });
-
-		container.components.push({
-			content: await formatCaseFields(info),
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
-
-		await context.respond({ components: [container] });
 	},
 });

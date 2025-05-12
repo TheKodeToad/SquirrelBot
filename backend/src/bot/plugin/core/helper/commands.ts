@@ -1,14 +1,10 @@
-import { ComponentTypes, Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
+import { Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
 import { type Command, type Reply, type ReplyObject } from "../public/command.ts";
+import { Text } from "./componentSugar.ts";
 
 export function transformReply(reply: Reply): ReplyObject & { flags: number; } {
 	if (typeof reply === "string") {
-		reply = {
-			components: [{
-				type: ComponentTypes.TEXT_DISPLAY,
-				content: reply
-			}],
-		};
+		reply = { components: [Text(reply)], };
 	}
 
 	reply.flags ??= 0;

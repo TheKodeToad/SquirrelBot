@@ -1,4 +1,5 @@
 import { ButtonStyles, ComponentTypes } from "oceanic.js";
+import { ActionRow, Separator } from "../../helper/componentSugar.ts";
 import type { BaseContext, CommandContext, CommandTextButton, ReplyObject } from "../command.ts";
 
 export interface Paginator<E, K> {
@@ -76,8 +77,8 @@ async function renderPaginator<E, K>(
 			? reply.components[0]!.components
 			: reply.components;
 
-	componentTarget.push({ type: ComponentTypes.SEPARATOR });
-	componentTarget.push({ components: [prevButton, nextButton], type: ComponentTypes.ACTION_ROW });
+	componentTarget.push(Separator());
+	componentTarget.push(ActionRow([prevButton, nextButton]));
 
 	return reply;
 }

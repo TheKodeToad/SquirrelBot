@@ -1,31 +1,19 @@
-import { ComponentTypes } from "oceanic.js";
 import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
 import type { CommandCacheEntry } from "../../commandEngine/commandCache.ts";
+import { Container, Separator, Text } from "../../helper/componentSugar.ts";
 import { coreConfig } from "../../index.ts";
-import { type CommandContainerComponent, type ReplyObject } from "../../public/command.ts";
+import { type ReplyObject } from "../../public/command.ts";
 
 export function renderCommandPage(guildID: string, entry: CommandCacheEntry): ReplyObject {
 	const { command } = entry;
 
-	const container: CommandContainerComponent = {
-		components: [],
-		type: ComponentTypes.CONTAINER,
-	};
+	const container = Container([Text("## " + entry.command.name[0])]);
 
-	container.components.push({
-		content: "## " + entry.command.name[0],
-		type: ComponentTypes.TEXT_DISPLAY,
-	});
-
-	if (command.description !== undefined) {
-		container.components.push({
-			content: escapeMarkdown(command.description),
-			type: ComponentTypes.TEXT_DISPLAY
-		});
-	}
+	if (command.description !== undefined)
+		container.components.push(Text(escapeMarkdown(command.description)));
 
 	if (command.supportPrefix ?? true) {
-		container.components.push({ type: ComponentTypes.SEPARATOR });
+		container.components.push(Separator());
 
 		const prefix = coreConfig.get(guildID)?.prefix_commands.prefix ?? "";
 
@@ -34,12 +22,12 @@ export function renderCommandPage(guildID: string, entry: CommandCacheEntry): Re
 		if (command.name.length > 1)
 			content += "\n**Aliases:** " + command.name.slice(1).map(name => makeMarkdownInlineCodeblock(prefix + name)).join(", ");
 
-		container.components.push({ content, type: ComponentTypes.TEXT_DISPLAY });
+		container.components.push(Text(content));
 	}
 
 	if (entry.optionsByName.size !== 0) {
-		container.components.push({ type: ComponentTypes.SEPARATOR });
-		container.components.push({ content: formatOptions(entry), type: ComponentTypes.TEXT_DISPLAY });
+		container.components.push(Separator());
+		container.components.push(Text(formatOptions(entry)));
 	}
 
 	return { components: [container] };

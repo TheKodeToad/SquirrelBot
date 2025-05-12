@@ -1,7 +1,8 @@
-import { ButtonStyles, ComponentTypes, User, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel, type TextDisplayComponent } from "oceanic.js";
+import { User, type InviteGuild, type PartialInviteChannel, type TextDisplayComponent } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
+import { ActionRow, Container, LinkButton, Section, Separator, Text, Thumbnail } from "../../../core/helper/componentSugar.ts";
 import type { CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 
@@ -14,10 +15,7 @@ export function renderGuildInvite(
 	expiresAt: Date | undefined,
 	hideImages: boolean
 ): CommandContainerComponent {
-	const result: CommandContainerComponent = {
-		components: [],
-		type: ComponentTypes.CONTAINER,
-	};
+	const result = Container();
 
 	const iconURL = guild.iconURL();
 	const bannerURL = guild.bannerURL();
@@ -25,39 +23,26 @@ export function renderGuildInvite(
 
 	const mainInfo: TextDisplayComponent[] = [];
 
-	mainInfo.push({
-		content: "## " + escapeMarkdown(guild.name) + "\n**Server Invite**\n" + (guild.description || "*No description provided.*"),
-		type: ComponentTypes.TEXT_DISPLAY
-	});
+	mainInfo.push(Text("## " + escapeMarkdown(guild.name) + "\n**Server Invite**\n" + (guild.description || "*No description provided.*")));
 
 	if (totalMembers !== undefined && onlineMembers !== undefined) {
 		const online = onlineMembers.toLocaleString("en-US");
 		const total = totalMembers.toLocaleString("en-US");
 
-		mainInfo.push({
-			type: ComponentTypes.TEXT_DISPLAY,
-			content: `${icons.online} ${online} Online  ${icons.offline} ${total} Total`
-		});
+		mainInfo.push(Text(`${icons.online} ${online} Online  ${icons.offline} ${total} Total`));
 	}
 
 	if (guild.premiumSubscriptionCount) {
-		mainInfo.push({
-			type: ComponentTypes.TEXT_DISPLAY,
-			content: `${icons.boost} Level ${calculateLevel(guild.premiumSubscriptionCount)} (${guild.premiumSubscriptionCount} Boosts)`
-		});
+		const level = calculateLevel(guild.premiumSubscriptionCount);
+		mainInfo.push(Text(`${icons.boost} Level ${level} (${guild.premiumSubscriptionCount} Boosts)`));
 	}
 
 	if (iconURL === null || hideImages)
 		result.components.push(...mainInfo);
-	else {
-		result.components.push({
-			type: ComponentTypes.SECTION,
-			components: mainInfo,
-			accessory: { type: ComponentTypes.THUMBNAIL, media: { url: iconURL } }
-		});
-	}
+	else
+		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
 
-	result.components.push({ type: ComponentTypes.SEPARATOR });
+	result.components.push(Separator());
 
 	let fields = "";
 
@@ -67,39 +52,26 @@ export function renderGuildInvite(
 	if (channel !== null)
 		fields += `**Channel:** #${escapeMarkdown(channel.name ?? "<unknown>")} (${channel.id})\n`;
 
-	result.components.push({ content: fields, type: ComponentTypes.TEXT_DISPLAY });
+	result.components.push(Text(fields));
 
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSeconds(expiresAt);
-
-		result.components.push({
-			content: `**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`,
-			type: ComponentTypes.TEXT_DISPLAY,
-		});
+		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}
 
-	const actions: MessageActionRowComponent[] = [];
+	const actions = ActionRow();
 
-	if (iconURL !== null) {
-		actions.push(
-			{ label: "Icon", type: ComponentTypes.BUTTON, style: ButtonStyles.LINK, url: iconURL }
-		);
-	}
+	if (iconURL !== null)
+		actions.components.push(LinkButton("Icon", iconURL));
 
-	if (bannerURL !== null) {
-		actions.push(
-			{ label: "Banner", type: ComponentTypes.BUTTON, style: ButtonStyles.LINK, url: bannerURL }
-		);
-	}
+	if (bannerURL !== null)
+		actions.components.push(LinkButton("Banner", bannerURL));
 
-	if (splashURL !== null) {
-		actions.push(
-			{ label: "Splash", type: ComponentTypes.BUTTON, style: ButtonStyles.LINK, url: splashURL }
-		);
-	}
+	if (splashURL !== null)
+		actions.components.push(LinkButton("Splash", splashURL));
 
-	if (actions.length !== 0)
-		result.components.push({ type: ComponentTypes.ACTION_ROW, components: actions });
+	if (actions.components.length !== 0)
+		result.components.push(actions);
 
 	let footer = "-# ";
 
@@ -108,10 +80,7 @@ export function renderGuildInvite(
 
 	footer += "Server ID: " + guild.id;
 
-	result.components.push({
-		type: ComponentTypes.TEXT_DISPLAY,
-		content: footer,
-	});
+	result.components.push(Text(footer));
 
 	return result;
 }
