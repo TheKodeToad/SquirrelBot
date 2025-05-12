@@ -82,13 +82,13 @@ importers:
         version: 6.36.6
       '@solid-primitives/deep':
         specifier: ^0.3.2
-        version: 0.3.2(solid-js@1.9.5)
+        version: 0.3.2(solid-js@1.9.6)
       '@solidjs/router':
         specifier: ^0.15.3
-        version: 0.15.3(solid-js@1.9.5)
+        version: 0.15.3(solid-js@1.9.6)
       '@tabler/icons-solidjs':
         specifier: ^3.31.0
-        version: 3.31.0(solid-js@1.9.5)
+        version: 3.31.0(solid-js@1.9.6)
       codemirror:
         specifier: ^6.0.1
         version: 6.0.1
@@ -96,15 +96,15 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       solid-js:
-        specifier: ^1.9.5
-        version: 1.9.5
+        specifier: ^1.9.6
+        version: 1.9.6
     devDependencies:
       esbuild:
         specifier: ^0.25.3
         version: 0.25.3
       esbuild-plugin-solid:
         specifier: ^0.6.0
-        version: 0.6.0(esbuild@0.25.3)(solid-js@1.9.5)
+        version: 0.6.0(esbuild@0.25.3)(solid-js@1.9.6)
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1373,14 +1373,14 @@ packages:
     resolution: {integrity: sha512-uaW0WwXKpL9blXE2o0bRhoL2EGXIrZxQ2ZQ4mgcfoBxdFmQold+qWsD2jLrfZ0trjKL6vOw0j//eAwcALFjKSw==}
     engines: {node: '>= 18'}
 
-  seroval-plugins@1.2.1:
-    resolution: {integrity: sha512-H5vs53+39+x4Udwp4J5rNZfgFuA+Lt+uU+09w1gYBVWomtAl98B+E9w7yC05Xc81/HgLvJdlyqJbU0fJCKCmdw==}
+  seroval-plugins@1.3.1:
+    resolution: {integrity: sha512-dOlUoiI3fgZbQIcj6By+l865pzeWdP3XCSLdI3xlKnjCk5983yLWPsXytFOUI0BUZKG9qwqbj78n9yVcVwUqaQ==}
     engines: {node: '>=10'}
     peerDependencies:
       seroval: ^1.0
 
-  seroval@1.2.1:
-    resolution: {integrity: sha512-yBxFFs3zmkvKNmR0pFSU//rIsYjuX418TnlDmc2weaq5XFDqDIV/NOMPBoLrbxjLH42p4UzRuXHryXh9dYcKcw==}
+  seroval@1.3.1:
+    resolution: {integrity: sha512-F+T9EQPdLzgdewgxnBh4mSc+vde+EOkU6dC9BDuu/bfGb+UyUlqM6t8znFCTPQSuai/ZcfFg0gu79h+bVW2O0w==}
     engines: {node: '>=10'}
 
   serve-static@2.2.0:
@@ -1418,8 +1418,8 @@ packages:
     resolution: {integrity: sha512-UOPtVuYkzYGee0Bd2Szz8d2G3RfMfJ2t3qVdZUAozZyAk+a0Sxa+QKix0YCwjL/A1RR0ar44nCxaoN9FxdJGwA==}
     engines: {node: '>= 18'}
 
-  solid-js@1.9.5:
-    resolution: {integrity: sha512-ogI3DaFcyn6UhYhrgcyRAMbu/buBJitYQASZz5WzfQVPP10RD2AbCoRZ517psnezrasyCbWzIxZ6kVqet768xw==}
+  solid-js@1.9.6:
+    resolution: {integrity: sha512-PoasAJvLk60hRtOTe9ulvALOdLjjqxuxcGZRolBQqxOnXrBXHGzqMT4ijNhGsDAYdOgEa8ZYaAE94PSldrFSkA==}
 
   split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
@@ -2007,33 +2007,33 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@solid-primitives/deep@0.3.2(solid-js@1.9.5)':
+  '@solid-primitives/deep@0.3.2(solid-js@1.9.6)':
     dependencies:
-      '@solid-primitives/memo': 1.4.2(solid-js@1.9.5)
-      solid-js: 1.9.5
+      '@solid-primitives/memo': 1.4.2(solid-js@1.9.6)
+      solid-js: 1.9.6
 
-  '@solid-primitives/memo@1.4.2(solid-js@1.9.5)':
+  '@solid-primitives/memo@1.4.2(solid-js@1.9.6)':
     dependencies:
-      '@solid-primitives/scheduled': 1.5.1(solid-js@1.9.5)
-      '@solid-primitives/utils': 6.3.1(solid-js@1.9.5)
-      solid-js: 1.9.5
+      '@solid-primitives/scheduled': 1.5.1(solid-js@1.9.6)
+      '@solid-primitives/utils': 6.3.1(solid-js@1.9.6)
+      solid-js: 1.9.6
 
-  '@solid-primitives/scheduled@1.5.1(solid-js@1.9.5)':
+  '@solid-primitives/scheduled@1.5.1(solid-js@1.9.6)':
     dependencies:
-      solid-js: 1.9.5
+      solid-js: 1.9.6
 
-  '@solid-primitives/utils@6.3.1(solid-js@1.9.5)':
+  '@solid-primitives/utils@6.3.1(solid-js@1.9.6)':
     dependencies:
-      solid-js: 1.9.5
+      solid-js: 1.9.6
 
-  '@solidjs/router@0.15.3(solid-js@1.9.5)':
+  '@solidjs/router@0.15.3(solid-js@1.9.6)':
     dependencies:
-      solid-js: 1.9.5
+      solid-js: 1.9.6
 
-  '@tabler/icons-solidjs@3.31.0(solid-js@1.9.5)':
+  '@tabler/icons-solidjs@3.31.0(solid-js@1.9.6)':
     dependencies:
       '@tabler/icons': 3.31.0
-      solid-js: 1.9.5
+      solid-js: 1.9.6
 
   '@tabler/icons@3.31.0': {}
 
@@ -2313,13 +2313,13 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
 
-  esbuild-plugin-solid@0.6.0(esbuild@0.25.3)(solid-js@1.9.5):
+  esbuild-plugin-solid@0.6.0(esbuild@0.25.3)(solid-js@1.9.6):
     dependencies:
       '@babel/core': 7.26.10
       '@babel/preset-typescript': 7.26.0(@babel/core@7.26.10)
       babel-preset-solid: 1.9.5(@babel/core@7.26.10)
       esbuild: 0.25.3
-      solid-js: 1.9.5
+      solid-js: 1.9.6
     transitivePeerDependencies:
       - supports-color
 
@@ -2894,11 +2894,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  seroval-plugins@1.2.1(seroval@1.2.1):
+  seroval-plugins@1.3.1(seroval@1.3.1):
     dependencies:
-      seroval: 1.2.1
+      seroval: 1.3.1
 
-  seroval@1.2.1: {}
+  seroval@1.3.1: {}
 
   serve-static@2.2.0:
     dependencies:
@@ -2947,11 +2947,11 @@ snapshots:
 
   smol-toml@1.3.4: {}
 
-  solid-js@1.9.5:
+  solid-js@1.9.6:
     dependencies:
       csstype: 3.1.3
-      seroval: 1.2.1
-      seroval-plugins: 1.2.1(seroval@1.2.1)
+      seroval: 1.3.1
+      seroval-plugins: 1.3.1(seroval@1.3.1)
 
   split2@4.2.0: {}
 
