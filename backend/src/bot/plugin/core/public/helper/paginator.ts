@@ -1,6 +1,6 @@
-import { ButtonStyles, ComponentTypes } from "oceanic.js";
+import { ButtonStyles, ComponentTypes, type TextButton } from "oceanic.js";
 import { ActionRow, Separator } from "../../helper/componentSugar.ts";
-import type { BaseContext, CommandContext, CommandTextButton, ReplyObject } from "../command.ts";
+import type { BaseContext, CommandContext, ReplyObject } from "../command.ts";
 
 export interface Paginator<E, K> {
 	pageSize: number;
@@ -44,41 +44,53 @@ async function renderPaginator<E, K>(
 
 	const reply = await paginator.render(queryResult);
 
-	const prevButton: CommandTextButton = {
+	const prevButton: TextButton = {
 		label: "←",
 		customID: "paginator-prev",
 		type: ComponentTypes.BUTTON,
 		style: ButtonStyles.SECONDARY,
-		async callback(context) {
-			const firstItem = queryResult[0];
-			const before = firstItem !== undefined ? paginator.getKey(firstItem) : undefined;
-
-			await context.edit(await renderPaginator(context, paginator, true, before, undefined));
-		},
 		disabled: after === undefined && (!hasMore || before === undefined)
 	};
 
-	const nextButton: CommandTextButton = {
+	const nextButton: TextButton = {
 		label: "→",
 		customID: "paginator-next",
 		type: ComponentTypes.BUTTON,
 		style: ButtonStyles.SECONDARY,
-		async callback(context) {
-			const lastItem = queryResult[queryResult.length - 1];
-			const after = lastItem !== undefined ? paginator.getKey(lastItem) : undefined;
-
-			await context.edit(await renderPaginator(context, paginator, false, undefined, after));
-		},
 		disabled: before === undefined && !hasMore,
 	};
 
-	const componentTarget =
-		reply.components.length === 1 && reply.components[0]!.type === ComponentTypes.CONTAINER
-			? reply.components[0]!.components
-			: reply.components;
+	if (!prevButton.disabled || !nextButton.disabled) {
+		const componentTarget =
+			reply.components.length === 1 && reply.components[0]!.type === ComponentTypes.CONTAINER
+				? reply.components[0]!.components
+				: reply.components;
 
-	componentTarget.push(Separator());
-	componentTarget.push(ActionRow([prevButton, nextButton]));
+		componentTarget.push(Separator());
+		componentTarget.push(ActionRow([prevButton, nextButton]));
+	}
+
+	const parentHandler = reply.componentHandler;
+
+	reply.componentHandler = async (context, customID, ...remaining) => {
+		if (context.originalUserID === context.user.id) {
+			if (customID === "paginator-prev") {
+				const firstItem = queryResult[0];
+				const before = firstItem !== undefined ? paginator.getKey(firstItem) : undefined;
+
+				await context.edit(await renderPaginator(context, paginator, true, before, undefined));
+				return;
+			} else if (customID === "paginator-next") {
+				const lastItem = queryResult[queryResult.length - 1];
+				const after = lastItem !== undefined ? paginator.getKey(lastItem) : undefined;
+
+				await context.edit(await renderPaginator(context, paginator, false, undefined, after));
+				return;
+			}
+		}
+
+		await parentHandler?.(context, customID, ...remaining);
+	};
 
 	return reply;
 }

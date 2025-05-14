@@ -163,7 +163,6 @@ export const slashRunHandler = defineEventListener("interactionCreate", async in
 });
 
 class SlashContext implements CommandContext {
-	command: Command;
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;
 	_responseID: string | null;
 	_acked: boolean;
@@ -171,6 +170,7 @@ class SlashContext implements CommandContext {
 	_deferPromise: Promise<void> | null;
 	_ephemeral: boolean;
 
+	command: Command;
 	get ephemeral(): boolean { return this._ephemeral; }
 
 	get shard(): Shard { return this._interaction.guild.shard; }
@@ -216,8 +216,8 @@ class SlashContext implements CommandContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
-			listenForInteractions(this._responseID, this._interaction.user.id, reply.components);
+		if (typeof reply !== "string" && reply.componentHandler !== undefined && this._responseID !== null)
+			listenForInteractions(this._responseID, this._interaction.user.id, reply.componentHandler);
 	}
 
 	_clearTimeout(): void {

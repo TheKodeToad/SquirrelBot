@@ -1,4 +1,4 @@
-import { type ActionRowBase, type AnyTextableGuildChannel, type ButtonComponent, type ContainerComponent, type CreateMessageOptions, Guild, Member, Message, type MessageActionRow, type MessageComponent, type SectionComponent, type SelectMenuComponent, Shard, type TextButton, type ThumbnailComponent, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User } from "oceanic.js";
 
 type NameList = [string, ...string[]];
 
@@ -47,43 +47,16 @@ export interface CommandContext extends BaseContext {
 }
 
 export interface ComponentContext extends BaseContext {
+	/** The ID of the user who initially ran the command */
+	originalUserID: string;
 	edit(reply: Reply): Promise<void>;
 }
 
-export type CommandComponent =
-	| CommandActionRow
-	| CommandSectionComponent
-	| CommandContainerComponent
-	| Exclude<MessageComponent, MessageActionRow | SectionComponent | ContainerComponent>;
-
-export type CommandActionRow = ActionRowBase<CommandActionRowComponent>;
-export type CommandActionRowComponent = CommandButtonComponent | CommandSelectMenuComponent;
-
-export type CommandContainerComponent = ContainerComponent
-	& {
-		components: (
-			| CommandActionRow
-			| CommandSectionComponent
-			| Exclude<ContainerComponent["components"][number], MessageActionRow | SectionComponent>
-		)[];
-	};
-
-export type CommandSectionComponent = SectionComponent & { accessory: ThumbnailComponent | CommandButtonComponent; };
-
-export type CommandButtonComponent = CommandTextButton | Exclude<ButtonComponent, TextButton>;
-export type CommandTextButton = TextButton & CommandComponentCallback<false>;
-export type CommandSelectMenuComponent = SelectMenuComponent & CommandComponentCallback<true>;
-
-export type AnyCommandComponentWithCallback = CommandTextButton | CommandSelectMenuComponent;
-
-export interface CommandComponentCallback<WithValues extends boolean = boolean> {
-	callback: WithValues extends true
-	? (context: ComponentContext, values: string[]) => Promise<void>
-	: (context: ComponentContext) => Promise<void>;
-	invokerOnly?: boolean;
+export interface ReplyObject extends Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> {
+	components: MessageComponent[];
+	componentHandler?(this: void, context: ComponentContext, customID: string, values?: string[]): Promise<void> | void;
 }
 
-export type ReplyObject = Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> & { components: CommandComponent[]; };
 export type Reply = ReplyObject | string;
 
 export const enum OptionType {

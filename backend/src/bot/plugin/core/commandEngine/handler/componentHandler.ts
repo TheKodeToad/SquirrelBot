@@ -1,21 +1,21 @@
-import { ComponentInteraction, ComponentTypes, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
+import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { transformReply } from "../../helper/commands.ts";
 import { Text } from "../../helper/componentSugar.ts";
-import type { AnyCommandComponentWithCallback, CommandActionRow, CommandComponent, CommandComponentCallback, CommandContainerComponent, CommandSectionComponent, ComponentContext, Reply } from "../../public/command.ts";
+import type { ComponentContext, Reply, ReplyObject } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
 
-interface ComponentData {
-	callbacks: Map<string, Required<CommandComponentCallback>>;
-	invokerID: string;
+interface ComponentHandler {
+	callback: NonNullable<ReplyObject["componentHandler"]>;
+	originalUserID: string;
 }
 
 const logger = moduleLogger();
 
-const activeComponents: TTLMap<string, ComponentData> = new TTLMap(STATE_EXPIRE_AFTER);
-setInterval(() => activeComponents.cleanup(), STATE_CLEANUP_INTERVAL).unref();
+const activeHandlers: TTLMap<string, ComponentHandler> = new TTLMap(STATE_EXPIRE_AFTER);
+setInterval(() => activeHandlers.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
 export const componentInterationHandler = defineEventListener("interactionCreate", async interaction => {
 	if (!interaction.inCachedGuildChannel())
@@ -24,28 +24,17 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	if (!interaction.isComponentInteraction())
 		return;
 
-	const componentData = activeComponents.get(interaction.message.id);
+	const handler = activeHandlers.get(interaction.message.id);
 
-	if (componentData === undefined)
+	if (handler === undefined)
 		return;
 
-	const callback = componentData.callbacks.get(interaction.data.customID);
-
-	if (callback === undefined)
-		return;
-
-	if (callback.invokerOnly && interaction.user.id !== componentData.invokerID) {
-		// just ignore
-		await interaction.deferUpdate();
-		return;
-	}
-
-	const context = new ComponentContextImpl(interaction, componentData.invokerID);
+	const context = new ComponentContextImpl(interaction, handler.originalUserID);
 
 	try {
-		const values = "values" in interaction.data ? interaction.data.values.raw : [];
+		const values = "values" in interaction.data ? interaction.data.values.raw : undefined;
 
-		await callback.callback(context, values);
+		await handler.callback(context, interaction.data.customID, values);
 	} catch (error) {
 		try {
 			await context.respond({
@@ -62,65 +51,27 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	}
 });
 
-export function listenForInteractions(messageID: string, invokerID: string, components: CommandComponent[]): void {
-	const callbacks: ComponentData["callbacks"] = new Map;
-
-	for (const component of components) {
-		if (component.type === ComponentTypes.ACTION_ROW)
-			putCallbacksForActionRow(callbacks, component);
-		else if (component.type === ComponentTypes.SECTION)
-			putCallbackForSection(callbacks, component);
-		else if (component.type === ComponentTypes.CONTAINER) {
-			putCallbacksForContainer(callbacks, component);
-		}
-	}
-
-	activeComponents.set(messageID, { callbacks, invokerID: invokerID });
-}
-
-export function putCallbacksForActionRow(callbacks: ComponentData["callbacks"], row: CommandActionRow): void {
-	for (const action of row.components)
-		if ("callback" in action)
-			putCallback(callbacks, action);
-}
-
-export function putCallbackForSection(callbacks: ComponentData["callbacks"], section: CommandSectionComponent): void {
-	if ("callback" in section.accessory)
-		putCallback(callbacks, section.accessory);
-}
-
-export function putCallbacksForContainer(callbacks: ComponentData["callbacks"], section: CommandContainerComponent): void {
-	for (const component of section.components) {
-		if (component.type === ComponentTypes.ACTION_ROW)
-			putCallbacksForActionRow(callbacks, component);
-		else if (component.type === ComponentTypes.SECTION)
-			putCallbackForSection(callbacks, component);
-	}
-}
-
-export function putCallback(callbacks: ComponentData["callbacks"], component: AnyCommandComponentWithCallback): void {
-	callbacks.set(
-		component.customID,
-		{ callback: component.callback, invokerOnly: component.invokerOnly ?? true }
-	);
+export function listenForInteractions(messageID: string, originalUserID: string, callback: ComponentHandler["callback"]): void {
+	activeHandlers.set(messageID, { callback, originalUserID });
 }
 
 export function unlistenForInteractions(messageID: string): void {
-	activeComponents.delete(messageID);
+	activeHandlers.delete(messageID);
 }
 
 class ComponentContextImpl implements ComponentContext {
 	private _interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
-	private _originalInvoker: string;
 	private _responseID: string | null;
 	private _acked: boolean;
 	private _edited: boolean;
 	private _ackPromise: Promise<void> | null;
 	private _ackTimeout: NodeJS.Timeout | null;
 
-	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalInvoker: string) {
+	originalUserID: string;
+
+	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalUserID: string) {
 		this._interaction = interaction;
-		this._originalInvoker = originalInvoker;
+		this.originalUserID = originalUserID;
 		this._responseID = null;
 		this._acked = false;
 		this._edited = false;
@@ -162,8 +113,8 @@ class ComponentContextImpl implements ComponentContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.components !== undefined && this._responseID !== null)
-			listenForInteractions(this._responseID, this._originalInvoker, reply.components);
+		if (typeof reply !== "string" && reply.componentHandler !== undefined && this._responseID !== null)
+			listenForInteractions(this._responseID, this.originalUserID, reply.componentHandler);
 	}
 
 	async edit(reply: Reply): Promise<void> {
@@ -181,8 +132,8 @@ class ComponentContextImpl implements ComponentContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.components !== undefined)
-			listenForInteractions(this._interaction.message.id, this._originalInvoker, reply.components);
+		if (typeof reply !== "string" && reply.componentHandler !== undefined)
+			listenForInteractions(this._interaction.message.id, this.originalUserID, reply.componentHandler);
 	}
 
 	_clearTimeout(): void {

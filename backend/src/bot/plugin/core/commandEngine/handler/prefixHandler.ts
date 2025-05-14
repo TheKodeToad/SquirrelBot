@@ -198,8 +198,8 @@ class PrefixContext implements CommandContext {
 			await this._response.edit(messageOptions);
 		}
 
-		if (typeof reply !== "string" && reply.components !== undefined)
-			listenForInteractions(this._response.id, this.message.author.id, reply.components);
+		if (typeof reply !== "string" && reply.componentHandler !== undefined)
+			listenForInteractions(this._response.id, this.message.author.id, reply.componentHandler);
 	}
 
 	async _delete(): Promise<void> {

@@ -1,4 +1,4 @@
-import { ButtonStyles, ComponentTypes, MessageFlags, type SelectOption } from "oceanic.js";
+import { ButtonStyles, ComponentTypes, MessageFlags, type ContainerComponent, type SelectMenuComponent, type SelectOption, type TextButton } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
 import { getPlugin, getPlugins } from "../../../../loader/index.ts";
@@ -6,7 +6,7 @@ import { getCommandByName } from "../../commandEngine/commandCache.ts";
 import { canRunCommand } from "../../helper/commands.ts";
 import { ActionRow, Container, Separator, Text } from "../../helper/componentSugar.ts";
 import { coreConfig } from "../../index.ts";
-import type { BaseContext, CommandContainerComponent, CommandSelectMenuComponent, CommandTextButton, ComponentContext, Reply, ReplyObject } from "../../public/command.ts";
+import type { BaseContext, Reply, ReplyObject } from "../../public/command.ts";
 import { icons } from "../../public/icons.ts";
 
 const logger = moduleLogger();
@@ -14,26 +14,31 @@ const logger = moduleLogger();
 interface CommandListState {
 	plugin: string;
 	page: number;
-	entries?: CommandContainerComponent["components"][];
+	entries?: ContainerComponent["components"][];
 }
 
 export function renderCommandListPageMinimal(guildID: string): Reply {
 	return {
 		components: [
 			Text("**Select a plugin to view commands**"),
-			ActionRow([
-				renderPluginSelection(null, guildID, async (context, value) => {
-					const page = renderCommandListPage(context, { plugin: value, page: 0 });
-					page.flags ??= MessageFlags.EPHEMERAL;
-					await context.respond(page);
-				})
-			]),
+			ActionRow([renderPluginSelection(null, guildID)]),
 			Text(`${icons.tip} You can also pass in the name of a command to view it directly.`)
 		],
+		async componentHandler(context, customID, values) {
+			if (customID !== "plugin")
+				return;
+
+			if (values?.length !== 1)
+				throw new Error("Selected plugin not present");
+
+			const page = renderCommandListPage(context, { plugin: values[0]!, page: 0 });
+			page.flags ??= MessageFlags.EPHEMERAL;
+			await context.respond(page);
+		},
 	};
 }
 
-export function renderPluginSelection(selected: string | null, guildID: string, callback: (context: ComponentContext, value: string) => Promise<void>): CommandSelectMenuComponent {
+function renderPluginSelection(selected: string | null, guildID: string): SelectMenuComponent {
 	const options: SelectOption[] = [];
 
 	for (const plugin of getPlugins()) {
@@ -52,9 +57,6 @@ export function renderPluginSelection(selected: string | null, guildID: string, 
 		customID: "plugin",
 		options,
 		type: ComponentTypes.STRING_SELECT,
-		async callback(context, values) {
-			await callback(context, values[0]!);
-		},
 	};
 }
 
@@ -69,11 +71,7 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 
 	const container = Container([Text("## Help")]);
 
-	container.components.push(ActionRow([
-		renderPluginSelection(state.plugin, context.guild.id, async (context, value) => {
-			await context.edit(renderCommandListPage(context, { plugin: value, page: 0 }));
-		})
-	]));
+	container.components.push(ActionRow([renderPluginSelection(state.plugin, context.guild.id)]));
 
 	let entries = state.entries;
 
@@ -133,26 +131,20 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 	container.components.push(Separator());
 
 	if (!prevDisabled || !nextDisabled) {
-		const prevButton: CommandTextButton = {
+		const prevButton: TextButton = {
 			label: "←",
 			customID: "prev",
 			disabled: prevDisabled,
 			style: ButtonStyles.SECONDARY,
 			type: ComponentTypes.BUTTON,
-			async callback(context) {
-				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page - 1 }));
-			},
 		};
 
-		const nextButton: CommandTextButton = {
+		const nextButton: TextButton = {
 			label: "→",
 			customID: "next",
 			disabled: nextDisabled,
 			style: ButtonStyles.SECONDARY,
 			type: ComponentTypes.BUTTON,
-			async callback(context) {
-				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page + 1 }));
-			},
 		};
 
 		container.components.push(ActionRow([prevButton, nextButton]));
@@ -160,5 +152,22 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 
 	container.components.push(Text("-# Optional options are surrounded with []."));
 
-	return { components: [container] };
+	return {
+		components: [container],
+		async componentHandler(context, customID, values) {
+			if (context.originalUserID !== context.user.id)
+				return;
+
+			if (customID === "prev")
+				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page - 1 }));
+			else if (customID === "next")
+				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page + 1 }));
+			else if (customID === "plugin") {
+				if (values?.length !== 1)
+					throw new Error("Selected plugin not present");
+
+				await context.edit(renderCommandListPage(context, { plugin: values[0]!, page: 0 }));
+			}
+		},
+	};
 }

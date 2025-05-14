@@ -1,5 +1,4 @@
-import { ButtonStyles, ComponentTypes, type ContainerComponent, type MediaGalleryComponent, type MediaGalleryItem, type SeparatorComponent, type TextDisplayComponent, type ThumbnailComponent, type URLButton } from "oceanic.js";
-import type { CommandActionRow, CommandContainerComponent, CommandSectionComponent } from "../public/command.ts";
+import { ButtonStyles, ComponentTypes, type ContainerComponent, type MediaGalleryComponent, type MediaGalleryItem, type MessageActionRow, type MessageActionRowComponent, type SectionComponent, type SeparatorComponent, type TextDisplayComponent, type ThumbnailComponent, type URLButton } from "oceanic.js";
 
 // inspired by nin0-dev's implementation
 
@@ -15,7 +14,7 @@ export function Thumbnail(url: string, props: Omit<ThumbnailComponent, "type" | 
 	return { ...props, media: { url }, type: ComponentTypes.THUMBNAIL };
 }
 
-export function Section(items: TextDisplayComponent[] = [], accessory: CommandSectionComponent["accessory"]): CommandSectionComponent {
+export function Section(items: TextDisplayComponent[] = [], accessory: SectionComponent["accessory"]): SectionComponent {
 	return { components: items, accessory, type: ComponentTypes.SECTION };
 }
 
@@ -27,11 +26,11 @@ export function Gallery(items: MediaGalleryItem[] = []): MediaGalleryComponent {
 	return { items, type: ComponentTypes.MEDIA_GALLERY };
 }
 
-export function Container(items: CommandContainerComponent["components"] = [], props: Omit<ContainerComponent, "type" | "components"> = {}): CommandContainerComponent {
+export function Container(items: ContainerComponent["components"] = [], props: Omit<ContainerComponent, "type" | "components"> = {}): ContainerComponent {
 	return { ...props, components: items, type: ComponentTypes.CONTAINER };
 }
 
-export function ActionRow(items: CommandActionRow["components"] = []): CommandActionRow {
+export function ActionRow(items: MessageActionRowComponent[] = []): MessageActionRow {
 	return { components: items, type: ComponentTypes.ACTION_ROW };
 }
 

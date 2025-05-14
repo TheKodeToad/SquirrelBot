@@ -1,4 +1,3 @@
-
 /**
  * How long to expire command state (edit tracking + component listening)
  */
