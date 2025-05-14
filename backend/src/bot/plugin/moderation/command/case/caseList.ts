@@ -1,5 +1,5 @@
+import { Container, Divider, Text } from "oceanic-component-helper";
 import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
-import { Container, Separator, Text } from "../../../core/helper/componentSugar.ts";
 import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
@@ -81,7 +81,7 @@ async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyOb
 		container.components.push(Text(content));
 	} else {
 		for (const info of cases) {
-			container.components.push(Separator());
+			container.components.push(Divider());
 			container.components.push(Text(await formatCaseDescription(info, false)));
 			container.components.push(Text(await formatCaseFields(info)));
 		}

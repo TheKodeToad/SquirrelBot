@@ -1,6 +1,6 @@
+import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "../../../../brand.ts";
 import { bot } from "../../../index.ts";
-import { Container, Section, Separator, Text, Thumbnail } from "../helper/componentSugar.ts";
 import { coreConfig } from "../index.ts";
 import { defineCommand } from "../public/command.ts";
 import { permissionsGuard } from "../public/helper/commandGuards.ts";
@@ -41,10 +41,10 @@ export const aboutCommand = defineCommand({
 
 		const container = Container([
 			Section(
-				[Text(`## About ${APP_NAME}\n${APP_DESCRIPTION}`)],
+				[`## About ${APP_NAME}\n${APP_DESCRIPTION}`],
 				Thumbnail(bot.user.avatarURL())
 			),
-			Separator(),
+			Divider(),
 			Text("**Source Code**\n" + APP_SOURCE_CODE),
 			Text("**Libraries**\n" + LIBRARIES),
 			uptimeComponent

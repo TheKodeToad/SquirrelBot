@@ -1,8 +1,8 @@
+import { Text } from "oceanic-component-helper";
 import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { TTLMap } from "../../../../../common/ttlMap.ts";
 import { transformReply } from "../../helper/commands.ts";
-import { Text } from "../../helper/componentSugar.ts";
 import type { ComponentContext, Reply, ReplyObject } from "../../public/command.ts";
 import { defineEventListener } from "../../public/eventListener.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";

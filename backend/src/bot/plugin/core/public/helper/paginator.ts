@@ -1,5 +1,5 @@
-import { ButtonStyles, ComponentTypes, type TextButton } from "oceanic.js";
-import { ActionRow, Separator } from "../../helper/componentSugar.ts";
+import { ActionRow, Divider, TextButton } from "oceanic-component-helper";
+import { ComponentTypes } from "oceanic.js";
 import type { BaseContext, CommandContext, ReplyObject } from "../command.ts";
 
 export interface Paginator<E, K> {
@@ -44,30 +44,20 @@ async function renderPaginator<E, K>(
 
 	const reply = await paginator.render(queryResult);
 
-	const prevButton: TextButton = {
-		label: "←",
-		customID: "paginator-prev",
-		type: ComponentTypes.BUTTON,
-		style: ButtonStyles.SECONDARY,
-		disabled: after === undefined && (!hasMore || before === undefined)
-	};
+	const prevDisabled = after === undefined && (!hasMore || before === undefined);
+	const nextDisabled = before === undefined && !hasMore;
 
-	const nextButton: TextButton = {
-		label: "→",
-		customID: "paginator-next",
-		type: ComponentTypes.BUTTON,
-		style: ButtonStyles.SECONDARY,
-		disabled: before === undefined && !hasMore,
-	};
-
-	if (!prevButton.disabled || !nextButton.disabled) {
+	if (!prevDisabled || !nextDisabled) {
 		const componentTarget =
 			reply.components.length === 1 && reply.components[0]!.type === ComponentTypes.CONTAINER
 				? reply.components[0]!.components
 				: reply.components;
 
-		componentTarget.push(Separator());
-		componentTarget.push(ActionRow([prevButton, nextButton]));
+		componentTarget.push(Divider());
+		componentTarget.push(ActionRow([
+			TextButton("←", "paginator-prev", { disabled: prevDisabled }),
+			TextButton("→", "paginator-next", { disabled: nextDisabled }),
+		]));
 	}
 
 	const parentHandler = reply.componentHandler;

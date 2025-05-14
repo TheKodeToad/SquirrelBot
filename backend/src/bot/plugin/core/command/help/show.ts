@@ -1,6 +1,6 @@
+import { Container, Divider, Text } from "oceanic-component-helper";
 import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
 import type { CommandCacheEntry } from "../../commandEngine/commandCache.ts";
-import { Container, Separator, Text } from "../../helper/componentSugar.ts";
 import { coreConfig } from "../../index.ts";
 import { type ReplyObject } from "../../public/command.ts";
 
@@ -13,7 +13,7 @@ export function renderCommandPage(guildID: string, entry: CommandCacheEntry): Re
 		container.components.push(Text(escapeMarkdown(command.description)));
 
 	if (command.supportPrefix ?? true) {
-		container.components.push(Separator());
+		container.components.push(Divider());
 
 		const prefix = coreConfig.get(guildID)?.prefix_commands.prefix ?? "";
 
@@ -26,7 +26,7 @@ export function renderCommandPage(guildID: string, entry: CommandCacheEntry): Re
 	}
 
 	if (entry.optionsByName.size !== 0) {
-		container.components.push(Separator());
+		container.components.push(Divider());
 		container.components.push(Text(formatOptions(entry)));
 	}
 

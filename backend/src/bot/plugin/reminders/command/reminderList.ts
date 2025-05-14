@@ -1,6 +1,6 @@
+import { Container, Text } from "oceanic-component-helper";
 import { dateToUnixSeconds } from "../../../../common/time.ts";
 import { getReminders, type Reminder } from "../../../../db/reminders/reminders.ts";
-import { Container, Text } from "../../core/helper/componentSugar.ts";
 import { defineCommand, type BaseContext, type ReplyObject } from "../../core/public/command.ts";
 import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "../../core/public/helper/paginator.ts";

@@ -1,9 +1,8 @@
-import { User, type InviteGuild, type PartialInviteChannel, type TextDisplayComponent } from "oceanic.js";
+import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
+import { User, type ContainerComponent, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { formatUser } from "../../../../common/discord/format.ts";
 import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { ActionRow, Container, LinkButton, Section, Separator, Text, Thumbnail } from "../../../core/helper/componentSugar.ts";
-import type { CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 
 export function renderGuildInvite(
@@ -14,35 +13,35 @@ export function renderGuildInvite(
 	totalMembers: number | undefined,
 	expiresAt: Date | undefined,
 	hideImages: boolean
-): CommandContainerComponent {
+): ContainerComponent {
 	const result = Container();
 
 	const iconURL = guild.iconURL();
 	const bannerURL = guild.bannerURL();
 	const splashURL = guild.splashURL();
 
-	const mainInfo: TextDisplayComponent[] = [];
+	const mainInfo: string[] = [];
 
-	mainInfo.push(Text("## " + escapeMarkdown(guild.name) + "\n**Server Invite**\n" + (guild.description || "*No description provided.*")));
+	mainInfo.push("## " + escapeMarkdown(guild.name) + "\n**Server Invite**\n" + (guild.description || "*No description provided.*"));
 
 	if (totalMembers !== undefined && onlineMembers !== undefined) {
 		const online = onlineMembers.toLocaleString("en-US");
 		const total = totalMembers.toLocaleString("en-US");
 
-		mainInfo.push(Text(`${icons.online} ${online} Online  ${icons.offline} ${total} Total`));
+		mainInfo.push(`${icons.online} ${online} Online  ${icons.offline} ${total} Total`);
 	}
 
 	if (guild.premiumSubscriptionCount) {
 		const level = calculateLevel(guild.premiumSubscriptionCount);
-		mainInfo.push(Text(`${icons.boost} Level ${level} (${guild.premiumSubscriptionCount} Boosts)`));
+		mainInfo.push(`${icons.boost} Level ${level} (${guild.premiumSubscriptionCount} Boosts)`);
 	}
 
 	if (iconURL === null || hideImages)
-		result.components.push(...mainInfo);
+		result.components.push(...mainInfo.map(content => Text(content)));
 	else
 		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
 
-	result.components.push(Separator());
+	result.components.push(Divider());
 
 	let fields = "";
 
@@ -59,16 +58,16 @@ export function renderGuildInvite(
 		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}
 
-	const actions = ActionRow();
+	const actions = ActionRow<MessageActionRowComponent>();
 
 	if (iconURL !== null)
-		actions.components.push(LinkButton("Icon", iconURL));
+		actions.components.push(URLButton("Icon", iconURL));
 
 	if (bannerURL !== null)
-		actions.components.push(LinkButton("Banner", bannerURL));
+		actions.components.push(URLButton("Banner", bannerURL));
 
 	if (splashURL !== null)
-		actions.components.push(LinkButton("Splash", splashURL));
+		actions.components.push(URLButton("Splash", splashURL));
 
 	if (actions.components.length !== 0)
 		result.components.push(actions);

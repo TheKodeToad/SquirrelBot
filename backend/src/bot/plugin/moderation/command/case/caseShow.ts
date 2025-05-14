@@ -1,5 +1,5 @@
+import { Container, Divider, Text } from "oceanic-component-helper";
 import { getCase } from "../../../../../db/moderation/cases.ts";
-import { Container, Separator, Text } from "../../../core/helper/componentSugar.ts";
 import { OptionType, defineCommand } from "../../../core/public/command.ts";
 import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
 import { icons } from "../../../core/public/icons.ts";
@@ -32,7 +32,7 @@ export const caseShowCommand = defineCommand({
 		await context.respond({
 			components: [Container([
 				Text(await formatCaseDescription(info, true)),
-				Separator(),
+				Divider(),
 				Text(await formatCaseFields(info)),
 			])]
 		});

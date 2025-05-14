@@ -1,9 +1,8 @@
-import { type PartialInviteChannel, type TextDisplayComponent, type User } from "oceanic.js";
+import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
+import { type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
 import { dateToUnixSeconds } from "../../../../../common/time.ts";
 import { formatUser } from "../../../../common/discord/format.ts";
 import { getChannelIconURL } from "../../../../common/discord/urls.ts";
-import { ActionRow, Container, LinkButton, Section, Separator, Text, Thumbnail } from "../../../core/helper/componentSugar.ts";
-import type { CommandContainerComponent } from "../../../core/public/command.ts";
 import { icons } from "../../../core/public/icons.ts";
 
 export function renderGroupDMInvite(
@@ -12,26 +11,26 @@ export function renderGroupDMInvite(
 	totalMembers: number | undefined,
 	expiresAt: Date | undefined,
 	hideImages: boolean
-): CommandContainerComponent {
+): ContainerComponent {
 	const result = Container();
 
-	const mainInfo: TextDisplayComponent[] = [];
+	const mainInfo: string[] = [];
 
-	mainInfo.push(Text("## " + (channel.name ?? "<unknown>") + "\n**Group Invite**"));
+	mainInfo.push("## " + (channel.name ?? "<unknown>") + "\n**Group Invite**");
 
 	if (totalMembers !== undefined) {
 		const total = totalMembers.toLocaleString("en-US");
-		mainInfo.push(Text(`${icons.online} ${total} Members`));
+		mainInfo.push(`${icons.online} ${total} Members`);
 	}
 
 	const iconURL: string | null = getChannelIconURL(channel);
 
 	if (iconURL === null || hideImages) {
-		result.components.push(...mainInfo);
+		result.components.push(...mainInfo.map(content => Text(content)));
 	} else
 		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
 
-	result.components.push(Separator());
+	result.components.push(Divider());
 
 	if (inviter !== undefined)
 		result.components.push(Text("**Invited By:** " + formatUser(inviter)));
@@ -43,7 +42,7 @@ export function renderGroupDMInvite(
 	}
 
 	if (iconURL !== null) {
-		result.components.push(ActionRow([LinkButton("Icon", iconURL)]));
+		result.components.push(ActionRow([URLButton("Icon", iconURL)]));
 	}
 
 	result.components.push(Text("-# Group Channel ID: " + channel.id));

@@ -1,10 +1,10 @@
-import { ButtonStyles, ComponentTypes, MessageFlags, type ContainerComponent, type SelectMenuComponent, type SelectOption, type TextButton } from "oceanic.js";
+import { ActionRow, Container, Divider, StringSelect, Text, TextButton } from "oceanic-component-helper";
+import { MessageFlags, type ContainerComponent, type StringSelectMenu } from "oceanic.js";
 import { moduleLogger } from "../../../../../common/logger/index.ts";
 import { makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
 import { getPlugin, getPlugins } from "../../../../loader/index.ts";
 import { getCommandByName } from "../../commandEngine/commandCache.ts";
 import { canRunCommand } from "../../helper/commands.ts";
-import { ActionRow, Container, Separator, Text } from "../../helper/componentSugar.ts";
 import { coreConfig } from "../../index.ts";
 import type { BaseContext, Reply, ReplyObject } from "../../public/command.ts";
 import { icons } from "../../public/icons.ts";
@@ -38,14 +38,14 @@ export function renderCommandListPageMinimal(guildID: string): Reply {
 	};
 }
 
-function renderPluginSelection(selected: string | null, guildID: string): SelectMenuComponent {
-	const options: SelectOption[] = [];
+function renderPluginSelection(selected: string | null, guildID: string): StringSelectMenu {
+	const select = StringSelect("plugin");
 
 	for (const plugin of getPlugins()) {
 		if (!(plugin.config === undefined || plugin.config.store.has(guildID)))
 			continue;
 
-		options.push({
+		select.options.push({
 			label: plugin.name,
 			value: plugin.id,
 			description: plugin.description,
@@ -53,11 +53,7 @@ function renderPluginSelection(selected: string | null, guildID: string): Select
 		});
 	}
 
-	return {
-		customID: "plugin",
-		options,
-		type: ComponentTypes.STRING_SELECT,
-	};
+	return select;
 }
 
 export function renderCommandListPage(context: BaseContext, state: CommandListState): ReplyObject {
@@ -116,7 +112,7 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 	const visibleEntries = entries.slice(sliceStart, sliceEnd);
 
 	for (const entry of visibleEntries) {
-		container.components.push(Separator());
+		container.components.push(Divider());
 		container.components.push(...entry);
 	}
 
@@ -128,26 +124,13 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 	const prevDisabled = sliceStart === 0;
 	const nextDisabled = sliceEnd >= entries.length;
 
-	container.components.push(Separator());
+	container.components.push(Divider());
 
 	if (!prevDisabled || !nextDisabled) {
-		const prevButton: TextButton = {
-			label: "←",
-			customID: "prev",
-			disabled: prevDisabled,
-			style: ButtonStyles.SECONDARY,
-			type: ComponentTypes.BUTTON,
-		};
-
-		const nextButton: TextButton = {
-			label: "→",
-			customID: "next",
-			disabled: nextDisabled,
-			style: ButtonStyles.SECONDARY,
-			type: ComponentTypes.BUTTON,
-		};
-
-		container.components.push(ActionRow([prevButton, nextButton]));
+		container.components.push(ActionRow([
+			TextButton("←", "prev", { disabled: prevDisabled }),
+			TextButton("→", "next", { disabled: nextDisabled }),
+		]));
 	}
 
 	container.components.push(Text("-# Optional options are surrounded with []."));
