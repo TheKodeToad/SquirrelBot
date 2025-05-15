@@ -47,16 +47,13 @@ export const inviteInfoCommand = defineCommand({
 		const code = matches[1]!;
 
 		try {
-			var invite = await bot.rest.channels.getInvite(code, {
-				withCounts: true,
-				withExpiration: true,
-			});
+			var invite = await stealthyGetInvite(code);
 		} catch (error) {
 			if (!(error instanceof DiscordRESTError))
 				throw error;
 
 			if (error.code === JSONErrorCodes.UNKNOWN_INVITE)
-				await context.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! This could be a friend invite or another type of invite invisible to bots.`);
+				await context.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! It might not be visible to apps.`);
 			else
 				await context.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
 
@@ -89,3 +86,28 @@ export const inviteInfoCommand = defineCommand({
 		await context.respond({ components: [container] });
 	},
 });
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function stealthyGetInvite(code: string) {
+	// HACK: I am very sorry
+	// remove Bot prefix because Discord API lets you resolve more invites for some reason (??)
+
+	const desc = Object.getOwnPropertyDescriptor(bot.options, "auth");
+	const trivialDesc = desc !== undefined && desc.writable && desc.get === undefined && desc.set === undefined;
+
+	const prefix = "Bot ";
+	const oldValue = bot.options.auth;
+
+	if (trivialDesc && bot.options.auth?.startsWith(prefix))
+		bot.options.auth = bot.options.auth.substring(prefix.length);
+
+	const result = bot.rest.channels.getInvite(code, {
+		withCounts: true,
+		withExpiration: true,
+	});
+
+	bot.options.auth = oldValue;
+
+	return result;
+}
+
