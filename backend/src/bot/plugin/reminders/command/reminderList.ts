@@ -1,12 +1,12 @@
 import { Container, Text } from "oceanic-component-helper";
-import { dateToUnixSeconds } from "../../../../common/time.ts";
-import { getReminders, type Reminder } from "../../../../db/reminders/reminders.ts";
-import { defineCommand, type BaseContext, type ReplyObject } from "../../core/public/command.ts";
-import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
-import { respondWithPaginator, type PaginatorQuery } from "../../core/public/helper/paginator.ts";
-import { icons } from "../../core/public/icons.ts";
-import { resolvePermissions } from "../../core/public/permissionResolution.ts";
-import { remindersConfig } from "../index.ts";
+import { dateToUnixSeconds } from "#common/time.ts";
+import { getReminders, type Reminder } from "#db/reminders/reminders.ts";
+import { defineCommand, type BaseContext, type ReplyObject } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { respondWithPaginator, type PaginatorQuery } from "#bot/plugin/core/public/helper/paginator.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { resolvePermissions } from "#bot/plugin/core/public/permissionResolution.ts";
+import { remindersConfig } from "#bot/plugin/reminders/index.ts";
 
 export const reminderListCommand = defineCommand({
 	name: ["reminderlist", "reminders", "listreminders"],

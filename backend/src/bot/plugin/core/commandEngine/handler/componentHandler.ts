@@ -1,11 +1,11 @@
+import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#bot/plugin/core/commandEngine/index.ts";
+import { transformReply } from "#bot/plugin/core/helper/commands.ts";
+import type { ComponentContext, Reply, ReplyObject } from "#bot/plugin/core/public/command.ts";
+import { defineEventListener } from "#bot/plugin/core/public/eventListener.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { TTLMap } from "#common/ttlMap.ts";
 import { Text } from "oceanic-component-helper";
 import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
-import { moduleLogger } from "../../../../../common/logger/index.ts";
-import { TTLMap } from "../../../../../common/ttlMap.ts";
-import { transformReply } from "../../helper/commands.ts";
-import type { ComponentContext, Reply, ReplyObject } from "../../public/command.ts";
-import { defineEventListener } from "../../public/eventListener.ts";
-import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
 
 interface ComponentHandler {
 	callback: NonNullable<ReplyObject["componentHandler"]>;

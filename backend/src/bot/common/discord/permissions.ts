@@ -1,6 +1,6 @@
+import { bot } from "#bot/index.ts";
+import { requireExhaustiveSwitch } from "#common/types.ts";
 import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role } from "oceanic.js";
-import { requireExhaustiveSwitch } from "../../../common/types.ts";
-import { bot } from "../../index.ts";
 
 /**
  * Resolve member roles from cached guild.

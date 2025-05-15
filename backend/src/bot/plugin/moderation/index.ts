@@ -1,15 +1,15 @@
-import { moderationConfigSchema } from "../../../schema/plugin/moderation.ts";
-import { definePlugin } from "../../loader/plugin.ts";
-import { ConfigStore } from "../core/public/config.ts";
-import { banCommand } from "./command/action/ban.ts";
-import { kickCommand } from "./command/action/kick.ts";
-import { timeoutCommand } from "./command/action/timeout.ts";
-import { unbanCommand } from "./command/action/unban.ts";
-import { warnCommand } from "./command/action/warn.ts";
-import { deleteCaseCommand } from "./command/case/caseDelete.ts";
-import { caseListCommand } from "./command/case/caseList.ts";
-import { caseShowCommand } from "./command/case/caseShow.ts";
-import { purgeCommand } from "./command/util/purge.ts";
+import { definePlugin } from "#bot/loader/plugin.ts";
+import { ConfigStore } from "#bot/plugin/core/public/config.ts";
+import { banCommand } from "#bot/plugin/moderation/command/action/ban.ts";
+import { kickCommand } from "#bot/plugin/moderation/command/action/kick.ts";
+import { timeoutCommand } from "#bot/plugin/moderation/command/action/timeout.ts";
+import { unbanCommand } from "#bot/plugin/moderation/command/action/unban.ts";
+import { warnCommand } from "#bot/plugin/moderation/command/action/warn.ts";
+import { deleteCaseCommand } from "#bot/plugin/moderation/command/case/caseDelete.ts";
+import { caseListCommand } from "#bot/plugin/moderation/command/case/caseList.ts";
+import { caseShowCommand } from "#bot/plugin/moderation/command/case/caseShow.ts";
+import { purgeCommand } from "#bot/plugin/moderation/command/util/purge.ts";
+import { moderationConfigSchema } from "#schema/plugin/moderation.ts";
 
 export const moderationConfig = new ConfigStore(moderationConfigSchema);
 

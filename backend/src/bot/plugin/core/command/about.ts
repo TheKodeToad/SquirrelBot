@@ -1,9 +1,9 @@
+import { bot } from "#bot/index.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import { defineCommand } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
-import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "../../../../brand.ts";
-import { bot } from "../../../index.ts";
-import { coreConfig } from "../index.ts";
-import { defineCommand } from "../public/command.ts";
-import { permissionsGuard } from "../public/helper/commandGuards.ts";
 
 const LIBRARIES = `
 [Node.js](https://nodejs.org/),

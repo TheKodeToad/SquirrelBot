@@ -1,6 +1,6 @@
+import { validateToken } from "#db/api/tokens.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { validateToken } from "../../db/api/tokens.ts";
 
 export type AuthVars = {
 	discordUserID: string;

@@ -1,5 +1,5 @@
+import { permissionsFilterSchema } from "#schema/common/permissionsFilter.ts";
 import { array, boolean, object, optional } from "valibot";
-import { permissionsFilterSchema } from "../common/permissionsFilter.ts";
 
 export const utilConfigSchema = object({
 	default_permissions: optional(object({

@@ -1,11 +1,11 @@
+import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { respondWithPaginator, type PaginatorQuery } from "#bot/plugin/core/public/helper/paginator.ts";
+import { resolvePermissions } from "#bot/plugin/core/public/permissionResolution.ts";
+import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#bot/plugin/moderation/helper/format.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { getCases, type CaseInfo } from "#db/moderation/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
-import { getCases, type CaseInfo } from "../../../../../db/moderation/cases.ts";
-import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { respondWithPaginator, type PaginatorQuery } from "../../../core/public/helper/paginator.ts";
-import { resolvePermissions } from "../../../core/public/permissionResolution.ts";
-import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "../../helper/format.ts";
-import { moderationConfig } from "../../index.ts";
 
 export const caseListCommand = defineCommand({
 	name: ["caselist", "casesearch", "cases", "listcases", "searchcases"],

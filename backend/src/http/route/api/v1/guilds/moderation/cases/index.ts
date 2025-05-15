@@ -1,7 +1,7 @@
+import { CaseType, type CaseInfo } from "#db/moderation/cases.ts";
+import byFilter from "#http/route/api/v1/guilds/moderation/cases/byFilter.ts";
+import byNumber from "#http/route/api/v1/guilds/moderation/cases/byNumber.ts";
 import { Hono } from "hono";
-import { CaseType, type CaseInfo } from "../../../../../../../db/moderation/cases.ts";
-import byFilter from "./byFilter.ts";
-import byNumber from "./byNumber.ts";
 
 export interface SerializedCaseObject {
 	number: number;

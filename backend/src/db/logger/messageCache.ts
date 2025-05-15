@@ -1,5 +1,5 @@
+import { dbParse, pool } from "#db/index.ts";
 import { date, nullable, object, string, type InferOutput } from "valibot";
-import { dbParse, pool } from "../index.ts";
 
 const messageCacheEntrySchema = object({
 	guildID: string(),

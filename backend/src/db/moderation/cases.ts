@@ -1,5 +1,5 @@
+import { dbParse, pool } from "#db/index.ts";
 import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
-import { dbParse, pool } from "../index.ts";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage

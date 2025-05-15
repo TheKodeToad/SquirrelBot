@@ -1,9 +1,9 @@
+import { formatUser } from "#bot/common/discord/format.ts";
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { dateToUnixSeconds } from "#common/time.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
 import { User, type ContainerComponent, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel } from "oceanic.js";
-import { dateToUnixSeconds } from "../../../../../common/time.ts";
-import { formatUser } from "../../../../common/discord/format.ts";
-import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { icons } from "../../../core/public/icons.ts";
 
 export function renderGuildInvite(
 	guild: InviteGuild,

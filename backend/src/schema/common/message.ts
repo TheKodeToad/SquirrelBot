@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
+import { hexColorSchema, snowflakeSchema } from "#schema/common/index.ts";
+import { template } from "#schema/common/template.ts";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type BaseIssue, type BaseSchema } from "valibot";
-import type { ParameterRecord, TemplateSchema } from "../../common/template/index.ts";
-import { hexColorSchema, snowflakeSchema } from "./index.ts";
-import { template } from "./template.ts";
 
 export const messageLiteral = message(string());
 

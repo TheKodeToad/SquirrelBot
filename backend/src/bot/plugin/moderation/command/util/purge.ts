@@ -1,10 +1,10 @@
-import { WEEK } from "../../../../../common/time.ts";
-import { isUndeletableMessageType } from "../../../../common/discord/typeGuards.ts";
-import { bot } from "../../../../index.ts";
-import { OptionType, defineCommand } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { moderationConfig } from "../../index.ts";
+import { isUndeletableMessageType } from "#bot/common/discord/typeGuards.ts";
+import { bot } from "#bot/index.ts";
+import { OptionType, defineCommand } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { WEEK } from "#common/time.ts";
 
 export const purgeCommand = defineCommand({
 	name: ["purge", "sweep", "clear"],

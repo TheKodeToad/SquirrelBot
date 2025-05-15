@@ -1,10 +1,10 @@
+import type { CommandCacheEntry } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { ArgsParseError, type ArgsParseResult } from "#bot/plugin/core/commandEngine/parsing/index.ts";
+import { readDuration, readSnowflake } from "#bot/plugin/core/commandEngine/parsing/primitiveParser.ts";
+import { StringReader } from "#bot/plugin/core/commandEngine/parsing/stringReader.ts";
+import { SafeArgs } from "#bot/plugin/core/commandEngine/safeArgs.ts";
+import { OptionType, type AnyArgsValueItem } from "#bot/plugin/core/public/command.ts";
 import type { InteractionOptions } from "oceanic.js";
-import { OptionType, type AnyArgsValueItem } from "../../public/command.ts";
-import type { CommandCacheEntry } from "../commandCache.ts";
-import { SafeArgs } from "../safeArgs.ts";
-import { ArgsParseError, type ArgsParseResult } from "./index.ts";
-import { readDuration, readSnowflake } from "./primitiveParser.ts";
-import { StringReader } from "./stringReader.ts";
 
 export function readSlashArgs(interactionOptions: InteractionOptions[], commandEntry: CommandCacheEntry): ArgsParseResult {
 	const output = new SafeArgs(commandEntry.command.options ?? {});

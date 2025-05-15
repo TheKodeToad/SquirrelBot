@@ -1,8 +1,8 @@
-import { dateToUnixSeconds, humanizeDuration } from "../../../../common/time.ts";
-import { CaseType, type CaseInfo } from "../../../../db/moderation/cases.ts";
-import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "../../../common/discord/format.ts";
-import { escapeMarkdown, makeMarkdownQuote } from "../../../common/discord/markdown.ts";
-import type { BulkResult } from "./bulkAction.ts";
+import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "#bot/common/discord/format.ts";
+import { escapeMarkdown, makeMarkdownQuote } from "#bot/common/discord/markdown.ts";
+import type { BulkResult } from "#bot/plugin/moderation/helper/bulkAction.ts";
+import { dateToUnixSeconds, humanizeDuration } from "#common/time.ts";
+import { CaseType, type CaseInfo } from "#db/moderation/cases.ts";
 
 export function formatBulkSuccess(item: BulkResult["successful"][number]): string {
 	return `${formatUserBold(item.user)} ${item.dmDelivered ? "with direct message " : ""}(case #${item.caseNumber})`;

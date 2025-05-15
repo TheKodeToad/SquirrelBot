@@ -9,8 +9,8 @@
  * These tokens are then rejoined in the formatting stage, based on the passed parameters.
  */
 
-import { formatTokens } from "./formatting.ts";
-import { parseTemplateTokens, TokenType } from "./parsing.ts";
+import { formatTokens } from "#common/template/formatting.ts";
+import { parseTemplateTokens, TokenType } from "#common/template/parsing.ts";
 
 /**
  * @returns A function to call to format data with the template,

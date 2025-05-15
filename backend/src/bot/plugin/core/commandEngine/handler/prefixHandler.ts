@@ -1,21 +1,21 @@
+import { debugFormatPermissionContext } from "#bot/common/discord/debugFormat.ts";
+import { makeMarkdownInlineCodeblock } from "#bot/common/discord/markdown.ts";
+import { canWriteInChannel } from "#bot/common/discord/permissions.ts";
+import { getCommandByName } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { listenForInteractions, unlistenForInteractions } from "#bot/plugin/core/commandEngine/handler/componentHandler.ts";
+import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#bot/plugin/core/commandEngine/index.ts";
+import { formatArgsParseError } from "#bot/plugin/core/commandEngine/parsing/index.ts";
+import { readPrefixArgs, readPrefixName } from "#bot/plugin/core/commandEngine/parsing/prefixParser.ts";
+import { StringReader } from "#bot/plugin/core/commandEngine/parsing/stringReader.ts";
+import { transformReply } from "#bot/plugin/core/helper/commands.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import { type Command, type CommandContext, type Reply } from "#bot/plugin/core/public/command.ts";
+import { defineEventListener } from "#bot/plugin/core/public/eventListener.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { resolvePermissions } from "#bot/plugin/core/public/permissionResolution.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { TTLMap } from "#common/ttlMap.ts";
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
-import { moduleLogger } from "../../../../../common/logger/index.ts";
-import { TTLMap } from "../../../../../common/ttlMap.ts";
-import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
-import { makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
-import { canWriteInChannel } from "../../../../common/discord/permissions.ts";
-import { transformReply } from "../../helper/commands.ts";
-import { coreConfig } from "../../index.ts";
-import { type Command, type CommandContext, type Reply } from "../../public/command.ts";
-import { defineEventListener } from "../../public/eventListener.ts";
-import { icons } from "../../public/icons.ts";
-import { resolvePermissions } from "../../public/permissionResolution.ts";
-import { getCommandByName } from "../commandCache.ts";
-import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "../index.ts";
-import { formatArgsParseError } from "../parsing/index.ts";
-import { readPrefixArgs, readPrefixName } from "../parsing/prefixParser.ts";
-import { StringReader } from "../parsing/stringReader.ts";
-import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 

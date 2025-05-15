@@ -1,11 +1,11 @@
+import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "#bot/common/discord/debugFormat.ts";
+import { isThreadChannel } from "#bot/common/discord/typeGuards.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { NumberFilterMode, type NumberFilter } from "#schema/common/numberFilter.ts";
+import type { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
+import type { CoreConfig, CoreGroup } from "#schema/plugin/core.ts";
 import { CategoryChannel, Member, ThreadChannel, type AnyGuildChannel } from "oceanic.js";
-import { moduleLogger } from "../../../../common/logger/index.ts";
-import { NumberFilterMode, type NumberFilter } from "../../../../schema/common/numberFilter.ts";
-import type { PermissionsFilter } from "../../../../schema/common/permissionsFilter.ts";
-import type { CoreConfig, CoreGroup } from "../../../../schema/plugin/core.ts";
-import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "../../../common/discord/debugFormat.ts";
-import { isThreadChannel } from "../../../common/discord/typeGuards.ts";
-import { coreConfig } from "../index.ts";
 
 const logger = moduleLogger();
 

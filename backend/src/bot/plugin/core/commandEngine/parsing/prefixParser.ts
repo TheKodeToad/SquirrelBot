@@ -1,9 +1,9 @@
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../../public/command.ts";
-import type { CommandCacheEntry } from "../commandCache.ts";
-import { SafeArgs } from "../safeArgs.ts";
-import { ArgsParseError, type ArgsParseResult } from "./index.ts";
-import { readBoolean, readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "./primitiveParser.ts";
-import type { StringReader } from "./stringReader.ts";
+import type { CommandCacheEntry } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { ArgsParseError, type ArgsParseResult } from "#bot/plugin/core/commandEngine/parsing/index.ts";
+import { readBoolean, readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "#bot/plugin/core/commandEngine/parsing/primitiveParser.ts";
+import type { StringReader } from "#bot/plugin/core/commandEngine/parsing/stringReader.ts";
+import { SafeArgs } from "#bot/plugin/core/commandEngine/safeArgs.ts";
+import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#bot/plugin/core/public/command.ts";
 
 const LIMITED_WHITESPACE_EATER_PATTERN = /\s{0,3}/y;
 

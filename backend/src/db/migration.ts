@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { instance, object } from "valibot";
 import "../environment.ts";
-import { dbParse, pool } from "./index.ts";
+import { dbParse, pool } from "#db/index.ts";
 
 export async function migrate(ignoreChanges: boolean): Promise<number> {
 	return await processMigrations(false, ignoreChanges);

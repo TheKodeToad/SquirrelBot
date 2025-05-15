@@ -1,8 +1,8 @@
+import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#bot/common/discord/markdown.ts";
+import type { CommandCacheEntry } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import { type ReplyObject } from "#bot/plugin/core/public/command.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
-import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
-import type { CommandCacheEntry } from "../../commandEngine/commandCache.ts";
-import { coreConfig } from "../../index.ts";
-import { type ReplyObject } from "../../public/command.ts";
 
 export function renderCommandPage(guildID: string, entry: CommandCacheEntry): ReplyObject {
 	const { command } = entry;

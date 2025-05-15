@@ -1,5 +1,5 @@
+import { bot } from "#bot/index.ts";
 import type { AnyChannel, Guild, Member, Uncached, User } from "oceanic.js";
-import { bot } from "../../index.ts";
 
 export function debugFormatUser(user: User): string {
 	return `@${user.tag}[${user.id}]`;

@@ -1,16 +1,16 @@
+import { moduleLogger } from "#common/logger/index.ts";
+import { HOUR } from "#common/time.ts";
+import { deleteExpiredTokens } from "#db/api/tokens.ts";
+import { pool } from "#db/index.ts";
+import { checkMigrationsOrExit } from "#db/migration.ts";
+import { HTTP_PORT } from "#environment.ts";
+import api from "#http/route/api/index.ts";
+import frontend from "#http/route/frontend.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
-import { moduleLogger } from "../common/logger/index.ts";
-import { HOUR } from "../common/time.ts";
-import { deleteExpiredTokens } from "../db/api/tokens.ts";
-import { pool } from "../db/index.ts";
-import { checkMigrationsOrExit } from "../db/migration.ts";
-import { HTTP_PORT } from "../environment.ts";
-import api from "./route/api/index.ts";
-import frontend from "./route/frontend.ts";
 
 await checkMigrationsOrExit();
 

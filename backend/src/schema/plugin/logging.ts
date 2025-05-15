@@ -1,5 +1,5 @@
+import { snowflakeSchema } from "#schema/common/index.ts";
 import { array, boolean, object, optional, union, type InferOutput } from "valibot";
-import { snowflakeSchema } from "../common/index.ts";
 
 export const eventConfigSchema = optional(union([boolean(), object({})]));
 export type EventConfigSchema = InferOutput<typeof eventConfigSchema>;

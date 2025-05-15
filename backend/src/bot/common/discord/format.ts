@@ -1,6 +1,6 @@
+import { fetchUserCachedSupressed } from "#bot/common/discord/cachedRequest.ts";
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
 import { DiscordRESTError, type Uncached } from "oceanic.js";
-import { fetchUserCachedSupressed } from "./cachedRequest.ts";
-import { escapeMarkdown } from "./markdown.ts";
 
 export function formatRESTError(restError: DiscordRESTError): string {
 	if (restError.resBody !== null

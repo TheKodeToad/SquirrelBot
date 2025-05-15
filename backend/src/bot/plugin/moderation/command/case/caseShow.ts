@@ -1,10 +1,10 @@
+import { OptionType, defineCommand } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { formatCaseDescription, formatCaseFields } from "#bot/plugin/moderation/helper/format.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { getCase } from "#db/moderation/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
-import { getCase } from "../../../../../db/moderation/cases.ts";
-import { OptionType, defineCommand } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { formatCaseDescription, formatCaseFields } from "../../helper/format.ts";
-import { moderationConfig } from "../../index.ts";
 
 export const caseShowCommand = defineCommand({
 	name: ["caseshow", "case", "showcase"],

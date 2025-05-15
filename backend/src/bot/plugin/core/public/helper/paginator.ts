@@ -1,6 +1,6 @@
+import type { BaseContext, CommandContext, ReplyObject } from "#bot/plugin/core/public/command.ts";
 import { ActionRow, Divider, TextButton } from "oceanic-component-helper";
 import { ComponentTypes } from "oceanic.js";
-import type { BaseContext, CommandContext, ReplyObject } from "../command.ts";
 
 export interface Paginator<E, K> {
 	pageSize: number;

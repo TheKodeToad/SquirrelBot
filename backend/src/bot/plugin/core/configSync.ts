@@ -1,15 +1,15 @@
+import { debugFormatGuildByID } from "#bot/common/discord/debugFormat.ts";
+import { getPlugin, getPlugins } from "#bot/loader/index.ts";
+import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds, isGuildAllowed } from "#bot/plugin/core/guildInfoSync.ts";
+import type { ConfigStore } from "#bot/plugin/core/public/config.ts";
+import { mapIterable } from "#common/iterators.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { getGuildConfig, insertGuildConfig } from "#db/core/configs.ts";
+import { addChannelListener } from "#db/notification.ts";
+import { coreConfigSchema } from "#schema/plugin/core.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { parse, safeParse, type InferInput } from "valibot";
-import { mapIterable } from "../../../common/iterators.ts";
-import { moduleLogger } from "../../../common/logger/index.ts";
-import { getGuildConfig, insertGuildConfig } from "../../../db/core/configs.ts";
-import { addChannelListener } from "../../../db/notification.ts";
-import { coreConfigSchema } from "../../../schema/plugin/core.ts";
-import { debugFormatGuildByID } from "../../common/discord/debugFormat.ts";
-import { getPlugin, getPlugins } from "../../loader/index.ts";
-import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds, isGuildAllowed } from "./guildInfoSync.ts";
-import type { ConfigStore } from "./public/config.ts";
 
 const logger = moduleLogger();
 

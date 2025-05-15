@@ -1,6 +1,6 @@
-import type { Command } from "../plugin/core/public/command.ts";
-import type { ConfigStore } from "../plugin/core/public/config.ts";
-import type { EventListener } from "../plugin/core/public/eventListener.ts";
+import type { Command } from "#bot/plugin/core/public/command.ts";
+import type { ConfigStore } from "#bot/plugin/core/public/config.ts";
+import type { EventListener } from "#bot/plugin/core/public/eventListener.ts";
 
 export interface Plugin {
 	id: string;

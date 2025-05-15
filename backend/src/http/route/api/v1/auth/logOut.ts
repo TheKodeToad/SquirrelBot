@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { deleteToken } from "../../../../../db/api/tokens.ts";
+import { deleteToken } from "#db/api/tokens.ts";
 
 const router = new Hono;
 router.get("/", async context => {

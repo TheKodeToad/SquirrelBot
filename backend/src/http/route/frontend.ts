@@ -1,11 +1,11 @@
+import { APP_DESCRIPTION, APP_INVITE_PERMISSIONS, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
+import { CLIENT_ID, REDIRECT_URI } from "#environment.ts";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { randomBytes } from "crypto";
 import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { etag } from "hono/etag";
 import { html, raw } from "hono/html";
-import { APP_DESCRIPTION, APP_INVITE_PERMISSIONS, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "../../brand.ts";
-import { CLIENT_ID, REDIRECT_URI } from "../../environment.ts";
 
 const router = new Hono;
 

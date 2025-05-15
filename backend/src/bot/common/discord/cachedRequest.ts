@@ -1,6 +1,6 @@
+import { isTextableGuildChannel, isThreadChannel } from "#bot/common/discord/typeGuards.ts";
+import { bot } from "#bot/index.ts";
 import { type AnyTextableGuildChannel, type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User } from "oceanic.js";
-import { bot } from "../../index.ts";
-import { isTextableGuildChannel, isThreadChannel } from "./typeGuards.ts";
 
 export async function fetchUserCached(userID: string): Promise<User> {
 	return bot.users.get(userID) ?? await bot.rest.users.get(userID);

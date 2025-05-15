@@ -1,12 +1,12 @@
-import { HOUR } from "../../../../../common/time.ts";
-import { CaseType } from "../../../../../db/moderation/cases.ts";
-import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { OptionType, defineCommand } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { doBulkAction } from "../../helper/bulkAction.ts";
-import { formatBulkError, formatBulkSuccess } from "../../helper/format.ts";
-import { moderationConfig } from "../../index.ts";
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
+import { OptionType, defineCommand } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { doBulkAction } from "#bot/plugin/moderation/helper/bulkAction.ts";
+import { formatBulkError, formatBulkSuccess } from "#bot/plugin/moderation/helper/format.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { HOUR } from "#common/time.ts";
+import { CaseType } from "#db/moderation/cases.ts";
 
 export const banCommand = defineCommand({
 	name: ["ban"],

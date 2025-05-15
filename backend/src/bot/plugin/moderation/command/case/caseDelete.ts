@@ -1,8 +1,8 @@
-import { deleteCase } from "../../../../../db/moderation/cases.ts";
-import { defineCommand, OptionType } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { moderationConfig } from "../../index.ts";
+import { defineCommand, OptionType } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { deleteCase } from "#db/moderation/cases.ts";
 
 export const deleteCaseCommand = defineCommand({
 	name: ["casedelete", "casedel", "caserm", "deletecase", "delcase", "rmcase"],

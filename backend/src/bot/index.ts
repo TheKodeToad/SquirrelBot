@@ -1,5 +1,5 @@
+import { BOT_TOKEN } from "#environment.ts";
 import { Client, Constants } from "oceanic.js";
-import { BOT_TOKEN } from "../environment.ts";
 
 export const bot = new Client({
 	auth: `Bot ${BOT_TOKEN}`,

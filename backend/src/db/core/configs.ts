@@ -1,5 +1,5 @@
 import { object, string } from "valibot";
-import { dbParse, pool } from "../index.ts";
+import { dbParse, pool } from "#db/index.ts";
 
 const justValueSchema = object({ value: string() });
 

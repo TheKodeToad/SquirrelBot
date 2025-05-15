@@ -1,11 +1,11 @@
+import { defineCommand, OptionType } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { remindersConfig } from "#bot/plugin/reminders/index.ts";
+import { trackNewReminder } from "#bot/plugin/reminders/scheduler.ts";
+import { dateToUnixSeconds } from "#common/time.ts";
+import { createReminder } from "#db/reminders/reminders.ts";
 import { MessageFlags } from "oceanic.js";
-import { dateToUnixSeconds } from "../../../../common/time.ts";
-import { createReminder } from "../../../../db/reminders/reminders.ts";
-import { defineCommand, OptionType } from "../../core/public/command.ts";
-import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
-import { icons } from "../../core/public/icons.ts";
-import { remindersConfig } from "../index.ts";
-import { trackNewReminder } from "../scheduler.ts";
 
 export const remindCommand = defineCommand({
 	description: "Set a personal reminder after the specified amount of time.",

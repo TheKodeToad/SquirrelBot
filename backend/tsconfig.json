@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "NodeNext",
-		"rewriteRelativeImportExtensions": true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"strict": true,
 		"noUncheckedIndexedAccess": true,

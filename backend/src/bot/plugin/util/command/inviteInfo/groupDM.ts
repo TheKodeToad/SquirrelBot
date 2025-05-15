@@ -1,9 +1,9 @@
+import { formatUser } from "#bot/common/discord/format.ts";
+import { getChannelIconURL } from "#bot/common/discord/urls.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { dateToUnixSeconds } from "#common/time.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
 import { type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
-import { dateToUnixSeconds } from "../../../../../common/time.ts";
-import { formatUser } from "../../../../common/discord/format.ts";
-import { getChannelIconURL } from "../../../../common/discord/urls.ts";
-import { icons } from "../../../core/public/icons.ts";
 
 export function renderGroupDMInvite(
 	channel: PartialInviteChannel,

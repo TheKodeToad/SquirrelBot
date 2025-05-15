@@ -1,4 +1,4 @@
-import type { AnyArgsValue } from "../../public/command.ts";
+import type { AnyArgsValue } from "#bot/plugin/core/public/command.ts";
 
 export const enum ArgsParseError {
 	MissingOptions,

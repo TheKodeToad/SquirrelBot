@@ -1,22 +1,22 @@
+import { debugFormatPermissionContext } from "#bot/common/discord/debugFormat.ts";
+import { bot } from "#bot/index.ts";
+import { getCommandByName, getCommands } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { listenForInteractions, unlistenForInteractions } from "#bot/plugin/core/commandEngine/handler/componentHandler.ts";
+import { AUTO_DEFER_AFTER } from "#bot/plugin/core/commandEngine/index.ts";
+import { formatArgsParseError } from "#bot/plugin/core/commandEngine/parsing/index.ts";
+import { readSlashArgs } from "#bot/plugin/core/commandEngine/parsing/slashParser.ts";
+import { transformReply } from "#bot/plugin/core/helper/commands.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import { type Command, type CommandContext, OptionType, type Reply } from "#bot/plugin/core/public/command.ts";
+import { defineEventListener } from "#bot/plugin/core/public/eventListener.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { resolvePermissions } from "#bot/plugin/core/public/permissionResolution.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { requireExhaustiveSwitch } from "#common/types.ts";
+import { CACHE_PATH } from "#environment.ts";
 import { readFile, writeFile } from "fs/promises";
 import { type AnyTextableGuildChannel, type ApplicationCommandOptions, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
 import path from "path";
-import { moduleLogger } from "../../../../../common/logger/index.ts";
-import { requireExhaustiveSwitch } from "../../../../../common/types.ts";
-import { CACHE_PATH } from "../../../../../environment.ts";
-import { debugFormatPermissionContext } from "../../../../common/discord/debugFormat.ts";
-import { bot } from "../../../../index.ts";
-import { transformReply } from "../../helper/commands.ts";
-import { coreConfig } from "../../index.ts";
-import { type Command, type CommandContext, OptionType, type Reply } from "../../public/command.ts";
-import { defineEventListener } from "../../public/eventListener.ts";
-import { icons } from "../../public/icons.ts";
-import { resolvePermissions } from "../../public/permissionResolution.ts";
-import { getCommandByName, getCommands } from "../commandCache.ts";
-import { AUTO_DEFER_AFTER } from "../index.ts";
-import { formatArgsParseError } from "../parsing/index.ts";
-import { readSlashArgs } from "../parsing/slashParser.ts";
-import { listenForInteractions, unlistenForInteractions } from "./componentHandler.ts";
 
 const logger = moduleLogger();
 

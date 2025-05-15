@@ -1,7 +1,7 @@
-import { loggingConfigSchema } from "../../../schema/plugin/logging.ts";
-import { definePlugin } from "../../loader/plugin.ts";
-import { ConfigStore } from "../core/public/config.ts";
-import { beginMessageCleanupLoop, messageLoggerCreateListener, messageLoggerDeleteListener, messageLoggerUpdateListener } from "./logger/messageLogger.ts";
+import { definePlugin } from "#bot/loader/plugin.ts";
+import { ConfigStore } from "#bot/plugin/core/public/config.ts";
+import { beginMessageCleanupLoop, messageLoggerCreateListener, messageLoggerDeleteListener, messageLoggerUpdateListener } from "#bot/plugin/logging/logger/messageLogger.ts";
+import { loggingConfigSchema } from "#schema/plugin/logging.ts";
 
 export const loggingConfig = new ConfigStore(loggingConfigSchema);
 

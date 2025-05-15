@@ -1,4 +1,4 @@
-import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType } from "./index.ts";
+import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType } from "#common/template/index.ts";
 
 const FORMAT_PATTERN = /\{\{(?<wrapper>>|`|```)?(?<parameter>\w+)(?:#(?<presentation>\w+))?\}\}?/g;
 

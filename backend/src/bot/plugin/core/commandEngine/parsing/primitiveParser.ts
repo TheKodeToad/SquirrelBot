@@ -1,6 +1,6 @@
-import { isSnowflake } from "../../../../../common/snowflake.ts";
-import { CENTURY, DAY, DECADE, HOUR, MILLENIUM, MINUTE, MONTH, SECOND, WEEK, YEAR } from "../../../../../common/time.ts";
-import type { StringReader } from "./stringReader.ts";
+import type { StringReader } from "#bot/plugin/core/commandEngine/parsing/stringReader.ts";
+import { isSnowflake } from "#common/snowflake.ts";
+import { CENTURY, DAY, DECADE, HOUR, MILLENIUM, MINUTE, MONTH, SECOND, WEEK, YEAR } from "#common/time.ts";
 
 export function readBoolean(reader: StringReader): boolean | null {
 	const result = reader.readWord().toLowerCase();

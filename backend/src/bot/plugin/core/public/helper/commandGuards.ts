@@ -1,7 +1,7 @@
-import type { SchemaWithOutput } from "../../../../../common/types.ts";
-import type { CommandContext } from "../command.ts";
-import type { ConfigStore } from "../config.ts";
-import { resolvePermissions, type ConfigWithPermissions } from "../permissionResolution.ts";
+import type { CommandContext } from "#bot/plugin/core/public/command.ts";
+import type { ConfigStore } from "#bot/plugin/core/public/config.ts";
+import { resolvePermissions, type ConfigWithPermissions } from "#bot/plugin/core/public/permissionResolution.ts";
+import type { SchemaWithOutput } from "#common/types.ts";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(
 	context: CommandContext,

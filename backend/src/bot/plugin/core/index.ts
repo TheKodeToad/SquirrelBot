@@ -1,20 +1,20 @@
-import { moduleLogger } from "../../../common/logger/index.ts";
-import { coreConfigSchema } from "../../../schema/plugin/core.ts";
-import { getPlugins } from "../../loader/index.ts";
-import { definePlugin } from "../../loader/plugin.ts";
-import { aboutCommand } from "./command/about.ts";
-import { grantAccessCommand, revokeAccessCommand } from "./command/access.ts";
-import { groupsCommand } from "./command/groups.ts";
-import { helpCommand } from "./command/help/index.ts";
-import { initCommandCache } from "./commandEngine/commandCache.ts";
-import { componentInterationHandler } from "./commandEngine/handler/componentHandler.ts";
-import { prefixDeleteHandler, prefixEditHandler, prefixSendHandler } from "./commandEngine/handler/prefixHandler.ts";
-import { slashRunHandler, syncSlashCommands } from "./commandEngine/handler/slashHandler.ts";
-import { initConfigs } from "./configSync.ts";
-import { installWrappedListener } from "./eventWrapper.ts";
-import { guildInfoSyncGuildCreateHandler, guildInfoSyncGuildUpdateHandler, initGuildInfo } from "./guildInfoSync.ts";
-import { initIcons } from "./iconSync.ts";
-import { ConfigStore } from "./public/config.ts";
+import { getPlugins } from "#bot/loader/index.ts";
+import { definePlugin } from "#bot/loader/plugin.ts";
+import { aboutCommand } from "#bot/plugin/core/command/about.ts";
+import { grantAccessCommand, revokeAccessCommand } from "#bot/plugin/core/command/access.ts";
+import { groupsCommand } from "#bot/plugin/core/command/groups.ts";
+import { helpCommand } from "#bot/plugin/core/command/help/index.ts";
+import { initCommandCache } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { componentInterationHandler } from "#bot/plugin/core/commandEngine/handler/componentHandler.ts";
+import { prefixDeleteHandler, prefixEditHandler, prefixSendHandler } from "#bot/plugin/core/commandEngine/handler/prefixHandler.ts";
+import { slashRunHandler, syncSlashCommands } from "#bot/plugin/core/commandEngine/handler/slashHandler.ts";
+import { initConfigs } from "#bot/plugin/core/configSync.ts";
+import { installWrappedListener } from "#bot/plugin/core/eventWrapper.ts";
+import { guildInfoSyncGuildCreateHandler, guildInfoSyncGuildUpdateHandler, initGuildInfo } from "#bot/plugin/core/guildInfoSync.ts";
+import { initIcons } from "#bot/plugin/core/iconSync.ts";
+import { ConfigStore } from "#bot/plugin/core/public/config.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { coreConfigSchema } from "#schema/plugin/core.ts";
 
 const logger = moduleLogger();
 

@@ -1,5 +1,5 @@
+import cases from "#http/route/api/v1/guilds/moderation/cases/index.ts";
 import { Hono } from "hono";
-import cases from "./cases/index.ts";
 
 const router = new Hono;
 router.route("/cases", cases);

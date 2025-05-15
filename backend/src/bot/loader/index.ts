@@ -1,10 +1,10 @@
-import { moduleLogger } from "../../common/logger/index.ts";
-import { corePlugin } from "../plugin/core/index.ts";
-import { logging as loggingPlugin } from "../plugin/logging/index.ts";
-import { moderationPlugin } from "../plugin/moderation/index.ts";
-import { remindersPlugin } from "../plugin/reminders/index.ts";
-import { utilPlugin } from "../plugin/util/index.ts";
-import type { Plugin } from "./plugin.ts";
+import type { Plugin } from "#bot/loader/plugin.ts";
+import { corePlugin } from "#bot/plugin/core/index.ts";
+import { logging as loggingPlugin } from "#bot/plugin/logging/index.ts";
+import { moderationPlugin } from "#bot/plugin/moderation/index.ts";
+import { remindersPlugin } from "#bot/plugin/reminders/index.ts";
+import { utilPlugin } from "#bot/plugin/util/index.ts";
+import { moduleLogger } from "#common/logger/index.ts";
 
 const logger = moduleLogger();
 

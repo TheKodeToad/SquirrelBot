@@ -1,12 +1,12 @@
+import { fetchUserCachedSupressed } from "#bot/common/discord/cachedRequest.ts";
+import { formatRESTError, formatUserBold } from "#bot/common/discord/format.ts";
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
+import { OptionType, defineCommand } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { CaseType, createCase } from "#db/moderation/cases.ts";
 import { DiscordRESTError, JSONErrorCodes, User, type Uncached } from "oceanic.js";
-import { CaseType, createCase } from "../../../../../db/moderation/cases.ts";
-import { fetchUserCachedSupressed } from "../../../../common/discord/cachedRequest.ts";
-import { formatRESTError, formatUserBold } from "../../../../common/discord/format.ts";
-import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { OptionType, defineCommand } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { moderationConfig } from "../../index.ts";
 
 export const unbanCommand = defineCommand({
 	name: ["unban"],

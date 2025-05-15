@@ -1,14 +1,14 @@
+import { fetchTextableGuildChannelCached } from "#bot/common/discord/cachedRequest.ts";
+import { colors } from "#bot/common/discord/colors.ts";
+import { bot } from "#bot/index.ts";
+import { defineEventListener } from "#bot/plugin/core/public/eventListener.ts";
+import { isEventConfigEnabled } from "#bot/plugin/logging/helper/config.ts";
+import { logToChannel } from "#bot/plugin/logging/helper/webhooks.ts";
+import { loggingConfig } from "#bot/plugin/logging/index.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { HOUR, MINUTE } from "#common/time.ts";
+import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "#db/logger/messageCache.ts";
 import { Routes } from "oceanic.js";
-import { moduleLogger } from "../../../../common/logger/index.ts";
-import { HOUR, MINUTE } from "../../../../common/time.ts";
-import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "../../../../db/logger/messageCache.ts";
-import { fetchTextableGuildChannelCached } from "../../../common/discord/cachedRequest.ts";
-import { colors } from "../../../common/discord/colors.ts";
-import { bot } from "../../../index.ts";
-import { defineEventListener } from "../../core/public/eventListener.ts";
-import { isEventConfigEnabled } from "../helper/config.ts";
-import { logToChannel } from "../helper/webhooks.ts";
-import { loggingConfig } from "../index.ts";
 
 const logger = moduleLogger();
 

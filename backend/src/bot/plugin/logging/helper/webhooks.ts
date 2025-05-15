@@ -1,8 +1,8 @@
+import { isThreadChannel } from "#bot/common/discord/typeGuards.ts";
+import { bot } from "#bot/index.ts";
+import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#db/logger/webhooks.ts";
 import AsyncLock from "async-lock";
 import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
-import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "../../../../db/logger/webhooks.ts";
-import { isThreadChannel } from "../../../common/discord/typeGuards.ts";
-import { bot } from "../../../index.ts";
 
 export async function logToChannel(channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
 	return acquireWebhook(channel, async ({ webhookID, token }) => {

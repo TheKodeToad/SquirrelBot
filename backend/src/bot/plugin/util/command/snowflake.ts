@@ -1,7 +1,7 @@
-import { OptionType, defineCommand } from "../../core/public/command.ts";
-import { permissionsGuard } from "../../core/public/helper/commandGuards.ts";
-import { icons } from "../../core/public/icons.ts";
-import { utilConfig } from "../index.ts";
+import { OptionType, defineCommand } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { utilConfig } from "#bot/plugin/util/index.ts";
 
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 

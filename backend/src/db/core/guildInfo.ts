@@ -1,5 +1,5 @@
+import { dbParse, pool } from "#db/index.ts";
 import { array, boolean, date, nullable, object, string, type InferOutput } from "valibot";
-import { dbParse, pool } from "../index.ts";
 
 const guildInfoSchema = object({
 	id: string(),

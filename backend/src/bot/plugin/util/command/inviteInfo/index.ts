@@ -1,15 +1,15 @@
+import { formatRESTError } from "#bot/common/discord/format.ts";
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
+import { bot } from "#bot/index.ts";
+import { defineCommand, OptionType } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { renderFriendInvite } from "#bot/plugin/util/command/inviteInfo/friend.ts";
+import { renderGroupDMInvite } from "#bot/plugin/util/command/inviteInfo/groupDM.ts";
+import { renderGuildInvite } from "#bot/plugin/util/command/inviteInfo/guild.ts";
+import { utilConfig } from "#bot/plugin/util/index.ts";
+import { moduleLogger } from "#common/logger/index.ts";
 import { DiscordRESTError, InviteTypes, JSONErrorCodes, type ContainerComponent } from "oceanic.js";
-import { moduleLogger } from "../../../../../common/logger/index.ts";
-import { formatRESTError } from "../../../../common/discord/format.ts";
-import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { bot } from "../../../../index.ts";
-import { defineCommand, OptionType } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { utilConfig } from "../../index.ts";
-import { renderFriendInvite } from "./friend.ts";
-import { renderGroupDMInvite } from "./groupDM.ts";
-import { renderGuildInvite } from "./guild.ts";
 
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 

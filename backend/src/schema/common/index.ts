@@ -1,6 +1,6 @@
+import { colors } from "#bot/common/discord/colors.ts";
+import { isSnowflake } from "#common/snowflake.ts";
 import { check, pipe, string, transform, union } from "valibot";
-import { colors } from "../../bot/common/discord/colors.ts";
-import { isSnowflake } from "../../common/snowflake.ts";
 
 export const snowflakeSchema = pipe(
 	string(),

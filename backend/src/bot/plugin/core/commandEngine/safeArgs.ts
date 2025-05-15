@@ -1,7 +1,7 @@
-import { isSnowflake } from "../../../../common/snowflake.ts";
-import { requireExhaustiveSwitch } from "../../../../common/types.ts";
-import { INTERNAL_TYPE_INTEGRITY } from "../../../../environment.ts";
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "../public/command.ts";
+import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#bot/plugin/core/public/command.ts";
+import { isSnowflake } from "#common/snowflake.ts";
+import { requireExhaustiveSwitch } from "#common/types.ts";
+import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
 
 export class SafeArgs {
 	private _schema: Record<string, Option>;

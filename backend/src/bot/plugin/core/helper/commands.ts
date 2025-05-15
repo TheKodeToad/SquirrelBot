@@ -1,6 +1,6 @@
+import { type Command, type Reply, type ReplyObject } from "#bot/plugin/core/public/command.ts";
 import { Text } from "oceanic-component-helper";
 import { Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
-import { type Command, type Reply, type ReplyObject } from "../public/command.ts";
 
 export function transformReply(reply: Reply): ReplyObject & { flags: number; } {
 	if (typeof reply === "string") {

@@ -1,14 +1,14 @@
+import { fetchMemberCached, fetchThreadCached } from "#bot/common/discord/cachedRequest.ts";
+import { debugFormatChannel } from "#bot/common/discord/debugFormat.ts";
+import { canWriteInChannel } from "#bot/common/discord/permissions.ts";
+import { isTextableChannel, isThreadChannelType } from "#bot/common/discord/typeGuards.ts";
+import { bot } from "#bot/index.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { debugFormatReminder, remindersConfig } from "#bot/plugin/reminders/index.ts";
+import { moduleLogger } from "#common/logger/index.ts";
+import { dateToHMSString, dateToUnixSeconds } from "#common/time.ts";
+import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#db/reminders/reminders.ts";
 import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
-import { moduleLogger } from "../../../common/logger/index.ts";
-import { dateToHMSString, dateToUnixSeconds } from "../../../common/time.ts";
-import { deleteReminder, getRemindersByFiresAt, type Reminder } from "../../../db/reminders/reminders.ts";
-import { fetchMemberCached, fetchThreadCached } from "../../common/discord/cachedRequest.ts";
-import { debugFormatChannel } from "../../common/discord/debugFormat.ts";
-import { canWriteInChannel } from "../../common/discord/permissions.ts";
-import { isTextableChannel, isThreadChannelType } from "../../common/discord/typeGuards.ts";
-import { bot } from "../../index.ts";
-import { icons } from "../core/public/icons.ts";
-import { debugFormatReminder, remindersConfig } from "./index.ts";
 
 const logger = moduleLogger();
 

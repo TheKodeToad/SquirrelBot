@@ -1,6 +1,6 @@
+import { dateToUnixSeconds } from "#common/time.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 import { type ContainerComponent, type User } from "oceanic.js";
-import { dateToUnixSeconds } from "../../../../../common/time.ts";
 
 export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, hideImages: boolean): ContainerComponent {
 	const result = Container();

@@ -1,13 +1,13 @@
+import { makeMarkdownInlineCodeblock } from "#bot/common/discord/markdown.ts";
+import { getPlugin, getPlugins } from "#bot/loader/index.ts";
+import { getCommandByName } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { canRunCommand } from "#bot/plugin/core/helper/commands.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import type { BaseContext, Reply, ReplyObject } from "#bot/plugin/core/public/command.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { moduleLogger } from "#common/logger/index.ts";
 import { ActionRow, Container, Divider, StringSelect, Text, TextButton } from "oceanic-component-helper";
 import { MessageFlags, type ContainerComponent, type StringSelectMenu } from "oceanic.js";
-import { moduleLogger } from "../../../../../common/logger/index.ts";
-import { makeMarkdownInlineCodeblock } from "../../../../common/discord/markdown.ts";
-import { getPlugin, getPlugins } from "../../../../loader/index.ts";
-import { getCommandByName } from "../../commandEngine/commandCache.ts";
-import { canRunCommand } from "../../helper/commands.ts";
-import { coreConfig } from "../../index.ts";
-import type { BaseContext, Reply, ReplyObject } from "../../public/command.ts";
-import { icons } from "../../public/icons.ts";
 
 const logger = moduleLogger();
 

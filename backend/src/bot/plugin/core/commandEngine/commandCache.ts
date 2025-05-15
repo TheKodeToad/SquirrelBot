@@ -1,5 +1,5 @@
-import { getPlugins } from "../../../loader/index.ts";
-import { OptionType, type Command, type Option } from "../public/command.ts";
+import { getPlugins } from "#bot/loader/index.ts";
+import { OptionType, type Command, type Option } from "#bot/plugin/core/public/command.ts";
 
 export interface CommandCacheEntry {
 	command: Command;

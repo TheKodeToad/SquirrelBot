@@ -1,5 +1,5 @@
+import { dbParse, pool } from "#db/index.ts";
 import { object, string, type InferOutput } from "valibot";
-import { dbParse, pool } from "../index.ts";
 
 const webhookAuthSchema = object({
 	webhookID: string(),

@@ -1,12 +1,12 @@
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
+import { defineCommand, OptionType } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { doBulkAction } from "#bot/plugin/moderation/helper/bulkAction.ts";
+import { formatBulkError, formatBulkSuccess } from "#bot/plugin/moderation/helper/format.ts";
+import { moderationConfig } from "#bot/plugin/moderation/index.ts";
+import { CaseType } from "#db/moderation/cases.ts";
 import { Permissions } from "oceanic.js";
-import { CaseType } from "../../../../../db/moderation/cases.ts";
-import { escapeMarkdown } from "../../../../common/discord/markdown.ts";
-import { defineCommand, OptionType } from "../../../core/public/command.ts";
-import { permissionsGuard } from "../../../core/public/helper/commandGuards.ts";
-import { icons } from "../../../core/public/icons.ts";
-import { doBulkAction } from "../../helper/bulkAction.ts";
-import { formatBulkError, formatBulkSuccess } from "../../helper/format.ts";
-import { moderationConfig } from "../../index.ts";
 
 export const timeoutCommand = defineCommand({
 	name: ["timeout", "mute", "chatmute"],

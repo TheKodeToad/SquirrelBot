@@ -1,7 +1,7 @@
+import { ParameterType } from "#common/template/index.ts";
+import { messageTemplate } from "#schema/common/message.ts";
+import { permissionsFilterSchema } from "#schema/common/permissionsFilter.ts";
 import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
-import { ParameterType } from "../../common/template/index.ts";
-import { messageTemplate } from "../common/message.ts";
-import { permissionsFilterSchema } from "../common/permissionsFilter.ts";
 
 export const presetReasonSchema = object({
 	name: string(),

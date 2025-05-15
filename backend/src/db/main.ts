@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
-import { pool } from "./index.ts";
-import { checkMigrations, migrate } from "./migration.ts";
+import { pool } from "#db/index.ts";
+import { checkMigrations, migrate } from "#db/migration.ts";
 
 const [_, script, command, ...args] = process.argv;
 

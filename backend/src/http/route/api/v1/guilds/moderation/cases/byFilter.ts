@@ -1,10 +1,10 @@
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import { check, enum_, object, optional, pipe, string, transform } from "valibot";
-import { CaseType, getCases, type CaseQuery } from "../../../../../../../db/moderation/cases.ts";
-import { parseBooleanSchema, parseIntSchema, snowflakeSchema } from "../../../../../../../schema/common/index.ts";
-import type { GuildAuthVars } from "../../../../../../middleware/guildAuth.ts";
-import { serializeCaseObject } from "./index.ts";
+import { CaseType, getCases, type CaseQuery } from "#db/moderation/cases.ts";
+import { parseBooleanSchema, parseIntSchema, snowflakeSchema } from "#schema/common/index.ts";
+import type { GuildAuthVars } from "#http/middleware/guildAuth.ts";
+import { serializeCaseObject } from "#http/route/api/v1/guilds/moderation/cases/index.ts";
 
 const router = new Hono<{ Variables: GuildAuthVars; }>;
 

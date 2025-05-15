@@ -1,10 +1,10 @@
-import { getCommandByName } from "../../commandEngine/commandCache.ts";
-import { coreConfig } from "../../index.ts";
-import { defineCommand, OptionType } from "../../public/command.ts";
-import { permissionsGuard } from "../../public/helper/commandGuards.ts";
-import { icons } from "../../public/icons.ts";
-import { renderCommandListPage, renderCommandListPageMinimal } from "./list.ts";
-import { renderCommandPage } from "./show.ts";
+import { renderCommandListPage, renderCommandListPageMinimal } from "#bot/plugin/core/command/help/list.ts";
+import { renderCommandPage } from "#bot/plugin/core/command/help/show.ts";
+import { getCommandByName } from "#bot/plugin/core/commandEngine/commandCache.ts";
+import { coreConfig } from "#bot/plugin/core/index.ts";
+import { defineCommand, OptionType } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
 
 export const helpCommand = defineCommand({
 	name: ["help"],

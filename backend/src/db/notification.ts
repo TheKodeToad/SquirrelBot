@@ -1,5 +1,5 @@
+import { pool } from "#db/index.ts";
 import type { PoolClient } from "pg";
-import { pool } from "./index.ts";
 
 let listenerClient: PoolClient | null = null;
 const listenersLookup: Map<string, Listener[]> = new Map;

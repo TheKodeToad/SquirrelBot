@@ -1,12 +1,12 @@
+import { fetchMemberCached } from "#bot/common/discord/cachedRequest.ts";
+import { formatRESTError, formatUserBold } from "#bot/common/discord/format.ts";
+import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#bot/common/discord/markdown.ts";
+import { coreConfig as coreConfigCache } from "#bot/plugin/core/index.ts";
+import { defineCommand, OptionType } from "#bot/plugin/core/public/command.ts";
+import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { resolveGroups } from "#bot/plugin/core/public/permissionResolution.ts";
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
-import { fetchMemberCached } from "../../../common/discord/cachedRequest.ts";
-import { formatRESTError, formatUserBold } from "../../../common/discord/format.ts";
-import { escapeMarkdown, makeMarkdownInlineCodeblock } from "../../../common/discord/markdown.ts";
-import { coreConfig as coreConfigCache } from "../index.ts";
-import { defineCommand, OptionType } from "../public/command.ts";
-import { permissionsGuard } from "../public/helper/commandGuards.ts";
-import { icons } from "../public/icons.ts";
-import { resolveGroups } from "../public/permissionResolution.ts";
 
 export const groupsCommand = defineCommand({
 	name: ["groups"],

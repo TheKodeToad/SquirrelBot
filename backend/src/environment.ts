@@ -1,6 +1,6 @@
+import { LogLevel, logLevelByName } from "#common/logger/level.ts";
 import "dotenv/config";
 import process from "process";
-import { LogLevel, logLevelByName } from "./common/logger/level.ts";
 
 export const CLIENT_ID = process.env["CLIENT_ID"] || "";
 export const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";

@@ -1,5 +1,5 @@
+import { bot } from "#bot/index.ts";
 import type { ImageFormat } from "oceanic.js";
-import { bot } from "../../index.ts";
 
 export function getChannelIconURL(channel: { id: string; icon?: string | null; }, format?: ImageFormat, size?: number): string | null {
 	if (channel.icon == null)

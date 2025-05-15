@@ -1,10 +1,10 @@
-import { dateToUnixSeconds } from "../../../../common/time.ts";
-import { BOT_ALLOWED_GUILDS } from "../../../../environment.ts";
-import { escapeMarkdown } from "../../../common/discord/markdown.ts";
-import { bot } from "../../../index.ts";
-import { grantAccess, revokeAccess } from "../guildInfoSync.ts";
-import { defineCommand, OptionType, type CommandContext } from "../public/command.ts";
-import { icons } from "../public/icons.ts";
+import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
+import { bot } from "#bot/index.ts";
+import { grantAccess, revokeAccess } from "#bot/plugin/core/guildInfoSync.ts";
+import { defineCommand, OptionType, type CommandContext } from "#bot/plugin/core/public/command.ts";
+import { icons } from "#bot/plugin/core/public/icons.ts";
+import { dateToUnixSeconds } from "#common/time.ts";
+import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 
 // for now
 function checkForMe(context: CommandContext): boolean {

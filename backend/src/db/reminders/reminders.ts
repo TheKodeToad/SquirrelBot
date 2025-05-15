@@ -1,6 +1,6 @@
+import { dbParse, pool } from "#db/index.ts";
 import { ChannelTypes } from "oceanic.js";
 import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
-import { dbParse, pool } from "../index.ts";
 
 const reminderSchema = object({
 	guildID: string(),
