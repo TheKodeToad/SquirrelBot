@@ -62,7 +62,12 @@ export const timeoutCommand = defineCommand({
 
 			membersOnly: true,
 
-			canPerform: member => !member.permissions.has(Permissions.ADMINISTRATOR),
+			check: member => {
+				if (member.permissions.has(Permissions.ADMINISTRATOR))
+					return "Member has admin permissions - forbidden by Discord";
+
+				return true;
+			},
 			async perform(member, calculatedExpiry) {
 				await context.guild.editMember(member.id, {
 					communicationDisabledUntil: calculatedExpiry!.toISOString(),
