@@ -1,6 +1,6 @@
 import { fetchUserCachedSupressed } from "#bot/common/discord/cachedRequest.ts";
 import { escapeMarkdown } from "#bot/common/discord/markdown.ts";
-import { DiscordRESTError, type Uncached } from "oceanic.js";
+import { DiscordRESTError, Member, User, UserFlags, type Uncached } from "oceanic.js";
 
 export function formatRESTError(restError: DiscordRESTError): string {
 	if (restError.resBody !== null
@@ -38,4 +38,26 @@ export function formatUserTag(user: UserLike): string {
 		return escapeMarkdown(user.tag);
 	else
 		return "\\<unknown\\>";
+}
+
+/**This should be used in user lookup commands to nicely present information next to the name which otherwise would be displayed elsewhere. */
+export function formatUserTagRich(user: User | Member): string {
+	if ("user" in user)
+		user = user.user;
+
+	let result = escapeMarkdown(user.tag || user.globalName || "<unknown>");
+
+	if (user.clan !== null)
+		result += " \\[" + escapeMarkdown(user.clan.tag) + "\\]";
+
+	if (user.system)
+		result += " \\[SYSTEM\\]";
+	else if (user.bot) {
+		if (user.publicFlags & UserFlags.VERIFIED_BOT)
+			result += " \\[✔\u8201APP]\\";
+		else
+			result += " \\[APP\\]";
+	}
+
+	return result;
 }

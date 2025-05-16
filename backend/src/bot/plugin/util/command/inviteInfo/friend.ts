@@ -1,3 +1,4 @@
+import { formatUserTagRich } from "#bot/common/discord/format.ts";
 import { dateToUnixSeconds } from "#common/time.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 import { type ContainerComponent, type User } from "oceanic.js";
@@ -7,7 +8,7 @@ export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, h
 
 	const mainInfo: string[] = [];
 
-	mainInfo.push("## " + (inviter.username || inviter.globalName || "<unknown>") + "\n**Friend Invite**");
+	mainInfo.push("## " + formatUserTagRich(inviter) + "\n**Friend Invite**");
 	mainInfo.push(`<@${inviter.id}>`);
 
 	if (hideImages)
