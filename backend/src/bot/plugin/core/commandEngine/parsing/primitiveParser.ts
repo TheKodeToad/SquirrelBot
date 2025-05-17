@@ -105,20 +105,18 @@ function readMention(reader: StringReader, prefix: "@" | "&" | "#"): string | nu
 
 const DURATION_UNIT_BOUNDARY = /[A-Za-z\s]/g;
 const DURATION_LENGTH_BOUNDARY = /[^A-Za-z]/g;
+const DURATION_SEPARATOR = /(,|\s|and)*/yi;
 
 export function readDuration(reader: StringReader): number | null {
-	let total = 0;
+	let total = null;
 
-	if (reader.skipOver("for"))
-		reader.skipWhitespace();
+	reader.mark();
 
 	while (reader.canRead()) {
-		reader.mark();
-
 		const lengthString = reader.readUntil(DURATION_UNIT_BOUNDARY);
 		const length = parseFloat(lengthString);
 
-		if (Number.isNaN(length) || length <= 0) {
+		if (Number.isNaN(length)) {
 			reader.reset();
 			break;
 		}
@@ -139,16 +137,16 @@ export function readDuration(reader: StringReader): number | null {
 			break;
 		}
 
+		total ??= 0;
 		total += ms;
 
 		reader.unmark();
-		reader.skipWhitespace();
 
-		if (reader.skipOver("and"))
-			reader.skipWhitespace();
+		reader.mark();
+		reader.skipOver(DURATION_SEPARATOR);
 	}
 
-	if (!Number.isSafeInteger(total) || total <= 0)
+	if (!Number.isSafeInteger(total))
 		return null;
 
 	return total;

@@ -40,7 +40,7 @@ export function formatUserTag(user: UserLike): string {
 		return "\\<unknown\\>";
 }
 
-/**This should be used in user lookup commands to nicely present information next to the name which otherwise would be displayed elsewhere. */
+/** This should be used in user lookup commands to nicely present information next to the name which otherwise would be displayed elsewhere. */
 export function formatUserTagRich(user: User | Member): string {
 	if ("user" in user)
 		user = user.user;
