@@ -19,15 +19,9 @@ importers:
       async-lock:
         specifier: ^1.4.1
         version: 1.4.1
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
       hono:
         specifier: ^4.7.9
         version: 4.7.9
-      humanize-duration:
-        specifier: ^3.32.2
-        version: 3.32.2
       oceanic-component-helper:
         specifier: ^1.0.1
         version: 1.0.1
@@ -792,10 +786,6 @@ packages:
   discord-api-types@0.37.120:
     resolution: {integrity: sha512-7xpNK0EiWjjDFp2nAhHXezE4OUWm7s1zhc/UXXN6hnFFU8dfoPHgV0Hx0RPiCa3ILRpdeh152icc68DGCyXYIw==}
 
-  dotenv@16.5.0:
-    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
-    engines: {node: '>=12'}
-
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -1023,9 +1013,6 @@ packages:
   http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
     engines: {node: '>= 0.8'}
-
-  humanize-duration@3.32.2:
-    resolution: {integrity: sha512-jcTwWYeCJf4dN5GJnjBmHd42bNyK94lY49QTkrsAQrMTUoIYLevvDpmQtg5uv8ZrdIRIbzdasmSNZ278HHUPEg==}
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -2312,8 +2299,6 @@ snapshots:
   discord-api-types@0.37.120:
     optional: true
 
-  dotenv@16.5.0: {}
-
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -2605,8 +2590,6 @@ snapshots:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
-
-  humanize-duration@3.32.2: {}
 
   iconv-lite@0.6.3:
     dependencies:
