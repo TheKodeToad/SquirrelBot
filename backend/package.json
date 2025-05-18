@@ -18,7 +18,6 @@
 		"async-lock": "^1.4.1",
 		"dotenv": "^16.5.0",
 		"hono": "^4.7.9",
-		"humanize-duration": "^3.32.2",
 		"oceanic-component-helper": "^1.0.1",
 		"oceanic.js": "~1.12.0",
 		"pg": "^8.16.0",
