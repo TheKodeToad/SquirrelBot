@@ -10,13 +10,12 @@
 		"http": "npm run _node src/http/main.ts",
 		"migrate": "npm run _node src/db/main.ts migrate --",
 		"check-migrations": "npm run _node src/db/main.ts check --",
-		"_node": "node --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
+		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.1",
 		"@hono/valibot-validator": "^0.5.2",
 		"async-lock": "^1.4.1",
-		"dotenv": "^16.5.0",
 		"hono": "^4.7.9",
 		"oceanic-component-helper": "^1.0.1",
 		"oceanic.js": "~1.12.0",
