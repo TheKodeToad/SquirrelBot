@@ -13,7 +13,7 @@
 		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.14.1",
+		"@hono/node-server": "^1.14.2",
 		"@hono/valibot-validator": "^0.5.2",
 		"async-lock": "^1.4.1",
 		"hono": "^4.7.10",
