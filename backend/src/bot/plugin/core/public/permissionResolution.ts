@@ -1,5 +1,5 @@
 import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "#bot/common/discord/debugFormat.ts";
-import { isThreadChannel } from "#bot/common/discord/typeGuards.ts";
+import { isThreadChannel } from "#bot/common/discord/general.ts";
 import { coreConfig } from "#bot/plugin/core/index.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { NumberFilterMode, type NumberFilter } from "#schema/common/numberFilter.ts";

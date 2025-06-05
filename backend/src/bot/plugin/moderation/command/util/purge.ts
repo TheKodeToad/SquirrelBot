@@ -1,4 +1,4 @@
-import { isUndeletableMessageType } from "#bot/common/discord/typeGuards.ts";
+import { isUndeletableMessageType } from "#bot/common/discord/general.ts";
 import { bot } from "#bot/index.ts";
 import { OptionType, defineCommand } from "#bot/plugin/core/public/command.ts";
 import { permissionsGuard } from "#bot/plugin/core/public/helper/commandGuards.ts";

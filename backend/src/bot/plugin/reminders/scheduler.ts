@@ -1,7 +1,7 @@
 import { fetchMemberCached, fetchThreadCached } from "#bot/common/discord/cachedRequest.ts";
 import { debugFormatChannel } from "#bot/common/discord/debugFormat.ts";
+import { isTextableChannel, isThreadChannelType } from "#bot/common/discord/general.ts";
 import { canWriteInChannel } from "#bot/common/discord/permissions.ts";
-import { isTextableChannel, isThreadChannelType } from "#bot/common/discord/typeGuards.ts";
 import { bot } from "#bot/index.ts";
 import { icons } from "#bot/plugin/core/public/icons.ts";
 import { debugFormatReminder, remindersConfig } from "#bot/plugin/reminders/index.ts";

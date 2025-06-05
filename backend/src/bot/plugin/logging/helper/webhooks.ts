@@ -1,4 +1,4 @@
-import { isThreadChannel } from "#bot/common/discord/typeGuards.ts";
+import { isThreadChannel } from "#bot/common/discord/general.ts";
 import { bot } from "#bot/index.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#db/logger/webhooks.ts";
 import AsyncLock from "async-lock";
