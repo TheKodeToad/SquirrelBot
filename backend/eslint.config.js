@@ -1,7 +1,7 @@
 import tseslint from "typescript-eslint";
 
 export default tseslint.config([
-	{ ignores: ["eslint.config.js"] },
+	{ ignores: ["*.js"] },
 	tseslint.configs.recommendedTypeChecked,
 	{
 		languageOptions: {
@@ -16,6 +16,11 @@ export default tseslint.config([
 			"@typescript-eslint/restrict-template-expressions": ["error", { allow: [], allowNullish: false }],
 			"@typescript-eslint/no-misused-promises": "off", // "let me abuse promises in peace"
 			"@typescript-eslint/no-unsafe-enum-comparison": "off",
+			"@typescript-eslint/no-floating-promises": ["error", {
+				"allowForKnownSafeCalls": [
+					{ from: "package", name: ["test", "suite"], package: "node:test" }
+				]
+			}],
 			"no-var": "off",
 			"no-console": "warn",
 			"prefer-const": "warn"

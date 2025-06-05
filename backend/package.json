@@ -10,6 +10,7 @@
 		"http": "npm run _node src/http/main.ts",
 		"migrate": "npm run _node src/db/main.ts migrate --",
 		"check-migrations": "npm run _node src/db/main.ts check --",
+		"test": "node --import=./registerSWC.js --test src/**/*.test.ts",
 		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
 	},
 	"dependencies": {
@@ -25,6 +26,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.27.0",
+		"@swc-node/register": "^1.10.10",
 		"@types/async-lock": "^1.4.2",
 		"@types/node": "^22.15.21",
 		"@types/pg": "^8.15.2",
