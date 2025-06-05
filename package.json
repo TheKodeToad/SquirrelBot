@@ -2,7 +2,7 @@
 	"name": "squirrel",
 	"private": true,
 	"scripts": {
-		"check": "cd backend && npm run check && cd ../frontend && npm run check",
+		"lint": "cd backend && npm run lint && cd ../frontend && npm run lint",
 		"bot": "cd backend && npm run bot",
 		"http": "cd backend && npm run http",
 		"migrate": "cd backend && npm run migrate --",

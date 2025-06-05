@@ -5,7 +5,7 @@
 		"#*": "./src/*"
 	},
 	"scripts": {
-		"check": "eslint && tsc",
+		"lint": "eslint && tsc",
 		"bot": "npm run _node src/bot/main.ts",
 		"http": "npm run _node src/http/main.ts",
 		"migrate": "npm run _node src/db/main.ts migrate --",
