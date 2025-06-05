@@ -10,7 +10,7 @@ export const enum NumberFilterMode {
 	GreaterThanOrEqual,
 }
 
-export const numberFilterSchema = pipe(
+export const NumberFilter = pipe(
 	string(),
 	rawTransform(({ dataset, addIssue, NEVER }) => {
 		if (!dataset.typed)
@@ -48,4 +48,4 @@ export const numberFilterSchema = pipe(
 		return { number, mode };
 	})
 );
-export interface NumberFilter extends InferOutput<typeof numberFilterSchema> { }
+export interface NumberFilter extends InferOutput<typeof NumberFilter> { }

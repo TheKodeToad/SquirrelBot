@@ -6,7 +6,7 @@ import { mapIterable } from "#common/iterators.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { getGuildConfig, insertGuildConfig } from "#db/core/configs.ts";
 import { addChannelListener } from "#db/notification.ts";
-import { coreConfigSchema } from "#schema/plugin/core.ts";
+import { CoreConfig } from "#schema/plugin/core.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { parse, safeParse, type InferInput } from "valibot";
@@ -111,7 +111,7 @@ async function unloadConfigs(guildID: string): Promise<void> {
 	});
 }
 
-const coreConfigDefault = parse(coreConfigSchema, {} satisfies InferInput<typeof coreConfigSchema>);
+const coreConfigDefault = parse(CoreConfig, {} satisfies InferInput<typeof CoreConfig>);
 
 async function loadConfig(guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
 	const value = await parseConfig(guildID, pluginID, configStore);

@@ -9,9 +9,9 @@ import { deleteCaseCommand } from "#bot/plugin/moderation/command/case/caseDelet
 import { caseListCommand } from "#bot/plugin/moderation/command/case/caseList.ts";
 import { caseShowCommand } from "#bot/plugin/moderation/command/case/caseShow.ts";
 import { purgeCommand } from "#bot/plugin/moderation/command/util/purge.ts";
-import { moderationConfigSchema } from "#schema/plugin/moderation.ts";
+import { ModerationConfig } from "#schema/plugin/moderation.ts";
 
-export const moderationConfig = new ConfigStore(moderationConfigSchema);
+export const moderationConfig = new ConfigStore(ModerationConfig);
 
 const defaultConfig = `enabled = false
 

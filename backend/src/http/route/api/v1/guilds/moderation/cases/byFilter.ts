@@ -1,10 +1,10 @@
+import { CaseType, getCases, type CaseQuery } from "#db/moderation/cases.ts";
+import type { GuildAuthVars } from "#http/middleware/guildAuth.ts";
+import { serializeCaseObject } from "#http/route/api/v1/guilds/moderation/cases/index.ts";
+import { parseBooleanSchema, parseIntSchema, Snowflake } from "#schema/common/index.ts";
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import { check, enum_, object, optional, pipe, string, transform } from "valibot";
-import { CaseType, getCases, type CaseQuery } from "#db/moderation/cases.ts";
-import { parseBooleanSchema, parseIntSchema, snowflakeSchema } from "#schema/common/index.ts";
-import type { GuildAuthVars } from "#http/middleware/guildAuth.ts";
-import { serializeCaseObject } from "#http/route/api/v1/guilds/moderation/cases/index.ts";
 
 const router = new Hono<{ Variables: GuildAuthVars; }>;
 
@@ -14,8 +14,8 @@ const querySchema = pipe(object({
 	type: optional(pipe(parseIntSchema, enum_(CaseType))),
 	"created-before": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
 	"created-after": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
-	actor: optional(snowflakeSchema),
-	target: optional(snowflakeSchema),
+	actor: optional(Snowflake),
+	target: optional(Snowflake),
 	"delete-message-seconds-lt": optional(parseIntSchema),
 	"delete-message-seconds-gt": optional(parseIntSchema),
 	"dm-delivered": optional(parseBooleanSchema),

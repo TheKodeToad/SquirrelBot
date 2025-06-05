@@ -1,11 +1,11 @@
 /* eslint no-console: 0 */
 
+import { LogLevel, logLevelName } from "#common/logger/level.ts";
+import { dateToHMSString } from "#common/time.ts";
+import { LOG_LEVEL } from "#environment.ts";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getCallSites } from "util";
-import { LOG_LEVEL } from "#environment.ts";
-import { dateToHMSString } from "#common/time.ts";
-import { LogLevel, logLevelName } from "#common/logger/level.ts";
 
 // A custom logger because the Node.JS ecosystem is scary
 // Logging allowing for lazy evaluation with ?.info etc.

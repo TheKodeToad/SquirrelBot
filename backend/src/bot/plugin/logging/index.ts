@@ -1,9 +1,9 @@
 import { definePlugin } from "#bot/loader/plugin.ts";
 import { ConfigStore } from "#bot/plugin/core/public/config.ts";
 import { beginMessageCleanupLoop, messageLoggerCreateListener, messageLoggerDeleteListener, messageLoggerUpdateListener } from "#bot/plugin/logging/logger/messageLogger.ts";
-import { loggingConfigSchema } from "#schema/plugin/logging.ts";
+import { LogginConfig } from "#schema/plugin/logging.ts";
 
-export const loggingConfig = new ConfigStore(loggingConfigSchema);
+export const loggingConfig = new ConfigStore(LogginConfig);
 
 const defaultConfig = `enabled = false
 

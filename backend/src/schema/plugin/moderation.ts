@@ -1,13 +1,13 @@
 import { ParameterType } from "#common/template/index.ts";
 import { messageTemplate } from "#schema/common/message.ts";
-import { permissionsFilterSchema } from "#schema/common/permissionsFilter.ts";
+import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
 import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
 
-export const presetReasonSchema = object({
+export const PresetReason = object({
 	name: string(),
 	replacement: string(),
 });
-export interface PresetReason extends InferOutput<typeof presetReasonSchema> { }
+export interface PresetReason extends InferOutput<typeof PresetReason> { }
 
 const discordReasons: PresetReason[] = [
 	// TODO: treat these keys specially
@@ -23,33 +23,33 @@ const actionParams = {
 	reason: ParameterType.MarkdownString,
 } as const;
 
-export const moderationConfigSchema = object({
-	preset_reasons: optional(array(presetReasonSchema), []), // TODO
+export const ModerationConfig = object({
+	preset_reasons: optional(array(PresetReason), []), // TODO
 	preset_prefix: optional(string(), "!"), // TODO
 
 	ban: optional(object({
 		send_direct_message: optional(boolean(), false),
 		direct_message: optional(messageTemplate(actionParams)),
 		purge_messages: optional(number(), 0),
-		preset_reasons: optional(array(presetReasonSchema), discordReasons) // TODO
+		preset_reasons: optional(array(PresetReason), discordReasons) // TODO
 	}), {}),
 	unban: optional(object({
-		preset_reasons: optional(array(presetReasonSchema), [])
+		preset_reasons: optional(array(PresetReason), [])
 	}), {}),
 	kick: optional(object({
 		send_direct_message: optional(boolean(), false),
 		direct_message: optional(messageTemplate(actionParams)),
-		preset_reasons: optional(array(presetReasonSchema), discordReasons), // TODO
+		preset_reasons: optional(array(PresetReason), discordReasons), // TODO
 	}), {}),
 	timeout: optional(object({
 		send_direct_message: optional(boolean(), false),
 		direct_message: optional(messageTemplate({ ...actionParams, duration: ParameterType.Duration })),
-		preset_reasons: optional(array(presetReasonSchema), discordReasons), // TODO
+		preset_reasons: optional(array(PresetReason), discordReasons), // TODO
 	}), {}),
 	warn: optional(object({
 		send_direct_message: optional(boolean(), false),
 		direct_message: optional(messageTemplate(actionParams)),
-		preset_reasons: optional(array(presetReasonSchema), discordReasons),
+		preset_reasons: optional(array(PresetReason), discordReasons),
 	}), {}),
 
 	default_permissions: optional(object({
@@ -71,7 +71,7 @@ export const moderationConfigSchema = object({
 		purge: optional(boolean()),
 		case_read: optional(boolean()),
 		case_delete: optional(boolean()),
-		...permissionsFilterSchema.entries
+		...PermissionsFilter.entries
 	})), []),
 });
-export interface ModerationConfig extends InferOutput<typeof moderationConfigSchema> { }
+export type ModerationConfig = InferOutput<typeof ModerationConfig>;

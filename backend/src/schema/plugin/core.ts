@@ -1,27 +1,27 @@
-import { snowflakeSchema } from "#schema/common/index.ts";
-import { permissionsFilterSchema } from "#schema/common/permissionsFilter.ts";
+import { Snowflake } from "#schema/common/index.ts";
+import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
 import type { InferOutput } from "valibot";
 import { array, boolean, number, object, optional, pipe, rawTransform, record, string } from "valibot";
 
-const coreGroupSchema = object({
-	users: optional(array(pipe(string(), snowflakeSchema)), []),
-	roles: optional(array(pipe(string(), snowflakeSchema)), []),
+const CoreGroup = object({
+	users: optional(array(pipe(string(), Snowflake)), []),
+	roles: optional(array(pipe(string(), Snowflake)), []),
 	inherits: optional(array(string()), []),
 	level: optional(number())
 });
-export interface CoreGroup extends InferOutput<typeof coreGroupSchema> { }
+export interface CoreGroup extends InferOutput<typeof CoreGroup> { }
 
-const coreGroupsSchema = pipe(
+const CoreGroups = pipe(
 	record(
 		string(),
-		coreGroupSchema
+		CoreGroup
 	),
 	transformCoreGroups()
 );
-export interface CoreGroups extends InferOutput<typeof coreGroupsSchema> { }
+export type CoreGroups = InferOutput<typeof CoreGroups>;
 
-export const coreConfigSchema = object({
-	groups: optional(coreGroupsSchema, {}),
+export const CoreConfig = object({
+	groups: optional(CoreGroups, {}),
 
 	prefix_commands: optional(object({
 		prefix: optional(string(), "?"),
@@ -43,10 +43,10 @@ export const coreConfigSchema = object({
 		about_command: optional(boolean()),
 		help_command: optional(boolean()),
 		groups_command: optional(boolean()),
-		...permissionsFilterSchema.entries
+		...PermissionsFilter.entries
 	})), []),
 });
-export interface CoreConfig extends InferOutput<typeof coreConfigSchema> { }
+export type CoreConfig = InferOutput<typeof CoreConfig>;
 
 const MAX_INHERITANCE_DEPTH = 1000;
 

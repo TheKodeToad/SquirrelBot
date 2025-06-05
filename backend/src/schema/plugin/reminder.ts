@@ -1,7 +1,7 @@
-import { permissionsFilterSchema } from "#schema/common/permissionsFilter.ts";
+import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
 import { array, boolean, object, optional } from "valibot";
 
-export const remindersConfigSchema = object({
+export const RemindersConfig = object({
 	default_permissions: optional(object({
 		personal_reminders: optional(boolean(), false),
 		manage_reminders: optional(boolean(), false),
@@ -9,6 +9,6 @@ export const remindersConfigSchema = object({
 	permission_overrides: optional(array(object({
 		personal_reminders: optional(boolean()),
 		manage_reminders: optional(boolean()),
-		...permissionsFilterSchema.entries
+		...PermissionsFilter.entries
 	})), []),
 });

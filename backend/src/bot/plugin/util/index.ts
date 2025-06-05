@@ -3,9 +3,9 @@ import { ConfigStore } from "#bot/plugin/core/public/config.ts";
 import { inviteInfoCommand } from "#bot/plugin/util/command/inviteInfo/index.ts";
 import { pingCommand } from "#bot/plugin/util/command/ping.ts";
 import { snowflakeCommand } from "#bot/plugin/util/command/snowflake.ts";
-import { utilConfigSchema } from "#schema/plugin/util.ts";
+import { UtilConfig } from "#schema/plugin/util.ts";
 
-export const utilConfig = new ConfigStore(utilConfigSchema);
+export const utilConfig = new ConfigStore(UtilConfig);
 
 const defaultConfig = `enabled = false
 

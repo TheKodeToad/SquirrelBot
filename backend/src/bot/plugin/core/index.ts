@@ -14,7 +14,7 @@ import { guildInfoSyncGuildCreateHandler, guildInfoSyncGuildUpdateHandler, initG
 import { initIcons } from "#bot/plugin/core/iconSync.ts";
 import { ConfigStore } from "#bot/plugin/core/public/config.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { coreConfigSchema } from "#schema/plugin/core.ts";
+import { CoreConfig } from "#schema/plugin/core.ts";
 
 const logger = moduleLogger();
 
@@ -33,7 +33,7 @@ const defaultConfig = `prefix_commands.prefix = "?" # Customize the prefix
 # prefix_commands = false
 # slash_commands = false`;
 
-export const coreConfig = new ConfigStore(coreConfigSchema);
+export const coreConfig = new ConfigStore(CoreConfig);
 
 export const corePlugin = definePlugin({
 	id: "core",

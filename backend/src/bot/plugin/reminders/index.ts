@@ -1,11 +1,11 @@
-import type { Reminder } from "#db/reminders/reminders.ts";
-import { remindersConfigSchema } from "#schema/plugin/reminder.ts";
 import { debugFormatGuildByID } from "#bot/common/discord/debugFormat.ts";
 import { definePlugin } from "#bot/loader/plugin.ts";
 import { ConfigStore } from "#bot/plugin/core/public/config.ts";
 import { remindCommand } from "#bot/plugin/reminders/command/remind.ts";
 import { reminderListCommand } from "#bot/plugin/reminders/command/reminderList.ts";
 import { beginPollingReminders } from "#bot/plugin/reminders/scheduler.ts";
+import type { Reminder } from "#db/reminders/reminders.ts";
+import { RemindersConfig } from "#schema/plugin/reminder.ts";
 
 const defaultConfig = `enabled = false
 
@@ -18,7 +18,7 @@ const defaultConfig = `enabled = false
 # in_group = ["moderator"]
 `;
 
-export const remindersConfig = new ConfigStore(remindersConfigSchema);
+export const remindersConfig = new ConfigStore(RemindersConfig);
 
 export const remindersPlugin = definePlugin({
 	id: "reminders",

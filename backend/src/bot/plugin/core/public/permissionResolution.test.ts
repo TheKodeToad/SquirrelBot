@@ -2,7 +2,7 @@ import { mockMember } from "#bot/common/tests/mockMember.ts";
 import { DUMMY_GUILD, mockSnowflake } from "#bot/common/tests/mockSnowflake.ts";
 import { coreConfig } from "#bot/plugin/core/index.ts";
 import { resolveGroups } from "#bot/plugin/core/public/permissionResolution.ts";
-import { permissionsFilterSchema } from "#schema/common/permissionsFilter.ts";
+import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
 import type { CoreConfig } from "#schema/plugin/core.ts";
 import assert from "assert";
 import { suite, test } from "node:test";
@@ -23,9 +23,10 @@ function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): 
 
 const permissionsSchema = object({
 	permissions: object({}),
-	permission_overrides: array(permissionsFilterSchema),
+	permission_overrides: array(PermissionsFilter),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function mockCustomConfig(value: string): InferOutput<typeof permissionsSchema> {
 	return parse(permissionsSchema, parseTOML(value));
 }

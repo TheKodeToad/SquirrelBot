@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
-import { hexColorSchema, snowflakeSchema } from "#schema/common/index.ts";
+import { HexColor, Snowflake } from "#schema/common/index.ts";
 import { template } from "#schema/common/template.ts";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
-import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type BaseIssue, type BaseSchema } from "valibot";
+import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type BaseIssue, type BaseSchema, type InferOutput } from "valibot";
 
-export const messageLiteral = message(string());
+export const MessageLiteral = message(string());
+export type MessageLiteral = InferOutput<typeof MessageLiteral>;
 
 export function messageTemplate<S extends TemplateSchema>(schema: S) {
 	return pipe(
@@ -54,13 +55,13 @@ function message<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(str
 					users: optional(union(
 						[
 							boolean(),
-							pipe(array(snowflakeSchema), maxLength(100))
+							pipe(array(Snowflake), maxLength(100))
 						]
 					)),
 					roles: optional(union(
 						[
 							boolean(),
-							pipe(array(snowflakeSchema), maxLength(100))
+							pipe(array(Snowflake), maxLength(100))
 						]
 					)),
 				}), {}),
@@ -83,7 +84,7 @@ function embed<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(strin
 		description: optional(stringSchema),
 		url: optional(stringSchema),
 		timestamp: optional(pipe(instance(TomlDate), transform(date => date.toISOString()))), // TODO is this filter consistent with Discord's
-		color: optional(hexColorSchema),
+		color: optional(HexColor),
 		footer: optional(object({ text: stringSchema, icon: stringSchema })),
 		image: optional(pipe(stringSchema, transform(url => ({ url })))),
 		thumbnail: optional(pipe(stringSchema, transform(url => ({ url })))),
