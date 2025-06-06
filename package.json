@@ -2,10 +2,10 @@
 	"name": "squirrel",
 	"private": true,
 	"scripts": {
-		"lint": "cd backend && npm run lint && cd ../frontend && npm run lint",
-		"bot": "cd backend && npm run bot",
-		"http": "cd backend && npm run http",
-		"migrate": "cd backend && npm run migrate --",
-		"test": "cd backend && npm run test"
+		"lint": "cd backend && pnpm run lint && cd ../frontend && pnpm run lint",
+		"bot": "cd backend && pnpm run bot",
+		"http": "cd backend && pnpm run http",
+		"migrate": "cd backend && pnpm run migrate --",
+		"test": "cd backend && pnpm run test"
 	}
 }

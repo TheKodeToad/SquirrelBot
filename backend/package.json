@@ -6,10 +6,10 @@
 	},
 	"scripts": {
 		"lint": "eslint && tsc",
-		"bot": "npm run _node src/bot/main.ts",
-		"http": "npm run _node src/http/main.ts",
-		"migrate": "npm run _node src/db/main.ts migrate --",
-		"check-migrations": "npm run _node src/db/main.ts check --",
+		"bot": "pnpm run _node src/bot/main.ts",
+		"http": "pnpm run _node src/http/main.ts",
+		"migrate": "pnpm run _node src/db/main.ts migrate --",
+		"check-migrations": "pnpm run _node src/db/main.ts check --",
 		"test": "node --import=./registerSWC.js --test src/**/*.test.ts",
 		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
 	},
