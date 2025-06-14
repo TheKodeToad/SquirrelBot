@@ -27,28 +27,37 @@ The overall goal is to implement a set of plugins focused on moderation and util
 
 ## To-do
 - [ ] Support for non-English languages
+  - is this viable? maybe just for slash commands as localising prefix options would be a nightmare - but so would localising duration parsing
 - [x] Log things properly instead of just using console
-- ❌ Unit testing
+- 🚧 Unit testing
 - 🚧 Moderation
   - [x] Ban
   - [x] Kick
-  - [x] Mute (probably should be changed just to timeout and role functionality moved to `?restrict` command)
-  - [ ] Voice Mute
-  - [ ] Warn
+  - [x] Timeout
+  - [ ] Voice mute
+  - [x] Warn
   - [x] Case recording
   - [ ] Case editing
-  - [ ] Restrictions (stop posting in certain channel etc.)
+  - [ ] Timed restriction presets (stop posting in certain channel etc.)
 - 🚧 Logging
-- 🚧 Utility - invite info, user info, server info, grant role, set channel props without needing manage channel perm, emoji helper
-- ❌ Automator - automatic actions focused on moderation but could also be replying to keywords without taking action
+  - [x] Basic message logging
+  - [ ] Log Discord bans/kicks/mutes
+  - [ ] Log all Discord things
+- 🚧 Utility
+  - [x] Invite info
+  - [ ] User info
+  - [ ] Server info
+  - [ ] Grant/revoke role
+  - [ ] Set channel props without needing manage channel perm
+  - [ ] Emoji helper
+- ❌ Automator ("reflex"? to avoid being sued by Apple®) - automatic actions focused on moderation but could also be replying to keywords without taking action
 - 🚧 Reminders
   - [x] Create reminder
   - [ ] List or delete reminders
   - [ ] Timezone setting - allow specifying reminder date in full or as time and/or weekday
 - ❌ Tags - post preset message with a command
-- ❌ Sticky and Static Messages - auto-reposted sticky notices in channels and static messages with support for selecting roles
+- ❌ Sticky and Static Messages ("billboard"?) - auto-reposted sticky notices in channels and static messages with support for selecting roles
 - ❌ Persistent Nickname and Roles
 - ❌ Starboard
 - ❌ Welcome DM
 - ❌ Command Rate Limit
--
