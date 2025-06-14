@@ -42,11 +42,6 @@ async function installConfigChangeListener(): Promise<void> {
 			return;
 		}
 
-		if (typeof payloadObject !== "object") {
-			logger.warn?.("configUpdate payload is not an object");
-			return;
-		}
-
 		if (typeof payloadObject !== "object" || payloadObject === null) {
 			logger.warn?.("configUpdate payload is not an object");
 			return;
