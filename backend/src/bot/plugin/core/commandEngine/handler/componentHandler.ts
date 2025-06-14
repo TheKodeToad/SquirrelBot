@@ -44,7 +44,6 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 		} catch (error) {
 			logger.error?.("Error responding with error to component", error);
 		}
-		// HACK for now
 		throw error;
 	} finally {
 		await context._abandon();

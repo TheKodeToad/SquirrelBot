@@ -154,7 +154,7 @@ export function readDuration(reader: StringReader): number | null {
 
 function durationToMS(length: number, unit: string): number | null {
 	switch (unit) {
-		case "ms":
+		case "ms": case "millisecond": case "milliseconds":
 			return length;
 
 		case "s": case "sec": case "secs": case "second": case "seconds":
