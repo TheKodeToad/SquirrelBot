@@ -12,7 +12,7 @@
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.8.1",
-		"@codemirror/language": "^6.11.0",
+		"@codemirror/language": "^6.11.1",
 		"@codemirror/state": "^6.5.2",
 		"@codemirror/view": "^6.36.8",
 		"@solid-primitives/deep": "^0.3.2",
