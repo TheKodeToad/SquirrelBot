@@ -1,12 +1,13 @@
+import { isUndeletableMessageType } from "#common/discord/general.ts";
 import { WEEK } from "#common/time.ts";
-import { isUndeletableMessageType } from "#discord/common/general.ts";
 import { bot } from "#discord/index.ts";
-import { OptionType, defineCommand } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 
-export const purgeCommand = defineCommand({
+export default defineCommand({
 	name: ["purge", "sweep", "clear"],
 	description: "Delete the specified number of messages in chat starting from the most recent.",
 
@@ -38,7 +39,7 @@ export const purgeCommand = defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.purge),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.purge),
 	async run(context, args) {
 		let purged = 0;
 

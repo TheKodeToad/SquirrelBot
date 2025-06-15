@@ -3,9 +3,9 @@ import { TTLMap } from "#common/ttlMap.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
 import type { ComponentContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
-import { defineEventListener } from "#plugin/core/public/eventListener.ts";
+import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { Text } from "oceanic-component-helper";
-import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
+import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyInteractionGateway, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 
 interface ComponentHandler {
 	callback: NonNullable<ReplyObject["componentHandler"]>;
@@ -17,7 +17,11 @@ const logger = moduleLogger();
 const activeHandlers: TTLMap<string, ComponentHandler> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => activeHandlers.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
-export const componentInterationHandler = defineEventListener("interactionCreate", async interaction => {
+export default [
+	onBotEvent({ type: "interactionCreate", listener: handle })
+];
+
+async function handle(interaction: AnyInteractionGateway): Promise<void> {
 	if (!interaction.inCachedGuildChannel())
 		return;
 
@@ -48,9 +52,9 @@ export const componentInterationHandler = defineEventListener("interactionCreate
 	} finally {
 		await context._abandon();
 	}
-});
+}
 
-export function listenForInteractions(messageID: string, originalUserID: string, callback: ComponentHandler["callback"]): void {
+export function listenForInteractions(messageID: string, originalUserID: string, callback: ComponentHandler["\callback"]): void {
 	activeHandlers.set(messageID, { callback, originalUserID });
 }
 

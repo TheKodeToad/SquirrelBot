@@ -1,4 +1,4 @@
-import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
+import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { array, boolean, object, optional } from "valibot";
 
 export const RemindersConfig = object({

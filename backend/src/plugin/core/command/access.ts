@@ -1,9 +1,10 @@
+import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSeconds } from "#common/time.ts";
-import { escapeMarkdown } from "#discord/common/markdown.ts";
 import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/guildInfoSync.ts";
-import { defineCommand, OptionType, type CommandContext } from "#plugin/core/public/command.ts";
+import { OptionType, type CommandContext } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 
 // for now
@@ -11,7 +12,7 @@ function checkForMe(context: CommandContext): boolean {
 	return context.user.id === "706152404072267788";
 }
 
-export const grantAccessCommand = defineCommand({
+const grantAccessCommand = defineCommand({
 	name: ["grantaccess", "whitelist"],
 	description: "Give a server access to the app.",
 	supportSlash: false, // don't want this cluttering the command list
@@ -36,7 +37,7 @@ export const grantAccessCommand = defineCommand({
 	},
 });
 
-export const revokeAccessCommand = defineCommand({
+const revokeAccessCommand = defineCommand({
 	name: ["revokeaccess", "unwhitelist"],
 	description: "Remove a server's access to the app and schedule its data for deletion.",
 	supportSlash: false,
@@ -76,3 +77,5 @@ export const revokeAccessCommand = defineCommand({
 		}
 	},
 });
+
+export default [grantAccessCommand, revokeAccessCommand];

@@ -1,8 +1,8 @@
+import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
+import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
+import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
-import { debugFormatPermissionContext } from "#discord/common/debugFormat.ts";
-import { makeMarkdownInlineCodeblock } from "#discord/common/markdown.ts";
-import { canWriteInChannel } from "#discord/common/permissions.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
 import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
@@ -10,18 +10,20 @@ import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.t
 import { readPrefixArgs, readPrefixName } from "#plugin/core/commandEngine/parsing/prefixParser.ts";
 import { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
-import { coreConfig } from "#plugin/core/index.ts";
-import { type Command, type CommandContext, type Reply } from "#plugin/core/public/command.ts";
-import { defineEventListener } from "#plugin/core/public/eventListener.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
+import type { Command, CommandContext, Reply } from "#plugin/core/public/command.ts";
+import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 
 const logger = moduleLogger();
 
-export const prefixSendHandler = defineEventListener("messageCreate", async message => void await handle(message));
-export const prefixEditHandler = defineEventListener("messageUpdate", handleEdit);
-export const prefixDeleteHandler = defineEventListener("messageDelete", handleDelete);
+export default [
+	onBotEvent({ type: "messageCreate", listener: async message => void await handle(message) }),
+	onBotEvent({ type: "messageUpdate", listener: handleEdit }),
+	onBotEvent({ type: "messageDelete", listener: handleDelete }),
+];
 
 // if anything is added here, make sure the message type can be replied to
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
@@ -43,7 +45,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	if (!canWriteInChannel(message.channel, message.channel.guild.clientMember))
 		return false;
 
-	const config = coreConfig.get(message.guildID);
+	const config = coreConfigStore.get(message.guildID);
 
 	if (config === undefined)
 		return false;
@@ -173,7 +175,7 @@ class PrefixContext implements CommandContext {
 			return;
 
 		if (this._response === null) {
-			const config = coreConfig.get(this.guild.id);
+			const config = coreConfigStore.get(this.guild.id);
 
 			if (config === undefined)
 				return;

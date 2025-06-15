@@ -1,13 +1,13 @@
+import { fetchMemberCached, fetchThreadCached } from "#common/discord/cachedRequest.ts";
+import { debugFormatChannel } from "#common/discord/debugFormat.ts";
+import { isTextableChannel, isThreadChannelType } from "#common/discord/general.ts";
+import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { dateToHMSString, dateToUnixSeconds } from "#common/time.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#db/reminders/reminders.ts";
-import { fetchMemberCached, fetchThreadCached } from "#discord/common/cachedRequest.ts";
-import { debugFormatChannel } from "#discord/common/debugFormat.ts";
-import { isTextableChannel, isThreadChannelType } from "#discord/common/general.ts";
-import { canWriteInChannel } from "#discord/common/permissions.ts";
 import { bot } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { debugFormatReminder, remindersConfig } from "#plugin/reminders/index.ts";
+import { debugFormatReminder, remindersConfigStore } from "#plugin/reminders/index.ts";
 import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
 
 const logger = moduleLogger();
@@ -56,7 +56,7 @@ async function fire(reminder: Reminder): Promise<void> {
 	if (!await deleteReminder(reminder.guildID, reminder.number))
 		return;
 
-	if (!remindersConfig.has(reminder.guildID))
+	if (!remindersConfigStore.has(reminder.guildID))
 		return;
 
 	const guild = bot.guilds.get(reminder.guildID);

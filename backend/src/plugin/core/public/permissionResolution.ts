@@ -1,10 +1,10 @@
+import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "#common/discord/debugFormat.ts";
+import { isThreadChannel } from "#common/discord/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { debugFormatChannel, debugFormatGuild, debugFormatUser } from "#discord/common/debugFormat.ts";
-import { isThreadChannel } from "#discord/common/general.ts";
-import { coreConfig } from "#plugin/core/index.ts";
-import { NumberFilterMode, type NumberFilter } from "#schema/common/numberFilter.ts";
-import type { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
-import type { CoreConfig, CoreGroup } from "#schema/plugin/core.ts";
+import { NumberFilterMode, type NumberFilter } from "#common/schema/numberFilter.ts";
+import type { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
+import type { CoreConfig, CoreGroup } from "#plugin/core/config.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
 import { CategoryChannel, Member, ThreadChannel, type AnyGuildChannel } from "oceanic.js";
 
 const logger = moduleLogger();
@@ -15,7 +15,7 @@ interface GroupsResult {
 }
 
 export function resolveGroups(member: Member): GroupsResult {
-	const config: CoreConfig | undefined = coreConfig.get(member.guildID);
+	const config: CoreConfig | undefined = coreConfigStore.get(member.guildID);
 
 	const groups: Set<string> = new Set;
 	let level = 0;

@@ -1,25 +1,31 @@
+import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
+import { colors } from "#common/discord/colors.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "#db/logger/messageCache.ts";
-import { fetchTextableGuildChannelCached } from "#discord/common/cachedRequest.ts";
-import { colors } from "#discord/common/colors.ts";
 import { bot } from "#discord/index.ts";
-import { defineEventListener } from "#plugin/core/public/eventListener.ts";
+import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { isEventConfigEnabled } from "#plugin/logging/helper/config.ts";
 import { logToChannel } from "#plugin/logging/helper/webhooks.ts";
-import { loggingConfig } from "#plugin/logging/index.ts";
-import { Routes } from "oceanic.js";
+import { loggingConfigStore } from "#plugin/logging/index.ts";
+import { Message, Routes } from "oceanic.js";
 
 const logger = moduleLogger();
 
 const MESSAGE_CLEANUP_INTERVAL = 30 * MINUTE;
 const MESSAGE_CLEANUP_THRESHOLD = 6 * HOUR;
 
-export const messageLoggerCreateListener = defineEventListener("messageCreate", async message => {
+export default [
+	onBotEvent({ type: "messageCreate", listener: handleCreate }),
+	onBotEvent({ type: "messageUpdate", listener: handleUpdate }),
+	onBotEvent({ type: "messageDelete", listener: handleDelete })
+];
+
+async function handleCreate(message: Message): Promise<void> {
 	if (message.guildID === null)
 		return;
 
-	const config = loggingConfig.get(message.guildID);
+	const config = loggingConfigStore.get(message.guildID);
 
 	if (config === undefined)
 		return;
@@ -35,13 +41,13 @@ export const messageLoggerCreateListener = defineEventListener("messageCreate", 
 		authorAvatarHash: message.author.avatar,
 		content: message.content,
 	});
-});
+}
 
-export const messageLoggerUpdateListener = defineEventListener("messageUpdate", async message => {
+async function handleUpdate(message: Message): Promise<void> {
 	if (message.guild === null)
 		return;
 
-	const config = loggingConfig.get(message.guild.id);
+	const config = loggingConfigStore.get(message.guild.id);
 
 	if (config === undefined)
 		return;
@@ -86,13 +92,13 @@ export const messageLoggerUpdateListener = defineEventListener("messageUpdate", 
 			}]
 		});
 	}
-});
+}
 
-export const messageLoggerDeleteListener = defineEventListener("messageDelete", async message => {
+async function handleDelete(message: Message): Promise<void> {
 	if (message.guild == null)
 		return;
 
-	const config = loggingConfig.get(message.guild.id);
+	const config = loggingConfigStore.get(message.guild.id);
 
 	if (config === undefined)
 		return;
@@ -128,7 +134,7 @@ export const messageLoggerDeleteListener = defineEventListener("messageDelete", 
 		});
 	}
 
-});
+}
 
 export async function beginMessageCleanupLoop(): Promise<void> {
 	try {

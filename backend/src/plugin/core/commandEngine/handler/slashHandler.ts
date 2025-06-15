@@ -1,6 +1,6 @@
+import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { requireExhaustiveSwitch } from "#common/types.ts";
-import { debugFormatPermissionContext } from "#discord/common/debugFormat.ts";
 import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { getCommandByName, getCommands } from "#plugin/core/commandEngine/commandCache.ts";
@@ -9,16 +9,84 @@ import { AUTO_DEFER_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.ts";
 import { readSlashArgs } from "#plugin/core/commandEngine/parsing/slashParser.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
-import { coreConfig } from "#plugin/core/index.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
 import { type Command, type CommandContext, OptionType, type Reply } from "#plugin/core/public/command.ts";
-import { defineEventListener } from "#plugin/core/public/eventListener.ts";
+import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { readFile, writeFile } from "fs/promises";
-import { type AnyTextableGuildChannel, type ApplicationCommandOptions, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
+import { type AnyInteractionGateway, type AnyTextableGuildChannel, type ApplicationCommandOptions, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
 import path from "path";
 
 const logger = moduleLogger();
+
+export default [
+	onBotEvent({ type: "interactionCreate", listener: handle }),
+];
+
+async function handle(interaction: AnyInteractionGateway): Promise<void> {
+	if (!interaction.inCachedGuildChannel())
+		return;
+
+	if (!interaction.isCommandInteraction())
+		return;
+
+	const config = coreConfigStore.get(interaction.guildID);
+
+	if (config === undefined)
+		return;
+
+	const perms = resolvePermissions(config, interaction.member, interaction.channel);
+
+	if (!perms.slash_commands)
+		return;
+
+	const commandEntry = getCommandByName(interaction.data.name);
+
+	if (commandEntry === undefined) {
+		logger.warn?.(`Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
+		return;
+	}
+
+	const ephemeral = perms.ephemeral_response && (interaction.data.options.getBoolean("private") ?? false);
+	const context = new SlashContext(commandEntry.command, interaction, ephemeral);
+
+	const data = commandEntry.command.preRun(context);
+
+	if (data === false) {
+		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
+		context._ephemeral = true;
+		await context.respond(`${icons.error} You lack permission to execute the command in this channel.`);
+		return;
+	}
+
+	if (data == null)
+		throw new Error("Nullish value returned from preRun!");
+
+	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
+
+	if (args.error !== null) {
+		context._ephemeral = true;
+		await context.respond(`${icons.error} ${formatArgsParseError(args)}`);
+		return;
+	}
+
+	logger.debug?.(`Parsed arguments; running '${interaction.data.name}'`, args);
+
+	try {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		await commandEntry.command.run(context, args.result as any, data);
+	} catch (error) {
+		try {
+			await context.respond(`:boom: Failed to execute command`);
+		} catch (error) {
+			logger.error?.("Error responding with error message for slash command", error);
+		}
+		throw error;
+	} finally {
+		context._clearTimeout();
+	}
+}
 
 const PLACEHOLDER_DESCRIPTION = "No description provided.";
 
@@ -97,70 +165,6 @@ function mapOptionType(type: OptionType) {
 
 	requireExhaustiveSwitch(type);
 }
-
-export const slashRunHandler = defineEventListener("interactionCreate", async interaction => {
-	if (!interaction.inCachedGuildChannel())
-		return;
-
-	if (!interaction.isCommandInteraction())
-		return;
-
-	const config = coreConfig.get(interaction.guildID);
-
-	if (config === undefined)
-		return;
-
-	const perms = resolvePermissions(config, interaction.member, interaction.channel);
-
-	if (!perms.slash_commands)
-		return;
-
-	const commandEntry = getCommandByName(interaction.data.name);
-
-	if (commandEntry === undefined) {
-		logger.warn?.(`Received event for unknown slash command - '${interaction.data.name}' is not internally known`);
-		return;
-	}
-
-	const ephemeral = perms.ephemeral_response && (interaction.data.options.getBoolean("private") ?? false);
-	const context = new SlashContext(commandEntry.command, interaction, ephemeral);
-
-	const data = commandEntry.command.preRun(context);
-
-	if (data === false) {
-		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
-		context._ephemeral = true;
-		await context.respond(`${icons.error} You lack permission to execute the command in this channel.`);
-		return;
-	}
-
-	if (data == null)
-		throw new Error("Nullish value returned from preRun!");
-
-	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
-
-	if (args.error !== null) {
-		context._ephemeral = true;
-		await context.respond(`${icons.error} ${formatArgsParseError(args)}`);
-		return;
-	}
-
-	logger.debug?.(`Parsed arguments; running '${interaction.data.name}'`, args);
-
-	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		await commandEntry.command.run(context, args.result as any, data);
-	} catch (error) {
-		try {
-			await context.respond(`:boom: Failed to execute command`);
-		} catch (error) {
-			logger.error?.("Error responding with error message for slash command", error);
-		}
-		throw error;
-	} finally {
-		context._clearTimeout();
-	}
-});
 
 class SlashContext implements CommandContext {
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;

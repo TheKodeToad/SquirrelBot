@@ -1,15 +1,13 @@
-import { moduleLogger } from "#common/logger/index.ts";
-import { makeMarkdownInlineCodeblock } from "#discord/common/markdown.ts";
-import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
+import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
+import { getPlugin, getPlugins } from "#loader/index.ts";
+import { getCommandsByPlugin } from "#plugin/core/commandEngine/commandCache.ts";
 import { canRunCommand } from "#plugin/core/helper/commands.ts";
-import { coreConfig } from "#plugin/core/index.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
 import type { BaseContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { getPlugin, getPlugins } from "#plugin/registry.ts";
 import { ActionRow, Container, Divider, StringSelect, Text, TextButton } from "oceanic-component-helper";
 import { MessageFlags, type ContainerComponent, type StringSelectMenu } from "oceanic.js";
-
-const logger = moduleLogger();
 
 interface CommandListState {
 	plugin: string;
@@ -42,7 +40,9 @@ function renderPluginSelection(selected: string | null, guildID: string): String
 	const select = StringSelect("plugin");
 
 	for (const plugin of getPlugins()) {
-		if (!(plugin.config === undefined || plugin.config.store.has(guildID)))
+		const config = defineConfig.contributions.get(plugin);
+
+		if (config !== undefined && !config.store.has(guildID))
 			continue;
 
 		select.options.push({
@@ -74,9 +74,11 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 	if (entries === undefined) {
 		entries = [];
 
-		const prefix = coreConfig.get(context.guild.id)?.prefix_commands.prefix ?? "";
+		const prefix = coreConfigStore.get(context.guild.id)?.prefix_commands.prefix ?? "";
 
-		for (const command of plugin.commands ?? []) {
+		for (const entry of getCommandsByPlugin(plugin.name) ?? []) {
+			const { command } = entry;
+
 			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true)))
 				continue;
 
@@ -87,13 +89,6 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 
 			if (command.description !== undefined)
 				summaryComponent.content += command.description + "\n";
-
-			const entry = getCommandByName(command.name[0]);
-
-			if (entry === undefined) {
-				logger.warn?.(`Command '${command.name[0]}' not cached!`);
-				continue;
-			}
 
 			if (command.supportPrefix ?? true) {
 				entries.push([

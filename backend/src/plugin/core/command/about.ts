@@ -1,7 +1,7 @@
 import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
 import { bot } from "#discord/index.ts";
-import { coreConfig } from "#plugin/core/index.ts";
-import { defineCommand } from "#plugin/core/public/command.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 
@@ -16,12 +16,12 @@ const LIBRARIES = `
 and [more](${APP_LIBRARIES_LINK})
 `.substring(1).replaceAll("\n", " ");
 
-export const aboutCommand = defineCommand({
+export default defineCommand({
 	name: ["about"],
 	description: "Display information about the app.",
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.about_command),
+	preRun: context => permissionsGuard(context, coreConfigStore, permissions => permissions.about_command),
 	async run(context) {
 		const uptime = Math.floor(process.uptime());
 		let uptimeString = "";

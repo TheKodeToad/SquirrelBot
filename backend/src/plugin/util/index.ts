@@ -1,11 +1,12 @@
-import { ConfigStore } from "#plugin/core/public/config.ts";
-import { definePlugin } from "#plugin/index.ts";
-import { inviteInfoCommand } from "#plugin/util/command/inviteInfo/index.ts";
-import { pingCommand } from "#plugin/util/command/ping.ts";
-import { snowflakeCommand } from "#plugin/util/command/snowflake.ts";
+import { definePlugin } from "#loader/plugin.ts";
+import { ConfigStore } from "#plugin/core/public/configStore.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
+import inviteInfo from "#plugin/util/command/inviteInfo/index.ts";
+import ping from "#plugin/util/command/ping.ts";
+import snowflake from "#plugin/util/command/snowflake.ts";
 import { UtilConfig } from "#schema/plugin/util.ts";
 
-export const utilConfig = new ConfigStore(UtilConfig);
+export const utilConfigStore = new ConfigStore(UtilConfig);
 
 const defaultConfig = `enabled = false
 
@@ -21,6 +22,12 @@ export default definePlugin({
 	name: "Utilities",
 	description: "Useful general purpose utilities.",
 
-	config: { store: utilConfig, defaultValue: defaultConfig },
-	commands: [inviteInfoCommand, pingCommand, snowflakeCommand]
+	contributions: [
+		defineConfig({
+			store: utilConfigStore,
+			defaultValue: defaultConfig,
+		}),
+
+		inviteInfo, ping, snowflake,
+	]
 });

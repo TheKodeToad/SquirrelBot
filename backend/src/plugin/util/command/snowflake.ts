@@ -1,11 +1,12 @@
-import { OptionType, defineCommand } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { utilConfig } from "#plugin/util/index.ts";
+import { utilConfigStore } from "#plugin/util/index.ts";
 
 const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 
-export const snowflakeCommand = defineCommand({
+export default defineCommand({
 	name: ["snowflake", "snowflakeinfo", "creation"],
 	description: "Calculate the creation date of something on Discord based on its ID.",
 
@@ -20,7 +21,7 @@ export const snowflakeCommand = defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.snowflake_command),
+	preRun: context => permissionsGuard(context, utilConfigStore, permissions => permissions.snowflake_command),
 	async run(context, args) {
 		const snowflake = BigInt(args.input);
 		const timestamp = DISCORD_EPOCH + (snowflake >> 22n);

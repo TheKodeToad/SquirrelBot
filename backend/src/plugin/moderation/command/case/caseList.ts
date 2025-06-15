@@ -1,13 +1,14 @@
 import { getCases, type CaseInfo } from "#db/moderation/cases.ts";
-import { defineCommand, OptionType, type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import { OptionType, type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#plugin/moderation/helper/format.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 
-export const caseListCommand = defineCommand({
+export default defineCommand({
 	name: ["caselist", "casesearch", "cases", "listcases", "searchcases"],
 	description: "List and filter moderation cases.",
 
@@ -28,7 +29,7 @@ export const caseListCommand = defineCommand({
 	},
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.case_read),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_read),
 	async run(context, args) {
 		await respondWithPaginator<CaseInfo, number>(
 			context,
@@ -48,7 +49,7 @@ async function lookUpCases(
 	actorID: string | null,
 	targetID: string | null
 ): Promise<CaseInfo[]> {
-	const config = moderationConfig.get(context.guild.id);
+	const config = moderationConfigStore.get(context.guild.id);
 
 	if (config === undefined)
 		return [];

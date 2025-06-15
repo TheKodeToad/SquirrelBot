@@ -1,15 +1,15 @@
-import { defineCommand } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { utilConfig } from "#plugin/util/index.ts";
+import { utilConfigStore } from "#plugin/util/index.ts";
 
-export const pingCommand = defineCommand({
+export default defineCommand({
 	name: ["ping"],
 	description: "Pong!",
 
 	trackUpdates: true, // allow deleting
 
-	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.ping_command),
+	preRun: context => permissionsGuard(context, utilConfigStore, permissions => permissions.ping_command),
 	async run(context) {
 		const baseResponse = `${icons.info} Gateway: **${context.shard.latency}ms**`;
 		const preRespond = Date.now();

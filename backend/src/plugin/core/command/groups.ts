@@ -1,14 +1,15 @@
-import { fetchMemberCached } from "#discord/common/cachedRequest.ts";
-import { formatRESTError, formatUserBold } from "#discord/common/format.ts";
-import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#discord/common/markdown.ts";
-import { coreConfig as coreConfigCache } from "#plugin/core/index.ts";
-import { defineCommand, OptionType } from "#plugin/core/public/command.ts";
+import { fetchMemberCached } from "#common/discord/cachedRequest.ts";
+import { formatRESTError, formatUserBold } from "#common/discord/format.ts";
+import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
+import { coreConfigStore as coreConfigCache } from "#plugin/core/index.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 
-export const groupsCommand = defineCommand({
+export default defineCommand({
 	name: ["groups"],
 	description: "View the groups a user is in.",
 	trackUpdates: true,

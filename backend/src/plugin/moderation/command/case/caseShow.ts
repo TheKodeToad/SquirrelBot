@@ -1,12 +1,13 @@
 import { getCase } from "#db/moderation/cases.ts";
-import { OptionType, defineCommand } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { formatCaseDescription, formatCaseFields } from "#plugin/moderation/helper/format.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 
-export const caseShowCommand = defineCommand({
+export default defineCommand({
 	name: ["caseshow", "case", "showcase"],
 	description: "Show details of a specific moderation case",
 
@@ -20,7 +21,7 @@ export const caseShowCommand = defineCommand({
 	},
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.case_read),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_read),
 	async run(context, { number }) {
 		const info = await getCase(context.guild.id, number);
 

@@ -1,13 +1,19 @@
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#db/core/guildInfo.ts";
 import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
-import { defineEventListener } from "#plugin/core/public/eventListener.ts";
+import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
+import type { Guild, JSONGuild } from "oceanic.js";
 
 type Listener = (guildID: string) => unknown;
 
 const allowedGuilds: Set<string> = new Set;
 const grantListeners: Listener[] = [];
 const revokeListeners: Listener[] = [];
+
+export default [
+	onBotEvent({ type: "guildCreate", listener: handleCreate }),
+	onBotEvent({ type: "guildUpdate", listener: handleUpdate }),
+];
 
 export async function initGuildInfo(): Promise<void> {
 	const guildsInfo = await getAllGuildInfo();
@@ -59,6 +65,28 @@ export async function initGuildInfo(): Promise<void> {
 		);
 	}
 }
+
+async function handleCreate(guild: Guild): Promise<void> {
+	if (isGuildAllowed(guild.id))
+		await updateGuildInfo(guild.id, guild.name, guild.icon, guild.ownerID);
+}
+
+async function handleUpdate(guild: Guild, oldGuild: JSONGuild | null): Promise<void> {
+	if (oldGuild === null)
+		return;
+
+	if (!isGuildAllowed(guild.id))
+		return;
+
+	if (oldGuild.name === guild.name
+		&& oldGuild.icon === guild.icon
+		&& oldGuild.ownerID === guild.ownerID) {
+		return;
+	}
+
+	await updateGuildInfo(guild.id, guild.name, guild.icon, guild.ownerID);
+}
+
 
 export function isGuildAllowed(id: string): boolean {
 	return allowedGuilds.has(id) || BOT_ALLOWED_GUILDS.includes(id);
@@ -124,25 +152,4 @@ export async function revokeAccess(id: string): Promise<false | true | Date> {
 		return date ?? false;
 	}
 }
-
-export const guildInfoSyncGuildCreateHandler = defineEventListener("guildCreate", async guild => {
-	if (isGuildAllowed(guild.id))
-		await updateGuildInfo(guild.id, guild.name, guild.icon, guild.ownerID);
-});
-
-export const guildInfoSyncGuildUpdateHandler = defineEventListener("guildUpdate", async (guild, oldGuild) => {
-	if (oldGuild === null)
-		return;
-
-	if (!isGuildAllowed(guild.id))
-		return;
-
-	if (oldGuild.name === guild.name
-		&& oldGuild.icon === guild.icon
-		&& oldGuild.ownerID === guild.ownerID) {
-		return;
-	}
-
-	await updateGuildInfo(guild.id, guild.name, guild.icon, guild.ownerID);
-});
 

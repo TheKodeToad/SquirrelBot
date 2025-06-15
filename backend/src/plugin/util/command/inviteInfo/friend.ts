@@ -1,5 +1,5 @@
+import { formatUserTagRich } from "#common/discord/format.ts";
 import { dateToUnixSeconds } from "#common/time.ts";
-import { formatUserTagRich } from "#discord/common/format.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 import { type ContainerComponent, type User } from "oceanic.js";
 

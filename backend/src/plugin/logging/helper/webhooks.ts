@@ -1,5 +1,5 @@
+import { isThreadChannel } from "#common/discord/general.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#db/logger/webhooks.ts";
-import { isThreadChannel } from "#discord/common/general.ts";
 import { bot } from "#discord/index.ts";
 import AsyncLock from "async-lock";
 import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";

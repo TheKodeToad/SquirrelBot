@@ -1,5 +1,5 @@
 import { OptionType, type Command, type Option } from "#plugin/core/public/command.ts";
-import { getPlugins } from "#plugin/registry.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 
 export interface CommandCacheEntry {
 	command: Command;
@@ -10,35 +10,44 @@ export interface CommandCacheEntry {
 }
 
 const all: CommandCacheEntry[] = [];
-const lookup: Map<string, CommandCacheEntry> = new Map;
+const byName: Map<string, CommandCacheEntry> = new Map;
+const byPlugin: Map<string, CommandCacheEntry[]> = new Map;
 
 export function getCommands(): CommandCacheEntry[] {
 	return all;
 }
 
 export function getCommandByName(name: string): CommandCacheEntry | undefined {
-	return lookup.get(name);
+	return byName.get(name);
+}
+
+export function getCommandsByPlugin(name: string): CommandCacheEntry[] | undefined {
+	return byPlugin.get(name);
 }
 
 export function initCommandCache(): void {
-	for (const plugin of getPlugins()) {
-		if (plugin.commands === undefined)
-			continue;
+	for (const [plugin, command] of defineCommand.contributedValues) {
+		const entry = makeCacheEntry(command);
 
-		for (const command of plugin.commands) {
-			const entry = makeCacheEntry(command);
+		for (const name of command.name) {
+			const nameLower = name.toLowerCase();
 
-			for (const name of command.name) {
-				const nameLower = name.toLowerCase();
+			if (byName.has(nameLower))
+				throw new Error(`Conflicting commands with name ${name}!`);
 
-				if (lookup.has(nameLower))
-					throw new Error(`Conflicting commands with name ${name}!`);
-
-				lookup.set(name.toLowerCase(), entry);
-			}
-
-			all.push(entry);
+			byName.set(name.toLowerCase(), entry);
 		}
+
+		let pluginCommands = byPlugin.get(plugin.name);
+
+		if (pluginCommands === undefined) {
+			pluginCommands = [];
+			byPlugin.set(plugin.name, pluginCommands);
+		}
+
+		pluginCommands.push(entry);
+
+		all.push(entry);
 	}
 }
 

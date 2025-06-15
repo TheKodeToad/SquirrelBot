@@ -1,11 +1,13 @@
+import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import type { Reminder } from "#db/reminders/reminders.ts";
-import { debugFormatGuildByID } from "#discord/common/debugFormat.ts";
-import { ConfigStore } from "#plugin/core/public/config.ts";
-import { definePlugin } from "#plugin/index.ts";
-import { remindCommand } from "#plugin/reminders/command/remind.ts";
-import { reminderListCommand } from "#plugin/reminders/command/reminderList.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
+import { definePlugin } from "#loader/plugin.ts";
+import { ConfigStore } from "#plugin/core/public/configStore.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
+import remind from "#plugin/reminders/command/remind.ts";
+import reminderList from "#plugin/reminders/command/reminderList.ts";
+import { RemindersConfig } from "#plugin/reminders/config.ts";
 import { beginPollingReminders } from "#plugin/reminders/scheduler.ts";
-import { RemindersConfig } from "#schema/plugin/reminder.ts";
 
 const defaultConfig = `enabled = false
 
@@ -18,19 +20,22 @@ const defaultConfig = `enabled = false
 # in_group = ["moderator"]
 `;
 
-export const remindersConfig = new ConfigStore(RemindersConfig);
+export const remindersConfigStore = new ConfigStore(RemindersConfig);
 
 export default definePlugin({
 	id: "reminders",
 	name: "Reminders",
 	description: "Set reminders for yourself.",
 
-	config: { store: remindersConfig, defaultValue: defaultConfig },
-	commands: [remindCommand, reminderListCommand],
+	contributions: [
+		defineConfig({
+			store: remindersConfigStore,
+			defaultValue: defaultConfig,
+		}),
+		onBotInit(beginPollingReminders),
 
-	async apply() {
-		await beginPollingReminders();
-	},
+		remind, reminderList,
+	],
 });
 
 export function debugFormatReminder(reminder: Reminder): string {

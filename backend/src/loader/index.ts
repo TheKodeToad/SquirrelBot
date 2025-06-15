@@ -1,16 +1,17 @@
-import type { Plugin } from "#plugin/index.ts";
+import type { Plugin } from "#loader/plugin.ts";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 let plugins: Map<string, Plugin> | null = null;
 
-export async function importPlugins(): Promise<void> {
+export async function loadPlugins(): Promise<void> {
 	if (plugins !== null)
-		throw new Error("Plugins already imported");
+		throw new Error("Plugins already loaded");
 
 	plugins = new Map;
 
-	const entries = await readdir(import.meta.dirname, { withFileTypes: true });
+	const pluginDir = path.join(import.meta.dirname, "..", "plugin");
+	const entries = await readdir(pluginDir, { withFileTypes: true });
 
 	entries.sort((a, b) => {
 		if (a.name < b.name)
@@ -29,13 +30,24 @@ export async function importPlugins(): Promise<void> {
 		const index = path.join(entry.parentPath, entry.name, "index.ts");
 		const { default: plugin } = await import(index) as { default: Plugin; };
 
+		initPlugin(plugin);
+
 		plugins.set(plugin.id, plugin);
 	}
+
+	if (plugins.size === 0)
+		throw new Error("No plugins?? Something's wrong");
+}
+
+function initPlugin(plugin: Plugin): void {
+	if (plugin.contributions !== undefined)
+		for (const contribution of plugin.contributions)
+			contribution(plugin);
 }
 
 function pluginsMap(): Map<string, Plugin> {
 	if (plugins === null)
-		throw new Error("importPlugins not called");
+		throw new Error("Plugins not loaded");
 
 	return plugins;
 }

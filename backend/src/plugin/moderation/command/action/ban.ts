@@ -1,14 +1,15 @@
+import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { HOUR } from "#common/time.ts";
 import { CaseType } from "#db/moderation/cases.ts";
-import { escapeMarkdown } from "#discord/common/markdown.ts";
-import { OptionType, defineCommand } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { doBulkAction } from "#plugin/moderation/helper/bulkAction.ts";
 import { formatBulkError, formatBulkSuccess } from "#plugin/moderation/helper/format.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 
-export const banCommand = defineCommand({
+export default defineCommand({
 	name: ["ban"],
 	description: "Ban a user from the server.",
 
@@ -38,7 +39,7 @@ export const banCommand = defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.ban),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.ban),
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage

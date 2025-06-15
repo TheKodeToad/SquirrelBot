@@ -1,14 +1,15 @@
+import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
+import { formatRESTError, formatUserBold } from "#common/discord/format.ts";
+import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { CaseType, createCase } from "#db/moderation/cases.ts";
-import { fetchUserCachedSupressed } from "#discord/common/cachedRequest.ts";
-import { formatRESTError, formatUserBold } from "#discord/common/format.ts";
-import { escapeMarkdown } from "#discord/common/markdown.ts";
-import { OptionType, defineCommand } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { DiscordRESTError, JSONErrorCodes, User, type Uncached } from "oceanic.js";
 
-export const unbanCommand = defineCommand({
+export default defineCommand({
 	name: ["unban"],
 	description: "Remove a ban on a user.",
 
@@ -27,7 +28,7 @@ export const unbanCommand = defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.unban),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.unban),
 	async run(context, args) {
 		const successful: { user: User; caseNumber: number; }[] = [];
 		const unsuccessful: { user: User | Uncached; error: string; }[] = [];

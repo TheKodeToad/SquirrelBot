@@ -1,9 +1,11 @@
-import { ConfigStore } from "#plugin/core/public/config.ts";
-import { definePlugin } from "#plugin/index.ts";
-import { beginMessageCleanupLoop, messageLoggerCreateListener, messageLoggerDeleteListener, messageLoggerUpdateListener } from "#plugin/logging/logger/messageLogger.ts";
-import { LogginConfig } from "#schema/plugin/logging.ts";
+import { onBotPreInit } from "#discord/extensionPoints.ts";
+import { definePlugin } from "#loader/plugin.ts";
+import { ConfigStore } from "#plugin/core/public/configStore.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
+import { LoggingConfig } from "#plugin/logging/config.ts";
+import messageLogger, { beginMessageCleanupLoop } from "#plugin/logging/logger/messageLogger.ts";
 
-export const loggingConfig = new ConfigStore(LogginConfig);
+export const loggingConfigStore = new ConfigStore(LoggingConfig);
 
 const defaultConfig = `enabled = false
 
@@ -18,10 +20,13 @@ export default definePlugin({
 	name: "Logging",
 	description: "Log server events.",
 
-	config: { store: loggingConfig, defaultValue: defaultConfig },
-	listeners: [messageLoggerCreateListener, messageLoggerUpdateListener, messageLoggerDeleteListener],
+	contributions: [
+		defineConfig({
+			store: loggingConfigStore,
+			defaultValue: defaultConfig,
+		}),
+		onBotPreInit(() => beginMessageCleanupLoop()),
 
-	async apply() {
-		await beginMessageCleanupLoop();
-	},
+		...messageLogger,
+	],
 });

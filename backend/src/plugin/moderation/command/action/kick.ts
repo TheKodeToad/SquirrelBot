@@ -1,14 +1,15 @@
+import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { CaseType } from "#db/moderation/cases.ts";
-import { escapeMarkdown } from "#discord/common/markdown.ts";
-import { OptionType, defineCommand } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { doBulkAction } from "#plugin/moderation/helper/bulkAction.ts";
 import { formatBulkError, formatBulkSuccess } from "#plugin/moderation/helper/format.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import type { CreateMessageOptions } from "oceanic.js";
 
-export const kickCommand = defineCommand({
+export default defineCommand({
 	name: ["kick"],
 	description: "Remove a member from the server.",
 
@@ -33,7 +34,7 @@ export const kickCommand = defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.kick),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.kick),
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage: CreateMessageOptions | undefined =

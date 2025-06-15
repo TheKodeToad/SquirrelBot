@@ -2,10 +2,6 @@ import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member,
 
 type NameList = [string, ...string[]];
 
-export function defineCommand<O extends Record<string, Option>, D extends {}>(command: Command<O, D>): Command<O, D> {
-	return command;
-}
-
 export interface Command<O extends Record<string, Option> = Record<string, Option>, D extends {} = {}> {
 	name: NameList;
 	description?: string;

@@ -1,4 +1,4 @@
-import { isTextableGuildChannel, isThreadChannel } from "#discord/common/general.ts";
+import { isTextableGuildChannel, isThreadChannel } from "#common/discord/general.ts";
 import { bot } from "#discord/index.ts";
 import { type AnyTextableGuildChannel, type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User } from "oceanic.js";
 

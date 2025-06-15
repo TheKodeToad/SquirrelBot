@@ -1,13 +1,14 @@
 import { dateToUnixSeconds } from "#common/time.ts";
 import { createReminder } from "#db/reminders/reminders.ts";
-import { defineCommand, OptionType } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { remindersConfig } from "#plugin/reminders/index.ts";
+import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { trackNewReminder } from "#plugin/reminders/scheduler.ts";
 import { MessageFlags } from "oceanic.js";
 
-export const remindCommand = defineCommand({
+export default defineCommand({
 	description: "Set a personal reminder after the specified amount of time.",
 	name: ["remindme", "reminderset", "remind", "reminder"],
 
@@ -26,7 +27,7 @@ export const remindCommand = defineCommand({
 		}
 	},
 
-	preRun: (context) => permissionsGuard(context, remindersConfig, permissions => permissions.personal_reminders),
+	preRun: (context) => permissionsGuard(context, remindersConfigStore, permissions => permissions.personal_reminders),
 	async run(context, args) {
 		if (context.guild === null)
 			return;

@@ -1,12 +1,13 @@
 import { renderCommandListPage, renderCommandListPageMinimal } from "#plugin/core/command/help/list.ts";
 import { renderCommandPage } from "#plugin/core/command/help/show.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
-import { coreConfig } from "#plugin/core/index.ts";
-import { defineCommand, OptionType } from "#plugin/core/public/command.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 
-export const helpCommand = defineCommand({
+export default defineCommand({
 	name: ["help"],
 	description: "View available commands and prefixed usage information.",
 	trackUpdates: true,
@@ -19,7 +20,7 @@ export const helpCommand = defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, coreConfig, permissions => permissions.help_command),
+	preRun: context => permissionsGuard(context, coreConfigStore, permissions => permissions.help_command),
 	async run(context, args) {
 		if (args.command !== null) {
 			const command = getCommandByName(args.command);

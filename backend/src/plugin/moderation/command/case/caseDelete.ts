@@ -1,10 +1,11 @@
 import { deleteCase } from "#db/moderation/cases.ts";
-import { defineCommand, OptionType } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { moderationConfig } from "#plugin/moderation/index.ts";
+import { moderationConfigStore } from "#plugin/moderation/index.ts";
 
-export const deleteCaseCommand = defineCommand({
+export default defineCommand({
 	name: ["casedelete", "casedel", "caserm", "deletecase", "delcase", "rmcase"],
 	description: "Delete a recorded moderation case.",
 
@@ -17,7 +18,7 @@ export const deleteCaseCommand = defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfig, permissions => permissions.case_delete),
+	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_delete),
 	async run(context, { number }) {
 		const deleted = await deleteCase(context.guild.id, number);
 

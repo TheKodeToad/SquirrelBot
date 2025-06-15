@@ -1,21 +1,22 @@
+import { formatRESTError } from "#common/discord/format.ts";
+import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { formatRESTError } from "#discord/common/format.ts";
-import { escapeMarkdown } from "#discord/common/markdown.ts";
 import { bot } from "#discord/index.ts";
-import { defineCommand, OptionType } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { renderFriendInvite } from "#plugin/util/command/inviteInfo/friend.ts";
 import { renderGroupDMInvite } from "#plugin/util/command/inviteInfo/groupDM.ts";
 import { renderGuildInvite } from "#plugin/util/command/inviteInfo/guild.ts";
-import { utilConfig } from "#plugin/util/index.ts";
+import { utilConfigStore } from "#plugin/util/index.ts";
 import { DiscordRESTError, InviteTypes, JSONErrorCodes, type ContainerComponent } from "oceanic.js";
 
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 
 const logger = moduleLogger();
 
-export const inviteInfoCommand = defineCommand({
+export default defineCommand({
 	name: ["inviteinfo", "invite", "invinfo", "inv"],
 	description: "Display information about a Discord invite by passing in the code or link.",
 
@@ -35,7 +36,7 @@ export const inviteInfoCommand = defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, utilConfig, permissions => permissions.invite_info_command),
+	preRun: context => permissionsGuard(context, utilConfigStore, permissions => permissions.invite_info_command),
 	async run(context, args) {
 		const matches = REGEX.exec(args.link);
 

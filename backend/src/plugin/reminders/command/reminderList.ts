@@ -1,20 +1,21 @@
 import { dateToUnixSeconds } from "#common/time.ts";
 import { getReminders, type Reminder } from "#db/reminders/reminders.ts";
-import { defineCommand, type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import { type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
-import { remindersConfig } from "#plugin/reminders/index.ts";
+import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { Container, Text } from "oceanic-component-helper";
 
-export const reminderListCommand = defineCommand({
+export default defineCommand({
 	name: ["reminderlist", "reminders", "listreminders"],
 	description: "List and filter reminders.",
 
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, remindersConfig, permissions => permissions.personal_reminders),
+	preRun: context => permissionsGuard(context, remindersConfigStore, permissions => permissions.personal_reminders),
 	async run(context) {
 		await respondWithPaginator<Reminder, Date>(
 			context,
@@ -29,7 +30,7 @@ export const reminderListCommand = defineCommand({
 });
 
 async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>): Promise<Reminder[]> {
-	const config = remindersConfig.get(context.guild.id);
+	const config = remindersConfigStore.get(context.guild.id);
 
 	if (config === undefined)
 		return [];

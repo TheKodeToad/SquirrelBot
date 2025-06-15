@@ -1,5 +1,5 @@
-import { Snowflake } from "#schema/common/general.ts";
-import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
+import { Snowflake } from "#common/schema/general.ts";
+import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import type { InferOutput } from "valibot";
 import { array, boolean, number, object, optional, pipe, rawTransform, record, string } from "valibot";
 

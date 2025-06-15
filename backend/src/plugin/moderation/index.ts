@@ -1,17 +1,18 @@
-import { ConfigStore } from "#plugin/core/public/config.ts";
-import { definePlugin } from "#plugin/index.ts";
-import { banCommand } from "#plugin/moderation/command/action/ban.ts";
-import { kickCommand } from "#plugin/moderation/command/action/kick.ts";
-import { timeoutCommand } from "#plugin/moderation/command/action/timeout.ts";
-import { unbanCommand } from "#plugin/moderation/command/action/unban.ts";
-import { warnCommand } from "#plugin/moderation/command/action/warn.ts";
-import { deleteCaseCommand } from "#plugin/moderation/command/case/caseDelete.ts";
-import { caseListCommand } from "#plugin/moderation/command/case/caseList.ts";
-import { caseShowCommand } from "#plugin/moderation/command/case/caseShow.ts";
-import { purgeCommand } from "#plugin/moderation/command/util/purge.ts";
+import { definePlugin } from "#loader/plugin.ts";
+import { ConfigStore } from "#plugin/core/public/configStore.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
+import ban from "#plugin/moderation/command/action/ban.ts";
+import kick from "#plugin/moderation/command/action/kick.ts";
+import timeout from "#plugin/moderation/command/action/timeout.ts";
+import unban from "#plugin/moderation/command/action/unban.ts";
+import warn from "#plugin/moderation/command/action/warn.ts";
+import caseDelete from "#plugin/moderation/command/case/caseDelete.ts";
+import caseList from "#plugin/moderation/command/case/caseList.ts";
+import caseShow from "#plugin/moderation/command/case/caseShow.ts";
+import purge from "#plugin/moderation/command/util/purge.ts";
 import { ModerationConfig } from "#schema/plugin/moderation.ts";
 
-export const moderationConfig = new ConfigStore(ModerationConfig);
+export const moderationConfigStore = new ConfigStore(ModerationConfig);
 
 const defaultConfig = `enabled = false
 
@@ -33,16 +34,12 @@ export default definePlugin({
 	name: "Moderation",
 	description: "Perform and record moderation actions.",
 
-	config: { store: moderationConfig, defaultValue: defaultConfig },
-	commands: [
-		banCommand,
-		unbanCommand,
-		kickCommand,
-		timeoutCommand,
-		warnCommand,
-		purgeCommand,
-		caseShowCommand,
-		deleteCaseCommand,
-		caseListCommand,
-	],
+	contributions: [
+		defineConfig({
+			store: moderationConfigStore,
+			defaultValue: defaultConfig,
+		}),
+
+		ban, unban, kick, timeout, warn, purge, caseShow, caseDelete, caseList,
+	]
 });

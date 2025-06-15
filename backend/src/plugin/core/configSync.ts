@@ -1,12 +1,13 @@
+import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { mapIterable } from "#common/iterators.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { getGuildConfig, insertGuildConfig } from "#db/core/configs.ts";
 import { addChannelListener } from "#db/notification.ts";
-import { debugFormatGuildByID } from "#discord/common/debugFormat.ts";
+import { getPlugin } from "#loader/index.ts";
+import { CoreConfig } from "#plugin/core/config.ts";
 import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds, isGuildAllowed } from "#plugin/core/guildInfoSync.ts";
-import type { ConfigStore } from "#plugin/core/public/config.ts";
-import { getPlugin, getPlugins } from "#plugin/registry.ts";
-import { CoreConfig } from "#schema/plugin/core.ts";
+import type { ConfigStore } from "#plugin/core/public/configStore.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { parse, safeParse, type InferInput } from "valibot";
@@ -21,7 +22,6 @@ export async function initConfigs(): Promise<void> {
 }
 
 const configUpdateLock = new AsyncLock;
-
 
 function formatPluginInGuild(pluginID: string, guildID: string): string {
 	return `#${pluginID} in ${debugFormatGuildByID(guildID)}`;
@@ -64,45 +64,46 @@ async function installConfigChangeListener(): Promise<void> {
 			return;
 		}
 
+		// TODO: don't lock all configs for each guild at a time
 		await configUpdateLock.acquire(guildID, async () => {
 			const plugin = getPlugin(key);
 
-			if (plugin === undefined || plugin.config === undefined) {
-				logger.debug?.(`Ignoring configUpdate for plugin '${key}'`);
+			if (plugin === undefined) {
+				logger.warn?.(`Received configUpdate for plugin #${key} which does not exist`);
+				return;
+			}
+
+			const config = defineConfig.contributions.get(plugin);
+
+			if (config === undefined) {
+				logger.warn?.(`Received configUpdate for plugin #${key} which does not have a config`);
 				return;
 			}
 
 			logger.debug?.(`Updating config for plugin ${formatPluginInGuild(key, guildID)}`);
 
-			await loadConfig(guildID, plugin.id, plugin.config.store);
+			await loadConfig(guildID, plugin.id, config.store);
 		});
 	});
 }
 
 async function createAndLoadConfigs(guildID: string): Promise<void> {
 	await configUpdateLock.acquire(guildID, async () => {
-		for (const plugin of getPlugins()) {
-			if (plugin.config === undefined)
-				continue;
-
-			const inserted = await insertGuildConfig(guildID, plugin.id, plugin.config.defaultValue);
+		for (const [plugin, config] of defineConfig.contributions) {
+			const inserted = await insertGuildConfig(guildID, plugin.id, config.defaultValue);
 
 			if (inserted)
 				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(guildID)}`);
 
-			await loadConfig(guildID, plugin.id, plugin.config.store);
+			await loadConfig(guildID, plugin.id, config.store);
 		}
 	});
 }
 
 async function unloadConfigs(guildID: string): Promise<void> {
 	await configUpdateLock.acquire(guildID, () => {
-		for (const plugin of getPlugins()) {
-			if (plugin.config === undefined)
-				return;
-
-			plugin.config.store.delete(guildID);
-		}
+		for (const config of defineConfig.contributions.values())
+			config.store.delete(guildID);
 	});
 }
 

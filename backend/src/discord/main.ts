@@ -2,9 +2,10 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { pool } from "#db/index.ts";
 import { checkMigrationsOrExit } from "#db/migration.ts";
 import { connectChannelListener, disconnectChannelListener } from "#db/notification.ts";
+import { onBotInit, onBotPostInit, onBotPreInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
-import { getPluginCount, getPlugins, importPlugins } from "#plugin/registry.ts";
+import { getPluginCount, getPluginIDs, loadPlugins } from "#loader/index.ts";
 import { mkdir } from "node:fs/promises";
 
 const logger = moduleLogger();
@@ -19,10 +20,18 @@ bot.once("ready", async () => {
 
 		logger.info?.("Starting up plugins");
 
-		await importPlugins();
+		await loadPlugins();
 
-		for (const plugin of getPlugins())
-			await plugin.apply?.();
+		logger.debug?.(`Plugins (${getPluginCount()}):`, [...getPluginIDs()].map(id => "- " + id).join("\n"));
+
+		logger.debug?.("Firing pre-init...");
+		await Promise.all(onBotPreInit.contributions.map(listener => listener()));
+
+		logger.debug?.("Firing init...");
+		await Promise.all(onBotInit.contributions.map(listener => listener()));
+
+		logger.debug?.("Firing post-init...");
+		await Promise.all(onBotPostInit.contributions.map(listener => listener()));
 
 		logger.info?.(`Total plugins: ${getPluginCount()}`);
 		logger.info?.("I'm ready :O");

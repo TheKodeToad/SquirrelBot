@@ -1,6 +1,6 @@
-import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#discord/common/markdown.ts";
+import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import type { CommandCacheEntry } from "#plugin/core/commandEngine/commandCache.ts";
-import { coreConfig } from "#plugin/core/index.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
 import { type ReplyObject } from "#plugin/core/public/command.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 
@@ -15,7 +15,7 @@ export function renderCommandPage(guildID: string, entry: CommandCacheEntry): Re
 	if (command.supportPrefix ?? true) {
 		container.components.push(Divider());
 
-		const prefix = coreConfig.get(guildID)?.prefix_commands.prefix ?? "";
+		const prefix = coreConfigStore.get(guildID)?.prefix_commands.prefix ?? "";
 
 		let content = "**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage);
 

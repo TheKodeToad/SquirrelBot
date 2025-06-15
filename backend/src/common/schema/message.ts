@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { HexColor, Snowflake } from "#common/schema/general.ts";
+import { template } from "#common/schema/template.ts";
 import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
-import { HexColor, Snowflake } from "#schema/common/general.ts";
-import { template } from "#schema/common/template.ts";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type BaseIssue, type BaseSchema, type InferOutput } from "valibot";

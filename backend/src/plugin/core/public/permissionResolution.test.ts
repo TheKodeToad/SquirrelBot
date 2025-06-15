@@ -1,22 +1,22 @@
-import { mockMember } from "#discord/common/testing/mockMember.ts";
-import { DUMMY_GUILD, mockSnowflake } from "#discord/common/testing/mockSnowflake.ts";
-import { coreConfig } from "#plugin/core/index.ts";
+import { mockMember } from "#common/discord/testing/mockMember.ts";
+import { DUMMY_GUILD, mockSnowflake } from "#common/discord/testing/mockSnowflake.ts";
+import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
+import type { CoreConfig } from "#plugin/core/config.ts";
+import { coreConfigStore } from "#plugin/core/index.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
-import { PermissionsFilter } from "#schema/common/permissionsFilter.ts";
-import type { CoreConfig } from "#schema/plugin/core.ts";
 import assert from "assert";
 import { suite, test } from "node:test";
 import { parse as parseTOML } from "smol-toml";
 import { array, object, parse, type InferOutput } from "valibot";
 
 function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): T {
-	const parsed = parse(coreConfig.schema, parseTOML(value));
+	const parsed = parse(coreConfigStore.schema, parseTOML(value));
 
-	coreConfig.set(DUMMY_GUILD, parsed);
+	coreConfigStore.set(DUMMY_GUILD, parsed);
 
 	const result = callback(parsed);
 
-	coreConfig.delete(DUMMY_GUILD);
+	coreConfigStore.delete(DUMMY_GUILD);
 
 	return result;
 }
