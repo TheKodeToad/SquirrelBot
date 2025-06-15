@@ -1,8 +1,8 @@
-import { formatUser, formatUserBold } from "#bot/common/discord/format.ts";
-import { escapeMarkdown, makeMarkdownInlineCodeblock, makeMarkdownMultilineCodeblock, makeMarkdownQuote } from "#bot/common/discord/markdown.ts";
 import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType, type GuildParameter, type ParameterRecord, type UserParameter } from "#common/template/index.ts";
 import { TokenType, type Token } from "#common/template/parsing.ts";
 import { dateToUnixSeconds, humanizeDuration } from "#common/time.ts";
+import { formatUser, formatUserBold } from "#discord/common/format.ts";
+import { escapeMarkdown, makeMarkdownInlineCodeblock, makeMarkdownMultilineCodeblock, makeMarkdownQuote } from "#discord/common/markdown.ts";
 
 export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 	let result = "";

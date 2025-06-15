@@ -6,7 +6,7 @@
 	},
 	"scripts": {
 		"lint": "eslint && tsc",
-		"bot": "pnpm run _node src/bot/main.ts",
+		"bot": "pnpm run _node src/discord/main.ts",
 		"http": "pnpm run _node src/http/main.ts",
 		"migrate": "pnpm run _node src/db/main.ts migrate --",
 		"check-migrations": "pnpm run _node src/db/main.ts check --",
