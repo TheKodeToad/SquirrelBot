@@ -2,6 +2,7 @@ import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { requireExhaustiveSwitch } from "#common/types.ts";
 import { CACHE_PATH } from "#environment.ts";
+import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { getCommandByName, getCommands } from "#plugin/core/discord/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/discord/commandEngine/handler/componentHandler.ts";
@@ -21,6 +22,7 @@ import path from "path";
 const logger = moduleLogger();
 
 export default [
+	onBotPreInit(syncSlashCommands),
 	onBotEvent({ type: "interactionCreate", listener: handle }),
 ];
 
@@ -90,7 +92,7 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 
 const PLACEHOLDER_DESCRIPTION = "No description provided.";
 
-export async function syncSlashCommands(): Promise<void> {
+async function syncSlashCommands(): Promise<void> {
 	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(({ command }) => {
 		const options: ApplicationCommandOptions[] = [];
 

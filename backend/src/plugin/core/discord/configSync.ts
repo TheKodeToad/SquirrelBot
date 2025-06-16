@@ -3,7 +3,7 @@ import { mapIterable } from "#common/iterators.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { getPlugin } from "#loader/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
-import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds, isGuildAllowed } from "#plugin/core/discord/guildInfoSync.ts";
+import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/discord/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
 import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
@@ -14,10 +14,14 @@ import { parse, safeParse, type InferInput } from "valibot";
 
 const logger = moduleLogger();
 
-export async function initConfigs(): Promise<void> {
+export default [
+	onGuildInfoReady(init),
+	onGuildAccessGranted(createAndLoadConfigs),
+	onGuildAccessRevoked(unloadConfigs),
+];
+
+async function init(): Promise<void> {
 	await Promise.all(mapIterable(getAllowedGuilds(), createAndLoadConfigs));
-	addGrantAccessListener(createAndLoadConfigs);
-	addRevokeAccessListener(unloadConfigs);
 	await installConfigChangeListener();
 }
 

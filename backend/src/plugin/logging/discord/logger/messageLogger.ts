@@ -2,6 +2,7 @@ import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.t
 import { colors } from "#common/discord/colors.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
 import { isEventConfigEnabled } from "#plugin/logging/discord/helper/config.ts";
@@ -16,10 +17,23 @@ const MESSAGE_CLEANUP_INTERVAL = 30 * MINUTE;
 const MESSAGE_CLEANUP_THRESHOLD = 6 * HOUR;
 
 export default [
+	onBotInit(beginMessageCleanupLoop),
 	onBotEvent({ type: "messageCreate", listener: handleCreate }),
 	onBotEvent({ type: "messageUpdate", listener: handleUpdate }),
 	onBotEvent({ type: "messageDelete", listener: handleDelete }),
 ];
+
+export async function beginMessageCleanupLoop(): Promise<void> {
+	try {
+		logger.debug?.("Cleaning up old message cache entries");
+
+		const deletedCount = await cleanUpMessageCacheEntries(new Date(Date.now() - MESSAGE_CLEANUP_THRESHOLD));
+
+		logger.debug?.(`Deleted ${deletedCount} message cache entries`);
+	} finally {
+		setTimeout(beginMessageCleanupLoop, MESSAGE_CLEANUP_INTERVAL).unref();
+	}
+}
 
 async function handleCreate(message: Message): Promise<void> {
 	if (message.guildID === null)
@@ -134,16 +148,4 @@ async function handleDelete(message: Message): Promise<void> {
 		});
 	}
 
-}
-
-export async function beginMessageCleanupLoop(): Promise<void> {
-	try {
-		logger.debug?.("Cleaning up old message cache entries");
-
-		const deletedCount = await cleanUpMessageCacheEntries(new Date(Date.now() - MESSAGE_CLEANUP_THRESHOLD));
-
-		logger.debug?.(`Deleted ${deletedCount} message cache entries`);
-	} finally {
-		setTimeout(beginMessageCleanupLoop, MESSAGE_CLEANUP_INTERVAL).unref();
-	}
 }

@@ -1,7 +1,10 @@
+import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { icons } from "#plugin/core/public/discord/icons.ts";
 
-export async function initIcons(): Promise<void> {
+export default [onBotPreInit(init)];
+
+async function init(): Promise<void> {
 	const emojis = await bot.application.getEmojis();
 	for (const emoji of emojis.items)
 		if (Object.hasOwn(icons, emoji.name))

@@ -1,21 +1,24 @@
 import { moduleLogger } from "#common/logger/index.ts";
-import { onBotPostInit, onBotPreInit } from "#interface/discord/extensionPoints.ts";
+import { onBotPostInit } from "#interface/discord/extensionPoints.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import about from "#plugin/core/discord/command/about.ts";
 import access from "#plugin/core/discord/command/access.ts";
 import groups from "#plugin/core/discord/command/groups.ts";
 import help from "#plugin/core/discord/command/help/index.ts";
-import { initCommandCache } from "#plugin/core/discord/commandEngine/commandCache.ts";
 import componentHandler from "#plugin/core/discord/commandEngine/handler/componentHandler.ts";
 import prefixHandler from "#plugin/core/discord/commandEngine/handler/prefixHandler.ts";
-import slashHandler, { syncSlashCommands } from "#plugin/core/discord/commandEngine/handler/slashHandler.ts";
-import { initConfigs } from "#plugin/core/discord/configSync.ts";
+import slashHandler from "#plugin/core/discord/commandEngine/handler/slashHandler.ts";
+import configSync from "#plugin/core/discord/configSync.ts";
 import { installWrappedListener } from "#plugin/core/discord/eventWrapper.ts";
-import guildInfoSync, { initGuildInfo } from "#plugin/core/discord/guildInfoSync.ts";
-import { initIcons } from "#plugin/core/discord/iconSync.ts";
+import guildInfoSync from "#plugin/core/discord/guildInfoSync.ts";
+import iconSync from "#plugin/core/discord/iconSync.ts";
 import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import { defineConfig, onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
+
+const logger = moduleLogger();
+
+export const coreConfigStore = new ConfigStore(CoreConfig);
 
 const defaultConfig = `prefix_commands.prefix = "?" # Customize the prefix
 
@@ -32,10 +35,6 @@ const defaultConfig = `prefix_commands.prefix = "?" # Customize the prefix
 # prefix_commands = false
 # slash_commands = false`;
 
-export const coreConfigStore = new ConfigStore(CoreConfig);
-
-const logger = moduleLogger();
-
 export default definePlugin({
 	id: "core",
 	name: "Core",
@@ -46,32 +45,24 @@ export default definePlugin({
 			defaultValue: defaultConfig,
 			store: coreConfigStore,
 		}),
-		onBotPreInit(preInit),
-		onBotPostInit(postInit),
 
-		help, about, ...access, groups,
+		...guildInfoSync,
+		...configSync,
+		...iconSync,
 
 		...prefixHandler,
 		...slashHandler,
 		...componentHandler,
-		...guildInfoSync,
+
+		onBotPostInit(postInit),
+
+		help, about, ...access, groups,
 	],
 });
 
-async function preInit(): Promise<void> {
-	initCommandCache();
-
-	logger.debug?.("Initializing guild info");
-	await initGuildInfo();
-	logger.debug?.("Initializing configs");
-	await initConfigs();
-	logger.debug?.("Syncing slash commands");
-	await syncSlashCommands();
-	logger.debug?.("Initializing icons");
-	await initIcons();
-}
-
 function postInit(): void {
+	logger.debug?.("Installing onBotEvent listeners");
+
 	for (const listener of onBotEvent.contributions)
 		installWrappedListener(listener.type, listener.listener.bind(listener));
 }

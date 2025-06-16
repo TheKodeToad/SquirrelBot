@@ -1,9 +1,8 @@
-import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
 import { LoggingConfig } from "#plugin/logging/config.ts";
-import messageLogger, { beginMessageCleanupLoop } from "#plugin/logging/discord/logger/messageLogger.ts";
+import messageLogger from "#plugin/logging/discord/logger/messageLogger.ts";
 
 export const loggingConfigStore = new ConfigStore(LoggingConfig);
 
@@ -25,8 +24,6 @@ export default definePlugin({
 			store: loggingConfigStore,
 			defaultValue: defaultConfig,
 		}),
-		onBotPreInit(() => beginMessageCleanupLoop()),
-
 		...messageLogger,
 	],
 });

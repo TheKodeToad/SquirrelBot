@@ -4,6 +4,7 @@ import { isTextableChannel, isThreadChannelType } from "#common/discord/general.
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { dateToHMSString, dateToUnixSeconds } from "#common/time.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { icons } from "#plugin/core/public/discord/icons.ts";
 import { debugFormatReminder, remindersConfigStore } from "#plugin/reminders/index.ts";
@@ -16,7 +17,9 @@ const TIMEOUT_POLL_RATE = 60 * 1000;
 
 let nextExpiryStartTime = new Date(0);
 
-export async function beginPollingReminders(): Promise<void> {
+export default [onBotInit(beginPollingReminders)];
+
+async function beginPollingReminders(): Promise<void> {
 	await poll();
 	setInterval(poll, TIMEOUT_POLL_RATE).unref();
 }

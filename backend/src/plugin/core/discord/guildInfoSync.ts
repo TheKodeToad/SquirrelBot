@@ -1,21 +1,30 @@
+import { moduleLogger } from "#common/logger/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
+import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
+import { makeArrayExtensionPoint } from "#loader/extensionPoint.ts";
 import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";
 
-type Listener = (guildID: string) => unknown;
+const logger = moduleLogger();
 
 const allowedGuilds: Set<string> = new Set;
-const grantListeners: Listener[] = [];
-const revokeListeners: Listener[] = [];
+
+export type GuildAccessListener = (guildID: string) => void;
+export const onGuildAccessGranted = makeArrayExtensionPoint<GuildAccessListener>();
+export const onGuildAccessRevoked = makeArrayExtensionPoint<GuildAccessListener>();
+export const onGuildInfoReady = makeArrayExtensionPoint<() => Promise<void> | void>();
 
 export default [
+	onBotPreInit(init),
 	onBotEvent({ type: "guildCreate", listener: handleCreate }),
 	onBotEvent({ type: "guildUpdate", listener: handleUpdate }),
 ];
 
-export async function initGuildInfo(): Promise<void> {
+async function init(): Promise<void> {
+	logger.debug?.("Initializing guild info");
+
 	const guildsInfo = await getAllGuildInfo();
 	// guilds from env var, remove those which are already present
 	const missing = [...BOT_ALLOWED_GUILDS];
@@ -64,6 +73,9 @@ export async function initGuildInfo(): Promise<void> {
 			false,
 		);
 	}
+
+	// we do await these as we do want errors to interrupt startup
+	await Promise.all(onGuildInfoReady.contributions.map(listener => listener()));
 }
 
 async function handleCreate(guild: Guild): Promise<void> {
@@ -101,14 +113,6 @@ export function* getAllowedGuilds(): Generator<string> {
 		yield id;
 }
 
-export function addGrantAccessListener(listener: Listener): void {
-	grantListeners.push(listener);
-}
-
-export function addRevokeAccessListener(listener: Listener): void {
-	revokeListeners.push(listener);
-}
-
 export async function grantAccess(id: string): Promise<boolean> {
 	if (allowedGuilds.has(id))
 		return false;
@@ -128,7 +132,7 @@ export async function grantAccess(id: string): Promise<boolean> {
 	allowedGuilds.add(id);
 
 	if (!BOT_ALLOWED_GUILDS.includes(id))
-		for (const listeners of grantListeners)
+		for (const listeners of onGuildAccessGranted.contributions)
 			listeners(id);
 
 	return true;
@@ -146,7 +150,7 @@ export async function revokeAccess(id: string): Promise<false | true | Date> {
 		const date = await scheduleGuildInfoDeletion(id);
 		allowedGuilds.delete(id);
 
-		for (const listener of revokeListeners)
+		for (const listener of onGuildAccessRevoked.contributions)
 			listener(id);
 
 		return date ?? false;

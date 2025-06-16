@@ -1,12 +1,11 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
-import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
 import { RemindersConfig } from "#plugin/reminders/config.ts";
 import remind from "#plugin/reminders/discord/command/remind.ts";
 import reminderList from "#plugin/reminders/discord/command/reminderList.ts";
-import { beginPollingReminders } from "#plugin/reminders/discord/scheduler.ts";
+import scheduler from "#plugin/reminders/discord/scheduler.ts";
 import type { Reminder } from "#plugin/reminders/storage/reminders.ts";
 
 const defaultConfig = `enabled = false
@@ -32,7 +31,7 @@ export default definePlugin({
 			store: remindersConfigStore,
 			defaultValue: defaultConfig,
 		}),
-		onBotInit(beginPollingReminders),
+		...scheduler,
 
 		remind, reminderList,
 	],
