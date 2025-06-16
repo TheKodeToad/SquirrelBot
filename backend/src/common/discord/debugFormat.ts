@@ -1,4 +1,4 @@
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import type { AnyChannel, Guild, Member, Uncached, User } from "oceanic.js";
 
 export function debugFormatUser(user: User): string {

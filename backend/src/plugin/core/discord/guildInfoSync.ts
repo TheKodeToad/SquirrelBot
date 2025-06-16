@@ -1,5 +1,5 @@
-import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
+import { bot } from "#interface/discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";

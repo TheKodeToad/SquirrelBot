@@ -1,5 +1,5 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
-import { onBotInit } from "#discord/extensionPoints.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";

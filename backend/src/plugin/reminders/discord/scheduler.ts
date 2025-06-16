@@ -4,7 +4,7 @@ import { isTextableChannel, isThreadChannelType } from "#common/discord/general.
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { dateToHMSString, dateToUnixSeconds } from "#common/time.ts";
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import { icons } from "#plugin/core/public/discord/icons.ts";
 import { debugFormatReminder, remindersConfigStore } from "#plugin/reminders/index.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";

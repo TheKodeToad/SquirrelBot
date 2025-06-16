@@ -1,4 +1,4 @@
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import type { ImageFormat } from "oceanic.js";
 
 export function getChannelIconURL(channel: { id: string; icon?: string | null; }, format?: ImageFormat, size?: number): string | null {

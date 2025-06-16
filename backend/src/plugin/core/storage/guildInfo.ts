@@ -1,4 +1,4 @@
-import { dbParse, pool } from "#db/index.ts";
+import { dbParse, postgres } from "#storage/index.ts";
 import { array, boolean, date, nullable, object, string, type InferOutput } from "valibot";
 
 const guildInfoSchema = object({
@@ -28,7 +28,7 @@ export interface APIGuildInfo extends InferOutput<typeof apiGuildInfoSchema> { }
 const justOwnerIDSchema = object({ ownerID: string() });
 
 export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT
 				"id",
@@ -53,7 +53,7 @@ export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
  * Only use for caching purposes!
  */
 export async function getAllGuildInfo(): Promise<GuildInfo[]> {
-	const result = await pool.query(`
+	const result = await postgres.query(`
 		SELECT
 			"id",
 			"name",
@@ -68,7 +68,7 @@ export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 }
 
 export async function getGuildOwnerID(id: string): Promise<string | null> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT "ownerID"
 			FROM "core_guildInfo"
@@ -84,7 +84,7 @@ export async function getGuildOwnerID(id: string): Promise<string | null> {
 }
 
 export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildInfo[]> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT
 				"id",
@@ -102,7 +102,7 @@ export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildI
 }
 
 export async function deleteGuildInfo(id: string): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			DELETE FROM "core_guildInfo"
 			WHERE "id" = $1
@@ -112,7 +112,7 @@ export async function deleteGuildInfo(id: string): Promise<void> {
 }
 
 export async function updateGuildInfo(id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			UPDATE "core_guildInfo"
 			SET
@@ -126,7 +126,7 @@ export async function updateGuildInfo(id: string, name: string, iconHash: string
 }
 
 export async function insertGuildInfo(id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			INSERT INTO "core_guildInfo" (
 				"id",
@@ -144,7 +144,7 @@ export async function insertGuildInfo(id: string, name: string | null, iconHash:
 }
 
 export async function markGuildAllowed(id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			INSERT INTO "core_guildInfo" (
 				"id",
@@ -166,7 +166,7 @@ export async function markGuildAllowed(id: string, name: string | null, iconHash
 }
 
 export async function markUnknownGuildAllowed(id: string): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			INSERT INTO "core_guildInfo" ("id", "allowed")
 			VALUES ($1, TRUE)
@@ -179,7 +179,7 @@ export async function markUnknownGuildAllowed(id: string): Promise<void> {
 }
 
 export async function markGuildNotAllowed(id: string): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			UPDATE "core_guildInfo"
 			SET "allowed" = FALSE
@@ -193,7 +193,7 @@ export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null
 	const date = new Date;
 	date.setDate(date.getDate() + 30);
 
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			UPDATE "core_guildInfo"
 			SET
@@ -213,7 +213,7 @@ export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null
 }
 
 export async function cancelGuildInfoDeletion(id: string): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			UPDATE "core_guildInfo"
 			SET "deleteAt" = NULL
@@ -224,7 +224,7 @@ export async function cancelGuildInfoDeletion(id: string): Promise<void> {
 }
 
 export async function deleteExpiredGuildInfo(): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			DELETE FROM "core_guildInfo"
 			WHERE "deleteAt" <= $1

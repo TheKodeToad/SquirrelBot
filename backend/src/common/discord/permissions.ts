@@ -1,5 +1,5 @@
 import { requireExhaustiveSwitch } from "#common/types.ts";
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role } from "oceanic.js";
 
 /**

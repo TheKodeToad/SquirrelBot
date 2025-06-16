@@ -1,5 +1,5 @@
 import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";

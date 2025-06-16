@@ -1,4 +1,4 @@
-import { dbParse, pool } from "#db/index.ts";
+import { dbParse, postgres } from "#storage/index.ts";
 import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
 
 export enum CaseType {
@@ -92,7 +92,7 @@ export async function getCase(guildID: string, number: number): Promise<CaseInfo
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT *
 			FROM "moderation_cases"
@@ -111,7 +111,7 @@ export async function getCase(guildID: string, number: number): Promise<CaseInfo
 export async function getCases(guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
 	query.reversed ??= false;
 
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT *
 			FROM "moderation_cases"
@@ -158,7 +158,7 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
 	// TODO: might have edge cases but it's pretty darn unlikely
 
-	const client = await pool.connect();
+	const client = await postgres.connect();
 
 	let done = false;
 
@@ -238,7 +238,7 @@ export async function deleteCase(guildID: string, number: number): Promise<boole
 	if (number < 0 || number >= 2 ** 32)
 		return false;
 
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			DELETE FROM "moderation_cases"
 			WHERE "guildID" = $1 AND "number" = $2

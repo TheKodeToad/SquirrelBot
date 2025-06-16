@@ -2,7 +2,7 @@ import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.t
 import { colors } from "#common/discord/colors.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
 import { isEventConfigEnabled } from "#plugin/logging/discord/helper/config.ts";
 import { logToChannel } from "#plugin/logging/discord/helper/webhooks.ts";

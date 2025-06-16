@@ -1,8 +1,8 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { requireExhaustiveSwitch } from "#common/types.ts";
-import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
+import { bot } from "#interface/discord/index.ts";
 import { getCommandByName, getCommands } from "#plugin/core/discord/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/discord/commandEngine/handler/componentHandler.ts";
 import { AUTO_DEFER_AFTER } from "#plugin/core/discord/commandEngine/index.ts";

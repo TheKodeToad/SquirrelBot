@@ -1,7 +1,7 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSeconds } from "#common/time.ts";
-import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
+import { bot } from "#interface/discord/index.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/discord/guildInfoSync.ts";
 import { OptionType, type CommandContext } from "#plugin/core/public/discord/command.ts";
 import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";

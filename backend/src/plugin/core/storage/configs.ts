@@ -1,10 +1,10 @@
+import { dbParse, postgres } from "#storage/index.ts";
 import { object, string } from "valibot";
-import { dbParse, pool } from "#db/index.ts";
 
 const justValueSchema = object({ value: string() });
 
 export async function getGuildConfig(guildID: string, key: string): Promise<string | null> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT "value"
 			FROM "core_guildConfigs"
@@ -20,7 +20,7 @@ export async function getGuildConfig(guildID: string, key: string): Promise<stri
 }
 
 export async function insertGuildConfig(guildID: string, key: string, value: string): Promise<boolean> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",
@@ -37,7 +37,7 @@ export async function insertGuildConfig(guildID: string, key: string, value: str
 }
 
 export async function updateGuildConfig(guildID: string, key: string, value: string): Promise<boolean> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			UPDATE "core_guildConfigs"
 			SET "value" = $3
@@ -50,7 +50,7 @@ export async function updateGuildConfig(guildID: string, key: string, value: str
 }
 
 export async function upsertGuildConfig(guildID: string, key: string, value: string): Promise<void> {
-	await pool.query(
+	await postgres.query(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",

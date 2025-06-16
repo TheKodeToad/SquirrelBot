@@ -1,13 +1,13 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { mapIterable } from "#common/iterators.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { addChannelListener } from "#db/notification.ts";
 import { getPlugin } from "#loader/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import { addGrantAccessListener, addRevokeAccessListener, getAllowedGuilds, isGuildAllowed } from "#plugin/core/discord/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
 import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
+import { addChannelListener } from "#storage/notification.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { parse, safeParse, type InferInput } from "valibot";

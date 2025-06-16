@@ -1,4 +1,4 @@
-import { dbParse, pool } from "#db/index.ts";
+import { dbParse, postgres } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
 import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
 
@@ -50,7 +50,7 @@ export async function getReminder(guildID: string, number: number): Promise<Remi
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT * FROM "reminders_reminders"
 			WHERE
@@ -67,7 +67,7 @@ export async function getReminder(guildID: string, number: number): Promise<Remi
 }
 
 export async function getReminders(guildID: string, query: ReminderQuery): Promise<Reminder[]> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT * FROM "reminders_reminders"
 			WHERE
@@ -96,7 +96,7 @@ export async function getReminders(guildID: string, query: ReminderQuery): Promi
 }
 
 export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: Date): Promise<Reminder[]> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			SELECT *
 			FROM "reminders_reminders"
@@ -111,7 +111,7 @@ export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: 
 export async function createReminder(guildID: string, options: CreateReminderOptions): Promise<Reminder> {
 	options.createdAt ??= new Date;
 
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			INSERT INTO "reminders_reminders" (
 				"guildID",
@@ -146,7 +146,7 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 }
 
 export async function deleteReminder(guildID: string, number: number): Promise<boolean> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			DELETE FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2

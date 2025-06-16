@@ -5,7 +5,7 @@
 		"lint": "cd backend && pnpm run lint && cd ../frontend && pnpm run lint",
 		"bot": "cd backend && pnpm run bot",
 		"http": "cd backend && pnpm run http",
-		"migrate": "cd backend && pnpm run migrate --",
+		"migration": "cd backend && pnpm run migration",
 		"test": "cd backend && pnpm run test"
 	}
 }

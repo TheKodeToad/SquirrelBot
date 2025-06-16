@@ -1,6 +1,6 @@
 import { isUndeletableMessageType } from "#common/discord/general.ts";
 import { WEEK } from "#common/time.ts";
-import { bot } from "#discord/index.ts";
+import { bot } from "#interface/discord/index.ts";
 import { OptionType } from "#plugin/core/public/discord/command.ts";
 import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";

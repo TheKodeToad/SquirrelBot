@@ -1,4 +1,4 @@
-import { dbParse, pool } from "#db/index.ts";
+import { dbParse, postgres } from "#storage/index.ts";
 import { date, nullable, object, string, type InferOutput } from "valibot";
 
 const messageCacheEntrySchema = object({
@@ -28,7 +28,7 @@ export async function upsertMessageCacheEntry(
 	entry: CreateMessageCacheEntryOptions
 ): Promise<void> {
 	// TODO check whether this works properly
-	await pool.query(
+	await postgres.query(
 		`
 			INSERT INTO "logging_messageCache" (
 				"guildID",
@@ -51,7 +51,7 @@ export async function upsertMessageCacheEntry(
 }
 
 export async function getMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
-	const result = await pool.query(
+	const result = await postgres.query(
 
 		`
 			SELECT * FROM "logging_messageCache"
@@ -67,7 +67,7 @@ export async function getMessageCacheEntry(guildID: string, channelID: string, i
 }
 
 export async function takeMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			DELETE FROM "logging_messageCache"
 			WHERE "guildID" = $1 AND "channelID" = $2 AND "id" = $3
@@ -83,7 +83,7 @@ export async function takeMessageCacheEntry(guildID: string, channelID: string, 
 }
 
 export async function cleanUpMessageCacheEntries(threshold: Date): Promise<number> {
-	const result = await pool.query(
+	const result = await postgres.query(
 		`
 			DELETE FROM "logging_messageCache"
 			WHERE "lastUpdated" <= $1

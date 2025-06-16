@@ -1,5 +1,5 @@
 import { moduleLogger } from "#common/logger/index.ts";
-import { onBotPostInit, onBotPreInit } from "#discord/extensionPoints.ts";
+import { onBotPostInit, onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import about from "#plugin/core/discord/command/about.ts";
