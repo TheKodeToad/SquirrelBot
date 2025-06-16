@@ -1,8 +1,8 @@
-import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
-import { getCase } from "#db/moderation/cases.ts";
 import type { GuildAuthVars } from "#http/middleware/guildAuth.ts";
 import { serializeCaseObject } from "#http/route/api/v1/guilds/moderation/cases/index.ts";
+import { getCase } from "#plugin/moderation/storage/cases.ts";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 
 const router = new Hono<{ Variables: GuildAuthVars; }>;
 router.get("/:number{\\d+}", async context => {

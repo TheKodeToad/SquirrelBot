@@ -1,10 +1,10 @@
 import { definePlugin } from "#loader/plugin.ts";
-import { ConfigStore } from "#plugin/core/public/configStore.ts";
-import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
-import inviteInfo from "#plugin/util/command/inviteInfo/index.ts";
-import ping from "#plugin/util/command/ping.ts";
-import snowflake from "#plugin/util/command/snowflake.ts";
-import { UtilConfig } from "#schema/plugin/util.ts";
+import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
+import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
+import { UtilConfig } from "#plugin/util/config.ts";
+import inviteInfo from "#plugin/util/discord/command/inviteInfo/index.ts";
+import ping from "#plugin/util/discord/command/ping.ts";
+import snowflake from "#plugin/util/discord/command/snowflake.ts";
 
 export const utilConfigStore = new ConfigStore(UtilConfig);
 
