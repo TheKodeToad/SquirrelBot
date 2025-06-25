@@ -4,6 +4,7 @@ import { HTTP_PORT } from "#environment.ts";
 import api from "#interface/http/route/api/index.ts";
 import frontend from "#interface/http/route/frontend.ts";
 import { deleteExpiredTokens } from "#interface/http/storage/api/tokens.ts";
+import { loadPlugins } from "#loader/index.ts";
 import { postgres } from "#storage/index.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";
 import { serve } from "@hono/node-server";
@@ -12,11 +13,13 @@ import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
 
+const logger = moduleLogger();
+const app = new Hono;
+
 await checkMigrationsOrExit();
 
-const logger = moduleLogger();
-
-const app = new Hono;
+logger.info?.("Loading plugins");
+await loadPlugins();
 
 app.use(nortonAntivirusPlus());
 app.use(async (context, next) => {
@@ -33,8 +36,8 @@ Disallow: /api/`;
 
 app.get("/robots.txt", context => context.text(ROBOTS));
 
-app.route("/api", api);
-app.route("/", frontend);
+app.route("/api", api());
+app.route("/", frontend());
 
 app.onError((error, context) => {
 	if (error instanceof HTTPException) {

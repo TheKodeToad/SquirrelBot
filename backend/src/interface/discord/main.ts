@@ -2,7 +2,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { onBotInit, onBotPostInit, onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
-import { getPluginCount, getPluginIDs, loadPlugins } from "#loader/index.ts";
+import { loadPlugins } from "#loader/index.ts";
 import { postgres } from "#storage/index.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";
 import { connectChannelListener, disconnectChannelListener } from "#storage/notification.ts";
@@ -22,8 +22,6 @@ bot.once("ready", async () => {
 
 		await loadPlugins();
 
-		logger.debug?.(`Plugins (${getPluginCount()}):`, [...getPluginIDs()].map(id => "- " + id).join("\n"));
-
 		logger.debug?.("Firing pre-init...");
 		await Promise.all(onBotPreInit.contributions.map(listener => listener()));
 
@@ -33,7 +31,6 @@ bot.once("ready", async () => {
 		logger.debug?.("Firing post-init...");
 		await Promise.all(onBotPostInit.contributions.map(listener => listener()));
 
-		logger.info?.(`Total plugins: ${getPluginCount()}`);
 		logger.info?.("I'm ready :O");
 	} catch (error) {
 		logger.error?.("Unhandled error during initialization", error);

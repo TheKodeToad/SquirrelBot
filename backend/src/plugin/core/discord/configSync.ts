@@ -5,12 +5,12 @@ import { getPlugin } from "#loader/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/discord/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
-import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
 import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
 import { addChannelListener } from "#storage/notification.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { parse, safeParse, type InferInput } from "valibot";
+import { defineConfig } from "../public/extensionPoints.ts";
 
 const logger = moduleLogger();
 

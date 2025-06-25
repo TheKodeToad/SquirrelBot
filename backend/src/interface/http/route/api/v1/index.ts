@@ -1,10 +1,12 @@
 import auth from "#interface/http/route/api/v1/auth/index.ts";
-import guilds from "#interface/http/route/api/v1/guilds/index.ts";
+import guilds from "#interface/http/route/api/v1/guilds.ts";
 import { Hono } from "hono";
 
-const router = new Hono;
+export default (): Hono => {
+	const app = new Hono;
 
-router.route("/auth", auth);
-router.route("/guilds", guilds);
+	app.route("/auth", auth());
+	app.route("/guilds", guilds());
 
-export default router;
+	return app;
+};

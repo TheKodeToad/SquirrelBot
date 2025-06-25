@@ -1,6 +1,6 @@
 import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
-import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { UtilConfig } from "#plugin/util/config.ts";
 import inviteInfo from "#plugin/util/discord/command/inviteInfo/index.ts";
 import ping from "#plugin/util/discord/command/ping.ts";

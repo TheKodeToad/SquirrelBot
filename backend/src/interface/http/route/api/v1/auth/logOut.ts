@@ -2,16 +2,20 @@ import { deleteToken } from "#interface/http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 
-const router = new Hono;
-router.get("/", async context => {
-	const authorization = context.req.header("Authorization");
+export default (): Hono => {
+	const app = new Hono;
 
-	if (authorization === undefined)
-		throw new HTTPException(401, { message: "No Authorization header provided" });
+	app.get("/", async context => {
+		const authorization = context.req.header("Authorization");
 
-	if (!await deleteToken(authorization))
-		throw new HTTPException(401, { message: "Invalid or expired token" });
+		if (authorization === undefined)
+			throw new HTTPException(401, { message: "No Authorization header provided" });
 
-	return context.body(null, 204);
-});
-export default router;
+		if (!await deleteToken(authorization))
+			throw new HTTPException(401, { message: "Invalid or expired token" });
+
+		return context.body(null, 204);
+	});
+
+	return app;
+};

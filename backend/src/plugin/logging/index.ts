@@ -1,6 +1,6 @@
 import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
-import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { LoggingConfig } from "#plugin/logging/config.ts";
 import messageLogger from "#plugin/logging/discord/logger/messageLogger.ts";
 

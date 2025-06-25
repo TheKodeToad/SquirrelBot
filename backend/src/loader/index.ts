@@ -1,6 +1,9 @@
+import { moduleLogger } from "#common/logger/index.ts";
 import type { Plugin } from "#loader/plugin.ts";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
+
+const logger = moduleLogger();
 
 let plugins: Map<string, Plugin> | null = null;
 
@@ -12,16 +15,7 @@ export async function loadPlugins(): Promise<void> {
 
 	const pluginDir = path.join(import.meta.dirname, "..", "plugin");
 	const entries = await readdir(pluginDir, { withFileTypes: true });
-
-	entries.sort((a, b) => {
-		if (a.name < b.name)
-			return -1;
-
-		if (a.name > b.name)
-			return 1;
-
-		return 0;
-	});
+	const loaded: Plugin[] = [];
 
 	for (const entry of entries) {
 		if (!entry.isDirectory())
@@ -32,11 +26,33 @@ export async function loadPlugins(): Promise<void> {
 
 		initPlugin(plugin);
 
+		loaded.push(plugin);
+	}
+
+	if (loaded.length === 0)
+		throw new Error("No plugins loaded - something must be wrong!");
+
+	loaded.sort((a, b) => {
+		if (a.id < b.id)
+			return -1;
+
+		if (a.id > b.id)
+			return 1;
+
+		return 0;
+	});
+
+	for (const plugin of loaded) {
+		if (plugins.has(plugin.id))
+			throw new Error(`Duplicate plugin #${plugin.id}`);
+
 		plugins.set(plugin.id, plugin);
 	}
 
-	if (plugins.size === 0)
-		throw new Error("No plugins?? Something's wrong");
+	logger.info?.(
+		`Plugins (${getPluginCount()}):`,
+		[...getPluginIDs()].map(id => "- " + id).join("\n")
+	);
 }
 
 function initPlugin(plugin: Plugin): void {

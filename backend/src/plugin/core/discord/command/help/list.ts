@@ -4,8 +4,8 @@ import { getCommandsByPlugin } from "#plugin/core/discord/commandEngine/commandC
 import { canRunCommand } from "#plugin/core/discord/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import type { BaseContext, Reply, ReplyObject } from "#plugin/core/public/discord/command.ts";
-import { defineConfig } from "#plugin/core/public/discord/extensionPoints.ts";
 import { icons } from "#plugin/core/public/discord/icons.ts";
+import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { ActionRow, Container, Divider, StringSelect, Text, TextButton } from "oceanic-component-helper";
 import { MessageFlags, type ContainerComponent, type StringSelectMenu } from "oceanic.js";
 

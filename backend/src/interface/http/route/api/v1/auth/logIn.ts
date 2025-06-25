@@ -26,65 +26,69 @@ const logInPayloadSchema = object({
 	codeVerifier: string(),
 });
 
-const router = new Hono;
-router.post("/", vValidator("json", logInPayloadSchema), async context => {
-	const { code, codeVerifier } = context.req.valid("json");
+export default (): Hono => {
+	const app = new Hono;
 
-	if (typeof code !== "string")
-		throw new HTTPException(400, { message: "Missing code" });
+	app.post("/", vValidator("json", logInPayloadSchema), async context => {
+		const { code, codeVerifier } = context.req.valid("json");
 
-	const tokenResponse = await fetch("https://discord.com/api/v10/oauth2/token", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-		body: new URLSearchParams({
-			client_id: CLIENT_ID,
-			client_secret: CLIENT_SECRET,
-			grant_type: "authorization_code",
-			code,
-			code_verifier: codeVerifier,
-			redirect_uri: REDIRECT_URI,
-			scope: "identify"
-		}),
+		if (typeof code !== "string")
+			throw new HTTPException(400, { message: "Missing code" });
+
+		const tokenResponse = await fetch("https://discord.com/api/v10/oauth2/token", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			body: new URLSearchParams({
+				client_id: CLIENT_ID,
+				client_secret: CLIENT_SECRET,
+				grant_type: "authorization_code",
+				code,
+				code_verifier: codeVerifier,
+				redirect_uri: REDIRECT_URI,
+				scope: "identify"
+			}),
+		});
+
+		if (!tokenResponse.ok)
+			throw new HTTPException(500, { message: "Failed fetching OAuth token" });
+
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		const tokenJSON: TokenResponse = await tokenResponse.json();
+		const auth = tokenJSON.token_type + " " + tokenJSON.access_token;
+
+		const userResponse = await fetch("https://discord.com/api/v10/users/@me", { headers: { "Authorization": auth } });
+
+		if (userResponse.status === 401)
+			throw new HTTPException(500, { message: "Application deauthorized" });
+
+		if (!userResponse.ok)
+			throw new HTTPException(500, { message: "Failed fetching Discord user" });
+
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		const userJSON: UserResponse = await userResponse.json();
+
+		await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams({
+				client_id: CLIENT_ID,
+				client_secret: CLIENT_SECRET,
+				token: tokenJSON.access_token,
+				token_type_hint: "access_token",
+			})
+		});
+
+		const [token, expiresAt] = await generateToken(userJSON.id);
+
+		return context.json({
+			token,
+			expiresAt: expiresAt.getTime(),
+			username: userJSON.username,
+			avatar: userJSON.avatar
+		});
 	});
 
-	if (!tokenResponse.ok)
-		throw new HTTPException(500, { message: "Failed fetching OAuth token" });
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const tokenJSON: TokenResponse = await tokenResponse.json();
-	const auth = tokenJSON.token_type + " " + tokenJSON.access_token;
-
-	const userResponse = await fetch("https://discord.com/api/v10/users/@me", { headers: { "Authorization": auth } });
-
-	if (userResponse.status === 401)
-		throw new HTTPException(500, { message: "Application deauthorized" });
-
-	if (!userResponse.ok)
-		throw new HTTPException(500, { message: "Failed fetching Discord user" });
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const userJSON: UserResponse = await userResponse.json();
-
-	await fetch("https://discord.com/api/v10/oauth2/token/revoke", {
-		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body: new URLSearchParams({
-			client_id: CLIENT_ID,
-			client_secret: CLIENT_SECRET,
-			token: tokenJSON.access_token,
-			token_type_hint: "access_token",
-		})
-	});
-
-	const [token, expiresAt] = await generateToken(userJSON.id);
-
-	return context.json({
-		token,
-		expiresAt: expiresAt.getTime(),
-		username: userJSON.username,
-		avatar: userJSON.avatar
-	});
-});
-export default router;
+	return app;
+};

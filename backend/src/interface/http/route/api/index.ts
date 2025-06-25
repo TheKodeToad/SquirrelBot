@@ -2,10 +2,12 @@ import v1 from "#interface/http/route/api/v1/index.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 
-const router = new Hono;
+export default (): Hono => {
+	const app = new Hono;
 
-router.route("/v1", v1);
-router.get("/hello", context => context.json("hello world"));
-router.all("/*", _ => { throw new HTTPException(404, { message: "API route does not exist" }); });
+	app.route("/v1", v1());
+	app.get("/hello", context => context.json("hello world"));
+	app.all("/*", () => { throw new HTTPException(404, { message: "API route does not exist" }); });
 
-export default router;
+	return app;
+};

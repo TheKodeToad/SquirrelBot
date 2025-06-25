@@ -1,15 +1,7 @@
-import { makeMapExtensionPoint, type Contribution } from "#loader/extensionPoint.ts";
+import { type Contribution } from "#loader/extensionPoint.ts";
 import type { Plugin } from "#loader/plugin.ts";
 import type { Command, Option } from "#plugin/core/public/discord/command.ts";
-import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
 import type { ClientEvents } from "oceanic.js";
-
-export interface Config {
-	store: ConfigStore;
-	defaultValue: string;
-}
-
-export const defineConfig = makeMapExtensionPoint<Config>("defineConfig");
 
 // custom implementations as fancy stuff with generics is required
 

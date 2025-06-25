@@ -7,11 +7,6 @@ import { compress } from "hono/compress";
 import { etag } from "hono/etag";
 import { html, raw } from "hono/html";
 
-const router = new Hono;
-
-// TODO: disturbing
-router.use("/static/*", compress(), etag(), serveStatic({ root: "../frontend" })); // yea
-
 const constants = JSON.stringify({
 	CLIENT_ID,
 	REDIRECT_URI,
@@ -23,18 +18,24 @@ const constants = JSON.stringify({
 	APP_INVITE_PERMISSIONS: APP_INVITE_PERMISSIONS.toString(),
 }).replaceAll("<", "\\u003c").replaceAll(">", "\\u003e");
 
-router.get("/*", context => {
-	const nonce = randomBytes(16).toString("base64");
+export default (): Hono => {
+	const app = new Hono;
 
-	const csp = [];
+	// TODO: disturbing
+	app.use("/static/*", compress(), etag(), serveStatic({ root: "../frontend" })); // yea
 
-	csp.push("default-src 'none'");
-	csp.push("connect-src 'self'");
-	csp.push(`script-src 'nonce-${nonce}'`);
-	csp.push("img-src 'self' cdn.discordapp.com");
-	csp.push("style-src 'self' 'unsafe-inline'");
+	app.get("/*", context => {
+		const nonce = randomBytes(16).toString("base64");
 
-	const generated = html`<!DOCTYPE html>
+		const csp = [];
+
+		csp.push("default-src 'none'");
+		csp.push("connect-src 'self'");
+		csp.push(`script-src 'nonce-${nonce}'`);
+		csp.push("img-src 'self' cdn.discordapp.com");
+		csp.push("style-src 'self' 'unsafe-inline'");
+
+		const generated = html`<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -49,7 +50,8 @@ router.get("/*", context => {
   </body>
 </html>`;
 
-	return context.html(generated, 200, { "Content-Security-Policy": csp.join("; ") });
-});
+		return context.html(generated, 200, { "Content-Security-Policy": csp.join("; ") });
+	});
 
-export default router;
+	return app;
+};
