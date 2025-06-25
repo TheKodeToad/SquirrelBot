@@ -22,13 +22,13 @@ bot.once("ready", async () => {
 
 		await loadPlugins();
 
-		logger.debug?.("Firing pre-init...");
+		logger.debug?.("Firing pre-init");
 		await Promise.all(onBotPreInit.contributions.map(listener => listener()));
 
-		logger.debug?.("Firing init...");
+		logger.debug?.("Firing init");
 		await Promise.all(onBotInit.contributions.map(listener => listener()));
 
-		logger.debug?.("Firing post-init...");
+		logger.debug?.("Firing post-init");
 		await Promise.all(onBotPostInit.contributions.map(listener => listener()));
 
 		logger.info?.("I'm ready :O");

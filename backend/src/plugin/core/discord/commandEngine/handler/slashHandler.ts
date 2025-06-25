@@ -145,6 +145,7 @@ async function syncSlashCommands(): Promise<void> {
 			throw error;
 	}
 
+	logger.debug?.("Syncing global slash commands");
 	await bot.application.bulkEditGlobalCommands(commands);
 
 	await writeFile(cacheFile, newHash);

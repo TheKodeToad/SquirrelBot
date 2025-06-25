@@ -6,6 +6,7 @@ import about from "#plugin/core/discord/command/about.ts";
 import access from "#plugin/core/discord/command/access.ts";
 import groups from "#plugin/core/discord/command/groups.ts";
 import help from "#plugin/core/discord/command/help/index.ts";
+import commandCache from "#plugin/core/discord/commandEngine/commandCache.ts";
 import componentHandler from "#plugin/core/discord/commandEngine/handler/componentHandler.ts";
 import prefixHandler from "#plugin/core/discord/commandEngine/handler/prefixHandler.ts";
 import slashHandler from "#plugin/core/discord/commandEngine/handler/slashHandler.ts";
@@ -52,6 +53,7 @@ export default definePlugin({
 		...configSync,
 		...iconSync,
 
+		...commandCache,
 		...prefixHandler,
 		...slashHandler,
 		...componentHandler,

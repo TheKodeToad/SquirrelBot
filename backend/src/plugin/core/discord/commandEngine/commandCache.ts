@@ -1,3 +1,4 @@
+import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { OptionType, type Command, type Option } from "#plugin/core/public/discord/command.ts";
 import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
 
@@ -13,6 +14,8 @@ const all: CommandCacheEntry[] = [];
 const byName: Map<string, CommandCacheEntry> = new Map;
 const byPlugin: Map<string, CommandCacheEntry[]> = new Map;
 
+export default [onBotPreInit(initCommandCache)];
+
 export function getCommands(): CommandCacheEntry[] {
 	return all;
 }
@@ -25,7 +28,7 @@ export function getCommandsByPlugin(name: string): CommandCacheEntry[] | undefin
 	return byPlugin.get(name);
 }
 
-export function initCommandCache(): void {
+function initCommandCache(): void {
 	for (const [plugin, command] of defineCommand.contributions) {
 		const entry = makeCacheEntry(command);
 
