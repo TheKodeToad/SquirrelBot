@@ -54,7 +54,7 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 	}
 }
 
-export function listenForInteractions(messageID: string, originalUserID: string, callback: ComponentHandler["\callback"]): void {
+export function listenForInteractions(messageID: string, originalUserID: string, callback: ComponentHandler["callback"]): void {
 	activeHandlers.set(messageID, { callback, originalUserID });
 }
 
