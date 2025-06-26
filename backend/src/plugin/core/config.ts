@@ -1,7 +1,7 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import type { InferOutput } from "valibot";
-import { array, boolean, number, object, optional, pipe, rawTransform, record, string } from "valibot";
+import { array, boolean, description, number, object, optional, pipe, rawTransform, record, string } from "valibot";
 
 const CoreGroup = object({
 	users: optional(array(pipe(string(), Snowflake)), []),
@@ -21,11 +21,22 @@ const CoreGroups = pipe(
 export type CoreGroups = InferOutput<typeof CoreGroups>;
 
 export const CoreConfig = object({
-	groups: optional(CoreGroups, {}),
+	groups: pipe(
+		optional(CoreGroups, {}),
+		description(
+			"Declare permission groups. " +
+			"Permission groups are used to assign permissions to users —" +
+			"for example, create a permission group for admins called 'admin' " +
+			"and assign it using a permission override which matches it."
+		)
+	),
 
 	prefix_commands: optional(object({
 		prefix: optional(string(), "?"),
-		reply: optional(boolean(), true),
+		reply: pipe(
+			optional(boolean(), true),
+			description("Reply to messages invoking commands. The bot must have 'Read Message History' permissions.")
+		),
 	}), {}),
 
 	default_permissions: optional(object({

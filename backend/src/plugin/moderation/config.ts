@@ -1,7 +1,7 @@
 import { messageTemplate } from "#common/schema/message.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { ParameterType } from "#common/template/index.ts";
-import { array, boolean, type InferOutput, number, object, optional, string } from "valibot";
+import { array, boolean, description, type InferOutput, number, object, optional, pipe, string } from "valibot";
 
 export const PresetReason = object({
 	name: string(),
@@ -27,30 +27,45 @@ export const ModerationConfig = object({
 	preset_reasons: optional(array(PresetReason), []), // TODO
 	preset_prefix: optional(string(), "!"), // TODO
 
-	ban: optional(object({
-		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageTemplate(actionParams)),
-		purge_messages: optional(number(), 0),
-		preset_reasons: optional(array(PresetReason), discordReasons) // TODO
-	}), {}),
-	unban: optional(object({
-		preset_reasons: optional(array(PresetReason), [])
-	}), {}),
-	kick: optional(object({
-		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageTemplate(actionParams)),
-		preset_reasons: optional(array(PresetReason), discordReasons), // TODO
-	}), {}),
-	timeout: optional(object({
-		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageTemplate({ ...actionParams, duration: ParameterType.Duration })),
-		preset_reasons: optional(array(PresetReason), discordReasons), // TODO
-	}), {}),
-	warn: optional(object({
-		send_direct_message: optional(boolean(), false),
-		direct_message: optional(messageTemplate(actionParams)),
-		preset_reasons: optional(array(PresetReason), discordReasons),
-	}), {}),
+	ban: pipe(
+		optional(object({
+			send_direct_message: optional(boolean(), false),
+			direct_message: optional(messageTemplate(actionParams)),
+			purge_messages: optional(number(), 0),
+			preset_reasons: optional(array(PresetReason), discordReasons) // TODO
+		}), {}),
+		description("Configure ban behavior")
+	),
+	unban: pipe(
+		optional(object({
+			preset_reasons: optional(array(PresetReason), [])
+		}), {}),
+		description("Configure unban behavior")
+	),
+	kick: pipe(
+		optional(object({
+			send_direct_message: optional(boolean(), false),
+			direct_message: optional(messageTemplate(actionParams)),
+			preset_reasons: optional(array(PresetReason), discordReasons), // TODO
+		}), {}),
+		description("Configure kick behavior")
+	),
+	timeout: pipe(
+		optional(object({
+			send_direct_message: optional(boolean(), false),
+			direct_message: optional(messageTemplate({ ...actionParams, duration: ParameterType.Duration })),
+			preset_reasons: optional(array(PresetReason), discordReasons), // TODO
+		}), {}),
+		description("Configure timeout behavior")
+	),
+	warn: pipe(
+		optional(object({
+			send_direct_message: optional(boolean(), false),
+			direct_message: optional(messageTemplate(actionParams)),
+			preset_reasons: optional(array(PresetReason), discordReasons),
+		}), {}),
+		description("Configure warn behavior")
+	),
 
 	default_permissions: optional(object({
 		ban: optional(boolean(), false),
