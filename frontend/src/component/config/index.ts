@@ -1,6 +1,7 @@
 import { indentLess, insertTab } from "@codemirror/commands";
 import { continuedIndent, indentNodeProp, LRLanguage } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";
+import { gruvboxDark } from "@fsegurai/codemirror-theme-gruvbox-dark";
 import { basicSetup } from "codemirror";
 import { parser } from "lezer-toml";
 
@@ -20,9 +21,11 @@ export const baseExtensions = [
 		run: insertTab,
 		shift: indentLess,
 	}]),
+	gruvboxDark,
 	EditorView.theme({
 		"&.cm-focused": {
-			outline: "none"
+			outline: "none",
+			"box-shadow": "none !important", // HACK
 		}
-	})
+	}),
 ];
