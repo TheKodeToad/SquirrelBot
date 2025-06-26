@@ -3,7 +3,7 @@ import { definePluginRoutes } from "#interface/http/extensionPoints.ts";
 import { CaseType, getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
 import { vValidator } from "@hono/valibot-validator";
 import { HTTPException } from "hono/http-exception";
-import { check, enum_, object, optional, pipe, string, transform } from "valibot";
+import { enum_, literal, object, optional, pipe, transform, union } from "valibot";
 
 const querySchema = pipe(object({
 	before: optional(parseIntSchema),
@@ -17,8 +17,7 @@ const querySchema = pipe(object({
 	"delete-message-seconds-gt": optional(parseIntSchema),
 	"dm-delivered": optional(parseBooleanSchema),
 	order: optional(pipe(
-		string(),
-		check(input => input === "asc" || input === "desc"),
+		union([literal("asc"), literal("desc")]),
 		transform(input => input === "desc")
 	), "desc"),
 	limit: optional(parseIntSchema, "100"),

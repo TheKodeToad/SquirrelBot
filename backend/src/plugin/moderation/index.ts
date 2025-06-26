@@ -17,7 +17,7 @@ export const moderationConfigStore = new ConfigStore(ModerationConfig);
 
 const defaultConfig = `enabled = false
 
-# Example: Allow users in the moderator group to delete reminders of other users
+# Example: Add moderation perms to user in the moderator group
 # [[permission_overrides]]
 # in_group = ["moderator"]
 # ban = true

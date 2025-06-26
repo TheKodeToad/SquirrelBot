@@ -5,12 +5,12 @@ import { account } from "../../state/account";
 import { useGuild } from "../../state/guilds";
 import { CodeMirror } from "../common/CodeMirror";
 
-export function ConfigEditor(props: { guildID: string; configKey: string; }) {
+export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
 
 	const [resource] = createResource(() => guild(), () => {
 		if (guild() !== undefined)
-			return getGuildConfig(account()!.token, guild()!.id, "moderation");
+			return getGuildConfig(account()!.token, guild()!.id, props.plugin);
 		else
 			return undefined;
 	});

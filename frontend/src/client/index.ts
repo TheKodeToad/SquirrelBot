@@ -1,4 +1,4 @@
-import { AUTH_LOG_IN, AUTH_LOG_OUT, GUILD_CONFIG, GUILDS } from "./routes";
+import { AUTH_LOG_IN, AUTH_LOG_OUT, GUILDS, PLUGIN_CONFIG } from "./routes";
 
 type HTTPMethod = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | "PATCH";
 
@@ -80,5 +80,5 @@ export function getGuilds(token: string) {
 }
 
 export async function getGuildConfig(token: string, guildID: string, config: string) {
-	return request<string>(GUILD_CONFIG(guildID, config), "GET", token);
+	return request<string>(PLUGIN_CONFIG(guildID, config), "GET", token);
 }

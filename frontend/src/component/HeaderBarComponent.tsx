@@ -4,7 +4,7 @@ import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { APP_NAME } from "../constants";
 import { logIn, logOut } from "../helper/auth";
-import { account, useAvatarURL } from "../state/account";
+import { account, Account, useAvatarURL } from "../state/account";
 import { useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
 import { GuildIcon } from "./common/GuildIcon";
@@ -32,26 +32,34 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 		return undefined;
 	};
 
-	return (<>
-		<nav id="headerBar" class="hbox">
-			<span id="headerBar-breadcrumb"><A href="/">{APP_NAME} Dashboard</A>{breadcrumbChildren()}</span>
-			<Switch>
-				<Match when={account() === null}>
-					<Button onClick={logIn} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
-						Log In
-					</Button>
-				</Match>
-				<Match when={account() !== null}>
-					<Button onClick={() => logOut()} color="transparent" style={{ "margin-left": "auto" }}>
-						<img src={useAvatarURL()} class="avatar" /> {account()?.username} <IconLogout size="1em" />
-					</Button>
-				</Match>
-			</Switch>
-			<Button color="transparent" icon={IconSettings}>
-				Preferences
-			</Button>
-		</nav>
+	return (
+		<>
+			<nav id="headerBar" class="hbox">
+				<span id="headerBar-breadcrumb"><A href="/">{APP_NAME} Dashboard</A>{breadcrumbChildren()}</span>
+				<AccountButton account={account()} />
+				<Button color="transparent" icon={IconSettings}>
+					Preferences
+				</Button>
+			</nav>
 
-		{props.children}
-	</>);
+			{props.children}
+		</>
+	);
 };
+function AccountButton(props: { account: Account | null; }) {
+	return (
+		<Switch>
+			<Match when={props.account === null}>
+				<Button onClick={logIn} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
+					Log In
+				</Button>
+			</Match>
+			<Match when={props.account !== null}>
+				<Button onClick={() => logOut()} color="transparent" style={{ "margin-left": "auto" }}>
+					<img src={useAvatarURL()} class="avatar" /> {props.account!.username} <IconLogout size="1em" />
+				</Button>
+			</Match>
+		</Switch>
+	);
+}
+

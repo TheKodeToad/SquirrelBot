@@ -8,6 +8,6 @@ export function GuildComponent() {
 	const guildID = () => useParams().guildID!;
 
 	return (
-		<div><ConfigEditor guildID={guildID()} configKey="core" /></div>
+		<div class="content"><ConfigEditor guildID={guildID()} plugin="core" /></div>
 	);
 }

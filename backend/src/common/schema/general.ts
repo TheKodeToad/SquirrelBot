@@ -1,6 +1,6 @@
 import { colors } from "#common/discord/colors.ts";
 import { isSnowflake } from "#common/snowflake.ts";
-import { check, pipe, string, transform, union } from "valibot";
+import { check, literal, pipe, string, transform, union } from "valibot";
 
 export const Snowflake = pipe(
 	string(),
@@ -30,7 +30,6 @@ export const parseIntSchema = pipe(
 );
 
 export const parseBooleanSchema = pipe(
-	string(),
-	check(input => input === "true" || input === "false", "Invalid boolean - expected true or false"),
+	union([literal("true"), literal("false")]),
 	transform(input => input === "true")
 );
