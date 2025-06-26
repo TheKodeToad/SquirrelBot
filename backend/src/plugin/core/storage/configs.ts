@@ -1,7 +1,7 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { object, string } from "valibot";
+import { strictObject, string } from "valibot";
 
-const justValueSchema = object({ value: string() });
+const justValueSchema = strictObject({ value: string() });
 
 export async function getGuildConfig(guildID: string, key: string): Promise<string | null> {
 	const result = await postgres.query(

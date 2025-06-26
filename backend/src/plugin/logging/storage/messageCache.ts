@@ -1,7 +1,7 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { date, nullable, object, string, type InferOutput } from "valibot";
+import { date, nullable, strictObject, string, type InferOutput } from "valibot";
 
-const messageCacheEntrySchema = object({
+const messageCacheEntrySchema = strictObject({
 	guildID: string(),
 	channelID: string(),
 	id: string(),

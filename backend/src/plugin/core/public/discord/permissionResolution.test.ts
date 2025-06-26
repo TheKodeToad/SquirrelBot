@@ -7,7 +7,7 @@ import { resolveGroups } from "#plugin/core/public/discord/permissionResolution.
 import assert from "assert";
 import { suite, test } from "node:test";
 import { parse as parseTOML } from "smol-toml";
-import { array, object, parse, type InferOutput } from "valibot";
+import { array, object, parse, strictObject, type InferOutput } from "valibot";
 
 function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): T {
 	const parsed = parse(coreConfigStore.schema, parseTOML(value));
@@ -21,9 +21,9 @@ function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): 
 	return result;
 }
 
-const permissionsSchema = object({
+const permissionsSchema = strictObject({
 	permissions: object({}),
-	permission_overrides: array(PermissionsFilter),
+	permission_overrides: array(object(PermissionsFilter.entries)),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

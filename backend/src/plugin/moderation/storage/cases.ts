@@ -1,5 +1,5 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
+import { array, boolean, date, enum_, nullable, number, strictObject, string, type InferOutput } from "valibot";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -30,7 +30,7 @@ export function caseReverseType(type: CaseType): CaseType | null {
 	}
 }
 
-export const caseInfoSchema = object({
+export const caseInfoSchema = strictObject({
 	guildID: string(),
 	number: number(),
 
@@ -86,7 +86,7 @@ export interface CaseQuery {
 	limit: number;
 }
 
-export const justNumberSchema = object({ number: number() });
+export const justNumberSchema = strictObject({ number: number() });
 
 export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)

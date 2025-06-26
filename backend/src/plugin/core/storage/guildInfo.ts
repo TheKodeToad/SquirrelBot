@@ -1,7 +1,7 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { array, boolean, date, nullable, object, string, type InferOutput } from "valibot";
+import { array, boolean, date, nullable, strictObject, string, type InferOutput } from "valibot";
 
-const guildInfoSchema = object({
+const guildInfoSchema = strictObject({
 	id: string(),
 	name: nullable(string()),
 	iconHash: nullable(string()),
@@ -14,7 +14,7 @@ const guildInfoArraySchema = array(guildInfoSchema);
 
 export interface GuildInfo extends InferOutput<typeof guildInfoSchema> { }
 
-const apiGuildInfoSchema = object({
+const apiGuildInfoSchema = strictObject({
 	id: string(),
 	name: nullable(string()),
 	iconHash: nullable(string()),
@@ -25,7 +25,7 @@ const apiGuildInfoArraySchema = array(apiGuildInfoSchema);
 
 export interface APIGuildInfo extends InferOutput<typeof apiGuildInfoSchema> { }
 
-const justOwnerIDSchema = object({ ownerID: string() });
+const justOwnerIDSchema = strictObject({ ownerID: string() });
 
 export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 	const result = await postgres.query(

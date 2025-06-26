@@ -1,7 +1,7 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { object, string, type InferOutput } from "valibot";
+import { strictObject, string, type InferOutput } from "valibot";
 
-const webhookAuthSchema = object({
+const webhookAuthSchema = strictObject({
 	webhookID: string(),
 	token: string(),
 });

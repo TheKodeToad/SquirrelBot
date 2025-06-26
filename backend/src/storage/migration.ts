@@ -4,7 +4,7 @@ import { dbParse, postgres } from "#storage/index.ts";
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
-import { instance, object } from "valibot";
+import { instance, strictObject } from "valibot";
 import "../environment.ts";
 
 export async function migrate(ignoreChanges: boolean): Promise<number> {
@@ -36,7 +36,7 @@ class MigrationError extends Error {
 	}
 }
 
-const justChecksumBufferSchema = object({ checksum: instance(Buffer) });
+const justChecksumBufferSchema = strictObject({ checksum: instance(Buffer) });
 
 async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
 	await postgres.query(`

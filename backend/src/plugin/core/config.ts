@@ -1,9 +1,9 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import type { InferOutput } from "valibot";
-import { array, boolean, description, number, object, optional, pipe, rawTransform, record, string } from "valibot";
+import { array, boolean, description, number, optional, pipe, rawTransform, record, strictObject, string } from "valibot";
 
-const CoreGroup = object({
+const CoreGroup = strictObject({
 	users: optional(array(pipe(string(), Snowflake)), []),
 	roles: optional(array(pipe(string(), Snowflake)), []),
 	inherits: optional(array(string()), []),
@@ -20,7 +20,7 @@ const CoreGroups = pipe(
 );
 export type CoreGroups = InferOutput<typeof CoreGroups>;
 
-export const CoreConfig = object({
+export const CoreConfig = strictObject({
 	groups: pipe(
 		optional(CoreGroups, {}),
 		description(
@@ -31,7 +31,7 @@ export const CoreConfig = object({
 		)
 	),
 
-	prefix_commands: optional(object({
+	prefix_commands: optional(strictObject({
 		prefix: optional(string(), "?"),
 		reply: pipe(
 			optional(boolean(), true),
@@ -39,7 +39,7 @@ export const CoreConfig = object({
 		),
 	}), {}),
 
-	default_permissions: optional(object({
+	default_permissions: optional(strictObject({
 		prefix_commands: optional(boolean(), true),
 		slash_commands: optional(boolean(), true),
 		ephemeral_response: optional(boolean(), true),
@@ -47,7 +47,7 @@ export const CoreConfig = object({
 		help_command: optional(boolean(), true),
 		groups_command: optional(boolean(), false)
 	}), {}),
-	permission_overrides: optional(array(object({
+	permission_overrides: optional(array(strictObject({
 		prefix_commands: optional(boolean()),
 		slash_commands: optional(boolean()),
 		ephemeral_response: optional(boolean()),

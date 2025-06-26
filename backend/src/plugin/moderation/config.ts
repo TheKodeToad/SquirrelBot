@@ -1,9 +1,9 @@
 import { messageTemplate } from "#common/schema/message.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { ParameterType } from "#common/template/index.ts";
-import { array, boolean, description, type InferOutput, number, object, optional, pipe, string } from "valibot";
+import { array, boolean, description, type InferOutput, number, optional, pipe, strictObject, string } from "valibot";
 
-export const PresetReason = object({
+export const PresetReason = strictObject({
 	name: string(),
 	replacement: string(),
 });
@@ -23,12 +23,12 @@ const actionParams = {
 	reason: ParameterType.MarkdownString,
 } as const;
 
-export const ModerationConfig = object({
+export const ModerationConfig = strictObject({
 	preset_reasons: optional(array(PresetReason), []), // TODO
 	preset_prefix: optional(string(), "!"), // TODO
 
 	ban: pipe(
-		optional(object({
+		optional(strictObject({
 			send_direct_message: optional(boolean(), false),
 			direct_message: optional(messageTemplate(actionParams)),
 			purge_messages: optional(number(), 0),
@@ -37,13 +37,13 @@ export const ModerationConfig = object({
 		description("Configure ban behavior")
 	),
 	unban: pipe(
-		optional(object({
+		optional(strictObject({
 			preset_reasons: optional(array(PresetReason), [])
 		}), {}),
 		description("Configure unban behavior")
 	),
 	kick: pipe(
-		optional(object({
+		optional(strictObject({
 			send_direct_message: optional(boolean(), false),
 			direct_message: optional(messageTemplate(actionParams)),
 			preset_reasons: optional(array(PresetReason), discordReasons), // TODO
@@ -51,7 +51,7 @@ export const ModerationConfig = object({
 		description("Configure kick behavior")
 	),
 	timeout: pipe(
-		optional(object({
+		optional(strictObject({
 			send_direct_message: optional(boolean(), false),
 			direct_message: optional(messageTemplate({ ...actionParams, duration: ParameterType.Duration })),
 			preset_reasons: optional(array(PresetReason), discordReasons), // TODO
@@ -59,7 +59,7 @@ export const ModerationConfig = object({
 		description("Configure timeout behavior")
 	),
 	warn: pipe(
-		optional(object({
+		optional(strictObject({
 			send_direct_message: optional(boolean(), false),
 			direct_message: optional(messageTemplate(actionParams)),
 			preset_reasons: optional(array(PresetReason), discordReasons),
@@ -67,7 +67,7 @@ export const ModerationConfig = object({
 		description("Configure warn behavior")
 	),
 
-	default_permissions: optional(object({
+	default_permissions: optional(strictObject({
 		ban: optional(boolean(), false),
 		unban: optional(boolean(), false),
 		kick: optional(boolean(), false),
@@ -77,7 +77,7 @@ export const ModerationConfig = object({
 		case_read: optional(boolean(), false),
 		case_delete: optional(boolean(), false),
 	}), {}),
-	permission_overrides: optional(array(object({
+	permission_overrides: optional(array(strictObject({
 		ban: optional(boolean()),
 		unban: optional(boolean()),
 		kick: optional(boolean()),

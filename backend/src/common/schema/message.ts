@@ -4,7 +4,7 @@ import { template } from "#common/schema/template.ts";
 import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
-import { array, boolean, instance, maxLength, object, optional, pipe, string, transform, union, type BaseIssue, type BaseSchema, type InferOutput } from "valibot";
+import { array, boolean, instance, maxLength, optional, pipe, strictObject, string, transform, union, type BaseIssue, type BaseSchema, type InferOutput } from "valibot";
 
 export const MessageLiteral = message(string());
 export type MessageLiteral = InferOutput<typeof MessageLiteral>;
@@ -46,10 +46,10 @@ export function messageTemplate<S extends TemplateSchema>(schema: S) {
 
 function message<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(stringSchema: S) {
 	return pipe(
-		object({
+		strictObject({
 			content: optional(stringSchema),
 			allowed_mentions: optional(pipe(
-				optional(object({
+				optional(strictObject({
 					everyone: optional(boolean()),
 					replied_user: optional(boolean()),
 					users: optional(union(
@@ -79,21 +79,21 @@ function message<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(str
 }
 
 function embed<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(stringSchema: S) {
-	return object({
+	return strictObject({
 		title: optional(stringSchema),
 		description: optional(stringSchema),
 		url: optional(stringSchema),
 		timestamp: optional(pipe(instance(TomlDate), transform(date => date.toISOString()))), // TODO is this filter consistent with Discord's
 		color: optional(HexColor),
-		footer: optional(object({ text: stringSchema, icon: stringSchema })),
+		footer: optional(strictObject({ text: stringSchema, icon: stringSchema })),
 		image: optional(pipe(stringSchema, transform(url => ({ url })))),
 		thumbnail: optional(pipe(stringSchema, transform(url => ({ url })))),
-		author: optional(pipe(object({
+		author: optional(pipe(strictObject({
 			name: stringSchema,
 			url: optional(stringSchema),
 			icon_url: optional(stringSchema)
 		}), transform(({ icon_url, ...input }) => ({ iconURL: icon_url, ...input })))),
-		fields: optional(array(object({
+		fields: optional(array(strictObject({
 			name: stringSchema,
 			value: stringSchema,
 			inline: boolean()

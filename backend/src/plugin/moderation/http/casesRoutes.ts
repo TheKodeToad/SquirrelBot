@@ -3,9 +3,9 @@ import { definePluginRoutes } from "#interface/http/extensionPoints.ts";
 import { CaseType, getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
 import { vValidator } from "@hono/valibot-validator";
 import { HTTPException } from "hono/http-exception";
-import { enum_, literal, object, optional, pipe, transform, union } from "valibot";
+import { enum_, literal, optional, pipe, strictObject, transform, union } from "valibot";
 
-const querySchema = pipe(object({
+const querySchema = pipe(strictObject({
 	before: optional(parseIntSchema),
 	after: optional(parseIntSchema),
 	type: optional(pipe(parseIntSchema, enum_(CaseType))),

@@ -3,7 +3,7 @@ import { generateToken } from "#interface/http/storage/api/tokens.ts";
 import { vValidator } from "@hono/valibot-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { object, string } from "valibot";
+import { strictObject, string } from "valibot";
 
 interface TokenResponse {
 	token_type: string;
@@ -21,7 +21,7 @@ interface UserResponse {
 	global_name: string;
 }
 
-const logInPayloadSchema = object({
+const logInPayloadSchema = strictObject({
 	code: string(),
 	codeVerifier: string(),
 });

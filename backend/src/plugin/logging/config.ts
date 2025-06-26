@@ -1,17 +1,17 @@
 import { Snowflake } from "#common/schema/general.ts";
-import { array, boolean, description, object, optional, pipe, union, type InferOutput } from "valibot";
+import { array, boolean, description, optional, pipe, strictObject, union, type InferOutput } from "valibot";
 
-export const EventConfig = optional(union([boolean(), object({})]));
+export const EventConfig = optional(union([boolean(), strictObject({})]));
 export type EventConfig = InferOutput<typeof EventConfig>;
 
-export const LoggingConfig = object({
+export const LoggingConfig = strictObject({
 	loggers: pipe(
 		array(
-			object({
+			strictObject({
 				channel: Snowflake,
 				// for now you can't customise each event
 				events: pipe(
-					object({
+					strictObject({
 						message_edit: EventConfig,
 						message_delete: EventConfig,
 					}),

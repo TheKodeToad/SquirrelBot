@@ -1,8 +1,8 @@
 import { dbParse, postgres } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
-import { array, boolean, date, enum_, nullable, number, object, string, type InferOutput } from "valibot";
+import { array, boolean, date, enum_, nullable, number, strictObject, string, type InferOutput } from "valibot";
 
-const reminderSchema = object({
+const reminderSchema = strictObject({
 	guildID: string(),
 	number: number(),
 
@@ -44,7 +44,7 @@ export interface ReminderQuery {
 	limit: number;
 }
 
-const justNumberSchema = object({ number: number() });
+const justNumberSchema = strictObject({ number: number() });
 
 export async function getReminder(guildID: string, number: number): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32)
