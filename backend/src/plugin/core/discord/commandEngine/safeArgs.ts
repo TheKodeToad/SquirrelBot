@@ -132,52 +132,46 @@ function validateType(type: OptionType, value: unknown): void {
 		return;
 
 	switch (type) {
-		case OptionType.Boolean:
-		case OptionType.Flag:
-			if (typeof value !== "boolean")
-				throw new Error(`typeof value is '${typeof value}'; expected 'boolean'`);
+	case OptionType.Boolean:
+	case OptionType.Flag:
+		if (typeof value !== "boolean")
+			throw new Error(`typeof value is '${typeof value}'; expected 'boolean'`);
 
-			break;
+		break;
+	case OptionType.Integer:
+		if (!Number.isSafeInteger(value))
+			throw new Error(`Number.isSafeInteger(value) is false`);
 
-		case OptionType.Integer:
-			if (!Number.isSafeInteger(value))
-				throw new Error(`Number.isSafeInteger(value) is false`);
+		break;
+	case OptionType.Number:
+		if (!Number.isFinite(value))
+			throw new Error(`Number.isFinite(value) is false`);
 
-			break;
+		break;
+	case OptionType.String:
+		if (typeof value !== "string")
+			throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
 
-		case OptionType.Number:
-			if (!Number.isFinite(value))
-				throw new Error(`Number.isFinite(value) is false`);
+		break;
+	case OptionType.Snowflake:
+	case OptionType.User:
+	case OptionType.Role:
+	case OptionType.Channel:
+		if (typeof value !== "string")
+			throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
 
-			break;
+		if (!isSnowflake(value))
+			throw new Error(`isSnowflake('${value}') is false`);
 
-		case OptionType.String:
-			if (typeof value !== "string")
-				throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
+		break;
+	case OptionType.Duration:
+		if (typeof value !== "number")
+			throw new Error(`typeof value is '${typeof value}'; expected 'number'`);
 
-			break;
-
-		case OptionType.Snowflake:
-		case OptionType.User:
-		case OptionType.Role:
-		case OptionType.Channel:
-			if (typeof value !== "string")
-				throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
-
-			if (!isSnowflake(value))
-				throw new Error(`isSnowflake('${value}') is false`);
-
-			break;
-
-		case OptionType.Duration:
-			if (typeof value !== "number")
-				throw new Error(`typeof value is '${typeof value}'; expected 'number'`);
-
-			break;
-
-		default:
-			requireExhaustiveSwitch(type);
-			break;
+		break;
+	default:
+		requireExhaustiveSwitch(type);
+		break;
 	}
 }
 

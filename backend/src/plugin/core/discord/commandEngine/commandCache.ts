@@ -136,16 +136,26 @@ function formatCommandPrefixUsage(options: Command["options"], optionsByPosition
 
 function formatOptionValue(option: Option): string {
 	switch (option.type) {
-		case OptionType.Boolean: return option.array ? "boolean(s)" : "(true|false)";
-		case OptionType.Flag: return "";
-		case OptionType.Integer: return option.array ? "integer(s)" : "integer";
-		case OptionType.Number: return option.array ? "number(s)" : "number";
-		case OptionType.String: return option.array ? "text(s)" : "text";
-		case OptionType.Snowflake: return option.array ? "id(s)" : "id";
-		case OptionType.User: return option.array ? "user(s)" : "user";
-		case OptionType.Role: return option.array ? "role(s)" : "role";
-		case OptionType.Channel: return option.array ? "channel(s)" : "channel";
-		case OptionType.Duration: return option.array ? "duration(s)" : "duration";
+	case OptionType.Boolean:
+		return option.array ? "boolean(s)" : "(true|false)";
+	case OptionType.Flag:
+		return "";
+	case OptionType.Integer:
+		return option.array ? "integer(s)" : "integer";
+	case OptionType.Number:
+		return option.array ? "number(s)" : "number";
+	case OptionType.String:
+		return option.array ? "text(s)" : "text";
+	case OptionType.Snowflake:
+		return option.array ? "id(s)" : "id";
+	case OptionType.User:
+		return option.array ? "user(s)" : "user";
+	case OptionType.Role:
+		return option.array ? "role(s)" : "role";
+	case OptionType.Channel:
+		return option.array ? "channel(s)" : "channel";
+	case OptionType.Duration:
+		return option.array ? "duration(s)" : "duration";
 	}
 }
 

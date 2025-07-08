@@ -132,11 +132,17 @@ function testFilter(filter: PermissionsFilter, groups: GroupsResult, channel: Ex
 
 function testNumberFilter(filter: NumberFilter, number: number): boolean {
 	switch (filter.mode) {
-		case NumberFilterMode.Equals: return number === filter.number;
-		case NumberFilterMode.NotEquals: return number !== filter.number;
-		case NumberFilterMode.LessThan: return number < filter.number;
-		case NumberFilterMode.LessThanOrEqual: return number <= filter.number;
-		case NumberFilterMode.GreaterThan: return number > filter.number;
-		case NumberFilterMode.GreaterThanOrEqual: return number >= filter.number;
+	case NumberFilterMode.Equals:
+		return number === filter.number;
+	case NumberFilterMode.NotEquals:
+		return number !== filter.number;
+	case NumberFilterMode.LessThan:
+		return number < filter.number;
+	case NumberFilterMode.LessThanOrEqual:
+		return number <= filter.number;
+	case NumberFilterMode.GreaterThan:
+		return number > filter.number;
+	case NumberFilterMode.GreaterThanOrEqual:
+		return number >= filter.number;
 	}
 }

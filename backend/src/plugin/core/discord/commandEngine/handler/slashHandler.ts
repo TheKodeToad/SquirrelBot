@@ -155,15 +155,25 @@ async function syncSlashCommands(): Promise<void> {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function mapOptionType(type: OptionType) {
 	switch (type) {
-		case OptionType.Flag: case OptionType.Boolean: return ApplicationCommandOptionTypes.BOOLEAN;
-		case OptionType.String: return ApplicationCommandOptionTypes.STRING;
-		case OptionType.Integer: return ApplicationCommandOptionTypes.INTEGER;
-		case OptionType.Number: return ApplicationCommandOptionTypes.NUMBER;
-		case OptionType.User: return ApplicationCommandOptionTypes.USER;
-		case OptionType.Role: return ApplicationCommandOptionTypes.ROLE;
-		case OptionType.Channel: return ApplicationCommandOptionTypes.CHANNEL;
-		case OptionType.Snowflake: return ApplicationCommandOptionTypes.STRING;
-		case OptionType.Duration: return ApplicationCommandOptionTypes.STRING;
+	case OptionType.Flag:
+	case OptionType.Boolean:
+		return ApplicationCommandOptionTypes.BOOLEAN;
+	case OptionType.String:
+		return ApplicationCommandOptionTypes.STRING;
+	case OptionType.Integer:
+		return ApplicationCommandOptionTypes.INTEGER;
+	case OptionType.Number:
+		return ApplicationCommandOptionTypes.NUMBER;
+	case OptionType.User:
+		return ApplicationCommandOptionTypes.USER;
+	case OptionType.Role:
+		return ApplicationCommandOptionTypes.ROLE;
+	case OptionType.Channel:
+		return ApplicationCommandOptionTypes.CHANNEL;
+	case OptionType.Snowflake:
+		return ApplicationCommandOptionTypes.STRING;
+	case OptionType.Duration:
+		return ApplicationCommandOptionTypes.STRING;
 	}
 
 	requireExhaustiveSwitch(type);

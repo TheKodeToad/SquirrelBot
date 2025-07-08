@@ -17,16 +17,26 @@ export enum CaseType {
 
 export function caseReverseType(type: CaseType): CaseType | null {
 	switch (type) {
-		case CaseType.Note: return null;
-		case CaseType.Warn: return CaseType.Unwarn;
-		case CaseType.Unwarn: return CaseType.Warn;
-		case CaseType.VoiceMute: return CaseType.VoiceUnmute;
-		case CaseType.VoiceUnmute: return CaseType.VoiceMute;
-		case CaseType.Timeout: return CaseType.ClearTimeout;
-		case CaseType.ClearTimeout: return CaseType.Timeout;
-		case CaseType.Kick: return null;
-		case CaseType.Ban: return CaseType.Unban;
-		case CaseType.Unban: return CaseType.Ban;
+	case CaseType.Note:
+		return null;
+	case CaseType.Warn:
+		return CaseType.Unwarn;
+	case CaseType.Unwarn:
+		return CaseType.Warn;
+	case CaseType.VoiceMute:
+		return CaseType.VoiceUnmute;
+	case CaseType.VoiceUnmute:
+		return CaseType.VoiceMute;
+	case CaseType.Timeout:
+		return CaseType.ClearTimeout;
+	case CaseType.ClearTimeout:
+		return CaseType.Timeout;
+	case CaseType.Kick:
+		return null;
+	case CaseType.Ban:
+		return CaseType.Unban;
+	case CaseType.Unban:
+		return CaseType.Ban;
 	}
 }
 

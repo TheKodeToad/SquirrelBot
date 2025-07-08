@@ -22,11 +22,16 @@ export function moduleLogger(): Logger {
 
 function logLevelColor(level: LogLevel): string {
 	switch (level) {
-		case LogLevel.Debug: return "\x1b[32m"; // green
-		case LogLevel.Info: return "\x1b[34m"; // blue
-		case LogLevel.Warn: return "\x1b[33m"; // yellow
-		case LogLevel.Error: return "\x1b[31m"; // red
-		case LogLevel.Fatal: return "\x1b[7m\x1b[31m"; // reversed red
+	case LogLevel.Debug:
+		return "\x1b[32m"; // green
+	case LogLevel.Info:
+		return "\x1b[34m"; // blue
+	case LogLevel.Warn:
+		return "\x1b[33m"; // yellow
+	case LogLevel.Error:
+		return "\x1b[31m"; // red
+	case LogLevel.Fatal:
+		return "\x1b[7m\x1b[31m"; // reversed red
 	}
 }
 

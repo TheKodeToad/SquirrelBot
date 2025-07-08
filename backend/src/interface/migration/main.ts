@@ -6,30 +6,30 @@ import { checkMigrations, migrate } from "#storage/migration.ts";
 const [_runtime, _script, command, ...args] = process.argv;
 
 switch (command) {
-	case "perform": {
-		const count = await migrate(args.includes("--ignore-changes"));
-		await postgres.end();
+case "perform": {
+	const count = await migrate(args.includes("--ignore-changes"));
+	await postgres.end();
 
-		if (count > 0)
-			console.log(`Done ${count} migrations!`);
-		else
-			console.log("No migrations needed!");
+	if (count > 0)
+		console.log(`Done ${count} migrations!`);
+	else
+		console.log("No migrations needed!");
 
-		break;
-	}
-	case "check": {
-		const count = await checkMigrations();
-		await postgres.end();
+	break;
+}
+case "check": {
+	const count = await checkMigrations();
+	await postgres.end();
 
-		if (count > 0) {
-			console.error(`${count} migrations needed!`);
-			process.exit(1);
-		} else
-			console.log("No migrations needed!");
+	if (count > 0) {
+		console.error(`${count} migrations needed!`);
+		process.exit(1);
+	} else
+		console.log("No migrations needed!");
 
-		break;
-	}
-	default:
-		console.error(`Usage: pnpm migration (perform|check) [--ignore-changes]`);
-		break;
+	break;
+}
+default:
+	console.error(`Usage: pnpm migration (perform|check) [--ignore-changes]`);
+	break;
 }

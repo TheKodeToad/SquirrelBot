@@ -22,22 +22,17 @@ export type ArgsParseResult =
 
 export function formatArgsParseError(error: ArgsParseResultWithError): string {
 	switch (error.error) {
-		case ArgsParseError.MissingOptions:
-			return `Missing options: ${[...error.options].map(option => "'" + option + "'").join(", ")}.`;
-
-		case ArgsParseError.BareNamedKey:
-			return "Missing option name after hyphen.";
-
-		case ArgsParseError.BadNamedKey:
-			return `No option named '${error.name}'.`;
-
-		case ArgsParseError.BadNamedValue:
-			return `Invalid value passed for '${error.name}'.`;
-
-		case ArgsParseError.BadPositionalIndex:
-			return "Too many unlabeled options provided.";
-
-		case ArgsParseError.BadPoisitionalValue:
-			return `Invalid value passed for '${error.name}' (unlabeled option #${error.index + 1}).`;
+	case ArgsParseError.MissingOptions:
+		return `Missing options: ${[...error.options].map(option => "'" + option + "'").join(", ")}.`;
+	case ArgsParseError.BareNamedKey:
+		return "Missing option name after hyphen.";
+	case ArgsParseError.BadNamedKey:
+		return `No option named '${error.name}'.`;
+	case ArgsParseError.BadNamedValue:
+		return `Invalid value passed for '${error.name}'.`;
+	case ArgsParseError.BadPositionalIndex:
+		return "Too many unlabeled options provided.";
+	case ArgsParseError.BadPoisitionalValue:
+		return `Invalid value passed for '${error.name}' (unlabeled option #${error.index + 1}).`;
 	}
 }

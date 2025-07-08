@@ -18,16 +18,26 @@ function caseExpired(info: CaseInfo, date: number = Date.now()): boolean {
 
 function caseSummaryBase(type: CaseType, target: string): string {
 	switch (type) {
-		case CaseType.Note: return `Note added for ${target}`;
-		case CaseType.Warn: return `Warned ${target}`;
-		case CaseType.Unwarn: return `Unwarned ${target}`;
-		case CaseType.VoiceMute: return `Voice-muted ${target}`;
-		case CaseType.VoiceUnmute: return `Voice-unmuted ${target}`;
-		case CaseType.Timeout: return `Timed out ${target}`;
-		case CaseType.ClearTimeout: return `Removed timeout from ${target}`;
-		case CaseType.Kick: return `Kicked ${target}`;
-		case CaseType.Ban: return `Banned ${target}`;
-		case CaseType.Unban: return `Unbanned ${target}`;
+	case CaseType.Note:
+		return `Note added for ${target}`;
+	case CaseType.Warn:
+		return `Warned ${target}`;
+	case CaseType.Unwarn:
+		return `Unwarned ${target}`;
+	case CaseType.VoiceMute:
+		return `Voice-muted ${target}`;
+	case CaseType.VoiceUnmute:
+		return `Voice-unmuted ${target}`;
+	case CaseType.Timeout:
+		return `Timed out ${target}`;
+	case CaseType.ClearTimeout:
+		return `Removed timeout from ${target}`;
+	case CaseType.Kick:
+		return `Kicked ${target}`;
+	case CaseType.Ban:
+		return `Banned ${target}`;
+	case CaseType.Unban:
+		return `Unbanned ${target}`;
 	}
 }
 
@@ -90,16 +100,36 @@ export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> 
 		result += `**#${info.number}:** `;
 
 	switch (info.type) {
-		case CaseType.Note: result += `Note added for ${target} by ${actor}`; break;
-		case CaseType.Warn: result += `${target} warned by ${actor}`; break;
-		case CaseType.Unwarn: result += `${target} unwarned by ${actor}`; break;
-		case CaseType.VoiceMute: result += `${target} voice-muted by ${actor}`; break;
-		case CaseType.VoiceUnmute: result += `${target} voice-unmuted by ${actor}`; break;
-		case CaseType.Timeout: result += `${target} muted by ${actor}`; break;
-		case CaseType.ClearTimeout: result += `${target} unmuted by ${actor}`; break;
-		case CaseType.Kick: result += `${target} kicked by ${actor}`; break;
-		case CaseType.Ban: result += `${target} banned by ${actor}`; break;
-		case CaseType.Unban: result += `${target} unbanned by ${actor}`; break;
+	case CaseType.Note:
+		result += `Note added for ${target} by ${actor}`;
+		break;
+	case CaseType.Warn:
+		result += `${target} warned by ${actor}`;
+		break;
+	case CaseType.Unwarn:
+		result += `${target} unwarned by ${actor}`;
+		break;
+	case CaseType.VoiceMute:
+		result += `${target} voice-muted by ${actor}`;
+		break;
+	case CaseType.VoiceUnmute:
+		result += `${target} voice-unmuted by ${actor}`;
+		break;
+	case CaseType.Timeout:
+		result += `${target} muted by ${actor}`;
+		break;
+	case CaseType.ClearTimeout:
+		result += `${target} unmuted by ${actor}`;
+		break;
+	case CaseType.Kick:
+		result += `${target} kicked by ${actor}`;
+		break;
+	case CaseType.Ban:
+		result += `${target} banned by ${actor}`;
+		break;
+	case CaseType.Unban:
+		result += `${target} unbanned by ${actor}`;
+		break;
 	}
 
 	if (info.reason !== null)

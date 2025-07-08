@@ -54,96 +54,149 @@ function parseFormatToken(input: FormatGroups, params: Record<string, ParameterT
 	const result = { type: TokenType.Format, parameter: input.parameter, wrapper } as const;
 
 	switch (valueType) {
-		case ParameterType.User: {
-			const presentation = parseUserPresentation(input.presentation);
+	case ParameterType.User: {
+		const presentation = parseUserPresentation(input.presentation);
 
-			if (presentation === null)
-				return `Invalid user presentation: '${input.presentation!}'`;
+		if (presentation === null)
+			return `Invalid user presentation: '${input.presentation!}'`;
 
-			return { ...result, valueType, presentation };
-		}
-		case ParameterType.Guild: {
-			const presentation = parseGuildPresentation(input.presentation);
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Guild: {
+		const presentation = parseGuildPresentation(input.presentation);
 
-			if (presentation === null)
-				return `Invalid guild presentation: '${input.presentation!}'`;
+		if (presentation === null)
+			return `Invalid guild presentation: '${input.presentation!}'`;
 
-			return { ...result, valueType, presentation };
-		}
-		case ParameterType.Duration: {
-			const presentation = parseDurationPresentation(input.presentation);
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Duration: {
+		const presentation = parseDurationPresentation(input.presentation);
 
-			if (presentation === null)
-				return `Invalid duration presentation: '${input.presentation!}'`;
+		if (presentation === null)
+			return `Invalid duration presentation: '${input.presentation!}'`;
 
-			return { ...result, valueType, presentation };
-		}
-		case ParameterType.Timestamp:
-			const presentation = parseTimestampPresentation(input.presentation);
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Timestamp: {
+		const presentation = parseTimestampPresentation(input.presentation);
 
-			if (presentation === null)
-				return `Invalid timestamp presentation: '${input.presentation!}'`;
+		if (presentation === null)
+			return `Invalid timestamp presentation: '${input.presentation!}'`;
 
-			return { ...result, valueType, presentation };
-		case ParameterType.RawString:
-		case ParameterType.MarkdownString:
-			return { ...result, valueType };
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.RawString:
+	case ParameterType.MarkdownString:
+		return { ...result, valueType };
 	}
 }
 
 function parseWrapper(input: FormatGroups["wrapper"]): FormattingWrapper | null {
 	switch (input) {
-		case ">": return FormattingWrapper.BlockQuote;
-		case "`": return FormattingWrapper.InlineCodeblock;
-		case "```": return FormattingWrapper.MultilineCodeblock;
-		case undefined: return null;
+	case ">":
+		return FormattingWrapper.BlockQuote;
+	case "`":
+		return FormattingWrapper.InlineCodeblock;
+	case "```":
+		return FormattingWrapper.MultilineCodeblock;
+	case undefined:
+		return null;
 	}
 }
 
 function parseUserPresentation(input: string | undefined): UserPresentationType | null {
 	switch (input) {
-		case "tag": case undefined: return UserPresentationType.Tag;
-		case "mention": return UserPresentationType.Mention;
-		case "tag_mention": return UserPresentationType.TagMention;
-		case "tag_mention_bold": return UserPresentationType.TagMentionBold;
-		case "id": return UserPresentationType.ID;
-		case "link": return UserPresentationType.Link;
-		case "masked_link": return UserPresentationType.MaskedLink;
-		default: return null;
+	case "tag":
+	case undefined:
+		return UserPresentationType.Tag;
+	case "mention":
+		return UserPresentationType.Mention;
+	case "tag_mention":
+		return UserPresentationType.TagMention;
+	case "tag_mention_bold":
+		return UserPresentationType.TagMentionBold;
+	case "id":
+		return UserPresentationType.ID;
+	case "link":
+		return UserPresentationType.Link;
+	case "masked_link":
+		return UserPresentationType.MaskedLink;
+	default:
+		return null;
 	}
 }
 
 function parseGuildPresentation(input: string | undefined): GuildPresentationType | null {
 	switch (input) {
-		case "name": case undefined: return GuildPresentationType.Name;
-		case "id": return GuildPresentationType.ID;
-		case "link": return GuildPresentationType.Link;
-		case "masked_link": return GuildPresentationType.MaskedLink;
-		default: return null;
+	case "name":
+	case undefined:
+		return GuildPresentationType.Name;
+	case "id":
+		return GuildPresentationType.ID;
+	case "link":
+		return GuildPresentationType.Link;
+	case "masked_link":
+		return GuildPresentationType.MaskedLink;
+	default:
+		return null;
 	}
 }
 
 function parseDurationPresentation(input: string | undefined): DurationPresentationType | null {
 	switch (input) {
-		case "readable": case undefined: return DurationPresentationType.Readable;
-		case "seconds": return DurationPresentationType.Seconds;
-		case "milliseconds": return DurationPresentationType.Milliseconds;
-		default: return null;
+	case "readable":
+	case undefined:
+		return DurationPresentationType.Readable;
+	case "seconds":
+		return DurationPresentationType.Seconds;
+	case "milliseconds":
+		return DurationPresentationType.Milliseconds;
+	default:
+		return null;
 	}
 }
 
 function parseTimestampPresentation(input: string | undefined): TimestampPresentationType | null {
 	switch (input) {
-		case "date_time": case "f": case undefined: return TimestampPresentationType.DateTime;
-		case "date_time_long": case "F": return TimestampPresentationType.DateTimeLong;
-		case "time": case "t": return TimestampPresentationType.Time;
-		case "time_long": case "T": return TimestampPresentationType.TimeLong;
-		case "date": case "d": return TimestampPresentationType.Date;
-		case "date_long": case "D": return TimestampPresentationType.DateLong;
-		case "relative": case "r": case "R": return TimestampPresentationType.Relative;
-		case "unix": return TimestampPresentationType.Unix;
-		case "unix_seconds": return TimestampPresentationType.UnixSeconds;
-		default: return null;
+	case "date_time":
+	case "f":
+	case undefined:
+		return TimestampPresentationType.DateTime;
+
+	case "date_time_long":
+	case "F":
+		return TimestampPresentationType.DateTimeLong;
+
+	case "time":
+	case "t":
+		return TimestampPresentationType.Time;
+
+	case "time_long":
+	case "T":
+		return TimestampPresentationType.TimeLong;
+
+	case "date":
+	case "d":
+		return TimestampPresentationType.Date;
+
+	case "date_long":
+	case "D":
+		return TimestampPresentationType.DateLong;
+
+	case "relative":
+	case "r":
+	case "R":
+		return TimestampPresentationType.Relative;
+
+	case "unix":
+		return TimestampPresentationType.Unix;
+
+	case "unix_seconds":
+		return TimestampPresentationType.UnixSeconds;
+
+	default:
+		return null;
 	}
 }
 

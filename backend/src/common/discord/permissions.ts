@@ -41,25 +41,25 @@ export function canWriteInChannel(channel: AnyGuildChannel, member: Member): boo
 	const perms = channel.permissionsOf(member);
 
 	switch (channel.type) {
-		case ChannelTypes.GUILD_TEXT:
-		case ChannelTypes.GUILD_ANNOUNCEMENT:
-			return perms.has(Permissions.VIEW_CHANNEL | Permissions.SEND_MESSAGES);
+	case ChannelTypes.GUILD_TEXT:
+	case ChannelTypes.GUILD_ANNOUNCEMENT:
+		return perms.has(Permissions.VIEW_CHANNEL | Permissions.SEND_MESSAGES);
 
-		case ChannelTypes.GUILD_VOICE:
-		case ChannelTypes.GUILD_STAGE_VOICE:
-			return perms.has(Permissions.VIEW_CHANNEL | Permissions.CONNECT | Permissions.SEND_MESSAGES);
+	case ChannelTypes.GUILD_VOICE:
+	case ChannelTypes.GUILD_STAGE_VOICE:
+		return perms.has(Permissions.VIEW_CHANNEL | Permissions.CONNECT | Permissions.SEND_MESSAGES);
 
-		case ChannelTypes.ANNOUNCEMENT_THREAD:
-		case ChannelTypes.PUBLIC_THREAD:
-		case ChannelTypes.PRIVATE_THREAD:
-			return perms.has(Permissions.VIEW_CHANNEL | Permissions.SEND_MESSAGES_IN_THREADS)
-				&& (!channel.threadMetadata.locked || perms.has(Permissions.MANAGE_THREADS));
+	case ChannelTypes.ANNOUNCEMENT_THREAD:
+	case ChannelTypes.PUBLIC_THREAD:
+	case ChannelTypes.PRIVATE_THREAD:
+		return perms.has(Permissions.VIEW_CHANNEL | Permissions.SEND_MESSAGES_IN_THREADS)
+			&& (!channel.threadMetadata.locked || perms.has(Permissions.MANAGE_THREADS));
 
-		// these channel types can only have messages in child channels
-		case ChannelTypes.GUILD_CATEGORY:
-		case ChannelTypes.GUILD_FORUM:
-		case ChannelTypes.GUILD_MEDIA:
-			return false;
+	// these channel types can only have messages in child channels
+	case ChannelTypes.GUILD_CATEGORY:
+	case ChannelTypes.GUILD_FORUM:
+	case ChannelTypes.GUILD_MEDIA:
+		return false;
 	}
 
 	requireExhaustiveSwitch(channel);
