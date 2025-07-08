@@ -11,7 +11,8 @@ export class SafeArgs {
 
 	constructor(schema: Record<string, Option>) {
 		this._schema = schema;
-		this._result = {};
+		// TODO: this is... safe... right?
+		this._result = { __proto__: null };
 		this._missing = new Set;
 		this._frozen = false;
 
@@ -25,20 +26,11 @@ export class SafeArgs {
 				continue;
 
 			const value: AnyArgsValue = (option.array ?? false) ? [] : null;
-			this._resultDefine(key, value);
+			this._result[key] = value;
 
 			if (option.required ?? false)
 				this._missing.add(key);
 		}
-	}
-
-	// TODO: biggest bottleneck of parser lol
-	private _resultDefine(key: string, value: AnyArgsValue): void {
-		Object.defineProperty(this._result, key, {
-			configurable: true,
-			enumerable: true,
-			value,
-		});
 	}
 
 	private _getSchemaValue(key: string): Option {
@@ -66,7 +58,7 @@ export class SafeArgs {
 
 		validateType(option.type, value);
 
-		this._resultDefine(key, value);
+		this._result[key] = value;
 		this._missing.delete(key);
 	}
 
