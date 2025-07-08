@@ -1,4 +1,4 @@
-import type { AnyArgsValue } from "#plugin/core/public/discord/command.ts";
+import type { AnyArgsValue } from "#plugin/core/discord/public/command.ts";
 
 export const enum ArgsParseError {
 	MissingOptions,

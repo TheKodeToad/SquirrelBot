@@ -2,8 +2,8 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/discord/commandEngine/index.ts";
 import { transformReply } from "#plugin/core/discord/helper/commands.ts";
-import type { ComponentContext, Reply, ReplyObject } from "#plugin/core/public/discord/command.ts";
-import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
+import type { ComponentContext, Reply, ReplyObject } from "#plugin/core/discord/public/command.ts";
+import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
 import { Text } from "oceanic-component-helper";
 import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyInteractionGateway, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 

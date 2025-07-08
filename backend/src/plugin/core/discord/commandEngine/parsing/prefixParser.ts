@@ -3,7 +3,7 @@ import { ArgsParseError, type ArgsParseResult } from "#plugin/core/discord/comma
 import { readBoolean, readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "#plugin/core/discord/commandEngine/parsing/primitiveParser.ts";
 import type { StringReader } from "#plugin/core/discord/commandEngine/parsing/stringReader.ts";
 import { SafeArgs } from "#plugin/core/discord/commandEngine/safeArgs.ts";
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/discord/command.ts";
+import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/discord/public/command.ts";
 
 const LIMITED_WHITESPACE_EATER_PATTERN = /\s{0,3}/y;
 

@@ -4,7 +4,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
-import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
+import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
 import { isEventConfigEnabled } from "#plugin/logging/discord/helper/config.ts";
 import { logToChannel } from "#plugin/logging/discord/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";

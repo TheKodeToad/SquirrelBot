@@ -1,11 +1,11 @@
 import { renderCommandListPage, renderCommandListPageMinimal } from "#plugin/core/discord/command/help/list.ts";
 import { renderCommandPage } from "#plugin/core/discord/command/help/show.ts";
 import { getCommandByName } from "#plugin/core/discord/commandEngine/commandCache.ts";
+import { OptionType } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import { OptionType } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
 
 export default defineCommand({
 	name: ["help"],

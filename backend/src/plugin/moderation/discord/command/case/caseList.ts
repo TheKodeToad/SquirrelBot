@@ -1,8 +1,8 @@
-import { OptionType, type BaseContext, type ReplyObject } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/discord/helper/paginator.ts";
-import { resolvePermissions } from "#plugin/core/public/discord/permissionResolution.ts";
+import { OptionType, type BaseContext, type ReplyObject } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/discord/public/helper/paginator.ts";
+import { resolvePermissions } from "#plugin/core/discord/public/permissionResolution.ts";
 import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#plugin/moderation/discord/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { getCases, type CaseInfo } from "#plugin/moderation/storage/cases.ts";

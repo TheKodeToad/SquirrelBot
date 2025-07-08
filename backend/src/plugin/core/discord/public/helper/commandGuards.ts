@@ -1,7 +1,7 @@
 import type { SchemaWithOutput } from "#common/types.ts";
-import type { CommandContext } from "#plugin/core/public/discord/command.ts";
-import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
-import { resolvePermissions, type ConfigWithPermissions } from "#plugin/core/public/discord/permissionResolution.ts";
+import type { CommandContext } from "#plugin/core/discord/public/command.ts";
+import type { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
+import { resolvePermissions, type ConfigWithPermissions } from "#plugin/core/discord/public/permissionResolution.ts";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(
 	context: CommandContext,

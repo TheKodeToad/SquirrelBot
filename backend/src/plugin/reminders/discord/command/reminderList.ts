@@ -1,10 +1,10 @@
 import { dateToUnixSeconds } from "#common/time.ts";
-import { type BaseContext, type ReplyObject } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/discord/helper/paginator.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
-import { resolvePermissions } from "#plugin/core/public/discord/permissionResolution.ts";
+import { type BaseContext, type ReplyObject } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/discord/public/helper/paginator.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
+import { resolvePermissions } from "#plugin/core/discord/public/permissionResolution.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { getReminders, type Reminder } from "#plugin/reminders/storage/reminders.ts";
 import { Container, Text } from "oceanic-component-helper";

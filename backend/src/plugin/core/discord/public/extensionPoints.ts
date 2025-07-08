@@ -1,6 +1,6 @@
 import { type Contribution } from "#loader/extensionPoint.ts";
 import type { Plugin } from "#loader/plugin.ts";
-import type { Command, Option } from "#plugin/core/public/discord/command.ts";
+import type { Command, Option } from "#plugin/core/discord/public/command.ts";
 import type { ClientEvents } from "oceanic.js";
 
 // custom implementations as fancy stuff with generics is required

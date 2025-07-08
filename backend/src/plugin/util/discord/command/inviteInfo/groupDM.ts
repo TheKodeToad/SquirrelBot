@@ -1,7 +1,7 @@
 import { formatUser } from "#common/discord/format.ts";
 import { getChannelIconURL } from "#common/discord/urls.ts";
 import { dateToUnixSeconds } from "#common/time.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
 import { type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
 

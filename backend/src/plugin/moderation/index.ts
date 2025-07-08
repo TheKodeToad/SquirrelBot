@@ -1,5 +1,5 @@
 import { definePlugin } from "#loader/plugin.ts";
-import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
+import { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { ModerationConfig } from "#plugin/moderation/config.ts";
 import ban from "#plugin/moderation/discord/command/action/ban.ts";

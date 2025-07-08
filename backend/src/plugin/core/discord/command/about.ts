@@ -1,8 +1,8 @@
 import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
 import { bot } from "#interface/discord/index.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 
 const LIBRARIES = `

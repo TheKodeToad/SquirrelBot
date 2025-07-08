@@ -4,7 +4,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { getPlugin } from "#loader/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/discord/guildInfoSync.ts";
-import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
+import type { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
 import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
 import { addChannelListener } from "#storage/notification.ts";
 import AsyncLock from "async-lock";

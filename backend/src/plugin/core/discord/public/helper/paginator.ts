@@ -1,4 +1,4 @@
-import type { BaseContext, CommandContext, ReplyObject } from "#plugin/core/public/discord/command.ts";
+import type { BaseContext, CommandContext, ReplyObject } from "#plugin/core/discord/public/command.ts";
 import { ActionRow, Divider, TextButton } from "oceanic-component-helper";
 import { ComponentTypes } from "oceanic.js";
 

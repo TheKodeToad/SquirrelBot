@@ -3,9 +3,9 @@ import { dateToUnixSeconds } from "#common/time.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 import { bot } from "#interface/discord/index.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/discord/guildInfoSync.ts";
-import { OptionType, type CommandContext } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { OptionType, type CommandContext } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 
 // for now
 function checkForMe(context: CommandContext): boolean {

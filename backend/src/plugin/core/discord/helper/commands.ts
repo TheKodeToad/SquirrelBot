@@ -1,4 +1,4 @@
-import { type Command, type Reply, type ReplyObject } from "#plugin/core/public/discord/command.ts";
+import { type Command, type Reply, type ReplyObject } from "#plugin/core/discord/public/command.ts";
 import { Text } from "oceanic-component-helper";
 import { Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
 

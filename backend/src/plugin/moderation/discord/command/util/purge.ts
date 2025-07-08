@@ -1,10 +1,10 @@
 import { isUndeletableMessageType } from "#common/discord/general.ts";
 import { WEEK } from "#common/time.ts";
 import { bot } from "#interface/discord/index.ts";
-import { OptionType } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { OptionType } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 
 export default defineCommand({

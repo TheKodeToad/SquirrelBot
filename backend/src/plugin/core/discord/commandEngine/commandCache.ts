@@ -1,6 +1,6 @@
 import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
-import { OptionType, type Command, type Option } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
+import { OptionType, type Command, type Option } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 
 export interface CommandCacheEntry {
 	command: Command;

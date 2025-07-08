@@ -3,7 +3,7 @@ import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { makeArrayExtensionPoint } from "#loader/extensionPoint.ts";
-import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
+import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";
 

@@ -1,6 +1,6 @@
 import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 
 export default [onBotPreInit(init)];
 

@@ -1,5 +1,5 @@
 import { makeMapExtensionPoint } from "#loader/extensionPoint.ts";
-import type { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
+import type { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
 
 export interface Config {
 	store: ConfigStore;

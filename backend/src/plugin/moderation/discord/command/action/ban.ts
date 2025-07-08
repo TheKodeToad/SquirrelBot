@@ -1,9 +1,9 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { HOUR } from "#common/time.ts";
-import { OptionType } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { OptionType } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { doBulkAction } from "#plugin/moderation/discord/helper/bulkAction.ts";
 import { formatBulkError, formatBulkSuccess } from "#plugin/moderation/discord/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";

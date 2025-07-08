@@ -1,7 +1,7 @@
-import { OptionType } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { OptionType } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { deleteCase } from "#plugin/moderation/storage/cases.ts";
 

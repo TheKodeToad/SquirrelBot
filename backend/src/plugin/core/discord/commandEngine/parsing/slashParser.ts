@@ -3,7 +3,7 @@ import { ArgsParseError, type ArgsParseResult } from "#plugin/core/discord/comma
 import { readDuration, readSnowflake } from "#plugin/core/discord/commandEngine/parsing/primitiveParser.ts";
 import { StringReader } from "#plugin/core/discord/commandEngine/parsing/stringReader.ts";
 import { SafeArgs } from "#plugin/core/discord/commandEngine/safeArgs.ts";
-import { OptionType, type AnyArgsValueItem } from "#plugin/core/public/discord/command.ts";
+import { OptionType, type AnyArgsValueItem } from "#plugin/core/discord/public/command.ts";
 import type { InteractionOptions } from "oceanic.js";
 
 export function readSlashArgs(interactionOptions: InteractionOptions[], commandEntry: CommandCacheEntry): ArgsParseResult {

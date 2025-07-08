@@ -1,10 +1,10 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
 import { formatRESTError, formatUserBold } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { OptionType } from "#plugin/core/public/discord/command.ts";
-import { defineCommand } from "#plugin/core/public/discord/extensionPoints.ts";
-import { permissionsGuard } from "#plugin/core/public/discord/helper/commandGuards.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { OptionType } from "#plugin/core/discord/public/command.ts";
+import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { CaseType, createCase } from "#plugin/moderation/storage/cases.ts";
 import { DiscordRESTError, JSONErrorCodes, User, type Uncached } from "oceanic.js";

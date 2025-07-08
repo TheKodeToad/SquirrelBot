@@ -1,7 +1,7 @@
 import { isSnowflake } from "#common/snowflake.ts";
 import { requireExhaustiveSwitch } from "#common/types.ts";
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/discord/command.ts";
+import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/discord/public/command.ts";
 
 export class SafeArgs {
 	private _schema: Record<string, Option>;

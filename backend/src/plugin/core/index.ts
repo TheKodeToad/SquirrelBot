@@ -14,9 +14,9 @@ import configSync from "#plugin/core/discord/configSync.ts";
 import { installWrappedListener } from "#plugin/core/discord/eventWrapper.ts";
 import guildInfoSync from "#plugin/core/discord/guildInfoSync.ts";
 import iconSync from "#plugin/core/discord/iconSync.ts";
+import { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
+import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
 import configRoutes from "#plugin/core/http/configRoutes.ts";
-import { ConfigStore } from "#plugin/core/public/discord/configStore.ts";
-import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
 import { defineConfig } from "./public/extensionPoints.ts";
 
 const logger = moduleLogger();

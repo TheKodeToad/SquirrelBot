@@ -10,11 +10,11 @@ import { formatArgsParseError } from "#plugin/core/discord/commandEngine/parsing
 import { readPrefixArgs, readPrefixName } from "#plugin/core/discord/commandEngine/parsing/prefixParser.ts";
 import { StringReader } from "#plugin/core/discord/commandEngine/parsing/stringReader.ts";
 import { transformReply } from "#plugin/core/discord/helper/commands.ts";
+import type { Command, CommandContext, Reply } from "#plugin/core/discord/public/command.ts";
+import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
+import { resolvePermissions } from "#plugin/core/discord/public/permissionResolution.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import type { Command, CommandContext, Reply } from "#plugin/core/public/discord/command.ts";
-import { onBotEvent } from "#plugin/core/public/discord/extensionPoints.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
-import { resolvePermissions } from "#plugin/core/public/discord/permissionResolution.ts";
 import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 
 const logger = moduleLogger();

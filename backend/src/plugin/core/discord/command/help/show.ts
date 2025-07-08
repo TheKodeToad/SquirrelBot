@@ -1,7 +1,7 @@
 import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import type { CommandCacheEntry } from "#plugin/core/discord/commandEngine/commandCache.ts";
+import { type ReplyObject } from "#plugin/core/discord/public/command.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import { type ReplyObject } from "#plugin/core/public/discord/command.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 
 export function renderCommandPage(guildID: string, entry: CommandCacheEntry): ReplyObject {

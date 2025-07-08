@@ -1,7 +1,7 @@
 import { formatUser } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSeconds } from "#common/time.ts";
-import { icons } from "#plugin/core/public/discord/icons.ts";
+import { icons } from "#plugin/core/discord/public/icons.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
 import { User, type ContainerComponent, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel } from "oceanic.js";
 
