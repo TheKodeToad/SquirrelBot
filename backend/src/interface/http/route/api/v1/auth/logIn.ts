@@ -1,9 +1,9 @@
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "#environment.ts";
 import { generateToken } from "#interface/http/storage/api/tokens.ts";
-import { vValidator } from "@hono/valibot-validator";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { strictObject, string } from "valibot";
+import { z } from "zod/v4";
 
 interface TokenResponse {
 	token_type: string;
@@ -21,15 +21,15 @@ interface UserResponse {
 	global_name: string;
 }
 
-const logInPayloadSchema = strictObject({
-	code: string(),
-	codeVerifier: string(),
+const LogInPayload = z.strictObject({
+	code: z.string(),
+	codeVerifier: z.string(),
 });
 
 export default (): Hono => {
 	const app = new Hono;
 
-	app.post("/", vValidator("json", logInPayloadSchema), async context => {
+	app.post("/", zValidator("json", LogInPayload), async context => {
 		const { code, codeVerifier } = context.req.valid("json");
 
 		if (typeof code !== "string")

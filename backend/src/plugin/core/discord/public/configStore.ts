@@ -1,16 +1,16 @@
-import type { BaseIssue, BaseSchema, InferOutput } from "valibot";
+import type { z, ZodType } from "zod/v4";
 
-export class ConfigStore<S extends BaseSchema<unknown, {}, BaseIssue<unknown>> = BaseSchema<unknown, {}, BaseIssue<unknown>>> implements ConfigStore<S> {
-	private _cache: Map<string, InferOutput<S>>;
-	schema: S;
+export class ConfigStore<Z extends ZodType = ZodType> implements ConfigStore<Z> {
+	private _cache: Map<string, z.output<Z>>;
+	schema: Z;
 
-	constructor(schema: S) {
+	constructor(schema: Z) {
 		this.schema = schema;
 		this._cache = new Map;
 	}
 
 	/** @returns The guild's config, or undefined if it's not available or disabled.  */
-	get(guildID: string): InferOutput<S> | undefined {
+	get(guildID: string): z.output<Z> | undefined {
 		return this._cache.get(guildID);
 	}
 
@@ -19,7 +19,7 @@ export class ConfigStore<S extends BaseSchema<unknown, {}, BaseIssue<unknown>> =
 		return this._cache.has(guildID);
 	}
 
-	set(guildID: string, value: InferOutput<S>): void {
+	set(guildID: string, value: z.output<Z>): void {
 		this._cache.set(guildID, value);
 	}
 

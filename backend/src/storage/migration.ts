@@ -4,7 +4,7 @@ import { dbParse, postgres } from "#storage/index.ts";
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
-import { instance, strictObject } from "valibot";
+import { z } from "zod/v4";
 import "../environment.ts";
 
 export async function migrate(ignoreChanges: boolean): Promise<number> {
@@ -36,7 +36,7 @@ class MigrationError extends Error {
 	}
 }
 
-const justChecksumBufferSchema = strictObject({ checksum: instance(Buffer) });
+const JustChecksumBuffer = z.strictObject({ checksum: z.instanceof(Buffer) });
 
 async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
 	await postgres.query(`
@@ -89,7 +89,7 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 
 		// already run
 		if (rows.length !== 0) {
-			const { checksum } = dbParse(justChecksumBufferSchema, rows[0]);
+			const { checksum } = dbParse(JustChecksumBuffer, rows[0]);
 
 			if (!checksum.equals(contentChecksum)) {
 				const message = `"${file}" contents changed after it has already been run`;

@@ -1,5 +1,5 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { array, boolean, date, enum_, nullable, number, strictObject, string, type InferOutput } from "valibot";
+import { z } from "zod/v4";
 
 export enum CaseType {
 	// explicit numbering to allow reordering in source without breakage
@@ -40,26 +40,26 @@ export function caseReverseType(type: CaseType): CaseType | null {
 	}
 }
 
-export const caseInfoSchema = strictObject({
-	guildID: string(),
-	number: number(),
+export const CaseInfo = z.strictObject({
+	guildID: z.string(),
+	number: z.number(),
 
-	type: enum_(CaseType),
-	createdAt: date(),
-	expiresAt: nullable(date()),
-	shadowedBy: nullable(number()),
+	type: z.enum(CaseType),
+	createdAt: z.date(),
+	expiresAt: z.date().nullable(),
+	shadowedBy: z.number().nullable(),
 
-	actorID: string(),
-	targetID: string(),
+	actorID: z.string(),
+	targetID: z.string(),
 
-	reason: nullable(string()),
+	reason: z.string().nullable(),
 
-	deleteMessageSeconds: nullable(number()),
-	dmDelivered: nullable(boolean())
+	deleteMessageSeconds: z.number().nullable(),
+	dmDelivered: z.boolean().nullable(),
 });
-export const caseInfoArraySchema = array(caseInfoSchema);
+export const CaseInfoArray = CaseInfo.array();
 
-export interface CaseInfo extends InferOutput<typeof caseInfoSchema> { }
+export interface CaseInfo extends z.output<typeof CaseInfo> { }
 
 export interface CreateCaseOptions {
 	type: CaseType;
@@ -96,7 +96,7 @@ export interface CaseQuery {
 	limit: number;
 }
 
-export const justNumberSchema = strictObject({ number: number() });
+export const JustNumber = z.strictObject({ number: z.number() });
 
 export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
@@ -115,7 +115,7 @@ export async function getCase(guildID: string, number: number): Promise<CaseInfo
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(caseInfoSchema, result.rows[0]);
+	return dbParse(CaseInfo, result.rows[0]);
 }
 
 export async function getCases(guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
@@ -162,7 +162,7 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 		]
 	);
 
-	return dbParse(caseInfoArraySchema, result.rows);
+	return dbParse(CaseInfoArray, result.rows);
 }
 
 export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
@@ -203,7 +203,7 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 				options.dmDelivered ?? null,
 			]
 		);
-		const newNumber = dbParse(justNumberSchema, result.rows[0]).number;
+		const newNumber = dbParse(JustNumber, result.rows[0]).number;
 
 		const reverseType = caseReverseType(options.type);
 

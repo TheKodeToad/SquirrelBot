@@ -1,27 +1,24 @@
-import { parseBooleanSchema, parseIntSchema, Snowflake } from "#common/schema/general.ts";
+import { Snowflake } from "#common/schema/general.ts";
 import { definePluginGuildRoutes } from "#interface/http/extensionPoints.ts";
 import { CaseType, getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
-import { vValidator } from "@hono/valibot-validator";
+import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import { enum_, literal, optional, pipe, strictObject, transform, union } from "valibot";
+import { z } from "zod/v4";
 
-const querySchema = pipe(strictObject({
-	before: optional(parseIntSchema),
-	after: optional(parseIntSchema),
-	type: optional(pipe(parseIntSchema, enum_(CaseType))),
-	"created-before": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
-	"created-after": optional(pipe(parseIntSchema, transform(input => new Date(input)))),
-	actor: optional(Snowflake),
-	target: optional(Snowflake),
-	"delete-message-seconds-lt": optional(parseIntSchema),
-	"delete-message-seconds-gt": optional(parseIntSchema),
-	"dm-delivered": optional(parseBooleanSchema),
-	order: optional(pipe(
-		union([literal("asc"), literal("desc")]),
-		transform(input => input === "desc")
-	), "desc"),
-	limit: optional(parseIntSchema, "100"),
-}), transform(input => ({
+const querySchema = z.strictObject({
+	before: z.coerce.number().optional(),
+	after: z.coerce.number().optional(),
+	type: z.pipe(z.coerce.number(), z.enum(CaseType)),
+	"created-before": z.coerce.date().optional(),
+	"created-after": z.coerce.date().optional(),
+	actor: Snowflake.optional(),
+	target: Snowflake.optional(),
+	"delete-message-seconds-lt": z.coerce.number().optional(),
+	"delete-message-seconds-gt": z.coerce.number().optional(),
+	"dm-delivered": z.stringbool().optional(),
+	order: z.enum(["asc", "desc"]).transform(input => input === "desc").default(false),
+	limit: z.coerce.number().default(100),
+}).transform(input => ({
 	numberLessThan: input.before,
 	numberGreaterThan: input.after,
 	types: input.type !== undefined ? [input.type] : undefined,
@@ -33,7 +30,7 @@ const querySchema = pipe(strictObject({
 	deleteMessageSecondsGreaterThan: input["delete-message-seconds-gt"],
 	reversed: input.order,
 	limit: input.limit,
-} satisfies CaseQuery)));
+} satisfies CaseQuery));
 
 export default definePluginGuildRoutes(app => {
 	app.get("/cases/:number{\\d+}", async context => {
@@ -53,7 +50,7 @@ export default definePluginGuildRoutes(app => {
 		return context.json(serializeCaseObject(info));
 	});
 
-	app.get("/", vValidator("query", querySchema), async context => {
+	app.get("/", zValidator("query", querySchema), async context => {
 		if (context.var.discordGuildID === undefined)
 			throw new Error("Missing guild ID");
 

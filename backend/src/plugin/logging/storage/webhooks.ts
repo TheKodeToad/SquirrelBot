@@ -1,12 +1,12 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { strictObject, string, type InferOutput } from "valibot";
+import { z } from "zod/v4";
 
-const webhookAuthSchema = strictObject({
-	webhookID: string(),
-	token: string(),
+const WebhookAuth = z.strictObject({
+	webhookID: z.string(),
+	token: z.string(),
 });
 
-export interface WebhookAuth extends InferOutput<typeof webhookAuthSchema> { }
+export interface WebhookAuth extends z.output<typeof WebhookAuth> { }
 
 export async function getLoggingWebhook(guildID: string, channelID: string): Promise<WebhookAuth | null> {
 	const result = await postgres.query(
@@ -20,7 +20,7 @@ export async function getLoggingWebhook(guildID: string, channelID: string): Pro
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(webhookAuthSchema, result.rows[0]);
+	return dbParse(WebhookAuth, result.rows[0]);
 }
 
 export async function insertLoggingWebhook(guildID: string, channelID: string, auth: WebhookAuth): Promise<boolean> {

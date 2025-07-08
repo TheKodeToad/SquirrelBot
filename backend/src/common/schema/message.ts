@@ -4,15 +4,14 @@ import { template } from "#common/schema/template.ts";
 import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
-import { array, boolean, instance, maxLength, optional, pipe, strictObject, string, transform, union, type BaseIssue, type BaseSchema, type InferOutput } from "valibot";
+import { z } from "zod/v4";
 
-export const MessageLiteral = message(string());
-export type MessageLiteral = InferOutput<typeof MessageLiteral>;
+export const MessageLiteral = message(z.string());
+export type MessageLiteral = z.infer<typeof MessageLiteral>;
 
 export function messageTemplate<S extends TemplateSchema>(schema: S) {
-	return pipe(
-		message(template(schema)),
-		transform(({ content, embeds, ...message }) => (params: ParameterRecord<S>) => ({
+	return message(template(schema))
+		.transform(({ content, embeds, ...message }) => (params: ParameterRecord<S>) => ({
 			content: content?.(params),
 			embeds: embeds?.map(
 				({ author, description, fields, footer, image, thumbnail, title, url, ...embed }) => ({
@@ -40,64 +39,49 @@ export function messageTemplate<S extends TemplateSchema>(schema: S) {
 				})
 			) ?? [],
 			...message
-		}))
-	);
+		}));
 }
 
-function message<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(stringSchema: S) {
-	return pipe(
-		strictObject({
-			content: optional(stringSchema),
-			allowed_mentions: optional(pipe(
-				optional(strictObject({
-					everyone: optional(boolean()),
-					replied_user: optional(boolean()),
-					users: optional(union(
-						[
-							boolean(),
-							pipe(array(Snowflake), maxLength(100))
-						]
-					)),
-					roles: optional(union(
-						[
-							boolean(),
-							pipe(array(Snowflake), maxLength(100))
-						]
-					)),
-				}), {}),
-				transform(({ replied_user, ...input }) => ({ repliedUser: replied_user, ...input }))
-			), {}),
-			embeds: optional(array(embed(stringSchema))),
-			silent: optional(boolean())
-		}),
-		transform(({ allowed_mentions, silent, ...input }) => ({
-			allowedMentions: allowed_mentions,
-			flags: silent ? MessageFlags.SUPPRESS_NOTIFICATIONS : 0,
-			...input
-		}))
-	);
+function message<Z extends z.ZodTypeAny>(stringType: Z) {
+	return z.strictObject({
+		content: stringType,
+		allowed_mentions: z.strictObject({
+			everyone: z.boolean(),
+			replied_user: z.boolean(),
+			users: z.union([z.boolean(), Snowflake.array().max(100)]),
+			roles: z.union([z.boolean(), Snowflake.array().max(100)]),
+		}).partial().transform(({ replied_user, ...input }) => ({
+			epliedUser: replied_user, ...input
+		})),
+		embeds: embed(stringType).array(),
+		silent: z.boolean(),
+	}).partial().transform(({ allowed_mentions, silent, ...input }) => ({
+		allowedMentions: allowed_mentions,
+		flags: silent ? MessageFlags.SUPPRESS_NOTIFICATIONS : 0,
+		...input
+	}));
 }
 
-function embed<S extends BaseSchema<unknown, unknown, BaseIssue<unknown>>>(stringSchema: S) {
-	return strictObject({
-		title: optional(stringSchema),
-		description: optional(stringSchema),
-		url: optional(stringSchema),
-		timestamp: optional(pipe(instance(TomlDate), transform(date => date.toISOString()))), // TODO is this filter consistent with Discord's
-		color: optional(HexColor),
-		footer: optional(strictObject({ text: stringSchema, icon: stringSchema })),
-		image: optional(pipe(stringSchema, transform(url => ({ url })))),
-		thumbnail: optional(pipe(stringSchema, transform(url => ({ url })))),
-		author: optional(pipe(strictObject({
-			name: stringSchema,
-			url: optional(stringSchema),
-			icon_url: optional(stringSchema)
-		}), transform(({ icon_url, ...input }) => ({ iconURL: icon_url, ...input })))),
-		fields: optional(array(strictObject({
-			name: stringSchema,
-			value: stringSchema,
-			inline: boolean()
-		})))
-	});
+function embed<Z extends z.ZodType>(stringType: Z) {
+	return z.strictObject({
+		title: stringType,
+		description: stringType,
+		url: stringType,
+		timestamp: z.instanceof(TomlDate).transform(date => date.toISOString()), // TODO is this filter consistent with Discord's
+		color: HexColor,
+		footer: z.strictObject({ text: stringType, icon: stringType }),
+		image: stringType.transform(url => ({ url })),
+		thumbnail: stringType.transform(url => ({ url })),
+		author: z.strictObject({
+			name: stringType,
+			url: stringType.optional(),
+			icon_url: stringType.optional(),
+		}).transform(({ icon_url, ...input }) => ({ iconURL: icon_url, ...input })),
+		fields: z.strictObject({
+			name: stringType,
+			value: stringType,
+			inline: z.boolean()
+		}).array()
+	}).partial();
 }
 

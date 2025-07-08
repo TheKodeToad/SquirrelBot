@@ -1,7 +1,7 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { strictObject, string } from "valibot";
+import { z } from "zod/v4";
 
-const justValueSchema = strictObject({ value: string() });
+const JustValueSchema = z.strictObject({ value: z.string() });
 
 export async function getGuildConfig(guildID: string, pluginID: string): Promise<string | null> {
 	const result = await postgres.query(
@@ -16,7 +16,7 @@ export async function getGuildConfig(guildID: string, pluginID: string): Promise
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(justValueSchema, result.rows[0]).value;
+	return dbParse(JustValueSchema, result.rows[0]).value;
 }
 
 export async function insertGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {

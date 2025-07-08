@@ -1,15 +1,15 @@
 import { DAY } from "#common/time.ts";
 import { dbParse, postgres } from "#storage/index.ts";
 import crypto from "crypto";
-import { date, strictObject, string } from "valibot";
+import { z } from "zod/v4";
 
 const ALGORITHM = "sha-256";
 const TOKEN_LIFETIME = 30 * DAY;
 const TOKEN_REFRESH_THRESHOLD = 7 * DAY;
 
-const tokenInfoSchema = strictObject({
-	userID: string(),
-	expiresAt: date()
+const TokenInfo = z.strictObject({
+	userID: z.string(),
+	expiresAt: z.date()
 });
 
 export async function generateToken(userID: string): Promise<[token: string, expiry: Date]> {
@@ -81,7 +81,7 @@ export async function validateToken(token: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	const { expiresAt, userID } = dbParse(tokenInfoSchema, result.rows[0]);
+	const { expiresAt, userID } = dbParse(TokenInfo, result.rows[0]);
 
 	if (Date.now() >= expiresAt.getTime()) {
 		await postgres.query(

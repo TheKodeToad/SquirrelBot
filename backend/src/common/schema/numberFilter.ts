@@ -1,5 +1,4 @@
-import type { InferOutput } from "valibot";
-import { pipe, rawTransform, string } from "valibot";
+import { z } from "zod/v4";
 
 export const enum NumberFilterMode {
 	Equals,
@@ -10,13 +9,9 @@ export const enum NumberFilterMode {
 	GreaterThanOrEqual,
 }
 
-export const NumberFilter = pipe(
-	string(),
-	rawTransform(({ dataset, addIssue, NEVER }) => {
-		if (!dataset.typed)
-			return NEVER;
-
-		let numberString = dataset.value;
+export const NumberFilter = z.string()
+	.transform((input, context) => {
+		let numberString = input;
 		let mode = NumberFilterMode.Equals;
 
 		if (numberString.startsWith("="))
@@ -24,28 +19,28 @@ export const NumberFilter = pipe(
 		else if (numberString.startsWith("!=")) {
 			mode = NumberFilterMode.NotEquals;
 			numberString = numberString.substring(2);
-		} else if (numberString.startsWith("<")) {
-			mode = NumberFilterMode.LessThan;
-			numberString = numberString.substring(1);
 		} else if (numberString.startsWith("<=")) {
 			mode = NumberFilterMode.LessThanOrEqual;
 			numberString = numberString.substring(2);
-		} else if (numberString.startsWith(">")) {
-			mode = NumberFilterMode.GreaterThan;
+		} else if (numberString.startsWith("<")) {
+			mode = NumberFilterMode.LessThan;
 			numberString = numberString.substring(1);
 		} else if (numberString.startsWith(">=")) {
 			mode = NumberFilterMode.GreaterThanOrEqual;
 			numberString = numberString.substring(2);
+		} else if (numberString.startsWith(">")) {
+			mode = NumberFilterMode.GreaterThan;
+			numberString = numberString.substring(1);
 		}
 
 		const number = parseInt(numberString, 10); // no hex cos it looks weird :>
 
 		if (Number.isNaN(number)) {
-			addIssue({ message: "Invalid value: Expected comparison operator (=, !=, >, >=, <, <=) followed by a number, but received " + dataset.value });
-			return NEVER;
+			context.addIssue("Invalid value: Expected comparison operator (=, !=, >, >=, <, <=) followed by a number, but received " + input);
+			return z.NEVER;
 		}
 
 		return { number, mode };
-	})
-);
-export interface NumberFilter extends InferOutput<typeof NumberFilter> { }
+	});
+
+export interface NumberFilter extends z.output<typeof NumberFilter> { }

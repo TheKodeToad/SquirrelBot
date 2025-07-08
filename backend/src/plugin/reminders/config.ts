@@ -1,14 +1,14 @@
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import { array, boolean, optional, strictObject } from "valibot";
+import { z } from "zod/v4";
 
-export const RemindersConfig = strictObject({
-	default_permissions: optional(strictObject({
-		personal_reminders: optional(boolean(), false),
-		manage_reminders: optional(boolean(), false),
-	}), {}),
-	permission_overrides: optional(array(strictObject({
-		personal_reminders: optional(boolean()),
-		manage_reminders: optional(boolean()),
-		...PermissionsFilter.entries
-	})), []),
+export const RemindersConfig = z.strictObject({
+	default_permissions: z.strictObject({
+		personal_reminders: z.boolean().default(false),
+		manage_reminders: z.boolean().default(false),
+	}).prefault({}),
+	permission_overrides: z.strictObject({
+		personal_reminders: z.boolean().optional(),
+		manage_reminders: z.boolean().optional(),
+		...PermissionsFilter.shape
+	}).array().default([]),
 });

@@ -1,12 +1,12 @@
+import { Snowflake } from "#common/schema/general.ts";
 import { NumberFilter } from "#common/schema/numberFilter.ts";
-import type { InferOutput } from "valibot";
-import { array, optional, strictObject, string } from "valibot";
+import { z } from "zod/v4";
 
-export const PermissionsFilter = strictObject({
-	in_group: optional(array(string())),
-	in_channel: optional(array(string())),
-	in_channel_category: optional(array(string())),
-	in_thread: optional(array(string())),
-	level: optional(NumberFilter),
+export const PermissionsFilter = z.strictObject({
+	in_group: Snowflake.array().optional(),
+	in_channel: Snowflake.array().optional(),
+	in_channel_category: Snowflake.array().optional(),
+	in_thread: Snowflake.array().optional(),
+	level: NumberFilter.optional(),
 });
-export type PermissionsFilter = InferOutput<typeof PermissionsFilter>;
+export type PermissionsFilter = z.output<typeof PermissionsFilter>;

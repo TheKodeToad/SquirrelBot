@@ -1,18 +1,18 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { date, nullable, strictObject, string, type InferOutput } from "valibot";
+import z from "zod/v4";
 
-const messageCacheEntrySchema = strictObject({
-	guildID: string(),
-	channelID: string(),
-	id: string(),
-	lastUpdated: date(),
-	authorID: string(),
-	authorName: string(),
-	authorAvatarHash: nullable(string()),
-	content: string(),
+const MessageCacheEntry = z.strictObject({
+	guildID: z.string(),
+	channelID: z.string(),
+	id: z.string(),
+	lastUpdated: z.date(),
+	authorID: z.string(),
+	authorName: z.string(),
+	authorAvatarHash: z.string().nullable(),
+	content: z.string(),
 });
 
-export interface MessageCacheEntry extends InferOutput<typeof messageCacheEntrySchema> { }
+export interface MessageCacheEntry extends z.output<typeof MessageCacheEntry> { }
 
 interface CreateMessageCacheEntryOptions {
 	authorID: string;
@@ -63,7 +63,7 @@ export async function getMessageCacheEntry(guildID: string, channelID: string, i
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(messageCacheEntrySchema, result.rows[0]);
+	return dbParse(MessageCacheEntry, result.rows[0]);
 }
 
 export async function takeMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
@@ -79,7 +79,7 @@ export async function takeMessageCacheEntry(guildID: string, channelID: string, 
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(messageCacheEntrySchema, result.rows[0]);
+	return dbParse(MessageCacheEntry, result.rows[0]);
 }
 
 export async function cleanUpMessageCacheEntries(threshold: Date): Promise<number> {

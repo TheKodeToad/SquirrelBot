@@ -1,35 +1,28 @@
 import { colors } from "#common/discord/colors.ts";
 import { isSnowflake } from "#common/snowflake.ts";
-import { check, literal, pipe, string, transform, union } from "valibot";
+import { z } from "zod/v4";
 
-export const Snowflake = pipe(
-	string(),
-	check(isSnowflake, "Invalid snowflake ID")
-);
+export const Snowflake = z.string().refine(isSnowflake, { error: "Invalid Discord ID (AKA snowflake)" });
 
 const colorPattern = /#[a-fA-F0-9]{6}/;
 
-export const HexColor = pipe(
-	string(),
-	check(input => colorPattern.test(input), "Not a valid hex colour"),
-	transform(input => parseInt(input.substring(1), 16))
-);
+export const HexColor = z.string().regex(colorPattern).transform((color, context) => {
+	const result = parseInt(color.substring(1), 16);
 
-export const NamedColor = pipe(
-	string(),
-	check(input => Object.hasOwn(colors, input), "Not a valid color name"),
-	transform(input => colors[input as keyof typeof colors])
-);
+	if (Number.isNaN(result)) {
+		context.addIssue("Invalid color specification");
+		return z.NEVER;
+	}
+});
 
-export const Color = union([HexColor, NamedColor]);
+export const NamedColor = z.enum(Object.keys(colors))
+	.transform((name, context) => {
+		if (!Object.hasOwn(colors, name)) {
+			context.addIssue("Invalid color name");
+			return z.NEVER;
+		}
 
-export const parseIntSchema = pipe(
-	string(),
-	transform(parseInt),
-	check(input => Number.isSafeInteger(input), "Invalid integer")
-);
+		return colors[name as keyof typeof colors];
+	});;
 
-export const parseBooleanSchema = pipe(
-	union([literal("true"), literal("false")]),
-	transform(input => input === "true")
-);
+export const Color = z.union([HexColor, NamedColor]);

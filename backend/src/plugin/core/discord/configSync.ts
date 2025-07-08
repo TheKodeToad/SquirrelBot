@@ -9,7 +9,7 @@ import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.
 import { addChannelListener } from "#storage/notification.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
-import { parse, safeParse, type InferInput } from "valibot";
+import { z } from "zod/v4";
 import { defineConfig } from "../public/extensionPoints.ts";
 
 const logger = moduleLogger();
@@ -111,7 +111,7 @@ async function unloadConfigs(guildID: string): Promise<void> {
 	});
 }
 
-const coreConfigDefault = parse(CoreConfig, {} satisfies InferInput<typeof CoreConfig>);
+const coreConfigDefault = CoreConfig.parse({} satisfies z.input<typeof CoreConfig>);
 
 async function loadConfig(guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
 	const value = await parseConfig(guildID, pluginID, configStore);
@@ -154,17 +154,18 @@ async function parseConfig(guildID: string, pluginID: string, configCache: Confi
 	}
 
 	try {
-		var result = safeParse(configCache.schema, table);
+		var result = configCache.schema.safeParse(table);
 	} catch (error) {
 		// if our code is broken it might throw
 		logger.error?.("Unexpected error in valibot safeParse (bug)", error);
 		return null;
 	}
 
-	if (!result.success || !result.typed) {
-		logger.debug?.(`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(guildID)}`, result.issues);
+	if (!result.success) {
+		logger.debug?.(`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(guildID)}`, z.prettifyError(result.error));
 		return null;
 	}
 
-	return result.output;
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+	return result.data as any;
 }

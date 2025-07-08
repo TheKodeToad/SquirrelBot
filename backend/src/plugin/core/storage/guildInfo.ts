@@ -1,31 +1,31 @@
 import { dbParse, postgres } from "#storage/index.ts";
-import { array, boolean, date, nullable, strictObject, string, type InferOutput } from "valibot";
+import { z } from "zod/v4";
 
-const guildInfoSchema = strictObject({
-	id: string(),
-	name: nullable(string()),
-	iconHash: nullable(string()),
-	ownerID: nullable(string()),
-	allowed: boolean(),
-	deleteAt: nullable(date()),
+const GuildInfo = z.strictObject({
+	id: z.string(),
+	name: z.string().nullable(),
+	iconHash: z.string().nullable(),
+	ownerID: z.string().nullable(),
+	allowed: z.boolean(),
+	deleteAt: z.date().nullable(),
 });
 
-const guildInfoArraySchema = array(guildInfoSchema);
+const GuildInfoArray = GuildInfo.array();
 
-export interface GuildInfo extends InferOutput<typeof guildInfoSchema> { }
+export interface GuildInfo extends z.output<typeof GuildInfo> { }
 
-const apiGuildInfoSchema = strictObject({
-	id: string(),
-	name: nullable(string()),
-	iconHash: nullable(string()),
-	ownerID: nullable(string()),
+const APIGuildInfo = z.strictObject({
+	id: z.string(),
+	name: z.string().nullable(),
+	iconHash: z.string().nullable(),
+	ownerID: z.string().nullable(),
 });
 
-const apiGuildInfoArraySchema = array(apiGuildInfoSchema);
+const APIGuildInfoArray = APIGuildInfo.array();
 
-export interface APIGuildInfo extends InferOutput<typeof apiGuildInfoSchema> { }
+export interface APIGuildInfo extends z.output<typeof APIGuildInfo> { }
 
-const justOwnerIDSchema = strictObject({ ownerID: string() });
+const JustOwnerID = z.strictObject({ ownerID: z.string() });
 
 export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 	const result = await postgres.query(
@@ -46,7 +46,7 @@ export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(guildInfoSchema, result.rows[0]);
+	return dbParse(GuildInfo, result.rows[0]);
 }
 
 /**
@@ -64,7 +64,7 @@ export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 		FROM "core_guildInfo"
 	`);
 
-	return dbParse(guildInfoArraySchema, result.rows);
+	return dbParse(GuildInfoArray, result.rows);
 }
 
 export async function getGuildOwnerID(id: string): Promise<string | null> {
@@ -80,7 +80,7 @@ export async function getGuildOwnerID(id: string): Promise<string | null> {
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(justOwnerIDSchema, result.rows[0]).ownerID;
+	return dbParse(JustOwnerID, result.rows[0]).ownerID;
 }
 
 export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildInfo[]> {
@@ -98,7 +98,7 @@ export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildI
 		[ownerID]
 	);
 
-	return dbParse(apiGuildInfoArraySchema, result.rows);
+	return dbParse(APIGuildInfoArray, result.rows);
 }
 
 export async function deleteGuildInfo(id: string): Promise<void> {

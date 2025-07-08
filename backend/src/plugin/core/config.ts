@@ -1,125 +1,101 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import type { InferOutput } from "valibot";
-import { array, boolean, description, number, optional, pipe, rawTransform, record, strictObject, string } from "valibot";
+import { z } from "zod/v4";
 
-const CoreGroup = strictObject({
-	users: optional(array(pipe(string(), Snowflake)), []),
-	roles: optional(array(pipe(string(), Snowflake)), []),
-	inherits: optional(array(string()), []),
-	level: optional(number())
+const CoreGroup = z.strictObject({
+	users: Snowflake.array().default([]),
+	roles: Snowflake.array().default([]),
+	inherits: Snowflake.array().default([]),
+	level: z.int().optional(),
 });
-export interface CoreGroup extends InferOutput<typeof CoreGroup> { }
+export interface CoreGroup extends z.output<typeof CoreGroup> { }
 
-const CoreGroups = pipe(
-	record(
-		string(),
-		CoreGroup
-	),
-	transformCoreGroups()
-);
-export type CoreGroups = InferOutput<typeof CoreGroups>;
+const CoreGroups = z.record(z.string(), CoreGroup).transform(transformCoreGroups);
+export type CoreGroups = z.output<typeof CoreGroups>;
 
-export const CoreConfig = strictObject({
-	groups: pipe(
-		optional(CoreGroups, {}),
-		description(
-			"Declare permission groups. " +
-			"Permission groups are used to assign permissions to users —" +
-			"for example, create a permission group for admins called 'admin' " +
-			"and assign it using a permission override which matches it."
-		)
+export const CoreConfig = z.strictObject({
+	groups: CoreGroups.prefault({}).describe(
+		"Declare permission groups. " +
+		"Permission groups are used to assign permissions to users —" +
+		"for example, create a permission group for admins called 'admin' " +
+		"and assign it using a permission override which matches it."
 	),
 
-	prefix_commands: optional(strictObject({
-		prefix: optional(string(), "?"),
-		reply: pipe(
-			optional(boolean(), true),
-			description("Reply to messages invoking commands. The bot must have 'Read Message History' permissions.")
-		),
-	}), {}),
+	prefix_commands: z.strictObject({
+		prefix: z.string().default("?"),
+		reply: z.boolean().default(true)
+			.describe("Reply to messages invoking commands. The bot must have 'Read Message History' permissions.")
+	}).prefault({}),
 
-	default_permissions: optional(strictObject({
-		prefix_commands: optional(boolean(), true),
-		slash_commands: optional(boolean(), true),
-		ephemeral_response: optional(boolean(), true),
-		about_command: optional(boolean(), true),
-		help_command: optional(boolean(), true),
-		groups_command: optional(boolean(), false)
-	}), {}),
-	permission_overrides: optional(array(strictObject({
-		prefix_commands: optional(boolean()),
-		slash_commands: optional(boolean()),
-		ephemeral_response: optional(boolean()),
-		about_command: optional(boolean()),
-		help_command: optional(boolean()),
-		groups_command: optional(boolean()),
-		...PermissionsFilter.entries
-	})), []),
+	default_permissions: z.strictObject({
+		prefix_commands: z.boolean().default(true),
+		slash_commands: z.boolean().default(true),
+		ephemeral_response: z.boolean().default(true),
+		about_command: z.boolean().default(true),
+		help_command: z.boolean().default(true),
+		groups_command: z.boolean().default(false),
+	}).prefault({}),
+	permission_overrides: z.strictObject({
+		prefix_commands: z.boolean().optional(),
+		slash_commands: z.boolean().optional(),
+		ephemeral_response: z.boolean().optional(),
+		about_command: z.boolean().optional(),
+		help_command: z.boolean().optional(),
+		groups_command: z.boolean().optional(),
+		...PermissionsFilter.shape
+	}).array().default([]),
 });
-export type CoreConfig = InferOutput<typeof CoreConfig>;
+export type CoreConfig = z.output<typeof CoreConfig>;
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function transformCoreGroups() {
-	return rawTransform<Record<string, CoreGroup>, Map<string, CoreGroup>>(({ dataset, addIssue, NEVER }) => {
-		if (!dataset.typed)
-			return NEVER;
+function transformCoreGroups(input: Record<string, CoreGroup>, context: z.RefinementCtx<Record<string, CoreGroup>>) {
+	// show all errors for invalid inherits references at once
+	let hasIssues = false;
 
-		// show all errors for invalid inherits references at once
-		let hasIssues = false;
+	for (const key in input) {
+		if (!Object.hasOwn(input, key))
+			continue;
 
-		for (const key in dataset.value) {
-			if (!Object.hasOwn(dataset.value, key))
-				continue;
+		const value = input[key]!;
 
-			const value = dataset.value[key]!;
-
-			value.inherits?.forEach((reference, index) => {
-				if (!Object.hasOwn(dataset.value, reference)) {
-					addIssue({
-						message: `Invalid group reference: Received ${reference}`,
-						path: [
-							{ type: "object", origin: "value", input: dataset.value, key, value },
-							{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
-							{ type: "array", origin: "value", input: value.inherits, key: index, value: reference }
-						]
-					});
-					hasIssues = true;
-				}
-			});
-		}
-
-		if (hasIssues)
-			return NEVER;
-
-		const result: Map<string, CoreGroup> = new Map;
-
-		for (const key in dataset.value) {
-			if (!Object.hasOwn(dataset.value, key))
-				continue;
-
-			const value = dataset.value[key]!;
-
-			const inherits = flattenInheritence(value, key, dataset.value);
-
-			if (inherits === null) {
-				addIssue({
-					message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
-					path: [
-						{ type: "object", origin: "value", input: dataset.value, key, value },
-						{ type: "object", origin: "value", input: value, key: "inherits", value: value.inherits },
-					]
+		value.inherits?.forEach((reference, index) => {
+			if (!Object.hasOwn(input, reference)) {
+				context.addIssue({
+					message: `Invalid group reference: Received ${reference}`,
+					path: [key, "inherits", index]
 				});
-				return NEVER;
+				hasIssues = true;
 			}
+		});
+	}
 
-			result.set(key, { ...value, inherits });
+	if (hasIssues)
+		return z.NEVER;
+
+	const result: Map<string, CoreGroup> = new Map;
+
+	for (const key in input) {
+		if (!Object.hasOwn(input, key))
+			continue;
+
+		const value = input[key]!;
+
+		const inherits = flattenInheritence(value, key, input);
+
+		if (inherits === null) {
+			context.addIssue({
+				message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
+				path: [key, "inherits"]
+			});
+			return z.NEVER;
 		}
 
-		return result;
-	});
+		result.set(key, { ...value, inherits });
+	}
+
+	return result;
 }
 
 function flattenInheritence(input: CoreGroup, key: string, groups: Record<string, CoreGroup>): string[] | null {

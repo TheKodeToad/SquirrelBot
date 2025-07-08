@@ -1,25 +1,25 @@
 import { dbParse, postgres } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
-import { array, boolean, date, enum_, nullable, number, strictObject, string, type InferOutput } from "valibot";
+import { z } from "zod/v4";
 
-const reminderSchema = strictObject({
-	guildID: string(),
-	number: number(),
+const Reminder = z.strictObject({
+	guildID: z.string(),
+	number: z.number(),
 
-	ownerID: string(),
-	channelID: string(),
-	channelType: enum_(ChannelTypes),
+	ownerID: z.string(),
+	channelID: z.string(),
+	channelType: z.enum(ChannelTypes),
 
-	createdAt: date(),
-	firesAt: date(),
+	createdAt: z.date(),
+	firesAt: z.date(),
 
-	message: nullable(string()),
-	silent: boolean(),
+	message: z.string().nullable(),
+	silent: z.boolean(),
 });
 
-const reminderArraySchema = array(reminderSchema);
+const ReminderArray = Reminder.array();
 
-export interface Reminder extends InferOutput<typeof reminderSchema> { }
+export interface Reminder extends z.output<typeof Reminder> { }
 
 export interface CreateReminderOptions {
 	ownerID: string;
@@ -44,7 +44,7 @@ export interface ReminderQuery {
 	limit: number;
 }
 
-const justNumberSchema = strictObject({ number: number() });
+const JustNumberSchema = z.strictObject({ number: z.number() });
 
 export async function getReminder(guildID: string, number: number): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32)
@@ -63,7 +63,7 @@ export async function getReminder(guildID: string, number: number): Promise<Remi
 	if (result.rowCount !== 1)
 		return null;
 
-	return dbParse(reminderSchema, result.rows[0]);
+	return dbParse(Reminder, result.rows[0]);
 }
 
 export async function getReminders(guildID: string, query: ReminderQuery): Promise<Reminder[]> {
@@ -92,7 +92,7 @@ export async function getReminders(guildID: string, query: ReminderQuery): Promi
 		]
 	);
 
-	return dbParse(reminderArraySchema, result.rows);
+	return dbParse(ReminderArray, result.rows);
 }
 
 export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: Date): Promise<Reminder[]> {
@@ -105,7 +105,7 @@ export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: 
 		[startInclusive, endExclusive]
 	);
 
-	return dbParse(reminderArraySchema, result.rows);
+	return dbParse(ReminderArray, result.rows);
 }
 
 export async function createReminder(guildID: string, options: CreateReminderOptions): Promise<Reminder> {
@@ -140,7 +140,7 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 
 	return {
 		guildID,
-		number: dbParse(justNumberSchema, result.rows[0]).number,
+		number: dbParse(JustNumberSchema, result.rows[0]).number,
 		...options
 	} satisfies Reminder;
 }

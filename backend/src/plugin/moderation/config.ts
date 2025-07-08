@@ -1,13 +1,13 @@
 import { messageTemplate } from "#common/schema/message.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { ParameterType } from "#common/template/index.ts";
-import { array, boolean, description, type InferOutput, number, optional, pipe, strictObject, string } from "valibot";
+import { z } from "zod/v4";
 
-export const PresetReason = strictObject({
-	name: string(),
-	replacement: string(),
+export const PresetReason = z.strictObject({
+	name: z.string(),
+	replacement: z.string(),
 });
-export interface PresetReason extends InferOutput<typeof PresetReason> { }
+export interface PresetReason extends z.output<typeof PresetReason> { }
 
 const discordReasons: PresetReason[] = [
 	// TODO: treat these keys specially
@@ -23,70 +23,55 @@ const actionParams = {
 	reason: ParameterType.MarkdownString,
 } as const;
 
-export const ModerationConfig = strictObject({
-	preset_reasons: optional(array(PresetReason), []), // TODO
-	preset_prefix: optional(string(), "!"), // TODO
+export const ModerationConfig = z.strictObject({
+	preset_reasons: z.array(PresetReason).default([]), // TODO
+	preset_prefix: z.string().default("!"), // TODO
 
-	ban: pipe(
-		optional(strictObject({
-			send_direct_message: optional(boolean(), false),
-			direct_message: optional(messageTemplate(actionParams)),
-			purge_messages: optional(number(), 0),
-			preset_reasons: optional(array(PresetReason), discordReasons) // TODO
-		}), {}),
-		description("Configure ban behavior")
-	),
-	unban: pipe(
-		optional(strictObject({
-			preset_reasons: optional(array(PresetReason), [])
-		}), {}),
-		description("Configure unban behavior")
-	),
-	kick: pipe(
-		optional(strictObject({
-			send_direct_message: optional(boolean(), false),
-			direct_message: optional(messageTemplate(actionParams)),
-			preset_reasons: optional(array(PresetReason), discordReasons), // TODO
-		}), {}),
-		description("Configure kick behavior")
-	),
-	timeout: pipe(
-		optional(strictObject({
-			send_direct_message: optional(boolean(), false),
-			direct_message: optional(messageTemplate({ ...actionParams, duration: ParameterType.Duration })),
-			preset_reasons: optional(array(PresetReason), discordReasons), // TODO
-		}), {}),
-		description("Configure timeout behavior")
-	),
-	warn: pipe(
-		optional(strictObject({
-			send_direct_message: optional(boolean(), false),
-			direct_message: optional(messageTemplate(actionParams)),
-			preset_reasons: optional(array(PresetReason), discordReasons),
-		}), {}),
-		description("Configure warn behavior")
-	),
+	ban: z.strictObject({
+		send_direct_message: z.boolean().default(false),
+		direct_message: messageTemplate(actionParams).optional(),
+		purge_messages: z.number().default(0),
+		preset_reasons: PresetReason.array().default(discordReasons) // TODO
+	}).prefault({}).describe("Configure ban behavior"),
+	unban: z.strictObject({
+		preset_reasons: PresetReason.array().default([])
+	}).prefault({}).describe("Configure unban behavior"),
+	kick: z.strictObject({
+		send_direct_message: z.boolean().default(false),
+		direct_message: messageTemplate(actionParams).optional(),
+		preset_reasons: PresetReason.array().default(discordReasons), // TODO
+	}).prefault({}).describe("Configure kick behavior"),
+	timeout: z.strictObject({
+		send_direct_message: z.boolean().default(false),
+		direct_message: messageTemplate({ ...actionParams, duration: ParameterType.Duration }).optional(),
+		preset_reasons: PresetReason.array().default(discordReasons), // TODO
+	}).prefault({}).describe("Configure timeout behavior"),
+	warn: z.strictObject({
+		send_direct_message: z.boolean().default(false),
+		direct_message: messageTemplate(actionParams).optional(),
+		preset_reasons: PresetReason.array().default(discordReasons),
+	}).prefault({}).describe("Configure warn behavior"),
 
-	default_permissions: optional(strictObject({
-		ban: optional(boolean(), false),
-		unban: optional(boolean(), false),
-		kick: optional(boolean(), false),
-		timeout: optional(boolean(), false),
-		warn: optional(boolean(), false),
-		purge: optional(boolean(), false),
-		case_read: optional(boolean(), false),
-		case_delete: optional(boolean(), false),
-	}), {}),
-	permission_overrides: optional(array(strictObject({
-		ban: optional(boolean()),
-		unban: optional(boolean()),
-		kick: optional(boolean()),
-		warn: optional(boolean()),
-		timeout: optional(boolean()),
-		purge: optional(boolean()),
-		case_read: optional(boolean()),
-		case_delete: optional(boolean()),
-		...PermissionsFilter.entries
-	})), []),
+	default_permissions: z.strictObject({
+		ban: z.boolean().default(false),
+		unban: z.boolean().default(false),
+		kick: z.boolean().default(false),
+		timeout: z.boolean().default(false),
+		warn: z.boolean().default(false),
+		purge: z.boolean().default(false),
+		case_read: z.boolean().default(false),
+		case_delete: z.boolean().default(false),
+	}).prefault({}),
+	permission_overrides: z.strictObject({
+		ban: z.boolean().optional(),
+		unban: z.boolean().optional(),
+		kick: z.boolean().optional(),
+		warn: z.boolean().optional(),
+		timeout: z.boolean().optional(),
+		purge: z.boolean().optional(),
+		case_read: z.boolean().optional(),
+		case_delete: z.boolean().optional(),
+		...PermissionsFilter.shape
+	}).array().default([]),
 });
-export type ModerationConfig = InferOutput<typeof ModerationConfig>;
+export type ModerationConfig = z.output<typeof ModerationConfig>;

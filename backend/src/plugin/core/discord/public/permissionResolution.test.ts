@@ -7,10 +7,10 @@ import { coreConfigStore } from "#plugin/core/index.ts";
 import assert from "assert";
 import { suite, test } from "node:test";
 import { parse as parseTOML } from "smol-toml";
-import { array, object, parse, strictObject, type InferOutput } from "valibot";
+import { z } from "zod/v4";
 
 function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): T {
-	const parsed = parse(coreConfigStore.schema, parseTOML(value));
+	const parsed = coreConfigStore.schema.parse(parseTOML(value));
 
 	coreConfigStore.set(DUMMY_GUILD, parsed);
 
@@ -21,14 +21,14 @@ function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): 
 	return result;
 }
 
-const permissionsSchema = strictObject({
-	permissions: object({}),
-	permission_overrides: array(object(PermissionsFilter.entries)),
+const Permissions = z.strictObject({
+	permissions: z.object({}),
+	permission_overrides: z.object(PermissionsFilter.shape).array(),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function mockCustomConfig(value: string): InferOutput<typeof permissionsSchema> {
-	return parse(permissionsSchema, parseTOML(value));
+function mockCustomConfig(value: string): z.output<typeof Permissions> {
+	return Permissions.parse(parseTOML(value));
 }
 
 suite("group resolution", () => {

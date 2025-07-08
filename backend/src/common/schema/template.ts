@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { parseTemplate, type TemplateSchema } from "#common/template/index.ts";
-import { pipe, rawTransform, string } from "valibot";
+import { z } from "zod/v4";
 
 export function template<S extends TemplateSchema>(schema: S) {
-	return pipe(string(), rawTransform(({ dataset, addIssue, NEVER }) => {
-		if (!dataset.typed)
-			return NEVER;
+	return z.string().transform((input, context) => {
+		const result = parseTemplate(input, schema);
 
-		const template = parseTemplate(dataset.value, schema);
-
-		if (typeof template === "string") {
-			addIssue({ message: template });
-			return NEVER;
+		if (typeof result === "string") {
+			context.addIssue({ message: result });
+			return z.NEVER;
 		}
 
-		return template;
-	}));
+		return result;
+	});
 }
