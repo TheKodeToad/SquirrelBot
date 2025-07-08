@@ -1,5 +1,5 @@
 import { parseBooleanSchema, parseIntSchema, Snowflake } from "#common/schema/general.ts";
-import { definePluginRoutes } from "#interface/http/extensionPoints.ts";
+import { definePluginGuildRoutes } from "#interface/http/extensionPoints.ts";
 import { CaseType, getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
 import { vValidator } from "@hono/valibot-validator";
 import { HTTPException } from "hono/http-exception";
@@ -35,7 +35,7 @@ const querySchema = pipe(strictObject({
 	limit: input.limit,
 } satisfies CaseQuery)));
 
-export default definePluginRoutes(app => {
+export default definePluginGuildRoutes(app => {
 	app.get("/cases/:number{\\d+}", async context => {
 		if (context.var.discordGuildID === undefined)
 			throw new Error("Missing guild ID");

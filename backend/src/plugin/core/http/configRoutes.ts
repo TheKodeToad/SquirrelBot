@@ -1,9 +1,9 @@
-import { defineGlobalPluginRoutes } from "#interface/http/extensionPoints.ts";
+import { defineGlobalPluginGuildRoutes } from "#interface/http/extensionPoints.ts";
 import { getGuildConfig, updateGuildConfig } from "#plugin/core/storage/configs.ts";
 import { notifyChannel } from "#storage/notification.ts";
 import { HTTPException } from "hono/http-exception";
 
-export default defineGlobalPluginRoutes((plugin, app) => {
+export default defineGlobalPluginGuildRoutes((plugin, app) => {
 	app.get("/config", async context => {
 		const config = await getGuildConfig(context.var.discordGuildID, plugin.id);
 
