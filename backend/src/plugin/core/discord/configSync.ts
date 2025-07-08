@@ -153,6 +153,8 @@ async function parseConfig(guildID: string, pluginID: string, configCache: Confi
 			return null;
 	}
 
+	delete table.enabled;
+
 	try {
 		var result = configCache.schema.safeParse(table);
 	} catch (error) {
