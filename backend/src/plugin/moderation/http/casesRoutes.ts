@@ -1,7 +1,7 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { definePluginGuildRoutes } from "#interface/http/extensionPoints.ts";
+import { validate } from "#interface/http/middleware/zod.ts";
 import { CaseType, getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
-import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod/v4";
 
@@ -34,26 +34,20 @@ const querySchema = z.strictObject({
 
 export default definePluginGuildRoutes(app => {
 	app.get("/cases/:number{\\d+}", async context => {
-		if (context.var.discordGuildID === undefined)
-			throw new Error("Missing guild ID");
-
 		const number = Number(context.req.param("number"));
 
 		if (!Number.isSafeInteger(number))
-			throw new HTTPException(400);
+			throw new HTTPException(400, { message: "Bad case number" });
 
 		const info = await getCase(context.var.discordGuildID, number);
 
 		if (info === null)
-			throw new HTTPException(400);
+			throw new HTTPException(404, { message: "Case not found" });
 
 		return context.json(serializeCaseObject(info));
 	});
 
-	app.get("/", zValidator("query", querySchema), async context => {
-		if (context.var.discordGuildID === undefined)
-			throw new Error("Missing guild ID");
-
+	app.get("/", validate("query", querySchema), async context => {
 		const result = await getCases(context.var.discordGuildID, context.req.valid("query"));
 		return context.json(result.map(serializeCaseObject));
 	});

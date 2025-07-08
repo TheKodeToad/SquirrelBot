@@ -1,11 +1,11 @@
 import type { CommandContext } from "#plugin/core/discord/public/command.ts";
 import type { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
 import { resolvePermissions, type ConfigWithPermissions } from "#plugin/core/discord/public/permissionResolution.ts";
-import type { ZodType } from "zod/v4";
+import { z } from "zod/v4";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(
 	context: CommandContext,
-	configCache: ConfigStore<ZodType<C>>,
+	configCache: ConfigStore<z.ZodType<C>>,
 	requirement?: (permissions: C["default_permissions"], config: C) => boolean
 ): false | PermissionsGuardData<C> {
 	const config = configCache.get(context.guild.id);

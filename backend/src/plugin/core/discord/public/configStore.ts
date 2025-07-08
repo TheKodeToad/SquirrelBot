@@ -1,6 +1,6 @@
-import type { z, ZodType } from "zod/v4";
+import type { z } from "zod/v4";
 
-export class ConfigStore<Z extends ZodType = ZodType> implements ConfigStore<Z> {
+export class ConfigStore<Z extends z.ZodType = z.ZodType> implements ConfigStore<Z> {
 	private _cache: Map<string, z.output<Z>>;
 	schema: Z;
 

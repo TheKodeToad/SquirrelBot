@@ -1,10 +1,10 @@
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
 import pg from "pg";
-import { z, ZodType } from "zod/v4";
+import { z } from "zod/v4";
 
 export const postgres = new pg.Pool;
 
-export function dbParse<Z extends ZodType>(type: Z, input: unknown): z.infer<Z> {
+export function dbParse<Z extends z.ZodType>(type: Z, input: unknown): z.infer<Z> {
 	if (INTERNAL_TYPE_INTEGRITY)
 		return type.parse(input);
 	else {
