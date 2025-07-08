@@ -80,6 +80,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.37.2
         version: 6.37.2
+      '@fsegurai/codemirror-theme-gruvbox-dark':
+        specifier: 6.2.0
+        version: 6.2.0(@codemirror/language@6.11.1)(@codemirror/state@6.5.2)(@codemirror/view@6.37.2)(@lezer/highlight@1.2.1)
       '@solid-primitives/deep':
         specifier: ^0.3.2
         version: 0.3.2(solid-js@1.9.7)
@@ -469,6 +472,14 @@ packages:
   '@eslint/plugin-kit@0.3.2':
     resolution: {integrity: sha512-4SaFZCNfJqvk/kenHpI8xvN42DMaoycy4PzKc5otHxRswww1kAt82OlBuwRVLofCACCTZEcla2Ydxv8scMXaTg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fsegurai/codemirror-theme-gruvbox-dark@6.2.0':
+    resolution: {integrity: sha512-AeQrgfP/6bometuQizMSaVbXv8ZAfyl31opL28dvcq4N1XasYTunCYom2FctGs0JWYEnLXzT3rOs+INwg69DLg==}
+    peerDependencies:
+      '@codemirror/language': ^6.0.0
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
+      '@lezer/highlight': ^1.0.0
 
   '@hono/node-server@1.14.4':
     resolution: {integrity: sha512-DnxpshhYewr2q9ZN8ez/M5mmc3sucr8CT1sIgIy1bkeUXut9XWDkqHoFHRhWIQgkYnKpVRxunyhK7WzpJeJ6qQ==}
@@ -1845,6 +1856,13 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.0
       levn: 0.4.1
+
+  '@fsegurai/codemirror-theme-gruvbox-dark@6.2.0(@codemirror/language@6.11.1)(@codemirror/state@6.5.2)(@codemirror/view@6.37.2)(@lezer/highlight@1.2.1)':
+    dependencies:
+      '@codemirror/language': 6.11.1
+      '@codemirror/state': 6.5.2
+      '@codemirror/view': 6.37.2
+      '@lezer/highlight': 1.2.1
 
   '@hono/node-server@1.14.4(hono@4.8.2)':
     dependencies:
