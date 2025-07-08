@@ -27,7 +27,7 @@ export default defineGlobalPluginGuildRoutes((plugin, app) => {
 			"core_configUpdate",
 			JSON.stringify({
 				guildID: context.var.discordGuildID,
-				key: plugin.id,
+				pluginID: plugin.id,
 			})
 		);
 

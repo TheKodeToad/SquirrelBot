@@ -3,14 +3,14 @@ import { strictObject, string } from "valibot";
 
 const justValueSchema = strictObject({ value: string() });
 
-export async function getGuildConfig(guildID: string, key: string): Promise<string | null> {
+export async function getGuildConfig(guildID: string, pluginID: string): Promise<string | null> {
 	const result = await postgres.query(
 		`
 			SELECT "value"
 			FROM "core_guildConfigs"
-			WHERE "guildID" = $1 AND "key" = $2
+			WHERE "guildID" = $1 AND "pluginID" = $2
 		`,
-		[guildID, key]
+		[guildID, pluginID]
 	);
 
 	if (result.rowCount !== 1)
@@ -19,48 +19,48 @@ export async function getGuildConfig(guildID: string, key: string): Promise<stri
 	return dbParse(justValueSchema, result.rows[0]).value;
 }
 
-export async function insertGuildConfig(guildID: string, key: string, value: string): Promise<boolean> {
+export async function insertGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {
 	const result = await postgres.query(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",
-				"key",
+				"pluginID",
 				"value"
 			)
 			VALUES ($1, $2, $3)
-			ON CONFLICT ("guildID", "key") DO NOTHING
+			ON CONFLICT ("guildID", "pluginID") DO NOTHING
 		`,
-		[guildID, key, value]
+		[guildID, pluginID, value]
 	);
 
 	return result.rowCount === 1;
 }
 
-export async function updateGuildConfig(guildID: string, key: string, value: string): Promise<boolean> {
+export async function updateGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {
 	const result = await postgres.query(
 		`
 			UPDATE "core_guildConfigs"
 			SET "value" = $3
-			WHERE "guildID" = $1 AND "key" = $2
+			WHERE "guildID" = $1 AND "pluginID" = $2
 		`,
-		[guildID, key, value]
+		[guildID, pluginID, value]
 	);
 
 	return result.rowCount === 1;
 }
 
-export async function upsertGuildConfig(guildID: string, key: string, value: string): Promise<void> {
+export async function upsertGuildConfig(guildID: string, pluginID: string, value: string): Promise<void> {
 	await postgres.query(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",
-				"key",
+				"pluginID",
 				"value"
 			)
 			VALUES ($1, $2, $3)
-			ON CONFLICT ("guildID", "key")
+			ON CONFLICT ("guildID", "pluginID")
 			DO UPDATE SET "value" = $3
 		`,
-		[guildID, key, value]
+		[guildID, pluginID, value]
 	);
 }

@@ -27,7 +27,7 @@ async function init(): Promise<void> {
 
 const configUpdateLock = new AsyncLock;
 
-function formatPluginInGuild(pluginID: string, guildID: string): string {
+function formatGuildPlugin(guildID: string, pluginID: string): string {
 	return `#${pluginID} in ${debugFormatGuildByID(guildID)}`;
 }
 
@@ -51,14 +51,14 @@ async function installConfigChangeListener(): Promise<void> {
 			return;
 		}
 
-		if (!("key" in payloadObject && "guildID" in payloadObject)) {
-			logger.warn?.("configUpdate payload does not contain key and guildID");
+		if (!("pluginID" in payloadObject && "guildID" in payloadObject)) {
+			logger.warn?.("configUpdate payload does not contain pluginID and guildID");
 			return;
 		}
 
-		const { key, guildID } = payloadObject;
+		const { guildID, pluginID } = payloadObject;
 
-		if (!(typeof key === "string" && typeof guildID === "string")) {
+		if (!(typeof guildID === "string" && typeof pluginID === "string")) {
 			logger.warn?.("configUpdate payload contains non string values");
 			return;
 		}
@@ -70,21 +70,21 @@ async function installConfigChangeListener(): Promise<void> {
 
 		// TODO: don't lock all configs for each guild at a time
 		await configUpdateLock.acquire(guildID, async () => {
-			const plugin = getPlugin(key);
+			const plugin = getPlugin(pluginID);
 
 			if (plugin === undefined) {
-				logger.warn?.(`Received configUpdate for plugin #${key} which does not exist`);
+				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not exist`);
 				return;
 			}
 
 			const config = defineConfig.contributions.get(plugin);
 
 			if (config === undefined) {
-				logger.warn?.(`Received configUpdate for plugin #${key} which does not have a config`);
+				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not have a config`);
 				return;
 			}
 
-			logger.debug?.(`Updating config for plugin ${formatPluginInGuild(key, guildID)}`);
+			logger.debug?.(`Updating config for plugin ${formatGuildPlugin(guildID, pluginID)}`);
 
 			await loadConfig(guildID, plugin.id, config.store);
 		});
@@ -138,14 +138,14 @@ async function parseConfig(guildID: string, pluginID: string, configCache: Confi
 		if (!(error instanceof TomlError))
 			logger.error?.("Unexpected error parsing TOML (bug)", error);
 		else
-			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatPluginInGuild(pluginID, guildID)}`, error);
+			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatGuildPlugin(guildID, pluginID)}`, error);
 
 		return null;
 	}
 
 	if (pluginID !== "core") {
 		if (typeof table.enabled !== "boolean") {
-			logger.debug?.(`Missing { enabled: boolean; } in plugin config of ${formatPluginInGuild(pluginID, guildID)}`);
+			logger.debug?.(`Missing { enabled: boolean; } in plugin config of ${formatGuildPlugin(guildID, pluginID)}`);
 			return null;
 		}
 
