@@ -52,6 +52,7 @@ export default defineCommand({
 
 			actor: context.member,
 			directMessage: directMessage,
+			memberRanking: config.member_ranking,
 
 			membersOnly: true,
 

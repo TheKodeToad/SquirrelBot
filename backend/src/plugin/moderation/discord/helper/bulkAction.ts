@@ -1,6 +1,8 @@
 import { createDMCached, fetchMembersCached, fetchUserCached } from "#common/discord/cachedRequest.ts";
 import { formatRESTError } from "#common/discord/format.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
+import { resolveGroups } from "#plugin/core/discord/public/permissionResolution.ts";
+import { MemberRanking } from "#plugin/moderation/config.ts";
 import { createCase, type CreateCaseOptions } from "#plugin/moderation/storage/cases.ts";
 import { DiscordRESTError, Member, type CreateMessageOptions, type Guild, type Uncached, type User } from "oceanic.js";
 
@@ -22,6 +24,7 @@ type BulkAction =
 		actor: Member;
 		directMessage?: CreateMessageOptions;
 		duration?: number;
+		memberRanking: MemberRanking;
 
 		check?(member: Member): Promise<string | true> | string | true;
 		makeCase(options: Pick<CreateCaseOptions, "createdAt" | "expiresAt" | "actorID" | "targetID" | "dmDelivered">): CreateCaseOptions;
@@ -60,7 +63,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 		if (targetMember !== undefined) {
 			target = targetMember;
 
-			if (!canModerate(action.actor, target)) {
+			if (!canModerate(action.memberRanking, action.actor, target)) {
 				result.unsuccessful.push({
 					error: "You lack permission to moderate the user",
 					user: target,
@@ -78,7 +81,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 				continue;
 			}
 
-			if (!canModerate(action.guild.clientMember, target)) {
+			if (!canModerate(action.memberRanking, action.guild.clientMember, target)) {
 				result.unsuccessful.push({
 					error: "App lacks permission to moderate the user",
 					user: target,
@@ -158,11 +161,25 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 	return result;
 }
 
-function canModerate(actor: Member, target: Member): boolean {
+function canModerate(ranking: MemberRanking, actor: Member, target: Member): boolean {
 	const guild = actor.guild;
 
-	if (guild.id !== target.guild.id)
-		throw new Error("Comparing across guilds");
+	switch (ranking) {
+	case MemberRanking.None:
+		return true;
 
-	return target.id !== guild.ownerID && (actor.id === guild.ownerID || getHighestRole(actor).position > getHighestRole(target).position);
+	case MemberRanking.HighestRole:
+		if (guild.id !== target.guild.id)
+			throw new Error("Comparing across guilds");
+
+		return target.id !== guild.ownerID
+			&& (actor.id === guild.ownerID || getHighestRole(actor).position > getHighestRole(target).position);
+
+	case MemberRanking.Level: {
+		const { level: actorLevel } = resolveGroups(actor);
+		const { level: targetLevel } = resolveGroups(target);
+
+		return actorLevel > targetLevel;
+	}
+	}
 }

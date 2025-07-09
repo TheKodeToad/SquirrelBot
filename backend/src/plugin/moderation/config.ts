@@ -1,3 +1,4 @@
+import { mappedEnum } from "#common/schema/general.ts";
 import { messageTemplate } from "#common/schema/message.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { ParameterType } from "#common/template/index.ts";
@@ -23,6 +24,12 @@ const actionParams = {
 	reason: ParameterType.MarkdownString,
 } as const;
 
+export const enum MemberRanking {
+	None,
+	HighestRole,
+	Level,
+}
+
 export const ModerationConfig = z.strictObject({
 	preset_reasons: z.array(PresetReason).default([]), // TODO
 	preset_prefix: z.string().default("!"), // TODO
@@ -33,24 +40,39 @@ export const ModerationConfig = z.strictObject({
 		purge_messages: z.number().default(0),
 		preset_reasons: PresetReason.array().default(discordReasons) // TODO
 	}).prefault({}).describe("Configure ban behavior"),
+
 	unban: z.strictObject({
 		preset_reasons: PresetReason.array().default([])
 	}).prefault({}).describe("Configure unban behavior"),
+
 	kick: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).optional(),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure kick behavior"),
+
 	timeout: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate({ ...actionParams, duration: ParameterType.Duration }).optional(),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure timeout behavior"),
+
 	warn: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).optional(),
 		preset_reasons: PresetReason.array().default(discordReasons),
 	}).prefault({}).describe("Configure warn behavior"),
+
+	member_ranking: mappedEnum({
+		none: MemberRanking.None,
+		highest_role: MemberRanking.HighestRole,
+		level: MemberRanking.Level
+	}).default(MemberRanking.HighestRole).describe(
+		"Customize the system used to determine whether a moderator can moderate a user.\n" +
+		"'none' allows anyone to be moderated by a moderator.\n" +
+		"'highest_role' reflects the behavior of Discord; you can only moderate users who's highest role is below yours.\n" +
+		"'level' is based on who has a higher level in the app's group system."
+	),
 
 	default_permissions: z.strictObject({
 		ban: z.boolean().default(false),
