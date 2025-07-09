@@ -81,7 +81,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 				continue;
 			}
 
-			if (!canModerate(action.memberRanking, action.guild.clientMember, target)) {
+			if (!canModerate(MemberRanking.HighestRole, action.guild.clientMember, target)) {
 				result.unsuccessful.push({
 					error: "App lacks permission to moderate the user",
 					user: target,
