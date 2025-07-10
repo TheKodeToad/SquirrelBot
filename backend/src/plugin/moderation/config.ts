@@ -31,7 +31,7 @@ export const enum MemberRanking {
 }
 
 export const ModerationConfig = z.strictObject({
-	preset_reasons: z.array(PresetReason).default([]), // TODO
+	preset_reasons: PresetReason.array().default([]), // TODO
 	preset_prefix: z.string().default("!"), // TODO
 
 	member_ranking: mappedEnum({

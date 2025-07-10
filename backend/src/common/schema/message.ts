@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { HexColor, Snowflake } from "#common/schema/general.ts";
+import { Color, Snowflake } from "#common/schema/general.ts";
 import { template } from "#common/schema/template.ts";
 import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
 import { MessageFlags } from "oceanic.js";
@@ -68,7 +68,7 @@ function embed<Z extends z.ZodType>(stringType: Z) {
 		description: stringType,
 		url: stringType,
 		timestamp: z.instanceof(TomlDate).transform(date => date.toISOString()), // TODO is this filter consistent with Discord's
-		color: HexColor,
+		color: Color,
 		footer: z.strictObject({ text: stringType, icon: stringType }),
 		image: stringType.transform(url => ({ url })),
 		thumbnail: stringType.transform(url => ({ url })),
@@ -80,8 +80,8 @@ function embed<Z extends z.ZodType>(stringType: Z) {
 		fields: z.strictObject({
 			name: stringType,
 			value: stringType,
-			inline: z.boolean()
-		}).array()
+			inline: z.boolean().optional(),
+		}).array(),
 	}).partial();
 }
 

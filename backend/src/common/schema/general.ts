@@ -23,7 +23,7 @@ export const NamedColor = z.enum(Object.keys(colors))
 			return z.NEVER;
 		}
 
-		return colors[name as keyof typeof colors];
+		return colors[name as keyof typeof colors]!;
 	});;
 
 export const Color = z.union([HexColor, NamedColor]);

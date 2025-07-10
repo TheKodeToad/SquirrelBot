@@ -1,11 +1,9 @@
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
-import { colors } from "#common/discord/colors.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
-import { isEventConfigEnabled } from "#plugin/logging/discord/helper/config.ts";
 import { logToChannel } from "#plugin/logging/discord/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
 import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "#plugin/logging/storage/messageCache.ts";
@@ -44,7 +42,7 @@ async function handleCreate(message: Message): Promise<void> {
 	if (config === undefined)
 		return;
 
-	const shouldTrack = config.loggers.some(logger => isEventConfigEnabled(logger.events.message_edit) || isEventConfigEnabled(logger.events.message_delete));
+	const shouldTrack = config.loggers.some(logger => logger.events.message_edit || logger.events.message_delete);
 
 	if (!shouldTrack)
 		return;
@@ -71,7 +69,7 @@ async function handleUpdate(message: Message): Promise<void> {
 	for (const logger of config.loggers) {
 		const { message_edit } = logger.events;
 
-		if (!isEventConfigEnabled(message_edit))
+		if (!message_edit)
 			continue;
 
 		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel);
@@ -88,23 +86,12 @@ async function handleUpdate(message: Message): Promise<void> {
 			content: message.content,
 		});
 
-		await logToChannel(channel, {
-			embeds: [{
-				title: "Message Edited",
-				author: { name: message.author.tag, iconURL: message.author.avatarURL() },
-				fields: [
-					{
-						name: "Old Content",
-						value: entry?.content ?? "*Not available.*",
-					},
-					{
-						name: "New Content",
-						value: message.content,
-					}
-				],
-				color: colors.yellow,
-			}]
-		});
+		await logToChannel(channel, message_edit.message({
+			author: message.author,
+			author_avatar: message.author.avatarURL(),
+			old_content: entry?.content,
+			new_content: message.content
+		}));
 	}
 }
 
@@ -122,14 +109,14 @@ async function handleDelete(message: Message): Promise<void> {
 	if (entry === null)
 		return;
 
-	const iconURL = entry.authorAvatarHash !== null ?
+	const avatarURL = entry.authorAvatarHash !== null ?
 		bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
 		: undefined;
 
 	for (const logger of config.loggers) {
-		const { message_edit } = logger.events;
+		const { message_delete } = logger.events;
 
-		if (!isEventConfigEnabled(message_edit))
+		if (!message_delete)
 			continue;
 
 		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel);
@@ -137,15 +124,10 @@ async function handleDelete(message: Message): Promise<void> {
 		if (channel === null)
 			continue;
 
-		await logToChannel(channel, {
-			embeds: [{
-				title: "Message Deleted",
-				author: { name: entry.authorName, iconURL },
-				description: entry.content,
-				color: colors.red,
-				footer: { text: `Author ID: ${entry.authorID} • Message ID: ${entry.id}` }
-			}]
-		});
+		await logToChannel(channel, message_delete.message({
+			author: { id: entry.authorID, tag: entry.authorName },
+			author_avatar: avatarURL,
+			content: entry.content,
+		}));
 	}
-
 }
