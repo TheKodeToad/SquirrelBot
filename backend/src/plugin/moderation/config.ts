@@ -2,6 +2,7 @@ import { mappedEnum } from "#common/schema/general.ts";
 import { messageTemplate } from "#common/schema/message.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { ParameterType } from "#common/template/index.ts";
+import { DAY } from "#common/time.ts";
 import { z } from "zod/v4";
 
 export const PresetReason = z.strictObject({
@@ -48,7 +49,7 @@ export const ModerationConfig = z.strictObject({
 	ban: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).optional(),
-		purge_messages: z.number().default(0),
+		purge_messages: z.number().default(0).transform(input => input * DAY),
 		preset_reasons: PresetReason.array().default(discordReasons) // TODO
 	}).prefault({}).describe("Configure ban behavior"),
 

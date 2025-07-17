@@ -1,5 +1,4 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { HOUR } from "#common/time.ts";
 import { OptionType } from "#plugin/core/discord/public/command.ts";
 import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
@@ -33,8 +32,8 @@ export default defineCommand({
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},
 		purge: {
-			type: OptionType.Number,
-			description: "Request to delete messages in the previous specified days.",
+			type: OptionType.Duration,
+			description: "Request to delete messages within the specified duration of being sent.",
 			name: ["purge", "p", "delete"],
 		},
 	},
@@ -50,7 +49,7 @@ export default defineCommand({
 			}) ?? { content: `You were banned from **${escapeMarkdown(context.guild.name)}**.` }
 			: undefined;
 
-		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages) * (24 * HOUR);
+		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages);
 
 		const { successful, unsuccessful } = await doBulkAction({
 			guild: context.guild,
