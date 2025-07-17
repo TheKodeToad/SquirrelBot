@@ -15,7 +15,7 @@ export default defineCommand({
 	options: {
 		actorID: {
 			type: OptionType.User,
-			name: ["actor", "a", "by", "moderator", "mod"],
+			name: ["moderator", "mod", "m", "by"],
 		},
 		targetID: {
 			type: OptionType.User,
