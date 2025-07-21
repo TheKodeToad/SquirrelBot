@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.4",
-		"@hono/zod-validator": "^0.7.0",
+		"@hono/zod-validator": "^0.7.2",
 		"async-lock": "^1.4.1",
 		"hono": "^4.8.2",
 		"oceanic-component-helper": "^1.0.1",
