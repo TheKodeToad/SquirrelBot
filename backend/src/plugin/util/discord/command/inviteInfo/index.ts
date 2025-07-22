@@ -99,15 +99,17 @@ function stealthyGetInvite(code: string) {
 	const prefix = "Bot ";
 	const oldValue = bot.options.auth;
 
-	if (trivialDesc && bot.options.auth?.startsWith(prefix))
-		bot.options.auth = bot.options.auth.substring(prefix.length);
+	try {
+		if (trivialDesc && bot.options.auth?.startsWith(prefix))
+			bot.options.auth = bot.options.auth.substring(prefix.length);
 
-	const result = bot.rest.channels.getInvite(code, {
-		withCounts: true,
-		withExpiration: true,
-	});
-
-	bot.options.auth = oldValue;
+		var result = bot.rest.channels.getInvite(code, {
+			withCounts: true,
+			withExpiration: true,
+		});
+	} finally {
+		bot.options.auth = oldValue;
+	}
 
 	return result;
 }
