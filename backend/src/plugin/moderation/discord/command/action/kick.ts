@@ -1,4 +1,3 @@
-import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { OptionType } from "#plugin/core/discord/public/command.ts";
 import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
@@ -39,12 +38,12 @@ export default defineCommand({
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage: CreateMessageOptions | undefined =
 			sendDirectMessage ?
-				config.ban.direct_message?.({
+				config.ban.direct_message({
 					server: context.guild,
 					moderator: context.user,
 					reason: args.reason ?? undefined,
-				}) ?? { content: `You were kicked from **${escapeMarkdown(context.guild.name)}**.` } :
-				undefined;
+				})
+				: undefined;
 
 		const { successful, unsuccessful } = await doBulkAction({
 			guild: context.guild,

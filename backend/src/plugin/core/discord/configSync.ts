@@ -159,7 +159,7 @@ async function parseConfig(guildID: string, pluginID: string, configCache: Confi
 		var result = configCache.schema.safeParse(table);
 	} catch (error) {
 		// if our code is broken it might throw
-		logger.error?.("Unexpected error in valibot safeParse (bug)", error);
+		logger.error?.("Unexpected error in zod safeParse (bug)", error);
 		return null;
 	}
 

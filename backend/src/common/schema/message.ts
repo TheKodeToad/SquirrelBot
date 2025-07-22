@@ -10,7 +10,7 @@ export const MessageLiteral = message(z.string());
 export type MessageLiteral = z.infer<typeof MessageLiteral>;
 
 export function messageTemplate<S extends TemplateSchema>(schema: S) {
-	return message(template(schema))
+	const result = message(template(schema))
 		.transform(({ content, embeds, ...message }) => (params: ParameterRecord<S>) => ({
 			content: content?.(params),
 			embeds: embeds?.map(
@@ -40,6 +40,14 @@ export function messageTemplate<S extends TemplateSchema>(schema: S) {
 			) ?? [],
 			...message
 		}));
+
+	// @ts-expect-error avoid parsing constantly
+	result.prefault = content => {
+		const parsed = result.parse(content);
+		return result.default(() => parsed);
+	};
+
+	return result;
 }
 
 function message<Z extends z.ZodTypeAny>(stringType: Z) {

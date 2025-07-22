@@ -1,4 +1,3 @@
-import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { OptionType } from "#plugin/core/discord/public/command.ts";
 import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
@@ -37,11 +36,11 @@ export default defineCommand({
 	async run(context, args, { config }): Promise<void> {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.warn.direct_message?.({
+			? config.warn.direct_message({
 				server: context.guild,
 				moderator: context.user,
 				reason: args.reason ?? undefined,
-			}) ?? { content: `You received a warning in **${escapeMarkdown(context.guild.name)}**:\n>>> ${args.reason ?? "*No reason provided*"}` }
+			})
 			: undefined;
 
 		const { successful, unsuccessful } = await doBulkAction({

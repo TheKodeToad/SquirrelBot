@@ -1,4 +1,3 @@
-import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { OptionType } from "#plugin/core/discord/public/command.ts";
 import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";
@@ -45,12 +44,12 @@ export default defineCommand({
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.timeout.direct_message?.({
+			? config.timeout.direct_message({
 				server: context.guild,
 				moderator: context.user,
 				reason: args.reason ?? undefined,
 				duration: args.duration,
-			}) ?? { content: `You were timed out for **${args.duration}** in **${escapeMarkdown(context.guild.name)}**` }
+			})
 			: undefined;
 
 		const { successful, unsuccessful } = await doBulkAction({

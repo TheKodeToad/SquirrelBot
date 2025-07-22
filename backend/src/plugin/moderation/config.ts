@@ -48,7 +48,9 @@ export const ModerationConfig = z.strictObject({
 
 	ban: z.strictObject({
 		send_direct_message: z.boolean().default(false),
-		direct_message: messageTemplate(actionParams).optional(),
+		direct_message: messageTemplate(actionParams).prefault({
+			content: "You are banned from {{server}}:\n{{>reason}}"
+		}),
 		purge_messages: z.number().default(0).transform(input => input * DAY),
 		preset_reasons: PresetReason.array().default(discordReasons) // TODO
 	}).prefault({}).describe("Configure ban behavior"),
@@ -59,19 +61,28 @@ export const ModerationConfig = z.strictObject({
 
 	kick: z.strictObject({
 		send_direct_message: z.boolean().default(false),
-		direct_message: messageTemplate(actionParams).optional(),
+		direct_message: messageTemplate(actionParams).prefault({
+			content: "You were kicked from {{server}}:\n{{>reason}}"
+		}),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure kick behavior"),
 
 	timeout: z.strictObject({
 		send_direct_message: z.boolean().default(false),
-		direct_message: messageTemplate({ ...actionParams, duration: ParameterType.Duration }).optional(),
+		direct_message: messageTemplate({
+			...actionParams,
+			duration: ParameterType.Duration
+		}).prefault({
+			content: "You were timed out in {{server}} for {{duration}}:\n{{>reason}}"
+		}),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure timeout behavior"),
 
 	warn: z.strictObject({
 		send_direct_message: z.boolean().default(false),
-		direct_message: messageTemplate(actionParams).optional(),
+		direct_message: messageTemplate(actionParams).prefault({
+			content: "You were warned in {{server}}:\n{{>reason}}"
+		}),
 		preset_reasons: PresetReason.array().default(discordReasons),
 	}).prefault({}).describe("Configure warn behavior"),
 

@@ -12,7 +12,7 @@ const LIBRARIES = `
 [PostgreSQL](https://www.postgresql.org/) with [node-postgres](https://node-postgres.com/),
 [Hono](https://hono.dev/),
 [smol-toml](https://github.com/squirrelchat/smol-toml),
-[Valibot](https://valibot.dev/),
+[Zod](https://zod.dev/),
 and [more](${APP_LIBRARIES_LINK})
 `.substring(1).replaceAll("\n", " ");
 
