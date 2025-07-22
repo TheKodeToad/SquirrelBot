@@ -1,6 +1,6 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { CACHE_PATH } from "#environment.ts";
-import { onBotInit, onBotPostInit, onBotPreInit } from "#interface/discord/extensionPoints.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
 import { loadPlugins } from "#loader/index.ts";
 import { postgres } from "#storage/index.ts";
@@ -22,14 +22,8 @@ bot.once("ready", async () => {
 
 		await loadPlugins();
 
-		logger.debug?.("Firing pre-init");
-		await Promise.all(onBotPreInit.contributions.map(listener => listener()));
-
-		logger.debug?.("Firing init");
-		await Promise.all(onBotInit.contributions.map(listener => listener()));
-
-		logger.debug?.("Firing post-init");
-		await Promise.all(onBotPostInit.contributions.map(listener => listener()));
+		logger.debug?.("Firing onBotInit");
+		await onBotInit.fire();
 
 		logger.info?.("I'm ready :O");
 	} catch (error) {

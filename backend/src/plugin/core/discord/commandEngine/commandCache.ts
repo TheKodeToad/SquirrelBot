@@ -1,4 +1,5 @@
-import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
+import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { OptionType, type Command, type Option } from "#plugin/core/discord/public/command.ts";
 import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 
@@ -14,7 +15,7 @@ const all: CommandCacheEntry[] = [];
 const byName: Map<string, CommandCacheEntry> = new Map;
 const byPlugin: Map<string, CommandCacheEntry[]> = new Map;
 
-export default [onBotPreInit(initCommandCache)];
+export default [onBotInit(initCommandCache, EventListenerPhase.Pre)];
 
 export function getCommands(): CommandCacheEntry[] {
 	return all;

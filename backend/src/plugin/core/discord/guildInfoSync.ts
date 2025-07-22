@@ -1,8 +1,8 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
-import { onBotPreInit } from "#interface/discord/extensionPoints.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
 import { bot } from "#interface/discord/index.ts";
-import { makeArrayExtensionPoint } from "#loader/extensionPoint.ts";
+import { EventListenerPhase, makeEventExtensionPoint } from "#loader/extensionPoint.ts";
 import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";
@@ -12,12 +12,12 @@ const logger = moduleLogger();
 const allowedGuilds: Set<string> = new Set;
 
 export type GuildAccessListener = (guildID: string) => void;
-export const onGuildAccessGranted = makeArrayExtensionPoint<GuildAccessListener>();
-export const onGuildAccessRevoked = makeArrayExtensionPoint<GuildAccessListener>();
-export const onGuildInfoReady = makeArrayExtensionPoint<() => Promise<void> | void>();
+export const onGuildAccessGranted = makeEventExtensionPoint<string>();
+export const onGuildAccessRevoked = makeEventExtensionPoint<string>();
+export const onGuildInfoReady = makeEventExtensionPoint<void>();
 
 export default [
-	onBotPreInit(init),
+	onBotInit(init, EventListenerPhase.Pre),
 	onBotEvent({ type: "guildCreate", listener: handleCreate }),
 	onBotEvent({ type: "guildUpdate", listener: handleUpdate }),
 ];
@@ -75,7 +75,7 @@ async function init(): Promise<void> {
 	}
 
 	// we do await these as we do want errors to interrupt startup
-	await Promise.all(onGuildInfoReady.contributions.map(listener => listener()));
+	await onGuildInfoReady.fire();
 }
 
 async function handleCreate(guild: Guild): Promise<void> {
@@ -132,8 +132,7 @@ export async function grantAccess(id: string): Promise<boolean> {
 	allowedGuilds.add(id);
 
 	if (!BOT_ALLOWED_GUILDS.includes(id))
-		for (const listeners of onGuildAccessGranted.contributions)
-			listeners(id);
+		await onGuildAccessGranted.fire(id);
 
 	return true;
 }
@@ -150,8 +149,7 @@ export async function revokeAccess(id: string): Promise<false | true | Date> {
 		const date = await scheduleGuildInfoDeletion(id);
 		allowedGuilds.delete(id);
 
-		for (const listener of onGuildAccessRevoked.contributions)
-			listener(id);
+		await onGuildAccessRevoked.fire(id);
 
 		return date ?? false;
 	}

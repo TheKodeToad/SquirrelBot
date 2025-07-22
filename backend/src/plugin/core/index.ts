@@ -1,5 +1,6 @@
 import { moduleLogger } from "#common/logger/index.ts";
-import { onBotPostInit } from "#interface/discord/extensionPoints.ts";
+import { onBotInit } from "#interface/discord/extensionPoints.ts";
+import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import about from "#plugin/core/discord/command/about.ts";
@@ -58,7 +59,7 @@ export default definePlugin({
 		...slashHandler,
 		...componentHandler,
 
-		onBotPostInit(postInit),
+		onBotInit(postInit, EventListenerPhase.Post),
 
 		help, about, ...access, groups,
 
