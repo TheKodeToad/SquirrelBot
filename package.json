@@ -5,7 +5,7 @@
 		"bot": "cd backend && pnpm run bot",
 		"http": "cd backend && pnpm run http",
 		"migration": "cd backend && pnpm run migration",
-		"typecheck": "pnpm --stream run -r lint",
+		"typecheck": "pnpm --stream run -r typecheck",
 		"lint": "pnpm --stream run -r lint",
 		"test": "pnpm --stream run -r test"
 	}

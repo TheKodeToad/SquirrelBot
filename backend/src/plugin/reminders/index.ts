@@ -1,11 +1,11 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { definePlugin } from "#loader/plugin.ts";
-import { ConfigStore } from "#plugin/core/discord/public/configStore.ts";
+import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
+import remind from "#plugin/reminders/command/remind.ts";
+import reminderList from "#plugin/reminders/command/reminderList.ts";
 import { RemindersConfig } from "#plugin/reminders/config.ts";
-import remind from "#plugin/reminders/discord/command/remind.ts";
-import reminderList from "#plugin/reminders/discord/command/reminderList.ts";
-import scheduler from "#plugin/reminders/discord/scheduler.ts";
+import scheduler from "#plugin/reminders/scheduler.ts";
 import type { Reminder } from "#plugin/reminders/storage/reminders.ts";
 
 const defaultConfig = `enabled = false
