@@ -3,7 +3,7 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
-import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#plugin/moderation/discord/helper/format.ts";
+import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#plugin/moderation/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { getCases, type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";

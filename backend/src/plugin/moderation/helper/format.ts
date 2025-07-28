@@ -1,7 +1,7 @@
 import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "#common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownQuote } from "#common/discord/markdown.ts";
 import { dateToUnixSeconds, humanizeDuration } from "#common/time.ts";
-import type { BulkResult } from "#plugin/moderation/discord/helper/bulkAction.ts";
+import type { BulkResult } from "#plugin/moderation/helper/bulkAction.ts";
 import { CaseType, type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 
 export function formatBulkSuccess(item: BulkResult["successful"][number]): string {

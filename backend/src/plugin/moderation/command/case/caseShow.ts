@@ -2,7 +2,7 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { formatCaseDescription, formatCaseFields } from "#plugin/moderation/discord/helper/format.ts";
+import { formatCaseDescription, formatCaseFields } from "#plugin/moderation/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { getCase } from "#plugin/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
