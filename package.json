@@ -2,10 +2,11 @@
 	"name": "squirrel",
 	"private": true,
 	"scripts": {
-		"lint": "cd backend && pnpm run lint && cd ../frontend && pnpm run lint",
 		"bot": "cd backend && pnpm run bot",
 		"http": "cd backend && pnpm run http",
 		"migration": "cd backend && pnpm run migration",
-		"test": "cd backend && pnpm run test"
+		"typecheck": "pnpm --stream run -r lint",
+		"lint": "pnpm --stream run -r lint",
+		"test": "pnpm --stream run -r test"
 	}
 }

@@ -5,10 +5,11 @@
 		"#*": "./src/*"
 	},
 	"scripts": {
-		"lint": "eslint && tsc",
-		"bot": "pnpm run _node src/interface/discord/main.ts",
-		"http": "pnpm run _node src/interface/http/main.ts",
-		"migration": "pnpm run _node src/interface/migration/main.ts",
+		"bot": "pnpm run _node src/discord/main.ts",
+		"http": "pnpm run _node src/http/main.ts",
+		"migration": "pnpm run _node src/storage/main.ts",
+		"typecheck": "tsc",
+		"lint": "eslint",
 		"test": "node --import=./registerSWC.js --test src/**/*.test.ts",
 		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
 	},

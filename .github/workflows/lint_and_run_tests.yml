@@ -21,7 +21,9 @@ jobs:
           cache-dependency-path: "**/pnpm-lock.yaml"
       - name: Install
         run: pnpm install
-      - name: Check types
+      - name: Run typechecker
+        run: pnpm typecheck
+      - name: Run linter
         run: pnpm lint
       - name: Run tests
         run: pnpm test

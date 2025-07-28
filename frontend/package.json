@@ -1,9 +1,9 @@
 {
 	"name": "frontend",
 	"scripts": {
-		"lint": "tsc --noEmit",
 		"build": "node build.mjs",
-		"watch": "node build.mjs watch"
+		"watch": "node build.mjs watch",
+		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"esbuild": "^0.25.4",
