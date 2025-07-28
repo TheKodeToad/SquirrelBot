@@ -1,5 +1,5 @@
-import logIn from "#interface/http/route/api/v1/auth/logIn.ts";
-import logOut from "#interface/http/route/api/v1/auth/logOut.ts";
+import logIn from "#http/route/api/v1/auth/logIn.ts";
+import logOut from "#http/route/api/v1/auth/logOut.ts";
 import { Hono } from "hono";
 
 export default (): Hono => {

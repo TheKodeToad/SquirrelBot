@@ -1,6 +1,6 @@
-import { defineGlobalPluginGuildRoutes, definePluginGuildRoutes } from "#interface/http/extensionPoints.ts";
-import { authMiddleware } from "#interface/http/middleware/auth.ts";
-import { guildAuthMiddleware, type GuildAuthVars } from "#interface/http/middleware/guildAuth.ts";
+import { defineGlobalPluginGuildRoutes, definePluginGuildRoutes } from "#http/extensionPoints.ts";
+import { authMiddleware } from "#http/middleware/auth.ts";
+import { guildAuthMiddleware, type GuildAuthVars } from "#http/middleware/guildAuth.ts";
 import { getPlugins } from "#loader/index.ts";
 import { getAPIGuildInfoByOwner } from "#plugin/core/storage/guildInfo.ts";
 import { Hono } from "hono";

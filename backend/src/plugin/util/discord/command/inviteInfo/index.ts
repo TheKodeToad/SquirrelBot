@@ -1,7 +1,7 @@
 import { formatRESTError } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { bot } from "#interface/discord/index.ts";
+import { bot } from "#discord/index.ts";
 import { OptionType } from "#plugin/core/discord/public/command.ts";
 import { defineCommand } from "#plugin/core/discord/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/discord/public/helper/commandGuards.ts";

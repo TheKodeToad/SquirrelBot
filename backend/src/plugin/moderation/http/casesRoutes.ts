@@ -1,6 +1,6 @@
 import { Snowflake } from "#common/schema/general.ts";
-import { definePluginGuildRoutes } from "#interface/http/extensionPoints.ts";
-import { validate } from "#interface/http/middleware/zod.ts";
+import { definePluginGuildRoutes } from "#http/extensionPoints.ts";
+import { validate } from "#http/middleware/zod.ts";
 import { CaseType, getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod/v4";

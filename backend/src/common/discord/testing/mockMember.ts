@@ -2,7 +2,7 @@
 
 
 import { todo } from "#common/errors.ts";
-import { bot } from "#interface/discord/index.ts";
+import { bot } from "#discord/index.ts";
 import { Base, Permission, type Member } from "oceanic.js";
 
 export type MockMemberProps = Partial<Member> & { id: string; };

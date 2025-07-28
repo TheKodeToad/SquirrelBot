@@ -1,4 +1,4 @@
-import { validateToken } from "#interface/http/storage/api/tokens.ts";
+import { validateToken } from "#http/storage/api/tokens.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 

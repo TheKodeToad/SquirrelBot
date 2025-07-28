@@ -1,5 +1,5 @@
 import { moduleLogger } from "#common/logger/index.ts";
-import { bot } from "#interface/discord/index.ts";
+import { bot } from "#discord/index.ts";
 import { isGuildAllowed } from "#plugin/core/discord/guildInfoSync.ts";
 import type { ClientEvents } from "oceanic.js";
 

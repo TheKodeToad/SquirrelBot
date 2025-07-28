@@ -1,7 +1,7 @@
 import { moduleLogger } from "#common/logger/index.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
+import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
-import { onBotInit } from "#interface/discord/extensionPoints.ts";
-import { bot } from "#interface/discord/index.ts";
 import { EventListenerPhase, makeEventExtensionPoint } from "#loader/extensionPoint.ts";
 import { onBotEvent } from "#plugin/core/discord/public/extensionPoints.ts";
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";

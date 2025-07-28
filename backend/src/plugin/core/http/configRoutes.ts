@@ -1,4 +1,4 @@
-import { defineGlobalPluginGuildRoutes } from "#interface/http/extensionPoints.ts";
+import { defineGlobalPluginGuildRoutes } from "#http/extensionPoints.ts";
 import { getGuildConfig, updateGuildConfig } from "#plugin/core/storage/configs.ts";
 import { notifyChannel } from "#storage/notification.ts";
 import { HTTPException } from "hono/http-exception";

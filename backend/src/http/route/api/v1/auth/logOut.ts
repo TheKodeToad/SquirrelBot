@@ -1,4 +1,4 @@
-import { deleteToken } from "#interface/http/storage/api/tokens.ts";
+import { deleteToken } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 

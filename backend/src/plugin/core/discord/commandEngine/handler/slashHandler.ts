@@ -1,9 +1,9 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { requireExhaustiveSwitch } from "#common/types.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
+import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
-import { onBotInit } from "#interface/discord/extensionPoints.ts";
-import { bot } from "#interface/discord/index.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { getCommandByName, getCommands } from "#plugin/core/discord/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/discord/commandEngine/handler/componentHandler.ts";

@@ -1,6 +1,6 @@
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "#environment.ts";
-import { validate } from "#interface/http/middleware/zod.ts";
-import { generateToken } from "#interface/http/storage/api/tokens.ts";
+import { validate } from "#http/middleware/zod.ts";
+import { generateToken } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod/v4";

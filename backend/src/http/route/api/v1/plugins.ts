@@ -1,4 +1,4 @@
-import { defineGlobalPluginRoutes } from "#interface/http/extensionPoints.ts";
+import { defineGlobalPluginRoutes } from "#http/extensionPoints.ts";
 import { getPlugins } from "#loader/index.ts";
 import { Hono } from "hono";
 

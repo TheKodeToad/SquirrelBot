@@ -1,7 +1,7 @@
 import { moduleLogger } from "#common/logger/index.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
+import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
-import { onBotInit } from "#interface/discord/extensionPoints.ts";
-import { bot } from "#interface/discord/index.ts";
 import { loadPlugins } from "#loader/index.ts";
 import { postgres } from "#storage/index.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";

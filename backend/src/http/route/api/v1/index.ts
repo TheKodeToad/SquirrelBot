@@ -1,6 +1,6 @@
-import auth from "#interface/http/route/api/v1/auth/index.ts";
-import guilds from "#interface/http/route/api/v1/guilds.ts";
-import plugins from "#interface/http/route/api/v1/plugins.ts";
+import auth from "#http/route/api/v1/auth/index.ts";
+import guilds from "#http/route/api/v1/guilds.ts";
+import plugins from "#http/route/api/v1/plugins.ts";
 import { Hono } from "hono";
 
 export default (): Hono => {

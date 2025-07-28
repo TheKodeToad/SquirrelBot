@@ -1,5 +1,5 @@
 import { moduleLogger } from "#common/logger/index.ts";
-import { onBotInit } from "#interface/discord/extensionPoints.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import { CoreConfig } from "#plugin/core/config.ts";

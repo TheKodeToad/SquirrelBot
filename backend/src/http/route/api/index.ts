@@ -1,4 +1,4 @@
-import v1 from "#interface/http/route/api/v1/index.ts";
+import v1 from "#http/route/api/v1/index.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 

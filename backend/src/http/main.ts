@@ -1,9 +1,9 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR } from "#common/time.ts";
 import { HTTP_PORT } from "#environment.ts";
-import api from "#interface/http/route/api/index.ts";
-import frontend from "#interface/http/route/frontend.ts";
-import { deleteExpiredTokens } from "#interface/http/storage/api/tokens.ts";
+import api from "#http/route/api/index.ts";
+import frontend from "#http/route/frontend.ts";
+import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
 import { loadPlugins } from "#loader/index.ts";
 import { postgres } from "#storage/index.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";

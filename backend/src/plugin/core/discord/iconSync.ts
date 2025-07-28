@@ -1,5 +1,5 @@
-import { onBotInit } from "#interface/discord/extensionPoints.ts";
-import { bot } from "#interface/discord/index.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
+import { bot } from "#discord/index.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { icons } from "#plugin/core/discord/public/icons.ts";
 
