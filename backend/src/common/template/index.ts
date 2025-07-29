@@ -46,6 +46,8 @@ export const enum FormattingWrapper {
 export const enum ParameterType {
 	User,
 	Guild,
+	Role,
+	Number,
 	Duration,
 	Timestamp,
 	RawString,
@@ -69,6 +71,14 @@ export const enum GuildPresentationType {
 	MaskedLink,
 }
 
+export const enum RolePresentationType {
+	Name,
+	Mention,
+	NameMention,
+	NameMentionBold,
+	ID,
+}
+
 export const enum DurationPresentationType {
 	Readable,
 	Seconds,
@@ -88,11 +98,13 @@ export const enum TimestampPresentationType {
 }
 
 export type UserParameter = { id: string; tag: string; };
-export type GuildParameter = { id: string; name: string; };
+export type EntityParameter = { id: string; name: string; };
 
 type ParameterValue<T extends ParameterType = any> =
 	T extends ParameterType.User ? UserParameter :
-	T extends ParameterType.Guild ? GuildParameter :
+	T extends ParameterType.Guild ? EntityParameter :
+	T extends ParameterType.Role ? EntityParameter :
+	T extends ParameterType.Number ? number :
 	T extends ParameterType.RawString ? string :
 	T extends ParameterType.MarkdownString ? string :
 	T extends ParameterType.Duration ? number :

@@ -1,10 +1,9 @@
-import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
-import { logToChannel } from "#plugin/logging/helper/webhooks.ts";
+import { logWithLogger } from "#plugin/logging/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
 import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "#plugin/logging/storage/messageCache.ts";
 import { Message, Routes } from "oceanic.js";
@@ -72,11 +71,6 @@ async function handleUpdate(message: Message): Promise<void> {
 		if (!message_edit)
 			continue;
 
-		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel);
-
-		if (channel === null)
-			continue;
-
 		entry ??= await getMessageCacheEntry(message.guild.id, message.channelID, message.id);
 
 		await upsertMessageCacheEntry(message.guild.id, message.channelID, message.id, {
@@ -86,7 +80,7 @@ async function handleUpdate(message: Message): Promise<void> {
 			content: message.content,
 		});
 
-		await logToChannel(channel, message_edit.message({
+		await logWithLogger(logger, message.guild, message_edit.message({
 			author: message.author,
 			author_avatar: message.author.avatarURL(),
 			old_content: entry?.content,
@@ -119,12 +113,7 @@ async function handleDelete(message: Message): Promise<void> {
 		if (!message_delete)
 			continue;
 
-		const channel = await fetchTextableGuildChannelCached(message.guild, logger.channel);
-
-		if (channel === null)
-			continue;
-
-		await logToChannel(channel, message_delete.message({
+		await logWithLogger(logger, message.guild, message_delete.message({
 			author: { id: entry.authorID, tag: entry.authorName },
 			author_avatar: avatarURL,
 			content: entry.content,

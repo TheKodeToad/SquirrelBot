@@ -1,8 +1,9 @@
 import { formatUser, formatUserBold } from "#common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownInlineCodeblock, makeMarkdownMultilineCodeblock, makeMarkdownQuote } from "#common/discord/markdown.ts";
-import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType, type GuildParameter, type ParameterRecord, type UserParameter } from "#common/template/index.ts";
+import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, RolePresentationType, TimestampPresentationType, UserPresentationType, type EntityParameter, type ParameterRecord, type UserParameter } from "#common/template/index.ts";
 import { TokenType, type Token } from "#common/template/parsing.ts";
 import { dateToUnixSeconds, humanizeDuration } from "#common/time.ts";
+import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
 
 export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 	let result = "";
@@ -22,22 +23,28 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 
 			switch (token.valueType) {
 			case ParameterType.User:
-				if (!(typeof value === "object"
-					&& "id" in value && typeof value.id === "string"
-					&& "tag" in value && typeof value.tag === "string")) {
+				if (!isUserParam(value))
 					throw new Error(`params['${token.parameter}'] is not a user!`);
-				}
 
 				output = formatUserParam(value, token.presentation, escaped);
 				break;
 			case ParameterType.Guild:
-				if (!(typeof value === "object"
-					&& "id" in value && typeof value.id === "string"
-					&& "name" in value && typeof value.name === "string")) {
-					throw new Error(`params['${token.parameter}'] is not a user!`);
-				}
+				if (!isEntityParam(value))
+					throw new Error(`params['${token.parameter}'] is not a guild!`);
 
 				output = formatGuildParam(value, token.presentation, escaped);
+				break;
+			case ParameterType.Role:
+				if (!isEntityParam(value))
+					throw new Error(`params['${token.parameter}'] is not a role!`);
+
+				output = formatRoleParam(value, token.presentation, escaped);
+				break;
+			case ParameterType.Number:
+				if (typeof value !== "number")
+					throw new Error(`params['${token.parameter}'] is not a number!`);
+
+				output = value.toString();
 				break;
 			case ParameterType.Duration:
 				if (typeof value !== "number")
@@ -56,7 +63,10 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 				if (typeof value !== "string")
 					throw new Error(`params['${token.parameter}'] is not a string!`);
 
-				output = value;
+				if (escaped && token.valueType === ParameterType.RawString)
+					output = escapeMarkdown(value);
+				else
+					output = value;
 				break;
 			}
 		} else
@@ -78,7 +88,24 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 	}
 
 	return result;
+}
 
+function isUserParam(value: {} | undefined): value is UserParameter {
+	if (!INTERNAL_TYPE_INTEGRITY)
+		return true;
+
+	return typeof value === "object"
+		&& "id" in value && typeof value.id === "string"
+		&& "tag" in value && typeof value.tag === "string";
+}
+
+function isEntityParam(value: {} | undefined): value is EntityParameter {
+	if (!INTERNAL_TYPE_INTEGRITY)
+		return true;
+
+	return typeof value === "object"
+		&& "id" in value && typeof value.id === "string"
+		&& "name" in value && typeof value.name === "string";
 }
 
 function formatUserParam(user: UserParameter, presentation: UserPresentationType, escaped: boolean): string {
@@ -100,7 +127,7 @@ function formatUserParam(user: UserParameter, presentation: UserPresentationType
 	}
 }
 
-function formatGuildParam(guild: GuildParameter, presentation: GuildPresentationType, escaped: boolean): string {
+function formatGuildParam(guild: EntityParameter, presentation: GuildPresentationType, escaped: boolean): string {
 	switch (presentation) {
 	case GuildPresentationType.Name:
 		return escaped ? escapeMarkdown(guild.name) : guild.name;
@@ -110,6 +137,21 @@ function formatGuildParam(guild: GuildParameter, presentation: GuildPresentation
 		return `https://discord.com/channels/${guild.id}`;
 	case GuildPresentationType.MaskedLink:
 		return `[${escapeMarkdown(guild.name)}](https://discord.com/channels/${guild.id})`;
+	}
+}
+
+function formatRoleParam(role: EntityParameter, presentation: RolePresentationType, escaped: boolean): string {
+	switch (presentation) {
+	case RolePresentationType.Name:
+		return escaped ? escapeMarkdown(role.name) : role.name;
+	case RolePresentationType.Mention:
+		return `<@&${role.id}>`;
+	case RolePresentationType.NameMention:
+		return `${escapeMarkdown(role.name)} (<@&${role.id}>)`;
+	case RolePresentationType.NameMentionBold:
+		return `**${escapeMarkdown(role.name)} (<@&${role.id}>)**`;
+	case RolePresentationType.ID:
+		return role.id;
 	}
 }
 

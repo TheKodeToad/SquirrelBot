@@ -1,8 +1,19 @@
+import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import { bot } from "#discord/index.ts";
+import type { LoggerConfig } from "#plugin/logging/config.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#plugin/logging/storage/webhooks.ts";
 import AsyncLock from "async-lock";
-import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
+import { DiscordRESTError, Guild, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
+
+export async function logWithLogger(logger: LoggerConfig, guild: Guild, message: ExecuteWebhookOptions): Promise<void> {
+	const channel = await fetchTextableGuildChannelCached(guild, logger.channel);
+
+	if (channel === null)
+		return;
+
+	await logToChannel(channel, message);
+}
 
 export async function logToChannel(channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
 	return acquireWebhook(channel, async ({ webhookID, token }) => {

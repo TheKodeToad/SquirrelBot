@@ -1,4 +1,4 @@
-import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, TimestampPresentationType, UserPresentationType } from "#common/template/index.ts";
+import { DurationPresentationType, FormattingWrapper, GuildPresentationType, ParameterType, RolePresentationType, TimestampPresentationType, UserPresentationType } from "#common/template/index.ts";
 
 const FORMAT_PATTERN = /\{\{(?<wrapper>>|`|```)?(?<parameter>\w+)(?:#(?<presentation>\w+))?\}\}?/g;
 
@@ -53,6 +53,8 @@ function parseFormatToken(input: FormatGroups, params: Record<string, ParameterT
 
 	const result = { type: TokenType.Format, parameter: input.parameter, wrapper } as const;
 
+	// TODO: what is this horror...
+
 	switch (valueType) {
 	case ParameterType.User: {
 		const presentation = parseUserPresentation(input.presentation);
@@ -67,6 +69,14 @@ function parseFormatToken(input: FormatGroups, params: Record<string, ParameterT
 
 		if (presentation === null)
 			return `Invalid guild presentation: '${input.presentation!}'`;
+
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Role: {
+		const presentation = parseRolePresentation(input.presentation);
+
+		if (presentation === null)
+			return `Invalid role presentation: '${input.presentation!}'`;
 
 		return { ...result, valueType, presentation };
 	}
@@ -86,6 +96,7 @@ function parseFormatToken(input: FormatGroups, params: Record<string, ParameterT
 
 		return { ...result, valueType, presentation };
 	}
+	case ParameterType.Number:
 	case ParameterType.RawString:
 	case ParameterType.MarkdownString:
 		return { ...result, valueType };
@@ -138,6 +149,24 @@ function parseGuildPresentation(input: string | undefined): GuildPresentationTyp
 		return GuildPresentationType.Link;
 	case "masked_link":
 		return GuildPresentationType.MaskedLink;
+	default:
+		return null;
+	}
+}
+
+function parseRolePresentation(input: string | undefined): RolePresentationType | null {
+	switch (input) {
+	case "name":
+	case undefined:
+		return RolePresentationType.Name;
+	case "mention":
+		return RolePresentationType.Mention;
+	case "name_mention":
+		return RolePresentationType.NameMention;
+	case "name_mention_bold":
+		return RolePresentationType.NameMentionBold;
+	case "id":
+		return RolePresentationType.ID;
 	default:
 		return null;
 	}
@@ -217,8 +246,9 @@ export type FormatToken =
 	& (
 		| { valueType: ParameterType.User; presentation: UserPresentationType; }
 		| { valueType: ParameterType.Guild; presentation: GuildPresentationType; }
+		| { valueType: ParameterType.Role; presentation: RolePresentationType; }
 		| { valueType: ParameterType.Duration; presentation: DurationPresentationType; }
 		| { valueType: ParameterType.Timestamp; presentation: TimestampPresentationType; }
-		| { valueType: ParameterType.MarkdownString | ParameterType.RawString; }
+		| { valueType: ParameterType.Number | ParameterType.MarkdownString | ParameterType.RawString; }
 	)
 	& { wrapper: FormattingWrapper | null; };

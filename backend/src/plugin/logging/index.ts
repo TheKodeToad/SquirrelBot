@@ -2,7 +2,8 @@ import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { LoggingConfig } from "#plugin/logging/config.ts";
-import messageLogger from "#plugin/logging/logger/messageLogger.ts";
+import messageLogger from "#plugin/logging/logger/messages.ts";
+import roleLogger from "#plugin/logging/logger/roles.ts";
 
 export const loggingConfigStore = new ConfigStore(LoggingConfig);
 
@@ -25,5 +26,6 @@ export default definePlugin({
 			defaultValue: defaultConfig,
 		}),
 		...messageLogger,
+		...roleLogger,
 	],
 });
