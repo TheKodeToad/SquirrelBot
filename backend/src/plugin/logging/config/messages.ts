@@ -22,6 +22,7 @@ export const messageEditEvent = eventConfig(
 					{ name: "New Content", value: "{{new_content}}", }
 				],
 				color: "yellow",
+				footer: { text: "Author ID: {{author#id}}" },
 			}]
 		}
 	}
@@ -44,6 +45,7 @@ export const messageDeleteEvent = eventConfig(
 					{ name: "Content", value: "{{content}}", }
 				],
 				color: "red",
+				footer: { text: "Author ID: {{author#id}}" },
 			}]
 		}
 	}

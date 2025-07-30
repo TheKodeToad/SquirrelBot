@@ -21,6 +21,7 @@ export const MemberJoinEvent = eventConfig(
 					{ name: "Account Created At", value: "{{user_created_at}} ({{user_age}} old)" }
 				],
 				color: "green",
+				footer: { text: "User ID: {{user#id}}" },
 			}]
 		}
 	}
@@ -46,6 +47,7 @@ export const MemberLeaveEvent = eventConfig(
 					{ name: "Joined At", value: "{{user_joined_at}} (stayed for {{user_stay_duration}})" },
 				],
 				color: "red",
+				footer: { text: "User ID: {{user#id}}" },
 			}]
 		}
 	}

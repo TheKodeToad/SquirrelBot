@@ -37,7 +37,7 @@ function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 		url: stringType(false),
 		timestamp: z.instanceof(TomlDate).transform(date => date.toISOString()), // TODO is this filter consistent with Discord's
 		color: Color,
-		footer: z.strictObject({ text: stringType(false), icon: stringType(false) }),
+		footer: z.strictObject({ text: stringType(false), icon: stringType(false).optional() }),
 		image: stringType(false).transform(url => ({ url })),
 		thumbnail: stringType(false).transform(url => ({ url })),
 		author: z.strictObject({
@@ -101,7 +101,7 @@ function applyEmbedTemplate<S extends TemplateSchema>(template: Embed<Template<S
 	const footer = template.footer !== undefined
 		? {
 			text: template.footer.text.apply(params),
-			icon: template.footer.icon.apply(params),
+			icon: template.footer.icon?.apply(params),
 		}
 		: undefined;
 

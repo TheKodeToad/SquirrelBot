@@ -27,6 +27,7 @@ export const roleCreateEvent = eventConfig(
 					{ name: "Mentionable", value: "{{mentionable}}" },
 				],
 				color: "green",
+				footer: { text: "Actor ID: {{user#id}}" },
 			}]
 		}
 	}
@@ -61,6 +62,7 @@ export const roleUpdateEvent = eventConfig(
 					{ name: "Mentionable", value: "{{old_mentionable}} → {{new_mentionable}}" },
 				],
 				color: "yellow",
+				footer: { text: "Actor ID: {{user#id}}" },
 			}]
 		}
 	}
@@ -89,6 +91,7 @@ export const roleDeleteEvent = eventConfig(
 					{ name: "Mentionable", value: "{{mentionable}}" },
 				],
 				color: "red",
+				footer: { text: "Actor ID: {{user#id}}" },
 			}]
 		}
 	}
