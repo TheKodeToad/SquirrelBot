@@ -2,9 +2,9 @@
 import { parseTemplate, type TemplateSchema } from "#common/template/index.ts";
 import { z } from "zod/v4";
 
-export function template<S extends TemplateSchema>(schema: S) {
+export function template<S extends TemplateSchema>(schema: S, allowEscape = true) {
 	return z.string().transform((input, context) => {
-		const result = parseTemplate(input, schema);
+		const result = parseTemplate(input, schema, allowEscape);
 
 		if (typeof result === "string") {
 			context.addIssue({ message: result });

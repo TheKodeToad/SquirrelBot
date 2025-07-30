@@ -6,11 +6,11 @@ import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { z } from "zod/v4";
 
-export const MessageLiteral = message(z.string());
+export const MessageLiteral = message(() => z.string());
 export type MessageLiteral = z.infer<typeof MessageLiteral>;
 
 export function messageTemplate<S extends TemplateSchema>(schema: S) {
-	const result = message(template(schema))
+	const result = message(markdown => template(schema, markdown))
 		.transform(({ content, embeds, ...message }) => (params: ParameterRecord<S>) => ({
 			content: content?.(params),
 			embeds: embeds?.map(
@@ -50,9 +50,9 @@ export function messageTemplate<S extends TemplateSchema>(schema: S) {
 	return result;
 }
 
-function message<Z extends z.ZodTypeAny>(stringType: Z) {
+function message<Z extends z.ZodTypeAny>(stringType: (markdown: boolean) => Z) {
 	return z.strictObject({
-		content: stringType,
+		content: stringType(true),
 		allowed_mentions: z.strictObject({
 			everyone: z.boolean(),
 			replied_user: z.boolean(),
@@ -70,24 +70,24 @@ function message<Z extends z.ZodTypeAny>(stringType: Z) {
 	}));
 }
 
-function embed<Z extends z.ZodType>(stringType: Z) {
+function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 	return z.strictObject({
-		title: stringType,
-		description: stringType,
-		url: stringType,
+		title: stringType(true),
+		description: stringType(true),
+		url: stringType(false),
 		timestamp: z.instanceof(TomlDate).transform(date => date.toISOString()), // TODO is this filter consistent with Discord's
 		color: Color,
-		footer: z.strictObject({ text: stringType, icon: stringType }),
-		image: stringType.transform(url => ({ url })),
-		thumbnail: stringType.transform(url => ({ url })),
+		footer: z.strictObject({ text: stringType(false), icon: stringType(false) }),
+		image: stringType(false).transform(url => ({ url })),
+		thumbnail: stringType(false).transform(url => ({ url })),
 		author: z.strictObject({
-			name: stringType,
-			url: stringType.optional(),
-			icon_url: stringType.optional(),
+			name: stringType(false),
+			url: stringType(false).optional(),
+			icon_url: stringType(false).optional(),
 		}).transform(({ icon_url, ...input }) => ({ iconURL: icon_url, ...input })),
 		fields: z.strictObject({
-			name: stringType,
-			value: stringType,
+			name: stringType(true),
+			value: stringType(true),
 			inline: z.boolean().optional(),
 		}).array(),
 	}).partial();

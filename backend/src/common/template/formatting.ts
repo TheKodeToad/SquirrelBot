@@ -5,7 +5,7 @@ import { TokenType, type Token } from "#common/template/parsing.ts";
 import { dateToUnixSeconds, humanizeDuration } from "#common/time.ts";
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
 
-export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
+export function formatTokens(params: ParameterRecord, tokens: Token[], allowEscape = true): string {
 	let result = "";
 
 	for (const token of tokens) {
@@ -14,7 +14,9 @@ export function formatTokens(params: ParameterRecord, tokens: Token[]): string {
 			continue;
 		}
 
-		const escaped = !(token.wrapper === FormattingWrapper.InlineCodeblock || token.wrapper === FormattingWrapper.MultilineCodeblock);
+		const escaped = allowEscape
+			&& token.wrapper !== FormattingWrapper.InlineCodeblock
+			&& token.wrapper !== FormattingWrapper.MultilineCodeblock;
 
 		let output: string;
 

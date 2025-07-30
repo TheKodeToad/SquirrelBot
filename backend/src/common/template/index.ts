@@ -16,7 +16,7 @@ import { parseTemplateTokens, TokenType } from "#common/template/parsing.ts";
  * @returns A function to call to format data with the template,
  * or an error denoting something that went wrong with parsing.
  */
-export function parseTemplate<S extends TemplateSchema>(template: string, schema: S): ((params: ParameterRecord<S>) => string) | string {
+export function parseTemplate<S extends TemplateSchema>(template: string, schema: S, allowEscape = true): ((params: ParameterRecord<S>) => string) | string {
 	// just a typed wrapper
 	const tokens = parseTemplateTokens(template, schema);
 
@@ -31,7 +31,7 @@ export function parseTemplate<S extends TemplateSchema>(template: string, schema
 		return () => value;
 	}
 
-	return params => formatTokens(params, tokens);
+	return params => formatTokens(params, tokens, allowEscape);
 }
 
 export type TemplateSchema = Record<string, ParameterType>;
