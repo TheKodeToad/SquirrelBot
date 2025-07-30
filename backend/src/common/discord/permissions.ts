@@ -1,4 +1,3 @@
-import { requireExhaustiveSwitch } from "#common/types.ts";
 import { bot } from "#discord/index.ts";
 import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role } from "oceanic.js";
 
@@ -62,7 +61,7 @@ export function canWriteInChannel(channel: AnyGuildChannel, member: Member): boo
 		return false;
 	}
 
-	requireExhaustiveSwitch(channel);
+	(channel satisfies never);
 
 	return false;
 }

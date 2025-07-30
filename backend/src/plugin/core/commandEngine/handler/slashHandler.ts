@@ -1,6 +1,5 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { requireExhaustiveSwitch } from "#common/types.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
@@ -177,7 +176,7 @@ function mapOptionType(type: OptionType) {
 		return ApplicationCommandOptionTypes.STRING;
 	}
 
-	requireExhaustiveSwitch(type);
+	(type satisfies never);
 }
 
 class SlashContext implements CommandContext {

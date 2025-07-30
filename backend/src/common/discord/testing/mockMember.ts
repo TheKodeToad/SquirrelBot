@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 
-import { todo } from "#common/errors.ts";
+import { todo } from "#common/general.ts";
 import { bot } from "#discord/index.ts";
 import { Base, Permission, type Member } from "oceanic.js";
 

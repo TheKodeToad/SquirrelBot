@@ -1,5 +1,4 @@
 import { isSnowflake } from "#common/snowflake.ts";
-import { requireExhaustiveSwitch } from "#common/types.ts";
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/command.ts";
 
@@ -162,7 +161,7 @@ function validateType(type: OptionType, value: unknown): void {
 
 		break;
 	default:
-		requireExhaustiveSwitch(type);
+		(type satisfies never);
 		break;
 	}
 }
