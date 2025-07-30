@@ -1,3 +1,4 @@
+import { APP_NAME } from "#brand.ts";
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import { bot } from "#discord/index.ts";
@@ -21,7 +22,7 @@ export async function logToChannel(channel: AnyTextableGuildChannel, message: Ex
 			message.threadID = channel.id;
 
 		await bot.rest.webhooks.execute(webhookID, token, {
-			username: (bot.user.globalName ?? bot.user.username) + " Logging",
+			username: APP_NAME + " Logging",
 			avatarURL: bot.user.avatarURL(),
 			...message,
 		});
@@ -57,7 +58,7 @@ async function acquireWebhook(channel: AnyTextableGuildChannel, action: (auth: W
 		if (!baseChannel.permissionsOf(channel.guild.clientMember).has(Permissions.MANAGE_WEBHOOKS))
 			return;
 
-		const webhook = await baseChannel.createWebhook({ name: "Squirrel Logging Webhook" });
+		const webhook = await baseChannel.createWebhook({ name: APP_NAME + " Logging Webhook" });
 		const auth: WebhookAuth = { webhookID: webhook.id, token: webhook.token! };
 
 		if (existingWebhook !== null)
