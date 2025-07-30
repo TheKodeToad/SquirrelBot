@@ -23,7 +23,7 @@ export class TTLMap<K, V> {
 	}
 
 	private _isExpired(now: number, date: number): boolean {
-		return (now - date) > this._ttl;
+		return (now - date) >= this._ttl;
 	}
 
 	get size(): number {
@@ -70,7 +70,7 @@ export class TTLMap<K, V> {
 			return false;
 
 		const [_, date] = this._map.get(key)!;
-		return this._isExpired(Date.now(), date);
+		return !this._isExpired(Date.now(), date);
 	}
 
 	set(key: K, value: V): this {
@@ -86,8 +86,12 @@ export class TTLMap<K, V> {
 				yield [key, value];
 	}
 
-	keys(): IterableIterator<K> {
-		return this._map.keys();
+	*keys(): IterableIterator<K> {
+		const now = Date.now();
+
+		for (const [key, [_, date]] of this._map)
+			if (!this._isExpired(now, date))
+				yield key;
 	}
 
 	*values(): IterableIterator<V> {

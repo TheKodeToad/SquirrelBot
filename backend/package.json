@@ -10,7 +10,7 @@
 		"migration": "pnpm run _node src/storage/main.ts",
 		"typecheck": "tsc",
 		"lint": "eslint",
-		"test": "node --import=./registerSWC.js --test src/**/*.test.ts",
+		"test": "node --import=./registerSWC.js --enable-source-maps --test src/**/*.test.ts",
 		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
 	},
 	"dependencies": {
