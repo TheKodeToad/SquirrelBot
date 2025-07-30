@@ -121,4 +121,21 @@ suite("TTLMap", () => {
 
 		assertConsistentData(map, {});
 	}));
+
+	test("forEach this arg", () => mockTime(() => {
+		const map: TTLMap<string, null> = new TTLMap(SECOND);
+		map.set("a", null);
+		map.set("b", null);
+
+		function unbound(this: undefined): void {
+			assert.equal(this, undefined);
+		}
+
+		function bound(this: string): void {
+			assert.equal(this, "foo");
+		}
+
+		map.forEach(unbound);
+		map.forEach(bound, "foo");
+	}));
 });

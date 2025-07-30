@@ -46,7 +46,7 @@ export class TTLMap<K, V> {
 	}
 
 	forEach(callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void, thisArg?: any): void {
-		if (thisArg !== undefined && thisArg !== null)
+		if (thisArg != null)
 			callbackfn = callbackfn.bind(thisArg);
 
 		for (const entry of this)
