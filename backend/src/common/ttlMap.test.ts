@@ -105,6 +105,19 @@ suite("TTLMap", () => {
 		assert.ok(!map.has("a"), "!map.has('a')");
 	}));
 
+	test("delete", () => mockTime(() => {
+		const map: TTLMap<string, null> = new TTLMap(SECOND);
+
+		map.set("a", null);
+		assert.ok(map.delete("a"), "map.delete('a')");
+		assert.ok(!map.delete("a"), "!map.delete('a')");
+
+		map.set("a", null);
+		time += SECOND;
+
+		assert.ok(!map.delete("a"), "!map.delete('a') (after expiry)");
+	}));
+
 	test("precision", () => mockTime(() => {
 		const map: TTLMap<string, number> = new TTLMap(SECOND);
 

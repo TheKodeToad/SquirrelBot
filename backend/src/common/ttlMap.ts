@@ -42,7 +42,9 @@ export class TTLMap<K, V> {
 	}
 
 	delete(key: K): boolean {
-		return this._map.delete(key);
+		const had = this.has(key);
+		this._map.delete(key);
+		return had;
 	}
 
 	forEach(callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void, thisArg?: any): void {
