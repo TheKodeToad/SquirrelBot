@@ -1,7 +1,8 @@
 import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
-import { LoggingConfig } from "#plugin/logging/config.ts";
+import { LoggingConfig } from "#plugin/logging/config/index.ts";
+import memberLogger from "#plugin/logging/logger/members.ts";
 import messageLogger from "#plugin/logging/logger/messages.ts";
 import roleLogger from "#plugin/logging/logger/roles.ts";
 
@@ -27,5 +28,6 @@ export default definePlugin({
 		}),
 		...messageLogger,
 		...roleLogger,
+		...memberLogger,
 	],
 });

@@ -2,7 +2,7 @@ import { APP_NAME } from "#brand.ts";
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import { bot } from "#discord/index.ts";
-import type { LoggerConfig } from "#plugin/logging/config.ts";
+import type { LoggerConfig } from "#plugin/logging/config/index.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#plugin/logging/storage/webhooks.ts";
 import AsyncLock from "async-lock";
 import { DiscordRESTError, Guild, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";

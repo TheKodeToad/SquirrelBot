@@ -20,7 +20,7 @@ export default [
 	onBotEvent({ type: "messageDelete", listener: handleDelete }),
 ];
 
-export async function beginMessageCleanupLoop(): Promise<void> {
+async function beginMessageCleanupLoop(): Promise<void> {
 	try {
 		logger.debug?.("Cleaning up old message cache entries");
 
