@@ -6,9 +6,9 @@ import type { ClientEvents } from "oceanic.js";
 
 // custom implementations as fancy stuff with generics is required
 
-export interface BotEventListener<T extends keyof ClientEvents = keyof ClientEvents> {
+export interface BotEventListener<T extends keyof ClientEvents = any> {
 	type: T;
-	listener(...args: ClientEvents[T]): Promise<void> | void;
+	listener: (...args: ClientEvents[T]) => Promise<void> | void;
 }
 
 export function onBotEvent<T extends keyof ClientEvents>(listener: BotEventListener<T>): Contribution {

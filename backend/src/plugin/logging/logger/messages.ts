@@ -6,7 +6,7 @@ import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { logWithLogger } from "#plugin/logging/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
 import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "#plugin/logging/storage/messageCache.ts";
-import { Message, Routes } from "oceanic.js";
+import { Message, Routes, type PossiblyUncachedMessage } from "oceanic.js";
 
 const logger = moduleLogger();
 
@@ -89,7 +89,7 @@ async function handleUpdate(message: Message): Promise<void> {
 	}
 }
 
-async function handleDelete(message: Message): Promise<void> {
+async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 	if (message.guild == null)
 		return;
 
@@ -103,8 +103,8 @@ async function handleDelete(message: Message): Promise<void> {
 	if (entry === null)
 		return;
 
-	const avatarURL = entry.authorAvatarHash !== null ?
-		bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
+	const avatarURL = entry.authorAvatarHash !== null
+		? bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
 		: undefined;
 
 	for (const logger of config.loggers) {

@@ -26,8 +26,8 @@ type BulkAction =
 		duration?: number;
 		memberRanking: MemberRanking;
 
-		check?(member: Member): Promise<string | true> | string | true;
-		makeCase(options: Pick<CreateCaseOptions, "createdAt" | "expiresAt" | "actorID" | "targetID" | "dmDelivered">): CreateCaseOptions;
+		check?: (member: Member) => Promise<string | true> | string | true;
+		makeCase: (options: Pick<CreateCaseOptions, "createdAt" | "expiresAt" | "actorID" | "targetID" | "dmDelivered">) => CreateCaseOptions;
 	};
 
 export interface BulkSuccessEntry {
@@ -51,7 +51,6 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 
 	const members = await fetchMembersCached(action.guild, action.ids);
 
-	// eslint-disable-next-line @typescript-eslint/unbound-method
 	action.check ??= () => true;
 
 	for (const targetID of action.ids) {

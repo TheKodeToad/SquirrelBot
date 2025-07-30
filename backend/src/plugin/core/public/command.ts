@@ -33,7 +33,7 @@ export interface BaseContext {
 	user: User;
 	member: Member;
 	channel: AnyTextableGuildChannel;
-	respond(reply: Reply): Promise<void>;
+	respond: (reply: Reply) => Promise<void>;
 }
 
 export interface CommandContext extends BaseContext {
@@ -45,7 +45,7 @@ export interface CommandContext extends BaseContext {
 export interface ComponentContext extends BaseContext {
 	/** The ID of the user who initially ran the command */
 	originalUserID: string;
-	edit(reply: Reply): Promise<void>;
+	edit: (reply: Reply) => Promise<void>;
 }
 
 export interface ReplyObject extends Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> {
