@@ -50,7 +50,9 @@ export const enum ParameterType {
 	Number,
 	Duration,
 	Timestamp,
+	/** Escape markdown */
 	RawString,
+	/** Preserve markdown */
 	MarkdownString,
 }
 

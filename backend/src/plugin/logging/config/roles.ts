@@ -6,7 +6,8 @@ import { z } from "zod/v4";
 export const roleCreateEvent = eventConfig(
 	z.strictObject({
 		message: messageTemplate({
-			by: ParameterType.User,
+			user: ParameterType.User,
+			user_avatar: ParameterType.MarkdownString,
 			role: ParameterType.Role,
 			color: ParameterType.RawString,
 			hoisted: ParameterType.RawString,
@@ -17,6 +18,7 @@ export const roleCreateEvent = eventConfig(
 		message: {
 			embeds: [{
 				title: "Role Created",
+				author: { name: "{{user#tag}}", icon_url: "{{user_avatar}}" },
 				description: "{{role#mention}}",
 				fields: [
 					{ name: "Name", value: "{{role#name}}" },
@@ -33,7 +35,8 @@ export const roleCreateEvent = eventConfig(
 export const roleUpdateEvent = eventConfig(
 	z.strictObject({
 		message: messageTemplate({
-			by: ParameterType.User,
+			user: ParameterType.User,
+			user_avatar: ParameterType.MarkdownString,
 			role: ParameterType.Role,
 			old_name: ParameterType.RawString,
 			old_color: ParameterType.RawString,
@@ -49,6 +52,7 @@ export const roleUpdateEvent = eventConfig(
 		message: {
 			embeds: [{
 				title: "Role Updated",
+				author: { name: "{{user#tag}}", icon_url: "{{user_avatar}}" },
 				description: "{{role#mention}}",
 				fields: [
 					{ name: "Name", value: "{{old_name}} → {{new_name}}" },
@@ -65,7 +69,8 @@ export const roleUpdateEvent = eventConfig(
 export const roleDeleteEvent = eventConfig(
 	z.strictObject({
 		message: messageTemplate({
-			by: ParameterType.User,
+			user: ParameterType.User,
+			user_avatar: ParameterType.MarkdownString,
 			role: ParameterType.Role,
 			color: ParameterType.RawString,
 			hoisted: ParameterType.RawString,
@@ -76,6 +81,7 @@ export const roleDeleteEvent = eventConfig(
 		message: {
 			embeds: [{
 				title: "Role Deleted",
+				author: { name: "{{user#tag}}", icon_url: "{{user_avatar}}" },
 				fields: [
 					{ name: "Name", value: "{{role#name}}" },
 					{ name: "Color", value: "{{color}}" },
