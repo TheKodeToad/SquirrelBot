@@ -60,7 +60,7 @@ async function handleCreate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 
 		user ??= await fetchUserCached(entry.userID);
 
-		await logWithLogger(logger, guild, role_create.message({
+		await logWithLogger(logger, guild, role_create.message.apply({
 			user,
 			user_avatar: user.avatarURL(),
 			role: { id: entry.targetID, name: changes.name!.new! },
@@ -102,7 +102,7 @@ async function handleUpdate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 
 		user ??= await fetchUserCached(entry.userID);
 
-		await logWithLogger(logger, guild, role_update.message({
+		await logWithLogger(logger, guild, role_update.message.apply({
 			user,
 			user_avatar: user.avatarURL(),
 			role: { id: entry.targetID, name },
@@ -145,7 +145,7 @@ async function handleDelete(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 
 		user ??= await fetchUserCached(entry.userID);
 
-		await logWithLogger(logger, guild, role_delete.message({
+		await logWithLogger(logger, guild, role_delete.message.apply({
 			user,
 			user_avatar: user.avatarURL(),
 			role: { id: entry.targetID, name: changes.name!.old! },

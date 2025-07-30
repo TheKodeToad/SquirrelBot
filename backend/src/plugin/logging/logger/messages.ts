@@ -80,7 +80,7 @@ async function handleUpdate(message: Message): Promise<void> {
 			content: message.content,
 		});
 
-		await logWithLogger(logger, message.guild, message_edit.message({
+		await logWithLogger(logger, message.guild, message_edit.message.apply({
 			author: message.author,
 			author_avatar: message.author.avatarURL(),
 			old_content: entry?.content,
@@ -113,7 +113,7 @@ async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 		if (!message_delete)
 			continue;
 
-		await logWithLogger(logger, message.guild, message_delete.message({
+		await logWithLogger(logger, message.guild, message_delete.message.apply({
 			author: { id: entry.authorID, tag: entry.authorName },
 			author_avatar: avatarURL,
 			content: entry.content,

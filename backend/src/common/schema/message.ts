@@ -1,56 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Color, Snowflake } from "#common/schema/general.ts";
-import { template } from "#common/schema/template.ts";
+import { template, type Template } from "#common/schema/template.ts";
 import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { z } from "zod/v4";
 
-export const MessageLiteral = message(() => z.string());
-export type MessageLiteral = z.infer<typeof MessageLiteral>;
+type Message<Z extends z.ZodType> = z.output<ReturnType<typeof message<Z>>>;
 
-export function messageTemplate<S extends TemplateSchema>(schema: S) {
-	const result = message(markdown => template(schema, markdown))
-		.transform(({ content, embeds, ...message }) => (params: ParameterRecord<S>) => ({
-			content: content?.(params),
-			embeds: embeds?.map(
-				({ author, description, fields, footer, image, thumbnail, title, url, ...embed }) => ({
-					author: author !== undefined
-						? {
-							name: author.name(params),
-							url: author.url?.(params),
-							iconURL: author.iconURL?.(params),
-						}
-						: undefined,
-					description: description?.(params),
-					fields: fields?.map(({ name, value, ...field }) => ({
-						name: name?.(params),
-						value: value?.(params),
-						...field
-					})) ?? [],
-					footer: footer !== undefined
-						? { text: footer.text(params), icon: footer.icon(params) }
-						: undefined,
-					image: image !== undefined ? { url: image.url(params) } : undefined,
-					thumbnail: thumbnail !== undefined ? { url: thumbnail.url(params) } : undefined,
-					title: title?.(params),
-					url: url?.(params),
-					...embed
-				})
-			) ?? [],
-			...message
-		}));
-
-	// @ts-expect-error avoid parsing constantly
-	result.prefault = content => {
-		const parsed = result.parse(content);
-		return result.default(() => parsed);
-	};
-
-	return result;
-}
-
-function message<Z extends z.ZodTypeAny>(stringType: (markdown: boolean) => Z) {
+function message<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 	return z.strictObject({
 		content: stringType(true),
 		allowed_mentions: z.strictObject({
@@ -59,7 +17,7 @@ function message<Z extends z.ZodTypeAny>(stringType: (markdown: boolean) => Z) {
 			users: z.union([z.boolean(), Snowflake.array().max(100)]),
 			roles: z.union([z.boolean(), Snowflake.array().max(100)]),
 		}).partial().transform(({ replied_user, ...input }) => ({
-			epliedUser: replied_user, ...input
+			repliedUser: replied_user, ...input
 		})),
 		embeds: embed(stringType).array(),
 		silent: z.boolean(),
@@ -69,6 +27,8 @@ function message<Z extends z.ZodTypeAny>(stringType: (markdown: boolean) => Z) {
 		...input
 	}));
 }
+
+type Embed<Z extends z.ZodType> = z.output<ReturnType<typeof embed<Z>>>;
 
 function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 	return z.strictObject({
@@ -93,3 +53,75 @@ function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 	}).partial();
 }
 
+export const MessageLiteral = message(() => z.string());
+export type MessageLiteral = z.infer<typeof MessageLiteral>;
+
+export function messageTemplate<S extends TemplateSchema>(schema: S) {
+	const result = message(markdown => template(schema, markdown))
+		.transform(template => {
+			return {
+				apply(params: ParameterRecord<S>) {
+					return applyMessageTemplate(template, params);
+				}
+			};
+		});
+
+	// @ts-expect-error avoid parsing constantly
+	result.prefault = content => {
+		const parsed = result.parse(content);
+		return result.default(parsed);
+	};
+
+	return result;
+}
+
+function applyMessageTemplate<S extends TemplateSchema>(template: Message<Template<S>>, params: ParameterRecord<S>) {
+	return {
+		...template,
+		content: template.content?.apply(params),
+		embeds: template.embeds?.map(embed => applyEmbedTemplate(embed, params)),
+	};
+}
+
+function applyEmbedTemplate<S extends TemplateSchema>(template: Embed<Template<S>>, params: ParameterRecord<S>) {
+	const author = template.author !== undefined
+		? {
+			name: template.author.name.apply(params),
+			url: template.author.url?.apply(params),
+			iconURL: template.author.iconURL?.apply(params),
+		}
+		: undefined;
+
+	const fields = template.fields?.map(({ name, value, ...field }) => ({
+		name: name?.apply(params),
+		value: value?.apply(params),
+		...field
+	}));
+
+	const footer = template.footer !== undefined
+		? {
+			text: template.footer.text.apply(params),
+			icon: template.footer.icon.apply(params),
+		}
+		: undefined;
+
+	const image = template.image !== undefined
+		? { url: template.image.url.apply(params) }
+		: undefined;
+
+	const thumbnail = template.thumbnail !== undefined
+		? { url: template.thumbnail.url.apply(params) }
+		: undefined;
+
+	return ({
+		...template,
+		author,
+		description: template.description?.apply(params),
+		fields,
+		footer,
+		image,
+		thumbnail,
+		title: template.title?.apply(params),
+		url: template.url?.apply(params)
+	});
+}

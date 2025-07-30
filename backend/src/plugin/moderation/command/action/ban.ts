@@ -41,7 +41,7 @@ export default defineCommand({
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.ban.direct_message({
+			? config.ban.direct_message.apply({
 				server: context.guild,
 				moderator: context.user,
 				reason: args.reason ?? undefined,

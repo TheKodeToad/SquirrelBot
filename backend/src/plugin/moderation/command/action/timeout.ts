@@ -44,7 +44,7 @@ export default defineCommand({
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.timeout.direct_message({
+			? config.timeout.direct_message.apply({
 				server: context.guild,
 				moderator: context.user,
 				reason: args.reason ?? undefined,

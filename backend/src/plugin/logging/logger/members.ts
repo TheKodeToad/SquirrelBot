@@ -20,7 +20,7 @@ async function handleAdd(member: Member): Promise<void> {
 		if (!member_join)
 			continue;
 
-		await logWithLogger(logger, member.guild, member_join.message({
+		await logWithLogger(logger, member.guild, member_join.message.apply({
 			user: member,
 			user_avatar: member.avatarURL(),
 			user_created_at: member.createdAt,
@@ -44,7 +44,7 @@ async function handleRemove(user: Member | User, guild: Guild | Uncached): Promi
 		if (!member_leave)
 			continue;
 
-		await logWithLogger(logger, guild, member_leave.message({
+		await logWithLogger(logger, guild, member_leave.message.apply({
 			user: user,
 			user_avatar: user.avatarURL(),
 			user_created_at: user.createdAt,

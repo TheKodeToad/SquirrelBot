@@ -12,11 +12,15 @@
 import { formatTokens } from "#common/template/formatting.ts";
 import { parseTemplateTokens, TokenType } from "#common/template/parsing.ts";
 
+interface TemplateWrapper<S extends TemplateSchema> {
+	apply: ((params: ParameterRecord<S>) => string);
+}
+
 /**
  * @returns A function to call to format data with the template,
  * or an error denoting something that went wrong with parsing.
  */
-export function parseTemplate<S extends TemplateSchema>(template: string, schema: S, allowEscape = true): ((params: ParameterRecord<S>) => string) | string {
+export function parseTemplate<S extends TemplateSchema>(template: string, schema: S, allowEscape = true): TemplateWrapper<S> | string {
 	// just a typed wrapper
 	const tokens = parseTemplateTokens(template, schema);
 
@@ -31,7 +35,11 @@ export function parseTemplate<S extends TemplateSchema>(template: string, schema
 		return () => value;
 	}
 
-	return params => formatTokens(params, tokens, allowEscape);
+	return {
+		apply(params) {
+			return formatTokens(params, tokens, allowEscape);
+		}
+	};
 }
 
 export type TemplateSchema = Record<string, ParameterType>;
