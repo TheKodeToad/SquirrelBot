@@ -3,16 +3,16 @@ import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { loadPlugins } from "#loader/index.ts";
+import { preMain, setupGracefulShutdown } from "#setup.ts";
 import { postgres } from "#storage/index.ts";
-import { checkMigrationsOrExit } from "#storage/migration.ts";
 import { connectChannelListener, disconnectChannelListener } from "#storage/notification.ts";
 import { mkdir } from "node:fs/promises";
+
+await preMain();
 
 const logger = moduleLogger();
 
 await mkdir(CACHE_PATH, { recursive: true });
-
-await checkMigrationsOrExit();
 
 bot.once("ready", async () => {
 	try {
@@ -31,8 +31,12 @@ bot.once("ready", async () => {
 		process.exit(1);
 	}
 
-	process.on("SIGINT", shutDown);
-	process.on("SIGTERM", shutDown);
+	setupGracefulShutdown(async () => {
+		bot.disconnect(false);
+
+		disconnectChannelListener();
+		await postgres.end();
+	});
 });
 
 bot.on("shardPreReady", id => logger.debug?.(`Shard #${id} received READY packet`));
@@ -54,15 +58,10 @@ bot.on("error", (error, shard) => {
 });
 
 bot.on("warn", (info, shard) => {
-	if (shard !== undefined) {
+	if (shard !== undefined)
 		logger.warn?.(`Oceanic warning (shard #${shard}): ${info}`);
-	} else {
+	else
 		logger.warn?.(`Oceanic warning: ${info}`);
-	}
-});
-
-process.on("unhandledRejection", error => {
-	logger.error?.("Unhandled Promise rejection!", error);
 });
 
 logger.info?.("Connecting Postgres listener");
@@ -70,33 +69,3 @@ await connectChannelListener();
 
 logger.info?.("Connecting to Discord");
 await bot.connect();
-
-let exitingAfter = 0;
-
-async function shutDown(signal: NodeJS.Signals): Promise<void> {
-	if (exitingAfter !== 0) {
-		logger.warn?.(`Already attempting shutdown - exit will be forced after ${exitingAfter} seconds`);
-		return;
-	}
-
-	logger.info?.(`Received ${signal}; attempting graceful shutdown`);
-
-	if (signal === "SIGTERM")
-		exitingAfter = 30;
-	else
-		exitingAfter = 5;
-
-	setTimeout(() => {
-		logger.warn?.(`Forced exit after waiting for ${exitingAfter} seconds`);
-		process.exit(1);
-	}, exitingAfter * 1000).unref();
-
-	try {
-		bot.disconnect(false);
-
-		disconnectChannelListener();
-		await postgres.end();
-	} catch (error) {
-		logger.error?.(`Unhandled error during cleanup; exit will be forced after ${exitingAfter} seconds`, error);
-	}
-}

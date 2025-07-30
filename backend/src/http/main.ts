@@ -5,18 +5,18 @@ import api from "#http/route/api/index.ts";
 import frontend from "#http/route/frontend.ts";
 import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
 import { loadPlugins } from "#loader/index.ts";
+import { preMain, setupGracefulShutdown } from "#setup.ts";
 import { postgres } from "#storage/index.ts";
-import { checkMigrationsOrExit } from "#storage/migration.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
 
+await preMain();
+
 const logger = moduleLogger();
 const app = new Hono;
-
-await checkMigrationsOrExit();
 
 logger.info?.("Loading plugins");
 await loadPlugins();
@@ -74,39 +74,13 @@ process.on("unhandledRejection", rejection => {
 	logger.error?.("Unhandled Promise rejection!", rejection);
 });
 
-process.on("SIGINT", shutDown);
-process.on("SIGTERM", shutDown);
+setupGracefulShutdown(async () => {
+	await new Promise<void>((resolve, reject) => server.close(error => {
+		if (error !== undefined)
+			reject(error);
+		else
+			resolve();
+	}));
 
-let exitingAfter = 0;
-
-async function shutDown(signal: NodeJS.Signals): Promise<void> {
-	if (exitingAfter !== 0) {
-		logger.warn?.(`Already attempting shutdown - exit will be forced after ${exitingAfter} seconds`);
-		return;
-	}
-
-	logger.info?.(`Received ${signal}; attempting graceful shutdown`);
-
-	if (signal === "SIGTERM")
-		exitingAfter = 30;
-	else
-		exitingAfter = 5;
-
-	setTimeout(() => {
-		logger.warn?.(`Forced exit after waiting for ${exitingAfter} seconds`);
-		process.exit(1);
-	}, exitingAfter * 1000).unref();
-
-	try {
-		await new Promise<void>((resolve, reject) => server.close(error => {
-			if (error !== undefined)
-				reject(error);
-			else
-				resolve();
-		}));
-
-		await postgres.end();
-	} catch (error) {
-		logger.error?.(`Unhandled error during cleanup; exit will be forced after ${exitingAfter} seconds`, error);
-	}
-}
+	await postgres.end();
+});
