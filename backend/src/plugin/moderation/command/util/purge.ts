@@ -26,11 +26,8 @@ export default defineCommand({
 		},
 		bots: {
 			type: OptionType.Flag,
-			name: ["bots"],
-		},
-		humans: {
-			type: OptionType.Flag,
-			name: ["humans"],
+			name: ["bots", "b"],
+			negativeName: ["no-bots", "nb", "humans", "earthlings"],
 		},
 		author: {
 			type: OptionType.User,
@@ -68,10 +65,7 @@ export default defineCommand({
 
 				const byBot = message.author.bot || message.webhookID !== undefined; // TODO: maybe slightly annoying with PluralKit/Tupperbox?
 
-				if (args.bots && !byBot)
-					continue;
-
-				if (args.humans && byBot)
+				if (args.bots !== null && args.bots !== byBot)
 					continue;
 
 				if (args.author.length !== 0 && !args.author.includes(message.author.id))
