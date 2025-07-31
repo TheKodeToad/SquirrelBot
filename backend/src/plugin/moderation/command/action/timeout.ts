@@ -60,12 +60,11 @@ export default defineCommand({
 			directMessage,
 			duration: args.duration,
 			memberRanking: config.member_ranking,
-
 			membersOnly: true,
 
 			check: member => {
 				if (member.permissions.has(Permissions.ADMINISTRATOR))
-					return "Member has admin permissions - forbidden by Discord";
+					return "Member has admin permissions — forbidden by Discord";
 
 				return true;
 			},

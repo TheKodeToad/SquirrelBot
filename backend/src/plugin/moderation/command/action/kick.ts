@@ -52,7 +52,6 @@ export default defineCommand({
 			actor: context.member,
 			directMessage: directMessage,
 			memberRanking: config.member_ranking,
-
 			membersOnly: true,
 
 			perform: async member => await context.guild.removeMember(member.id, args.reason ?? undefined),

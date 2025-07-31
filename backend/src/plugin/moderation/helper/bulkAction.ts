@@ -25,6 +25,7 @@ type BulkAction =
 		directMessage?: CreateMessageOptions;
 		duration?: number;
 		memberRanking: MemberRanking;
+		botNeedsPerm?: boolean;
 
 		check?: (member: Member) => Promise<string | true> | string | true;
 		makeCase: (options: Pick<CreateCaseOptions, "createdAt" | "expiresAt" | "actorID" | "targetID" | "dmDelivered">) => CreateCaseOptions;
@@ -51,6 +52,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 
 	const members = await fetchMembersCached(action.guild, action.ids);
 
+	action.botNeedsPerm ??= true;
 	action.check ??= () => true;
 
 	for (const targetID of action.ids) {
@@ -80,7 +82,7 @@ export async function doBulkAction(action: BulkAction): Promise<BulkResult> {
 				continue;
 			}
 
-			if (!canModerate(MemberRanking.HighestRole, action.guild.clientMember, target)) {
+			if (action.botNeedsPerm && !canModerate(MemberRanking.HighestRole, action.guild.clientMember, target)) {
 				result.unsuccessful.push({
 					error: "App lacks permission to moderate the user",
 					user: target,
