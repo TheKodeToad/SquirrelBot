@@ -3,9 +3,9 @@ import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
-import { logWithLogger } from "#plugin/logging/helper/webhooks.ts";
+import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
-import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry, type MessageCacheEntry } from "#plugin/logging/storage/messageCache.ts";
+import { cleanUpMessageCacheEntries, getMessageCacheEntry, takeMessageCacheEntry, upsertMessageCacheEntry } from "#plugin/logging/storage/messageCache.ts";
 import { Message, Routes, type PossiblyUncachedMessage } from "oceanic.js";
 
 const logger = moduleLogger();
@@ -58,65 +58,54 @@ async function handleUpdate(message: Message): Promise<void> {
 	if (message.guild === null)
 		return;
 
-	const config = loggingConfigStore.get(message.guild.id);
+	await logEvent(
+		message.guild,
+		message.channelID,
+		events => events.message_edit,
+		async () => {
+			const entry = await getMessageCacheEntry(message.guild!.id, message.channelID, message.id);
 
-	if (config === undefined)
-		return;
+			await upsertMessageCacheEntry(message.guild!.id, message.channelID, message.id, {
+				authorID: message.author.id,
+				authorName: message.author.tag,
+				authorAvatarHash: message.author.avatar,
+				content: message.content,
+			});
 
-	let entry: MessageCacheEntry | null | undefined;
-
-	for (const logger of config.loggers) {
-		const { message_edit } = logger.events;
-
-		if (!message_edit)
-			continue;
-
-		entry ??= await getMessageCacheEntry(message.guild.id, message.channelID, message.id);
-
-		await upsertMessageCacheEntry(message.guild.id, message.channelID, message.id, {
-			authorID: message.author.id,
-			authorName: message.author.tag,
-			authorAvatarHash: message.author.avatar,
-			content: message.content,
-		});
-
-		await logWithLogger(logger, message.guild, message_edit.message.apply({
-			author: message.author,
-			author_avatar: message.author.avatarURL(),
-			old_content: entry?.content,
-			new_content: message.content
-		}));
-	}
+			return {
+				author: message.author,
+				author_avatar: message.author.avatarURL(),
+				old_content: entry?.content,
+				new_content: message.content
+			};
+		}
+	);
 }
 
 async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 	if (message.guild == null)
 		return;
 
-	const config = loggingConfigStore.get(message.guild.id);
+	await logEvent(
+		message.guild,
+		message.channelID,
+		events => events.message_delete,
+		async () => {
+			const entry = await takeMessageCacheEntry(message.guild!.id, message.channelID, message.id);
 
-	if (config === undefined)
-		return;
+			if (entry === null)
+				return null;
 
-	const entry = await takeMessageCacheEntry(message.guild.id, message.channelID, message.id);
+			const avatarURL = entry.authorAvatarHash !== null
+				? bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
+				: undefined;
 
-	if (entry === null)
-		return;
+			return {
+				author: { id: entry.authorID, tag: entry.authorName },
+				author_avatar: avatarURL,
+				content: entry.content,
+			};
+		}
+	);
 
-	const avatarURL = entry.authorAvatarHash !== null
-		? bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
-		: undefined;
-
-	for (const logger of config.loggers) {
-		const { message_delete } = logger.events;
-
-		if (!message_delete)
-			continue;
-
-		await logWithLogger(logger, message.guild, message_delete.message.apply({
-			author: { id: entry.authorID, tag: entry.authorName },
-			author_avatar: avatarURL,
-			content: entry.content,
-		}));
-	}
 }

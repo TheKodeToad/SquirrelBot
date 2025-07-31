@@ -56,6 +56,8 @@ function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 export const MessageLiteral = message(() => z.string());
 export type MessageLiteral = z.infer<typeof MessageLiteral>;
 
+export type MessageTemplate<S extends TemplateSchema = any> = z.infer<ReturnType<typeof messageTemplate<S>>>;
+
 export function messageTemplate<S extends TemplateSchema>(schema: S) {
 	const result = message(markdown => template(schema, markdown))
 		.transform(template => {

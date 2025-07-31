@@ -1,3 +1,4 @@
+import type { Awaitable } from "#common/general.ts";
 import { makeMapExtensionPoint, type Contribution } from "#loader/extensionPoint.ts";
 import type { Plugin } from "#loader/plugin.ts";
 import type { Command, Option } from "#plugin/core/public/command.ts";
@@ -8,7 +9,7 @@ import type { ClientEvents } from "oceanic.js";
 
 export interface BotEventListener<T extends keyof ClientEvents = any> {
 	type: T;
-	listener: (...args: ClientEvents[T]) => Promise<void> | void;
+	listener: (...args: ClientEvents[T]) => Awaitable<void>;
 }
 
 export function onBotEvent<T extends keyof ClientEvents>(listener: BotEventListener<T>): Contribution {

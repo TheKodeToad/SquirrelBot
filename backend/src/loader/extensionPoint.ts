@@ -1,3 +1,4 @@
+import type { Awaitable } from "#common/general.ts";
 import type { Plugin } from "#loader/plugin.ts";
 
 export type Contribution = (plugin: Plugin) => void;
@@ -62,7 +63,7 @@ export const enum EventListenerPhase {
 	Post,
 }
 
-type EventListener<T> = (event: T) => Promise<void> | void;
+type EventListener<T> = (event: T) => Awaitable<void>;
 
 export function makeEventExtensionPoint<T>(): ((listener: EventListener<T>, phase?: EventListenerPhase) => Contribution) & { fire(event: T): Promise<void>; } {
 	const contributions: Map<EventListenerPhase, EventListener<T>[]> = new Map;

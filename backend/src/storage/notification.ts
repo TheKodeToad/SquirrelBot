@@ -1,10 +1,11 @@
+import type { Awaitable } from "#common/general.ts";
 import { postgres } from "#storage/index.ts";
 import type { PoolClient } from "pg";
 
 let listenerClient: PoolClient | null = null;
 const listenersLookup: Map<string, Listener[]> = new Map;
 
-export type Listener = (payload: string | undefined) => void | Promise<void>;
+export type Listener = (payload: string | undefined) => Awaitable<void>;
 
 export async function connectChannelListener(): Promise<void> {
 	listenerClient = await postgres.connect();

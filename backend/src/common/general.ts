@@ -7,3 +7,6 @@ export function* mapIterable<I, O>(iterable: Iterable<I>, transformer: (value: I
 export function todo(): never {
 	throw new Error("Function not implemented");
 }
+
+export type ValuesOf<T> = T[keyof T];
+export type Awaitable<T> = T | PromiseLike<T>;

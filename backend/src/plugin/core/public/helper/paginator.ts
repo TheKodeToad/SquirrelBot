@@ -1,3 +1,4 @@
+import type { Awaitable } from "#common/general.ts";
 import type { BaseContext, CommandContext, ReplyObject } from "#plugin/core/public/command.ts";
 import { ActionRow, Divider, TextButton } from "oceanic-component-helper";
 import { ComponentTypes } from "oceanic.js";
@@ -5,8 +6,8 @@ import { ComponentTypes } from "oceanic.js";
 export interface Paginator<E, K> {
 	pageSize: number;
 	getKey: (entry: E) => K;
-	lookUp: (context: BaseContext, query: PaginatorQuery<K>) => Promise<E[]>;
-	render: (entries: E[]) => Promise<ReplyObject> | ReplyObject;
+	lookUp: (context: BaseContext, query: PaginatorQuery<K>) => Awaitable<E[]>;
+	render: (entries: E[]) => Awaitable<ReplyObject>;
 }
 
 export interface PaginatorQuery<K> {

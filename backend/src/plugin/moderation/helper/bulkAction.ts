@@ -1,6 +1,7 @@
 import { createDMCached, fetchMembersCached, fetchUserCached } from "#common/discord/cachedRequest.ts";
 import { formatRESTError } from "#common/discord/format.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
+import type { Awaitable } from "#common/general.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { createCase, type CreateCaseOptions } from "#plugin/moderation/storage/cases.ts";
@@ -10,11 +11,11 @@ type BulkAction =
 	(
 		{
 			membersOnly: true;
-			perform: (member: Member, calculatedExpiry: Date | undefined) => Promise<void> | void;
+			perform: (member: Member, calculatedExpiry: Date | undefined) => Awaitable<void>;
 		}
 		| {
 			membersOnly: false;
-			perform: (user: Member | User, caculatedExpiry: Date | undefined) => Promise<void> | void;
+			perform: (user: Member | User, caculatedExpiry: Date | undefined) => Awaitable<void>;
 		}
 	)
 	& {
@@ -27,7 +28,7 @@ type BulkAction =
 		memberRanking: MemberRanking;
 		botNeedsPerm?: boolean;
 
-		check?: (member: Member) => Promise<string | true> | string | true;
+		check?: (member: Member) => Awaitable<string | true>;
 		makeCase: (options: Pick<CreateCaseOptions, "createdAt" | "expiresAt" | "actorID" | "targetID" | "dmDelivered">) => CreateCaseOptions;
 	};
 

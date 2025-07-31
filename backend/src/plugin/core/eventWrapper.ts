@@ -1,3 +1,4 @@
+import type { Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { bot } from "#discord/index.ts";
 import { isGuildAllowed } from "#plugin/core/guildInfoSync.ts";
@@ -7,7 +8,7 @@ const logger = moduleLogger();
 
 export function wrapListener<E extends keyof ClientEvents>(
 	event: E,
-	listener: (...args: ClientEvents[E]) => void | Promise<void>
+	listener: (...args: ClientEvents[E]) => Awaitable<void>
 ) {
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
@@ -30,7 +31,7 @@ export function wrapListener<E extends keyof ClientEvents>(
 
 export function installWrappedListener<E extends keyof ClientEvents>(
 	event: E,
-	listener: (...args: ClientEvents[E]) => void | Promise<void>
+	listener: (...args: ClientEvents[E]) => Awaitable<void>
 ): void {
 	bot.on(event, wrapListener(event, listener));
 }

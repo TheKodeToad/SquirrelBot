@@ -1,37 +1,23 @@
 import { APP_NAME } from "#brand.ts";
-import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
+import type { Awaitable } from "#common/general.ts";
 import { bot } from "#discord/index.ts";
-import type { LoggerConfig } from "#plugin/logging/config/index.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#plugin/logging/storage/webhooks.ts";
 import AsyncLock from "async-lock";
-import { DiscordRESTError, Guild, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
+import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
 
-export async function logWithLogger(logger: LoggerConfig, guild: Guild, message: ExecuteWebhookOptions): Promise<void> {
-	const channel = await fetchTextableGuildChannelCached(guild, logger.channel);
-
-	if (channel === null)
-		return;
-
-	await logToChannel(channel, message);
-}
-
-export async function logToChannel(channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
+export async function logViaWebhook(channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
 	return acquireWebhook(channel, async ({ webhookID, token }) => {
 		if (isThreadChannel(channel))
 			message.threadID = channel.id;
 
-		await bot.rest.webhooks.execute(webhookID, token, {
-			username: APP_NAME + " Logging",
-			avatarURL: bot.user.avatarURL(),
-			...message,
-		});
+		await bot.rest.webhooks.execute(webhookID, token, message);
 	});
 }
 
 const webhookLock = new AsyncLock();
 
-async function acquireWebhook(channel: AnyTextableGuildChannel, action: (auth: WebhookAuth) => Promise<void>): Promise<void> {
+async function acquireWebhook(channel: AnyTextableGuildChannel, action: (auth: WebhookAuth) => Awaitable<void>): Promise<void> {
 	return webhookLock.acquire(channel.id, async () => {
 		const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
 

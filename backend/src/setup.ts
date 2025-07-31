@@ -1,3 +1,4 @@
+import type { Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";
 
@@ -31,7 +32,7 @@ function hasProto(): boolean {
 	}
 }
 
-export function setupGracefulShutdown(callback: () => Promise<void>): void {
+export function setupGracefulShutdown(callback: () => Awaitable<void>): void {
 	let exitingAfter = 0;
 
 	const shutDown = async (signal: NodeJS.Signals): Promise<void> => {

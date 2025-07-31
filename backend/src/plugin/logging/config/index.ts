@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
+import { APP_NAME } from "#brand.ts";
 import { Snowflake } from "#common/schema/general.ts";
 import { MemberJoinEvent, MemberLeaveEvent } from "#plugin/logging/config/members.ts";
 import { messageDeleteEvent as MessageDeleteEvent, messageEditEvent as MessageEditEvent } from "#plugin/logging/config/messages.ts";
 import { roleCreateEvent as RoleCreateEvent, roleDeleteEvent as RoleDeleteEvent, roleUpdateEvent as RoleUpdateEvent } from "#plugin/logging/config/roles.ts";
 import { z } from "zod/v4";
 
-export function eventConfig<Z extends z.ZodObject>(object: Z, defaultObject: z.input<Z>) {
+export function eventConfig<Z extends z.ZodType>(object: Z, defaultObject: z.input<Z>) {
 	const defaultTransformed = object.parse(defaultObject);
 
 	return z.union([
@@ -17,6 +18,8 @@ export function eventConfig<Z extends z.ZodObject>(object: Z, defaultObject: z.i
 
 export const LoggerConfig = z.strictObject({
 	channel: Snowflake,
+	displayName: z.string().default(APP_NAME + " Logging"),
+	avatar: z.url().optional(),
 	events: z.strictObject({
 		message_edit: MessageEditEvent,
 		message_delete: MessageDeleteEvent,
