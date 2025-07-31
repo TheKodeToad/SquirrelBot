@@ -137,8 +137,6 @@ function formatCommandPrefixUsage(options: Command["options"], optionsByPosition
 
 function formatOptionValue(option: Option): string {
 	switch (option.type) {
-	case OptionType.Boolean:
-		return option.array ? "boolean(s)" : "(true|false)";
 	case OptionType.Flag:
 		return "";
 	case OptionType.Integer:

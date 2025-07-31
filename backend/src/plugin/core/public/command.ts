@@ -56,11 +56,6 @@ export interface ReplyObject extends Omit<CreateMessageOptions, "messageReferenc
 export type Reply = ReplyObject | string;
 
 export const enum OptionType {
-	Boolean,
-	/**
-	 * Same as boolean for slash command;
-	 * --name to enable and and --negative-name to disable for prefix commands.
-	 */
 	Flag,
 	Integer,
 	Number,
@@ -82,7 +77,6 @@ export type AnyArgsValue = OptionValue<any>;
 export type AnyArgsValueItem = OptionTypeValue<any>;
 
 export type Option =
-	BooleanOption |
 	FlagOption |
 	StringOption |
 	IntegerOption |
@@ -104,12 +98,14 @@ interface BaseOption {
 
 interface FlagOption extends BaseOption {
 	type: OptionType.Flag;
+	/**  For prefix commands - specify an option to set the value to false insetad of true. */
 	negativeName?: NameList;
+	/** For slash commands - override the values from yes/no. */
+	values?: [string, string];
 	array?: false;
 	position?: undefined;
 }
 
-interface BooleanOption extends BaseOption { type: OptionType.Boolean; }
 interface StringOption extends BaseOption { type: OptionType.String; }
 interface IntegerOption extends BaseOption { type: OptionType.Integer; }
 interface NumberOption extends BaseOption { type: OptionType.Number; }
@@ -129,7 +125,6 @@ type NullableValue<O, Required extends boolean | undefined> = Required extends t
 
 type OptionTypeValue<T extends OptionType> =
 	T extends OptionType.Flag ? boolean :
-	T extends OptionType.Boolean ? boolean :
 	T extends OptionType.String ? string :
 	T extends OptionType.Integer ? number :
 	T extends OptionType.Number ? number :

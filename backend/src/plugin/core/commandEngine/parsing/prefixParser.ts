@@ -1,6 +1,6 @@
 import type { CommandCacheEntry } from "#plugin/core/commandEngine/commandCache.ts";
 import { ArgsParseError, type ArgsParseResult } from "#plugin/core/commandEngine/parsing/index.ts";
-import { readBoolean, readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
+import { readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
 import type { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import { SafeArgs } from "#plugin/core/commandEngine/safeArgs.ts";
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/command.ts";
@@ -175,8 +175,6 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 
 function readCommandArgValue(reader: StringReader, type: Exclude<OptionType, OptionType.Flag>, terminator?: RegExp): AnyArgsValueItem | null {
 	switch (type) {
-	case OptionType.Boolean:
-		return readBoolean(reader);
 	case OptionType.Integer:
 		return readInteger(reader);
 	case OptionType.Number:

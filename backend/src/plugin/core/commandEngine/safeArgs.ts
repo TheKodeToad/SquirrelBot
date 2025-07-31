@@ -123,7 +123,6 @@ function validateType(type: OptionType, value: unknown): void {
 		return;
 
 	switch (type) {
-	case OptionType.Boolean:
 	case OptionType.Flag:
 		if (typeof value !== "boolean")
 			throw new Error(`typeof value is '${typeof value}'; expected 'boolean'`);

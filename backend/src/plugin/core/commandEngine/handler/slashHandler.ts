@@ -4,7 +4,7 @@ import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
-import { getCommandByName, getCommands } from "#plugin/core/commandEngine/commandCache.ts";
+import { type CommandCacheEntry, getCommandByName, getCommands } from "#plugin/core/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
 import { AUTO_DEFER_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.ts";
@@ -16,7 +16,7 @@ import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { readFile, writeFile } from "fs/promises";
-import { type AnyInteractionGateway, type AnyTextableGuildChannel, type ApplicationCommandOptions, ApplicationCommandOptionTypes, ApplicationCommandTypes, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, User } from "oceanic.js";
+import { type AnyInteractionGateway, type AnyTextableGuildChannel, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, type ApplicationCommandOptions as SlashOptions, ApplicationCommandOptionTypes as SlashOptionTypes, ApplicationCommandTypes as SlashTypes, User } from "oceanic.js";
 import path from "path";
 
 const logger = moduleLogger();
@@ -50,7 +50,7 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 		return;
 	}
 
-	const ephemeral = perms.ephemeral_response && (interaction.data.options.getBoolean("private") ?? false);
+	const ephemeral = perms.ephemeral_response && ((interaction.data.options.getNumber("private") ?? 0) !== 0);
 	const context = new SlashContext(commandEntry.command, interaction, ephemeral);
 
 	const data = commandEntry.command.preRun(context);
@@ -93,43 +93,13 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 const PLACEHOLDER_DESCRIPTION = "No description provided.";
 
 async function syncSlashCommands(): Promise<void> {
-	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(({ command }) => {
-		const options: ApplicationCommandOptions[] = [];
-
-		if (command.options !== undefined) {
-			for (const key in command.options) {
-				if (!Object.hasOwn(command.options, key))
-					continue;
-
-				const option = command.options[key]!;
-
-				options.push({
-					name: option.name[0],
-					description: option.description ?? PLACEHOLDER_DESCRIPTION,
-					required: option.required ?? false,
-					type: mapOptionType(option.type),
-				});
-			}
-		}
-
-		options.push({
-			name: "private",
-			description: "Send the response privately.",
-			type: ApplicationCommandOptionTypes.BOOLEAN,
-		});
-
-		return {
-			type: ApplicationCommandTypes.CHAT_INPUT,
-			name: typeof command.name === "string" ? command.name : command.name[0],
-			description: command.description ?? PLACEHOLDER_DESCRIPTION,
-			options,
-		} satisfies CreateApplicationCommandOptions;
-	});
+	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(mapCommand);
 
 	const cacheFile = path.resolve(CACHE_PATH, "core_syncSlashCommandsHash.bin");
 
 	const newHash = new Uint8Array(await crypto.subtle.digest("sha-1", new TextEncoder().encode(JSON.stringify(commands))));
 
+	// TODO: get rid of this (bad idea)
 	try {
 		const oldHash = await readFile(cacheFile, null);
 
@@ -151,32 +121,76 @@ async function syncSlashCommands(): Promise<void> {
 	await writeFile(cacheFile, newHash);
 }
 
-// so union of everything returned is not needed :)
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function mapOptionType(type: OptionType) {
-	switch (type) {
-	case OptionType.Flag:
-	case OptionType.Boolean:
-		return ApplicationCommandOptionTypes.BOOLEAN;
-	case OptionType.String:
-		return ApplicationCommandOptionTypes.STRING;
-	case OptionType.Integer:
-		return ApplicationCommandOptionTypes.INTEGER;
-	case OptionType.Number:
-		return ApplicationCommandOptionTypes.NUMBER;
-	case OptionType.User:
-		return ApplicationCommandOptionTypes.USER;
-	case OptionType.Role:
-		return ApplicationCommandOptionTypes.ROLE;
-	case OptionType.Channel:
-		return ApplicationCommandOptionTypes.CHANNEL;
-	case OptionType.Snowflake:
-		return ApplicationCommandOptionTypes.STRING;
-	case OptionType.Duration:
-		return ApplicationCommandOptionTypes.STRING;
+function mapCommand({ command }: CommandCacheEntry): CreateApplicationCommandOptions {
+	const options: SlashOptions[] = [];
+
+	for (const key in command.options) {
+		if (!Object.hasOwn(command.options, key))
+			continue;
+
+		const option = command.options[key]!;
+
+		const base = {
+			name: option.name[0],
+			description: option.description ?? PLACEHOLDER_DESCRIPTION,
+			required: option.required ?? false,
+		};
+
+		switch (option.type) {
+		case OptionType.Flag:
+			options.push({
+				type: SlashOptionTypes.NUMBER,
+				choices: [
+					{ name: option.values?.[0] || "yes", value: 1 },
+					{ name: option.values?.[1] || "no", value: 0 },
+				],
+				...base
+			});
+			break;
+		case OptionType.String:
+			options.push({ type: SlashOptionTypes.STRING, ...base });
+			break;
+		case OptionType.Integer:
+			options.push({ type: SlashOptionTypes.INTEGER, ...base });
+			break;
+		case OptionType.Number:
+			options.push({ type: SlashOptionTypes.NUMBER, ...base });
+			break;
+		case OptionType.User:
+			options.push({ type: SlashOptionTypes.USER, ...base });
+			break;
+		case OptionType.Role:
+			options.push({ type: SlashOptionTypes.ROLE, ...base });
+			break;
+		case OptionType.Channel:
+			options.push({ type: SlashOptionTypes.CHANNEL, ...base });
+			break;
+		case OptionType.Snowflake:
+			options.push({ type: SlashOptionTypes.STRING, ...base });
+			break;
+		case OptionType.Duration:
+			options.push({ type: SlashOptionTypes.STRING, ...base });
+			break;
+		default:
+			(option satisfies never);
+			break;
+		}
 	}
 
-	(type satisfies never);
+	options.push({
+		name: "private",
+		description: "Send the response privately.",
+
+		type: SlashOptionTypes.NUMBER,
+		choices: [{ name: "yes", value: 1 }, { name: "no", value: 0 }]
+	});
+
+	return {
+		type: SlashTypes.CHAT_INPUT,
+		name: typeof command.name === "string" ? command.name : command.name[0],
+		description: command.description ?? PLACEHOLDER_DESCRIPTION,
+		options,
+	};
 }
 
 class SlashContext implements CommandContext {
@@ -244,4 +258,3 @@ class SlashContext implements CommandContext {
 		}
 	}
 }
-

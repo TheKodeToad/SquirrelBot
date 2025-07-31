@@ -20,11 +20,19 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 
 		let value: AnyArgsValueItem | null = interactionOption.value;
 
-		if (typeof interactionOption.value === "string") {
+		switch (typeof interactionOption.value) {
+		case "string":
 			if (option.type === OptionType.Snowflake)
 				value = readValue(interactionOption.value, readSnowflake);
 			else if (option.type === OptionType.Duration)
 				value = readValue(interactionOption.value, readDuration);
+
+			break;
+		case "number":
+			if (option.type === OptionType.Flag)
+				value = interactionOption.value !== 0;
+
+			break;
 		}
 
 		if (value === null) {
