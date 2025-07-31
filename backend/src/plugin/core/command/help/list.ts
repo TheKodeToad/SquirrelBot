@@ -111,24 +111,23 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 		container.components.push(...entry);
 	}
 
-	if (entries.length === 0) {
+	if (entries.length === 0)
 		container.components.push(Text(`**${icons.info} You do not have access to any commands for this plugin!**`));
-		return { components: [container] };
+	else {
+		const prevDisabled = sliceStart === 0;
+		const nextDisabled = sliceEnd >= entries.length;
+
+		container.components.push(Divider());
+
+		if (!prevDisabled || !nextDisabled) {
+			container.components.push(ActionRow([
+				TextButton("←", "prev", { disabled: prevDisabled }),
+				TextButton("→", "next", { disabled: nextDisabled }),
+			]));
+		}
+
+		container.components.push(Text("-# Optional options are surrounded with []."));
 	}
-
-	const prevDisabled = sliceStart === 0;
-	const nextDisabled = sliceEnd >= entries.length;
-
-	container.components.push(Divider());
-
-	if (!prevDisabled || !nextDisabled) {
-		container.components.push(ActionRow([
-			TextButton("←", "prev", { disabled: prevDisabled }),
-			TextButton("→", "next", { disabled: nextDisabled }),
-		]));
-	}
-
-	container.components.push(Text("-# Optional options are surrounded with []."));
 
 	return {
 		components: [container],
@@ -136,15 +135,26 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 			if (context.originalUserID !== context.user.id)
 				return;
 
-			if (customID === "prev")
-				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page - 1 }));
-			else if (customID === "next")
-				await context.edit(renderCommandListPage(context, { plugin: state.plugin, entries, page: state.page + 1 }));
-			else if (customID === "plugin") {
+			if (customID === "prev") {
+				await context.edit(renderCommandListPage(context, {
+					plugin: state.plugin,
+					entries,
+					page: state.page - 1,
+				}));
+			} else if (customID === "next") {
+				await context.edit(renderCommandListPage(context, {
+					plugin: state.plugin,
+					entries,
+					page: state.page + 1,
+				}));
+			} else if (customID === "plugin") {
 				if (values?.length !== 1)
 					throw new Error("Selected plugin not present");
 
-				await context.edit(renderCommandListPage(context, { plugin: values[0]!, page: 0 }));
+				await context.edit(renderCommandListPage(context, {
+					plugin: values[0]!,
+					page: 0,
+				}));
 			}
 		},
 	};
