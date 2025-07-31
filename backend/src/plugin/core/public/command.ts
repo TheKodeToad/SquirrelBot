@@ -10,6 +10,7 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 	supportPrefix?: boolean;
 	supportSlash?: boolean;
 	trackUpdates?: boolean;
+	ephemeralByDefault?: boolean;
 
 	/**
 	 * Check preconditions - return false to abort execution and anything else to proceed.

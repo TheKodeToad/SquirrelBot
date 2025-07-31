@@ -50,7 +50,9 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 		return;
 	}
 
-	const ephemeral = perms.ephemeral_response && ((interaction.data.options.getNumber("private") ?? 0) !== 0);
+	const privateOption = interaction.data.options.getNumber("private")
+		?? Number(commandEntry.command.ephemeralByDefault);
+	const ephemeral = perms.ephemeral_response && Boolean(privateOption);
 	const context = new SlashContext(commandEntry.command, interaction, ephemeral);
 
 	const data = commandEntry.command.preRun(context);

@@ -11,6 +11,7 @@ export default defineCommand({
 	name: ["help"],
 	description: "View available commands and prefixed usage information.",
 	trackUpdates: true,
+	ephemeralByDefault: true,
 
 	options: {
 		command: {
