@@ -2,6 +2,7 @@ import { OptionType, type BaseContext, type ReplyObject } from "#plugin/core/pub
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
+import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#plugin/moderation/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
@@ -72,6 +73,11 @@ async function lookUpCases(
 
 async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
 	const container = Container([Text("## Cases")]);
+
+	if (cases.length === 0) {
+		container.components.push(Text(`**${icons.info} No cases found!**`));
+		return { components: [container] };
+	}
 
 	if (compact) {
 		let content = "";
