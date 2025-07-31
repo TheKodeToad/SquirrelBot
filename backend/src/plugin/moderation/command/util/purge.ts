@@ -21,13 +21,16 @@ export default defineCommand({
 		},
 		match: {
 			type: OptionType.String,
+			description: "Only delete messages including the specified text.",
 			name: ["match", "m"],
 			position: 1,
 		},
-		bots: {
+		apps: {
 			type: OptionType.Flag,
-			name: ["bots", "b"],
-			negativeName: ["no-bots", "nb", "humans", "earthlings"],
+			description: "How to handle apps.",
+			name: ["apps", "a", "bots", "b"],
+			negativeName: ["no-apps", "na", "no-bots", "nb", "humans"],
+			values: ["include only apps", "exclude apps"],
 		},
 		author: {
 			type: OptionType.User,
@@ -65,7 +68,7 @@ export default defineCommand({
 
 				const byBot = message.author.bot || message.webhookID !== undefined; // TODO: maybe slightly annoying with PluralKit/Tupperbox?
 
-				if (args.bots !== null && args.bots !== byBot)
+				if (args.apps !== null && args.apps !== byBot)
 					continue;
 
 				if (args.author.length !== 0 && !args.author.includes(message.author.id))
