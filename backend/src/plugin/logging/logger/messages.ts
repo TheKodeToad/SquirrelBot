@@ -65,6 +65,9 @@ async function handleUpdate(message: Message): Promise<void> {
 		async () => {
 			const entry = await getMessageCacheEntry(message.guild!.id, message.channelID, message.id);
 
+			if (entry?.content === message.content)
+				return null;
+
 			await upsertMessageCacheEntry(message.guild!.id, message.channelID, message.id, {
 				authorID: message.author.id,
 				authorName: message.author.tag,

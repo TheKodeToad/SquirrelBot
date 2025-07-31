@@ -33,9 +33,7 @@ export const messageDeleteEvent = eventConfig(
 		embeds: [{
 			title: "Message Deleted",
 			author: { name: "{{author#tag}}", icon_url: "{{author_avatar}}" },
-			fields: [
-				{ name: "Content", value: "{{content}}", }
-			],
+			description: "{{content}}",
 			color: "red",
 			footer: { text: "Author ID: {{author#id}}" },
 		}]
