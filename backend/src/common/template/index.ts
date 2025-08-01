@@ -9,8 +9,12 @@
  * These tokens are then rejoined in the formatting stage, based on the passed parameters.
  */
 
-import { formatTokens } from "#common/template/formatting.ts";
-import { parseTemplateTokens, TokenType } from "#common/template/parsing.ts";
+import { escapeMarkdown, makeMarkdownInlineCodeblock, makeMarkdownMultilineCodeblock, makeMarkdownQuote } from "#common/discord/markdown.ts";
+import { DurationPresentation, formatDurationParam, parseDurationPresentation } from "#common/template/presentation/duration.ts";
+import { formatGuildParam, GuildPresentation, parseGuildPresentation } from "#common/template/presentation/guild.ts";
+import { formatRoleParam, parseRolePresentation, RolePresentation } from "#common/template/presentation/role.ts";
+import { formatTimestampParam, parseTimestampPresentation, TimestampPresentation } from "#common/template/presentation/timestamp.ts";
+import { formatUserParam, parseUserPresentation, UserPresentation } from "#common/template/presentation/user.ts";
 
 interface TemplateWrapper<S extends TemplateSchema> {
 	apply: ((params: ParameterRecord<S>) => string);
@@ -42,16 +46,41 @@ export function parseTemplate<S extends TemplateSchema>(template: string, schema
 	};
 }
 
-export type TemplateSchema = Record<string, ParameterType>;
-export type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]?: ParameterValue<S[K]> };
+type Token = LiteralToken | FormatToken;
 
-export const enum FormattingWrapper {
+const enum TokenType {
+	Literal,
+	Format,
+}
+
+interface LiteralToken {
+	type: TokenType.Literal;
+	value: string;
+}
+
+type FormatToken =
+	{ type: TokenType.Format; parameter: string; }
+	& (
+		| { valueType: ParameterType.User; presentation: UserPresentation; }
+		| { valueType: ParameterType.Guild; presentation: GuildPresentation; }
+		| { valueType: ParameterType.Role; presentation: RolePresentation; }
+		| { valueType: ParameterType.Duration; presentation: DurationPresentation; }
+		| { valueType: ParameterType.Timestamp; presentation: TimestampPresentation; }
+		| { valueType: ParameterType.Number | ParameterType.MarkdownString | ParameterType.RawString; }
+	)
+	& { wrapper: FormattingWrapper | null; };
+
+
+type TemplateSchema = Record<string, ParameterType>;
+type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]?: ParameterValue<S[K]> };
+
+const enum FormattingWrapper {
 	BlockQuote,
 	InlineCodeblock,
 	MultilineCodeblock,
 }
 
-export const enum ParameterType {
+const enum ParameterType {
 	User,
 	Guild,
 	Role,
@@ -62,49 +91,6 @@ export const enum ParameterType {
 	RawString,
 	/** Preserve markdown */
 	MarkdownString,
-}
-
-export const enum UserPresentationType {
-	Tag,
-	Mention,
-	TagMention,
-	TagMentionBold,
-	ID,
-	Link,
-	MaskedLink,
-}
-
-export const enum GuildPresentationType {
-	Name,
-	ID,
-	Link,
-	MaskedLink,
-}
-
-export const enum RolePresentationType {
-	Name,
-	Mention,
-	NameMention,
-	NameMentionBold,
-	ID,
-}
-
-export const enum DurationPresentationType {
-	Readable,
-	Seconds,
-	Milliseconds,
-}
-
-export const enum TimestampPresentationType {
-	DateTime,
-	DateTimeLong,
-	Time,
-	TimeLong,
-	Date,
-	DateLong,
-	Relative,
-	Unix,
-	UnixSeconds,
 }
 
 export type UserParameter = { id: string; tag: string; };
@@ -120,3 +106,185 @@ type ParameterValue<T extends ParameterType = any> =
 	T extends ParameterType.Duration ? number :
 	T extends ParameterType.Timestamp ? Date :
 	never;
+
+const FORMAT_PATTERN = /\{\{(?<wrapper>>|`|```)?(?<parameter>\w+)(?:#(?<presentation>\w+))?\}\}?/g;
+
+interface FormatGroups {
+	wrapper?: ">" | "`" | "```";
+	parameter: string;
+	presentation?: string;
+};
+
+function parseTemplateTokens(template: string, schema: Record<string, ParameterType>): Token[] | string {
+	const result: Token[] = [];
+
+	let match = FORMAT_PATTERN.exec(template);
+	let literalStart = 0;
+
+	while (match !== null) {
+		if (literalStart !== match.index) {
+			result.push({
+				type: TokenType.Literal,
+				value: template.substring(literalStart, match.index),
+			});
+		}
+
+		const groups = match.groups as unknown as FormatGroups;
+		const token = parseFormatToken(groups, schema);
+
+		if (typeof token === "string")
+			return token;
+		else
+			result.push(token);
+
+		literalStart = FORMAT_PATTERN.lastIndex;
+		match = FORMAT_PATTERN.exec(template);
+	}
+
+	if (literalStart !== template.length) {
+		result.push({
+			type: TokenType.Literal,
+			value: template.substring(literalStart)
+		});
+	}
+
+	return result;
+}
+
+function parseFormatToken(input: FormatGroups, params: Record<string, ParameterType>): FormatToken | string {
+	if (!Object.hasOwn(params, input.parameter))
+		return `No value named '${input.parameter}' exists`;
+
+	const valueType = params[input.parameter]!;
+	const wrapper = parseWrapper(input.wrapper);
+
+	const result = { type: TokenType.Format, parameter: input.parameter, wrapper } as const;
+
+	// TODO: what is this horror...
+
+	switch (valueType) {
+	case ParameterType.User: {
+		const presentation = parseUserPresentation(input.presentation);
+
+		if (presentation === null)
+			return `Invalid user presentation: '${input.presentation!}'`;
+
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Guild: {
+		const presentation = parseGuildPresentation(input.presentation);
+
+		if (presentation === null)
+			return `Invalid guild presentation: '${input.presentation!}'`;
+
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Role: {
+		const presentation = parseRolePresentation(input.presentation);
+
+		if (presentation === null)
+			return `Invalid role presentation: '${input.presentation!}'`;
+
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Duration: {
+		const presentation = parseDurationPresentation(input.presentation);
+
+		if (presentation === null)
+			return `Invalid duration presentation: '${input.presentation!}'`;
+
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Timestamp: {
+		const presentation = parseTimestampPresentation(input.presentation);
+
+		if (presentation === null)
+			return `Invalid timestamp presentation: '${input.presentation!}'`;
+
+		return { ...result, valueType, presentation };
+	}
+	case ParameterType.Number:
+	case ParameterType.RawString:
+	case ParameterType.MarkdownString:
+		return { ...result, valueType };
+	}
+}
+
+function parseWrapper(input: FormatGroups["wrapper"]): FormattingWrapper | null {
+	switch (input) {
+	case ">":
+		return FormattingWrapper.BlockQuote;
+	case "`":
+		return FormattingWrapper.InlineCodeblock;
+	case "```":
+		return FormattingWrapper.MultilineCodeblock;
+	case undefined:
+		return null;
+	}
+}
+
+function formatTokens(params: ParameterRecord, tokens: Token[], allowEscape = true): string {
+	let result = "";
+
+	for (const token of tokens) {
+		if (token.type === TokenType.Literal) {
+			result += token.value;
+			continue;
+		}
+
+		const escaped = allowEscape
+			&& token.wrapper !== FormattingWrapper.InlineCodeblock
+			&& token.wrapper !== FormattingWrapper.MultilineCodeblock;
+
+		let output: string;
+
+		if (Object.hasOwn(params, token.parameter) && params[token.parameter] !== undefined) {
+			const value = params[token.parameter];
+
+			switch (token.valueType) {
+			case ParameterType.User:
+				output = formatUserParam(value as UserParameter, token.presentation, escaped);
+				break;
+			case ParameterType.Guild:
+				output = formatGuildParam(value as EntityParameter, token.presentation, escaped);
+				break;
+			case ParameterType.Role:
+				output = formatRoleParam(value as EntityParameter, token.presentation, escaped);
+				break;
+			case ParameterType.Number:
+				output = (value as number).toString();
+				break;
+			case ParameterType.Duration:
+				output = formatDurationParam(value as number, token.presentation);
+				break;
+			case ParameterType.Timestamp:
+				output = formatTimestampParam(value as Date, token.presentation);
+				break;
+			case ParameterType.RawString:
+			case ParameterType.MarkdownString:
+				if (escaped && token.valueType === ParameterType.RawString)
+					output = escapeMarkdown(value as string);
+				else
+					output = value as string;
+				break;
+			}
+		} else
+			output = escaped ? "*None*" : "None";
+
+		switch (token.wrapper) {
+		case FormattingWrapper.BlockQuote:
+			output = makeMarkdownQuote(output);
+			break;
+		case FormattingWrapper.InlineCodeblock:
+			output = makeMarkdownInlineCodeblock(output);
+			break;
+		case FormattingWrapper.MultilineCodeblock:
+			output = makeMarkdownMultilineCodeblock(output);
+			break;
+		}
+
+		result += output;
+	}
+
+	return result;
+}
