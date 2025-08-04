@@ -72,7 +72,7 @@ type FormatToken =
 
 
 type TemplateSchema = Record<string, ParameterType>;
-type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]?: ParameterValue<S[K]> };
+export type ParameterRecord<S extends Record<string, ParameterType> = any> = { readonly [K in keyof S]?: ParameterValue<S[K]> };
 
 const enum FormattingWrapper {
 	BlockQuote,
@@ -80,7 +80,7 @@ const enum FormattingWrapper {
 	MultilineCodeblock,
 }
 
-const enum ParameterType {
+export const enum ParameterType {
 	User,
 	Guild,
 	Role,
