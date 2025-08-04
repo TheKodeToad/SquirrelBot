@@ -21,5 +21,9 @@
 	"typescript.format.semicolons": "insert",
 	"typescript.preferences.importModuleSpecifier": "non-relative",
 	"javascript.preferences.importModuleSpecifier": "non-relative",
-	"typescript.preferences.autoImportSpecifierExcludeRegexes": ["^zod(/(v3|v4-mini))?$"],
+	"typescript.preferences.autoImportSpecifierExcludeRegexes": [
+		"^zod(/(v3|v4-mini))?$"
+	],
+	"typescript.format.indentSwitchCase": false,
+	"javascript.format.indentSwitchCase": false
 }
