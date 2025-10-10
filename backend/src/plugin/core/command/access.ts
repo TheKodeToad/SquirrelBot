@@ -1,5 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { dateToUnixSeconds } from "#common/time.ts";
+import { dateToUnixSecs } from "#common/time.ts";
 import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/guildInfoSync.ts";
@@ -61,7 +61,7 @@ const revokeAccessCommand = defineCommand({
 			if (result instanceof Date)
 				await context.respond(
 					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
-					+ `Plugin data will be purged on <t:${dateToUnixSeconds(result)}:d>.`
+					+ `Plugin data will be purged on <t:${dateToUnixSecs(result)}:d>.`
 				);
 			else
 				await context.respond(

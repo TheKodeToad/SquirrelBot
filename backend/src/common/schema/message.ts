@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Color, Snowflake } from "#common/schema/general.ts";
-import { template, type Template } from "#common/schema/template.ts";
-import type { ParameterRecord, TemplateSchema } from "#common/template/index.ts";
+import { zTemplate, type ZTemplate } from "#common/schema/template.ts";
+import type { InferView, m, Shape } from "mousetache";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
 import { z } from "zod/v4";
 
-type Message<Z extends z.ZodType> = z.output<ReturnType<typeof message<Z>>>;
+type Message<T extends z.ZodType> = z.output<ReturnType<typeof message<T>>>;
 
-function message<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
+function message<T extends z.ZodType>(stringType: (markdown: boolean) => T) {
 	return z.strictObject({
 		content: stringType(true),
 		allowed_mentions: z.strictObject({
@@ -28,9 +28,9 @@ function message<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 	}));
 }
 
-type Embed<Z extends z.ZodType> = z.output<ReturnType<typeof embed<Z>>>;
+type Embed<T extends z.ZodType> = z.output<ReturnType<typeof embed<T>>>;
 
-function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
+function embed<T extends z.ZodType>(stringType: (markdown: boolean) => T) {
 	return z.strictObject({
 		title: stringType(true),
 		description: stringType(true),
@@ -56,14 +56,14 @@ function embed<Z extends z.ZodType>(stringType: (markdown: boolean) => Z) {
 export const MessageLiteral = message(() => z.string());
 export type MessageLiteral = z.infer<typeof MessageLiteral>;
 
-export type MessageTemplate<S extends TemplateSchema = any> = z.infer<ReturnType<typeof messageTemplate<S>>>;
+export type MessageTemplate<T extends m.Shape = any> = z.infer<ReturnType<typeof messageTemplate<T>>>;
 
-export function messageTemplate<S extends TemplateSchema>(schema: S) {
-	const result = message(markdown => template(schema, markdown))
+export function messageTemplate<T extends m.Shape>(shape: T) {
+	const result = message(markdown => zTemplate(shape, markdown))
 		.transform(template => {
 			return {
-				apply(params: ParameterRecord<S>) {
-					return applyMessageTemplate(template, params);
+				render(view: InferView<T>) {
+					return renderMessageTemplate(template, view);
 				}
 			};
 		});
@@ -77,53 +77,53 @@ export function messageTemplate<S extends TemplateSchema>(schema: S) {
 	return result;
 }
 
-function applyMessageTemplate<S extends TemplateSchema>(template: Message<Template<S>>, params: ParameterRecord<S>) {
+function renderMessageTemplate<T extends Shape>(template: Message<ZTemplate<T>>, view: InferView<T>) {
 	return {
 		...template,
-		content: template.content?.apply(params),
-		embeds: template.embeds?.map(embed => applyEmbedTemplate(embed, params)),
+		content: template.content?.render(view),
+		embeds: template.embeds?.map(embed => applyEmbedTemplate(embed, view)),
 	};
 }
 
-function applyEmbedTemplate<S extends TemplateSchema>(template: Embed<Template<S>>, params: ParameterRecord<S>) {
+function applyEmbedTemplate<T extends Shape>(template: Embed<ZTemplate<T>>, view: InferView<T>) {
 	const author = template.author !== undefined
 		? {
-			name: template.author.name.apply(params),
-			url: template.author.url?.apply(params),
-			iconURL: template.author.iconURL?.apply(params),
+			name: template.author.name.render(view),
+			url: template.author.url?.render(view),
+			iconURL: template.author.iconURL?.render(view),
 		}
 		: undefined;
 
 	const fields = template.fields?.map(({ name, value, ...field }) => ({
-		name: name?.apply(params),
-		value: value?.apply(params),
+		name: name?.render(view),
+		value: value?.render(view),
 		...field
 	}));
 
 	const footer = template.footer !== undefined
 		? {
-			text: template.footer.text.apply(params),
-			icon: template.footer.icon?.apply(params),
+			text: template.footer.text.render(view),
+			icon: template.footer.icon?.render(view),
 		}
 		: undefined;
 
 	const image = template.image !== undefined
-		? { url: template.image.url.apply(params) }
+		? { url: template.image.url.render(view) }
 		: undefined;
 
 	const thumbnail = template.thumbnail !== undefined
-		? { url: template.thumbnail.url.apply(params) }
+		? { url: template.thumbnail.url.render(view) }
 		: undefined;
 
 	return ({
 		...template,
 		author,
-		description: template.description?.apply(params),
+		description: template.description?.render(view),
 		fields,
 		footer,
 		image,
 		thumbnail,
-		title: template.title?.apply(params),
-		url: template.url?.apply(params)
+		title: template.title?.render(view),
+		url: template.url?.render(view)
 	});
 }

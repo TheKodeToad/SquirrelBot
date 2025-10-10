@@ -1,16 +1,16 @@
 import type { z } from "zod/v4";
 
-export class ConfigStore<Z extends z.ZodType = z.ZodType> implements ConfigStore<Z> {
-	private _cache: Map<string, z.output<Z>>;
-	schema: Z;
+export class ConfigStore<T extends z.ZodType = z.ZodType> implements ConfigStore<T> {
+	private _cache: Map<string, z.output<T>>;
+	schema: T;
 
-	constructor(schema: Z) {
+	constructor(schema: T) {
 		this.schema = schema;
 		this._cache = new Map;
 	}
 
 	/** @returns The guild's config, or undefined if it's not available or disabled.  */
-	get(guildID: string): z.output<Z> | undefined {
+	get(guildID: string): z.output<T> | undefined {
 		return this._cache.get(guildID);
 	}
 
@@ -19,7 +19,7 @@ export class ConfigStore<Z extends z.ZodType = z.ZodType> implements ConfigStore
 		return this._cache.has(guildID);
 	}
 
-	set(guildID: string, value: z.output<Z>): void {
+	set(guildID: string, value: z.output<T>): void {
 		this._cache.set(guildID, value);
 	}
 

@@ -1,4 +1,4 @@
-import { dateToUnixSeconds } from "#common/time.ts";
+import { dateToUnixSecs } from "#common/time.ts";
 import { type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -56,7 +56,7 @@ function renderReminders(reminders: Reminder[]): ReplyObject {
 	let content = "";
 
 	for (const reminder of reminders)
-		content += `<t:${dateToUnixSeconds(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message ?? "*No message provided.*"}\n`;
+		content += `<t:${dateToUnixSecs(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message ?? "*No message provided.*"}\n`;
 
 	return {
 		components: [Container([Text("## Reminders"), Text(content)])]

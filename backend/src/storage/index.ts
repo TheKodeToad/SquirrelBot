@@ -4,7 +4,7 @@ import { z } from "zod/v4";
 
 export const postgres = new pg.Pool;
 
-export function dbParse<Z extends z.ZodType>(type: Z, input: unknown): z.infer<Z> {
+export function dbParse<T extends z.ZodType>(type: T, input: unknown): z.infer<T> {
 	if (INTERNAL_TYPE_INTEGRITY)
 		return type.parse(input);
 	else {

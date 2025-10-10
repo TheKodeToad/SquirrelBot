@@ -1,6 +1,6 @@
 import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "#common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownQuote } from "#common/discord/markdown.ts";
-import { dateToUnixSeconds, humanizeDuration } from "#common/time.ts";
+import { dateToUnixSecs, humanizeDuration } from "#common/time.ts";
 import type { BulkResult } from "#plugin/moderation/helper/bulkAction.ts";
 import { CaseType, type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 
@@ -76,12 +76,12 @@ export async function formatCaseFields(info: CaseInfo): Promise<string> {
 
 	result += `**Moderator:** ${await formatUserByID(info.actorID)}\n`;
 
-	const creationSecs = dateToUnixSeconds(info.createdAt);
+	const creationSecs = dateToUnixSecs(info.createdAt);
 	result += `**Performed At:** <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
 
 
 	if (info.expiresAt !== null) {
-		const expirySecs = dateToUnixSeconds(info.expiresAt);
+		const expirySecs = dateToUnixSecs(info.expiresAt);
 		result += `**Expires At:** <t:${expirySecs}> (<t:${expirySecs}:R>)\n`;
 	}
 
@@ -92,7 +92,7 @@ export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> 
 	const actor = await formatUserTagByID(info.actorID);
 	const target = await formatUserTagByID(info.targetID);
 
-	let result = `<t:${dateToUnixSeconds(info.createdAt)}:d> `;
+	let result = `<t:${dateToUnixSecs(info.createdAt)}:d> `;
 
 	if (caseExpired(info) || info.shadowedBy !== null)
 		result += `**~~#${info.number}:~~** `;

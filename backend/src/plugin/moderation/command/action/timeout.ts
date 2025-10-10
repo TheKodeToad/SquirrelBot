@@ -1,3 +1,6 @@
+import { makeDurationView } from "#common/template/duration.ts";
+import { makeGuildView } from "#common/template/guild.ts";
+import { makeUserView } from "#common/template/user.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -44,11 +47,11 @@ export default defineCommand({
 	async run(context, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
-			? config.timeout.direct_message.apply({
-				server: context.guild,
-				moderator: context.user,
+			? config.timeout.direct_message.render({
+				server: makeGuildView(context.guild),
+				moderator: makeUserView(context.user),
 				reason: args.reason ?? undefined,
-				duration: args.duration,
+				duration: makeDurationView(args.duration),
 			})
 			: undefined;
 

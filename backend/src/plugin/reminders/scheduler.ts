@@ -3,7 +3,7 @@ import { debugFormatChannel } from "#common/discord/debugFormat.ts";
 import { isTextableChannel, isThreadChannelType } from "#common/discord/general.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { dateToHMSString, dateToUnixSeconds } from "#common/time.ts";
+import { dateToHMSString, dateToUnixSecs } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -124,7 +124,7 @@ async function fire(reminder: Reminder): Promise<void> {
 		return;
 	}
 
-	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${dateToUnixSeconds(reminder.createdAt)}>!**`;
+	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${dateToUnixSecs(reminder.createdAt)}>!**`;
 
 	if ((Date.now() - reminder.firesAt.getTime()) >= 10 * 60 * 1000)
 		content += `\n${icons.warning} Reminder running late! This is likely due to downtime.`;

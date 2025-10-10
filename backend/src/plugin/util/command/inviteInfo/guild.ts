@@ -1,6 +1,6 @@
 import { formatUser } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { dateToUnixSeconds } from "#common/time.ts";
+import { dateToUnixSecs } from "#common/time.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
 import { User, type ContainerComponent, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel } from "oceanic.js";
@@ -54,7 +54,7 @@ export function renderGuildInvite(
 	result.components.push(Text(fields));
 
 	if (expiresAt !== undefined) {
-		const expirySeconds = dateToUnixSeconds(expiresAt);
+		const expirySeconds = dateToUnixSecs(expiresAt);
 		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}
 

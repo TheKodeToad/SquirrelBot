@@ -1,3 +1,5 @@
+import { makeGuildView } from "#common/template/guild.ts";
+import { makeUserView } from "#common/template/user.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -38,9 +40,9 @@ export default defineCommand({
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage: CreateMessageOptions | undefined =
 			sendDirectMessage ?
-				config.ban.direct_message.apply({
-					server: context.guild,
-					moderator: context.user,
+				config.ban.direct_message.render({
+					server: makeGuildView(context.guild),
+					moderator: makeUserView(context.user),
 					reason: args.reason ?? undefined,
 				})
 				: undefined;

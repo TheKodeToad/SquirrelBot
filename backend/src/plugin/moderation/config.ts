@@ -1,8 +1,11 @@
 import { mappedEnum } from "#common/schema/general.ts";
 import { messageTemplate } from "#common/schema/message.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import { ParameterType } from "#common/template/index.ts";
+import { DurationView } from "#common/template/duration.ts";
+import { GuildView } from "#common/template/guild.ts";
+import { UserView } from "#common/template/user.ts";
 import { DAY } from "#common/time.ts";
+import { m } from "mousetache";
 import { z } from "zod/v4";
 
 export const PresetReason = z.strictObject({
@@ -19,11 +22,11 @@ const discordReasons: PresetReason[] = [
 	{ name: "rules", replacement: "" /* Breaking server rules */ },
 ];
 
-const actionParams = {
-	moderator: ParameterType.User,
-	server: ParameterType.Guild,
-	reason: ParameterType.MarkdownString,
-} as const;
+const actionParams = m.object({
+	moderator: UserView,
+	server: GuildView,
+	reason: m.terminal(),
+});
 
 export const enum MemberRanking {
 	None,
@@ -49,7 +52,7 @@ export const ModerationConfig = z.strictObject({
 	ban: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).prefault({
-			content: "You are banned from {{server}}:\n{{>reason}}"
+			content: "You are banned from {{server}}:\n{{reason}}"
 		}),
 		purge_messages: z.number().default(0).transform(input => input * DAY),
 		preset_reasons: PresetReason.array().default(discordReasons) // TODO
@@ -62,18 +65,18 @@ export const ModerationConfig = z.strictObject({
 	kick: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).prefault({
-			content: "You were kicked from {{server}}:\n{{>reason}}"
+			content: "You were kicked from {{server}}:\n{{reason}}"
 		}),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure kick behavior"),
 
 	timeout: z.strictObject({
 		send_direct_message: z.boolean().default(false),
-		direct_message: messageTemplate({
-			...actionParams,
-			duration: ParameterType.Duration
-		}).prefault({
-			content: "You were timed out in {{server}} for {{duration}}:\n{{>reason}}"
+		direct_message: messageTemplate(m.object({
+			...actionParams.entries,
+			duration: DurationView,
+		})).prefault({
+			content: "You were timed out in {{server}} for {{duration}}:\n{{reason}}"
 		}),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure timeout behavior"),
@@ -81,7 +84,7 @@ export const ModerationConfig = z.strictObject({
 	warn: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).prefault({
-			content: "You were warned in {{server}}:\n{{>reason}}"
+			content: "You were warned in {{server}}:\n{{reason}}"
 		}),
 		preset_reasons: PresetReason.array().default(discordReasons),
 	}).prefault({}).describe("Configure warn behavior"),

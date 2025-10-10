@@ -1,5 +1,7 @@
 import { parseRoleUpdates } from "#common/discord/auditLogChanges.ts";
-import { fetchUserCached } from "#common/discord/cachedRequest.ts";
+import { fetchMemberCached, fetchUserCached } from "#common/discord/cachedRequest.ts";
+import { makeRoleView } from "#common/template/role.ts";
+import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { AuditLogActionTypes, AuditLogEntry, Guild, type Uncached } from "oceanic.js";
@@ -25,13 +27,6 @@ async function handleAuditLog(guild: Guild | Uncached, entry: AuditLogEntry): Pr
 	}
 }
 
-function colorToString(color?: number): string | undefined {
-	if (color === undefined)
-		return undefined;
-
-	return "#" + color.toString(16).padStart(6, "0");
-}
-
 async function handleCreate(guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
 	if (!(guild instanceof Guild))
 		return;
@@ -45,17 +40,20 @@ async function handleCreate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 		events => events.role_create,
 		async () => {
 			const changes = parseRoleUpdates(entry.changes ?? []);
-			const user = await fetchUserCached(entry.userID!);
+			const actor = await fetchMemberCached(guild, entry.userID!);
 
 			return {
-				user,
-				user_avatar: user.avatarURL(),
-				role: { id: entry.targetID!, name: changes.name!.new! },
-				color: colorToString(changes.color?.new ?? 0),
-				hoisted: (changes.hoist?.new ?? false).toString(),
-				mentionable: (changes.mentionable?.new ?? false).toString(),
+				actor: makeMemberUserView(actor),
+				role: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name!.new!,
+					color: changes.color?.new,
+					hoist: changes.hoist?.new,
+					mentionable: changes.mentionable?.new,
+				})
 			};
-		});
+		}
+	);
 }
 
 async function handleUpdate(guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
@@ -76,21 +74,28 @@ async function handleUpdate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 			if (name === undefined)
 				return null;
 
-
-			const user = await fetchUserCached(entry.userID!);
+			const actor = await fetchMemberCached(guild, entry.userID!);
 
 			return {
-				user,
-				user_avatar: user.avatarURL(),
-				role: { id: entry.targetID!, name },
-				old_name: changes.name?.old,
-				old_color: colorToString(changes.color?.old),
-				old_hoisted: changes.hoist?.old?.toString(),
-				old_mentionable: changes.mentionable?.old?.toString(),
-				new_name: changes.name?.new,
-				new_color: colorToString(changes.color?.new),
-				new_hoisted: changes.hoist?.new?.toString(),
-				new_mentionable: changes.mentionable?.new?.toString(),
+				actor: makeMemberUserView(actor),
+				name_changed: changes.name?.new !== undefined,
+				color_changed: changes.color?.new !== undefined,
+				hoisted_changed: changes.hoist?.new !== undefined,
+				mentionable_changed: changes.mentionable?.new !== undefined,
+				old_role: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name?.old,
+					color: changes.color?.old,
+					hoist: changes.hoist?.old,
+					mentionable: changes.mentionable?.old,
+				}),
+				new_role: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name!.new!,
+					color: changes.color?.new,
+					hoist: changes.hoist?.new,
+					mentionable: changes.mentionable?.new,
+				})
 			};
 		}
 	);
@@ -109,15 +114,17 @@ async function handleDelete(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 		events => events.role_delete,
 		async () => {
 			const changes = parseRoleUpdates(entry.changes ?? []);
-			const user = await fetchUserCached(entry.userID!);
+			const actor = await fetchUserCached(entry.userID!);
 
 			return {
-				user,
-				user_avatar: user.avatarURL(),
-				role: { id: entry.targetID!, name: changes.name!.old! },
-				color: colorToString(changes.color?.old),
-				hoisted: changes.hoist?.old?.toString(),
-				mentionable: changes.mentionable?.old?.toString(),
+				actor: makeUserView(actor),
+				role: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name!.new!,
+					color: changes.color?.new,
+					hoist: changes.hoist?.new,
+					mentionable: changes.mentionable?.new,
+				})
 			};
 		}
 	);

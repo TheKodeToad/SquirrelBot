@@ -7,7 +7,7 @@ export function dateToHMSString(date = new Date): string {
 	);
 }
 
-export function dateToUnixSeconds(date: Date | number = new Date): number {
+export function dateToUnixSecs(date: Date | number = new Date): number {
 	const time = typeof date === "number" ? date : date.getTime();
 
 	return Math.floor(time / 1000);

@@ -11,13 +11,14 @@
 		"typecheck": "tsc",
 		"lint": "eslint",
 		"test": "node --import=./registerSWC.js --enable-source-maps --test src/**/*.test.ts",
-		"_node": "node --env-file=.env --disable-proto=throw --disallow-code-generation-from-strings --experimental-transform-types"
+		"_node": "node --env-file=.env --disable-proto=throw --experimental-transform-types"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.4",
 		"@hono/zod-validator": "^0.7.0",
 		"async-lock": "^1.4.1",
 		"hono": "^4.8.2",
+		"mousetache": "github:TheKodeToad/mousetache#b34b2ad8f0e19e1f0932a2efe82e1484449beb8b",
 		"oceanic-component-helper": "^1.0.1",
 		"oceanic.js": "~1.12.0",
 		"pg": "^8.16.3",

@@ -1,6 +1,6 @@
 import { formatUser } from "#common/discord/format.ts";
 import { getChannelIconURL } from "#common/discord/urls.ts";
-import { dateToUnixSeconds } from "#common/time.ts";
+import { dateToUnixSecs } from "#common/time.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
 import { type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
@@ -36,7 +36,7 @@ export function renderGroupDMInvite(
 		result.components.push(Text("**Invited By:** " + formatUser(inviter)));
 
 	if (expiresAt !== undefined) {
-		const expirySeconds = dateToUnixSeconds(expiresAt);
+		const expirySeconds = dateToUnixSecs(expiresAt);
 
 		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}

@@ -1,4 +1,4 @@
-import { dateToUnixSeconds } from "#common/time.ts";
+import { dateToUnixSecs } from "#common/time.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -47,7 +47,7 @@ export default defineCommand({
 
 		trackNewReminder(reminder);
 
-		const firesAtSecs = dateToUnixSeconds(firesAt);
+		const firesAtSecs = dateToUnixSecs(firesAt);
 
 		await context.respond(
 			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${reminder.number})!\n`

@@ -4,6 +4,10 @@ export function* mapIterable<I, O>(iterable: Iterable<I>, transformer: (value: I
 		yield transformer(value);
 }
 
+export function paddedHex(value: number, bytes: number): string {
+	return "#" + value.toString(16).padStart(bytes * 2, "0");
+}
+
 export function todo(): never {
 	throw new Error("Function not implemented");
 }

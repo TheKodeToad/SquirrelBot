@@ -53,16 +53,18 @@ export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
  * Only use for caching purposes!
  */
 export async function getAllGuildInfo(): Promise<GuildInfo[]> {
-	const result = await postgres.query(`
-		SELECT
-			"id",
-			"name",
-			"iconHash",
-			"ownerID",
-			"allowed",
-			"deleteAt"
-		FROM "core_guildInfo"
-	`);
+	const result = await postgres.query(
+		`
+			SELECT
+				"id",
+				"name",
+				"iconHash",
+				"ownerID",
+				"allowed",
+				"deleteAt"
+			FROM "core_guildInfo"
+		`
+	);
 
 	return dbParse(GuildInfoArray, result.rows);
 }

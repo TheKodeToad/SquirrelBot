@@ -1,5 +1,5 @@
 import { formatUserTagRich } from "#common/discord/format.ts";
-import { dateToUnixSeconds } from "#common/time.ts";
+import { dateToUnixSecs } from "#common/time.ts";
 import { Container, Divider, Section, Text, Thumbnail } from "oceanic-component-helper";
 import { type ContainerComponent, type User } from "oceanic.js";
 
@@ -19,7 +19,7 @@ export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, h
 	result.components.push(Divider());
 
 	if (expiresAt !== undefined) {
-		const expirySeconds = dateToUnixSeconds(expiresAt);
+		const expirySeconds = dateToUnixSecs(expiresAt);
 
 		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
 	}

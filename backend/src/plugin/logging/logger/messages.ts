@@ -1,4 +1,5 @@
 import { moduleLogger } from "#common/logger/index.ts";
+import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
@@ -76,10 +77,9 @@ async function handleUpdate(message: Message): Promise<void> {
 			});
 
 			return {
-				author: message.author,
-				author_avatar: message.author.avatarURL(),
-				old_content: entry?.content,
-				new_content: message.content
+				author: message.member !== undefined ? makeMemberUserView(message.member) : makeUserView(message.author),
+				old_message: { content: entry?.content },
+				new_message: { content: message.content }
 			};
 		}
 	);
@@ -104,7 +104,11 @@ async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 				: undefined;
 
 			return {
-				author: { id: entry.authorID, tag: entry.authorName },
+				author: {
+					id: entry.authorID,
+					tag: entry.authorName,
+					avatar: entry.authorAvatarHash
+				},
 				author_avatar: avatarURL,
 				content: entry.content,
 			};

@@ -7,7 +7,7 @@ import { messageDeleteEvent as MessageDeleteEvent, messageEditEvent as MessageEd
 import { roleCreateEvent as RoleCreateEvent, roleDeleteEvent as RoleDeleteEvent, roleUpdateEvent as RoleUpdateEvent } from "#plugin/logging/config/roles.ts";
 import { z } from "zod/v4";
 
-export function eventConfig<Z extends z.ZodType>(object: Z, defaultObject: z.input<Z>) {
+export function eventConfig<T extends z.ZodType>(object: T, defaultObject: z.input<T>) {
 	const defaultTransformed = object.parse(defaultObject);
 
 	return z.union([

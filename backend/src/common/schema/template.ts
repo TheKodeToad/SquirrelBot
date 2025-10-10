@@ -1,18 +1,26 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { parseTemplate, type TemplateSchema } from "#common/template/index.ts";
+
+import { escapeMarkdown } from "#common/discord/markdown.ts";
+import { compileTemplate, TemplateCompileError, TemplateParseError, type Shape } from "mousetache";
 import { z } from "zod/v4";
 
-export type Template<S extends TemplateSchema> = ReturnType<typeof template<S>>;
+export type ZTemplate<T extends Shape> = ReturnType<typeof zTemplate<T>>;
 
-export function template<S extends TemplateSchema>(schema: S, allowEscape = true) {
+export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 	return z.string().transform((input, context) => {
-		const result = parseTemplate(input, schema, allowEscape);
+		try {
+			const tmpl = compileTemplate(input, shape, {
+				fallbackValue: "",
+				escape: allowEscape ? value => escapeMarkdown(String(value)) : undefined,
+			});
+			console.log(tmpl.getSource());
+			return tmpl;
+		} catch (error) {
+			if (!(error instanceof TemplateCompileError || error instanceof TemplateParseError))
+				throw error;
 
-		if (typeof result === "string") {
-			context.addIssue({ message: result });
+			context.addIssue({ message: error.message });
 			return z.NEVER;
 		}
-
-		return result;
 	});
 }
