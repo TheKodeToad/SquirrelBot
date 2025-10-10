@@ -17,7 +17,7 @@ export type RoleView = InferView<typeof RoleView>;
 
 export interface RoleViewable {
 	id: string;
-	name: string;
+	name?: string;
 	color?: number;
 	hoist?: boolean;
 	mentionable?: boolean;
@@ -37,8 +37,18 @@ export function makeRoleView(role: RoleViewable): RoleView {
 		mentionable: role.mentionable,
 
 		get mention() { return `<@&${role.id}>`; },
-		get name_mention() { return `${escapeMarkdown(role.name)} <@&${role.id}>`; },
-		get name_bold_mention() { return `**${escapeMarkdown(role.name)}** <@&${role.id}>`; },
+		get name_mention() {
+			if (role.name === undefined)
+				return this.mention;
+
+			return `${escapeMarkdown(role.name)} ${this.mention}`;
+		},
+		get name_bold_mention() {
+			if (role.name === undefined)
+				return this.mention;
+
+			return `**${escapeMarkdown(role.name)}** ${this.mention}`;
+		},
 	};
 }
 

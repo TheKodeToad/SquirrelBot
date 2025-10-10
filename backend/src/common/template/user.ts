@@ -35,7 +35,7 @@ export function makeUserView(user: User): UserView {
 		get tag() { return user.tag; },
 		get display_name() { return user.globalName ?? user.tag; },
 		get avatar() { return user.avatarURL(); },
-		get global_name() { return this.displayName; },
+		get global_name() { return this.display_name; },
 		get global_avatar() { return this.avatar; },
 
 		get mention() { return user.mention; },
