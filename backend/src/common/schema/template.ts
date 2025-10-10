@@ -9,12 +9,10 @@ export type ZTemplate<T extends Shape> = ReturnType<typeof zTemplate<T>>;
 export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 	return z.string().transform((input, context) => {
 		try {
-			const tmpl = compileTemplate(input, shape, {
+			return compileTemplate(input, shape, {
 				fallbackValue: "",
 				escape: allowEscape ? value => escapeMarkdown(String(value)) : undefined,
 			});
-			console.log(tmpl.getSource());
-			return tmpl;
 		} catch (error) {
 			if (!(error instanceof TemplateCompileError || error instanceof TemplateParseError))
 				throw error;
