@@ -1,5 +1,5 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
-import { mapIterable } from "#common/general.ts";
+import { mapIterable, type Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { getPlugin } from "#loader/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
@@ -26,6 +26,10 @@ async function init(): Promise<void> {
 }
 
 const configUpdateLock = new AsyncLock;
+
+function acquireConfig<T>(guildID: string, pluginID: string, action: () => Awaitable<T>) {
+	return configUpdateLock.acquire(guildID + "::" + pluginID, action);
+}
 
 function formatGuildPlugin(guildID: string, pluginID: string): string {
 	return `#${pluginID} in ${debugFormatGuildByID(guildID)}`;
@@ -68,8 +72,7 @@ async function installConfigChangeListener(): Promise<void> {
 			return;
 		}
 
-		// TODO: don't lock all configs for each guild at a time
-		await configUpdateLock.acquire(guildID, async () => {
+		await acquireConfig(guildID, pluginID, async () => {
 			const plugin = getPlugin(pluginID);
 
 			if (plugin === undefined) {
@@ -92,23 +95,22 @@ async function installConfigChangeListener(): Promise<void> {
 }
 
 async function createAndLoadConfigs(guildID: string): Promise<void> {
-	await configUpdateLock.acquire(guildID, async () => {
-		for (const [plugin, config] of defineConfig.contributions) {
-			const inserted = await insertGuildConfig(guildID, plugin.id, config.defaultValue);
+	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
+			await acquireConfig(guildID, plugin.id, async () => {
+				const inserted = await insertGuildConfig(guildID, plugin.id, config.defaultValue);
 
-			if (inserted)
-				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(guildID)}`);
+				if (inserted)
+					logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(guildID)}`);
 
-			await loadConfig(guildID, plugin.id, config.store);
-		}
-	});
+				await loadConfig(guildID, plugin.id, config.store);
+			});
+	}));
 }
 
 async function unloadConfigs(guildID: string): Promise<void> {
-	await configUpdateLock.acquire(guildID, () => {
-		for (const config of defineConfig.contributions.values())
-			config.store.delete(guildID);
-	});
+	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
+		await acquireConfig(guildID, plugin.id, async () => config.store.delete(guildID));
+	}));
 }
 
 const coreConfigDefault = CoreConfig.parse({} satisfies z.input<typeof CoreConfig>);
