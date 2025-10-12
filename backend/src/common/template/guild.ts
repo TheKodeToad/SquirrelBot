@@ -20,6 +20,8 @@ export function makeGuildView(guild: Guild): GuildView {
 
 		get link() { return BASE_URL + Routes.CHANNEL(guild.id); },
 		get maskedLink() { return `[${escapeMarkdown(guild.name)}](${this.link})`; },
+
+		toString() { return this.name; }
 	};
 
 	return result;
