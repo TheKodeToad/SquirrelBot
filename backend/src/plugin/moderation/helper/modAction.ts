@@ -52,7 +52,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 			if (!(action.target instanceof Member))
 				return { user: action.target, error: ERR_NOT_A_MEMBER };
 
-			if (!action.target.permissions.has(Permissions.ADMINISTRATOR))
+			if (action.target.permissions.has(Permissions.ADMINISTRATOR))
 				return { user: action.target, error: "Member has admin permissions" };
 
 			await action.target.edit({
