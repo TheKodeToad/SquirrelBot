@@ -1,50 +1,13 @@
 import { dbParse, postgres } from "#storage/index.ts";
 import { z } from "zod/v4";
-
-export enum CaseType {
-	// explicit numbering to allow reordering in source without breakage
-	Note = 0,
-	Warn = 1,
-	Unwarn = 2,
-	VoiceMute = 3,
-	VoiceUnmute = 4,
-	Timeout = 5,
-	ClearTimeout = 6,
-	Kick = 7,
-	Ban = 8,
-	Unban = 9,
-}
-
-export function caseReverseType(type: CaseType): CaseType | null {
-	switch (type) {
-	case CaseType.Note:
-		return null;
-	case CaseType.Warn:
-		return CaseType.Unwarn;
-	case CaseType.Unwarn:
-		return CaseType.Warn;
-	case CaseType.VoiceMute:
-		return CaseType.VoiceUnmute;
-	case CaseType.VoiceUnmute:
-		return CaseType.VoiceMute;
-	case CaseType.Timeout:
-		return CaseType.ClearTimeout;
-	case CaseType.ClearTimeout:
-		return CaseType.Timeout;
-	case CaseType.Kick:
-		return null;
-	case CaseType.Ban:
-		return CaseType.Unban;
-	case CaseType.Unban:
-		return CaseType.Ban;
-	}
-}
+import { ModActionType, reverseModActionType, type ModAction } from "../public/modAction.ts";
 
 export const CaseInfo = z.strictObject({
 	guildID: z.string(),
 	number: z.number(),
 
-	type: z.enum(CaseType),
+	// required since Zod won't allow merged declarations in enums
+	type: z.enum(ModActionType),
 	createdAt: z.date(),
 	expiresAt: z.date().nullable(),
 	shadowedBy: z.number().nullable(),
@@ -61,25 +24,11 @@ export const CaseInfoArray = CaseInfo.array();
 
 export interface CaseInfo extends z.output<typeof CaseInfo> { }
 
-export interface CreateCaseOptions {
-	type: CaseType;
-	createdAt: Date;
-	expiresAt?: Date;
-
-	actorID: string;
-	targetID: string;
-
-	reason?: string;
-
-	deleteMessageSeconds?: number;
-	dmDelivered?: boolean;
-}
-
 export interface CaseQuery {
 	numberLessThan?: number;
 	numberGreaterThan?: number;
 
-	types?: CaseType[];
+	types?: ModActionType[];
 	createdBefore?: Date;
 	createdAfter?: Date;
 	expiresBefore?: Date;
@@ -96,7 +45,7 @@ export interface CaseQuery {
 	limit: number;
 }
 
-export const JustNumber = z.strictObject({ number: z.number() });
+const JustNumber = z.strictObject({ number: z.number() });
 
 export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
@@ -165,7 +114,7 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	return dbParse(CaseInfoArray, result.rows);
 }
 
-export async function createCase(guildID: string, options: CreateCaseOptions): Promise<number> {
+export async function createCase(guildID: string, action: ModAction, dmDelivered: boolean): Promise<number> {
 	// TODO: might have edge cases but it's pretty darn unlikely
 
 	const client = await postgres.connect();
@@ -193,21 +142,21 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 			`,
 			[
 				guildID,
-				options.type,
-				options.createdAt ?? null,
-				options.expiresAt ?? null,
-				options.actorID,
-				options.targetID,
-				options.reason ?? null,
-				options.deleteMessageSeconds ?? null,
-				options.dmDelivered ?? null,
+				action.type,
+				new Date,
+				action.expiresAt ?? null,
+				action.actor.id,
+				action.target.id,
+				action.reason ?? null,
+				action.deleteMessageSeconds ?? null,
+				dmDelivered ?? null,
 			]
 		);
 		const newNumber = dbParse(JustNumber, result.rows[0]).number;
 
-		const reverseType = caseReverseType(options.type);
+		const reverseType = reverseModActionType(action.type);
 
-		if (!(reverseType === null || reverseType === CaseType.Warn || reverseType === CaseType.Unwarn)) {
+		if (!(reverseType === null || reverseType === ModActionType.Warn || reverseType === ModActionType.Unwarn)) {
 			await client.query(
 				`
 					WITH "shadowed" AS (
@@ -228,7 +177,7 @@ export async function createCase(guildID: string, options: CreateCaseOptions): P
 						"moderation_cases"."guildID" = "shadowed"."guildID"
 						AND "moderation_cases"."number" = "shadowed"."number"
 				`,
-				[newNumber, options.targetID, options.type, reverseType, new Date]
+				[newNumber, action.target.id, action.type, reverseType, new Date]
 			);
 		}
 

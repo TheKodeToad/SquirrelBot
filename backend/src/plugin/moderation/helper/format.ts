@@ -1,42 +1,43 @@
 import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "#common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownQuote } from "#common/discord/markdown.ts";
 import { dateToUnixSecs, humanizeDuration } from "#common/time.ts";
-import type { BulkResult } from "#plugin/moderation/helper/bulkAction.ts";
-import { CaseType, type CaseInfo } from "#plugin/moderation/storage/cases.ts";
+import type { ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
+import { ModActionType, type ModActionSuccess } from "#plugin/moderation/public/modAction.ts";
+import { type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 
-export function formatBulkSuccess(item: BulkResult["successful"][number]): string {
-	return `${formatUserBold(item.user)} ${item.dmDelivered ? "with direct message " : ""}(case #${item.caseNumber})`;
+export function formatModActionSuccess(result: ModActionSuccess): string {
+	return `${formatUserBold(result.action.target)} ${result.dmDelivered ? "with direct message " : ""}(case #${result.caseNumber})`;
 }
 
-export function formatBulkError(item: BulkResult["unsuccessful"][number]): string {
-	return `${formatUserBold(item.user)}: ${escapeMarkdown(item.error)}`;
+export function formatModActionFailure(result: ModActionFailure): string {
+	return `${formatUserBold(result.user)}: ${escapeMarkdown(result.error)}`;
 }
 
 function caseExpired(info: CaseInfo, date: number = Date.now()): boolean {
 	return info.expiresAt !== null && info.expiresAt.getTime() <= date;
 }
 
-function caseSummaryBase(type: CaseType, target: string): string {
+function caseSummaryBase(type: ModActionType, target: string): string {
 	switch (type) {
-	case CaseType.Note:
+	case ModActionType.Note:
 		return `Note added for ${target}`;
-	case CaseType.Warn:
+	case ModActionType.Warn:
 		return `Warned ${target}`;
-	case CaseType.Unwarn:
+	case ModActionType.Unwarn:
 		return `Unwarned ${target}`;
-	case CaseType.VoiceMute:
+	case ModActionType.VoiceMute:
 		return `Voice-muted ${target}`;
-	case CaseType.VoiceUnmute:
+	case ModActionType.VoiceUnmute:
 		return `Voice-unmuted ${target}`;
-	case CaseType.Timeout:
+	case ModActionType.Timeout:
 		return `Timed out ${target}`;
-	case CaseType.ClearTimeout:
+	case ModActionType.ClearTimeout:
 		return `Removed timeout from ${target}`;
-	case CaseType.Kick:
+	case ModActionType.Kick:
 		return `Kicked ${target}`;
-	case CaseType.Ban:
+	case ModActionType.Ban:
 		return `Banned ${target}`;
-	case CaseType.Unban:
+	case ModActionType.Unban:
 		return `Unbanned ${target}`;
 	}
 }
@@ -100,34 +101,34 @@ export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> 
 		result += `**#${info.number}:** `;
 
 	switch (info.type) {
-	case CaseType.Note:
+	case ModActionType.Note:
 		result += `Note added for ${target} by ${actor}`;
 		break;
-	case CaseType.Warn:
+	case ModActionType.Warn:
 		result += `${target} warned by ${actor}`;
 		break;
-	case CaseType.Unwarn:
+	case ModActionType.Unwarn:
 		result += `${target} unwarned by ${actor}`;
 		break;
-	case CaseType.VoiceMute:
+	case ModActionType.VoiceMute:
 		result += `${target} voice-muted by ${actor}`;
 		break;
-	case CaseType.VoiceUnmute:
+	case ModActionType.VoiceUnmute:
 		result += `${target} voice-unmuted by ${actor}`;
 		break;
-	case CaseType.Timeout:
+	case ModActionType.Timeout:
 		result += `${target} muted by ${actor}`;
 		break;
-	case CaseType.ClearTimeout:
+	case ModActionType.ClearTimeout:
 		result += `${target} unmuted by ${actor}`;
 		break;
-	case CaseType.Kick:
+	case ModActionType.Kick:
 		result += `${target} kicked by ${actor}`;
 		break;
-	case CaseType.Ban:
+	case ModActionType.Ban:
 		result += `${target} banned by ${actor}`;
 		break;
-	case CaseType.Unban:
+	case ModActionType.Unban:
 		result += `${target} unbanned by ${actor}`;
 		break;
 	}

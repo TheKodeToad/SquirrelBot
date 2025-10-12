@@ -5,9 +5,12 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
+import { MemberRanking } from "#plugin/moderation/config.ts";
+import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
+import { performModAction, type ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { CaseType, createCase } from "#plugin/moderation/storage/cases.ts";
-import { DiscordRESTError, JSONErrorCodes, User, type Uncached } from "oceanic.js";
+import { ModActionType, type ModAction, type ModActionSuccess } from "#plugin/moderation/public/modAction.ts";
+import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 
 export default defineCommand({
 	name: ["unban"],
@@ -30,8 +33,8 @@ export default defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.unban),
 	async run(context, args) {
-		const successful: { user: User; caseNumber: number; }[] = [];
-		const unsuccessful: { user: User | Uncached; error: string; }[] = [];
+		const successful: ModActionSuccess[] = [];
+		const unsuccessful: ModActionFailure[] = [];
 
 		for (const target of args.user) {
 			const cachedMember = context.guild.members.get(target);
@@ -68,41 +71,34 @@ export default defineCommand({
 				continue;
 			}
 
-			// consistent with bulkAction
-			const createdAt = new Date;
+			const action: ModAction = {
+				guild: context.guild,
 
-			try {
-				await context.guild.removeBan(target, args.reason ?? undefined);
-			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
-					throw error;
+				type: ModActionType.Unban,
 
-				unsuccessful.push({ user: ban.user, error: formatRESTError(error) });
-				continue;
-			}
+				actor: context.member,
+				target: ban.user,
+				ranking: MemberRanking.None,
 
-			const caseNumber = await createCase(context.guild.id, {
-				createdAt,
-				type: CaseType.Unban,
-				actorID: context.user.id,
-				targetID: target,
 				reason: args.reason ?? undefined,
-			});
+			};
 
-			successful.push({ caseNumber: caseNumber, user: ban.user });
+			const actionResult = await performModAction(action);
+
+			if ("error" in actionResult)
+				unsuccessful.push(actionResult);
+			else
+				successful.push(actionResult);
 		}
 
 		if (args.user.length === 1) {
-			if (successful.length === 1) {
-				const unban = successful[0]!;
-				await context.respond(`${icons.success} Unbanned ${formatUserBold(unban.user)} (case #${unban.caseNumber})!`);
-			} else if (unsuccessful.length === 1) {
-				const unban = unsuccessful[0]!;
-				await context.respond(`${icons.error} Could not unban ${formatUserBold(unban.user)}: ${escapeMarkdown(unban.error)}!`);
-			}
+			if (successful.length === 1)
+				await context.respond(`${icons.success} Unbanned ${formatModActionSuccess(successful[0]!)}!`);
+			else if (unsuccessful.length === 1)
+				await context.respond(`${icons.error} Could not unban ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
-			const successfulMessage = successful.map(unban => `- ${formatUserBold(unban.user)} (case #${unban.caseNumber})`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(unban => `- ${formatUserBold(unban.user)}: ${unban.error}`).join("\n");
+			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
@@ -114,9 +110,9 @@ export default defineCommand({
 				);
 			} else {
 				await context.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** unbanned!\n`
-					+ `Successful unbans:\n${successfulMessage}\n`
-					+ `Unsuccessful unbans:\n${unsuccessfulMessage}`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were unbanned!\n`
+					+ `Successful:\n${successfulMessage}\n`
+					+ `Unsuccessful:\n${unsuccessfulMessage}`
 				);
 			}
 		}

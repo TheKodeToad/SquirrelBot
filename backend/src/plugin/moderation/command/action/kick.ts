@@ -4,10 +4,10 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { doBulkAction } from "#plugin/moderation/helper/bulkAction.ts";
-import { formatBulkError, formatBulkSuccess } from "#plugin/moderation/helper/format.ts";
+import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
+import { performModActions } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { CaseType } from "#plugin/moderation/storage/cases.ts";
+import { ModActionType } from "#plugin/moderation/public/modAction.ts";
 import type { CreateMessageOptions } from "oceanic.js";
 
 export default defineCommand({
@@ -40,40 +40,35 @@ export default defineCommand({
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage: CreateMessageOptions | undefined =
 			sendDirectMessage ?
-				config.ban.direct_message.render({
+				config.kick.direct_message.render({
 					server: makeGuildView(context.guild),
 					moderator: makeUserView(context.user),
 					reason: args.reason ?? undefined,
 				})
 				: undefined;
 
-		const { successful, unsuccessful } = await doBulkAction({
+		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
 			guild: context.guild,
-			ids: args.user,
+
+			type: ModActionType.Kick,
 
 			actor: context.member,
-			directMessage: directMessage,
-			memberRanking: config.member_ranking,
-			membersOnly: true,
+			target,
+			ranking: config.member_ranking,
 
-			perform: async member => await context.guild.removeMember(member.id, args.reason ?? undefined),
-			makeCase(options) {
-				return {
-					...options,
-					type: CaseType.Kick,
-					reason: args.reason ?? undefined,
-				};
-			},
-		});
+			reason: args.reason ?? undefined,
+
+			directMessage,
+		}));
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Kicked ${formatBulkSuccess(successful[0]!)}!`);
+				await context.respond(`${icons.success} Kicked ${formatModActionSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not kick ${formatBulkError(unsuccessful[0]!)}!`);
+				await context.respond(`${icons.error} Could not kick ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
-			const successfulMessage = successful.map(item => `- ${formatBulkSuccess(item)}`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatBulkError(item)}`).join("\n");
+			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(

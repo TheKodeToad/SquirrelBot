@@ -5,11 +5,10 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { doBulkAction } from "#plugin/moderation/helper/bulkAction.ts";
-import { formatBulkError, formatBulkSuccess } from "#plugin/moderation/helper/format.ts";
+import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
+import { performModActions } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { CaseType } from "#plugin/moderation/storage/cases.ts";
-import { Permissions } from "oceanic.js";
+import { ModActionType } from "#plugin/moderation/public/modAction.ts";
 
 export default defineCommand({
 	name: ["timeout", "mute", "chatmute"],
@@ -55,45 +54,29 @@ export default defineCommand({
 			})
 			: undefined;
 
-		const { successful, unsuccessful } = await doBulkAction({
+		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
 			guild: context.guild,
-			ids: args.user,
+
+			type: ModActionType.Timeout,
+			expiresAt: new Date(Date.now() + args.duration),
 
 			actor: context.member,
+			target,
+			ranking: config.member_ranking,
+
+			reason: args.reason ?? undefined,
+
 			directMessage,
-			duration: args.duration,
-			memberRanking: config.member_ranking,
-			membersOnly: true,
-
-			check: member => {
-				if (member.permissions.has(Permissions.ADMINISTRATOR))
-					return "Member has admin permissions — forbidden by Discord";
-
-				return true;
-			},
-			async perform(member, calculatedExpiry) {
-				await context.guild.editMember(member.id, {
-					communicationDisabledUntil: calculatedExpiry!.toISOString(),
-					reason: args.reason ?? undefined,
-				});
-			},
-			makeCase(options) {
-				return {
-					...options,
-					type: CaseType.Timeout,
-					reason: args.reason ?? undefined,
-				};
-			},
-		});
+		}));
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Timed out ${formatBulkSuccess(successful[0]!)}!`);
+				await context.respond(`${icons.success} Timed out ${formatModActionSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not time out ${formatBulkError(unsuccessful[0]!)}!`);
+				await context.respond(`${icons.error} Could not time out ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
-			const successfulMessage = successful.map(item => `- ${formatBulkSuccess(item)}`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatBulkError(item)}`).join("\n");
+			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
+			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
 				await context.respond(
