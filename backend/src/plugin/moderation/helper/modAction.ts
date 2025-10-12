@@ -4,14 +4,14 @@ import { getHighestRole } from "#common/discord/permissions.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
-import { ModActionType, type ModAction, type ModActionSuccess } from "#plugin/moderation/public/modAction.ts";
+import { ModActionType, type ModAction, type CommitedModAction } from "#plugin/moderation/public/modAction.ts";
 import { createCase } from "#plugin/moderation/storage/cases.ts";
 import { DiscordRESTError, Guild, Member, Permissions, User, type Uncached } from "oceanic.js";
 
-export type ModActionResult = ModActionSuccess | ModActionFailure;
+export type ModActionResult = CommitedModAction | ModActionFailure;
 
 export interface ModActionFailure {
-	user: User | Member | Uncached;
+	target: User | Member | Uncached;
 	error: string;
 }
 
@@ -20,10 +20,10 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 
 	if (action.target instanceof Member) {
 		if (!canModerate(action.ranking, action.actor, action.target))
-			return { user: action.target, error: "You lack permission to moderate the user" };
+			return { target: action.target, error: "You lack permission to moderate the user" };
 
 		if (botNeedsPerm(action.type) && !canModerate(MemberRanking.HighestRole, action.guild.clientMember, action.target))
-			return { user: action.target, error: "App lacks permission to moderate the user" };
+			return { target: action.target, error: "App lacks permission to moderate the user" };
 
 		if (action.directMessage !== undefined && !action.target.bot) {
 			const dmChannel = await createDMCached(action.target.id);
@@ -50,10 +50,10 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 			break;
 		case ModActionType.Timeout:
 			if (!(action.target instanceof Member))
-				return { user: action.target, error: ERR_NOT_A_MEMBER };
+				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
 			if (action.target.permissions.has(Permissions.ADMINISTRATOR))
-				return { user: action.target, error: "Member has admin permissions" };
+				return { target: action.target, error: "Member has admin permissions" };
 
 			await action.target.edit({
 				communicationDisabledUntil: action.expiresAt?.toISOString() ?? null,
@@ -62,7 +62,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 			break;
 		case ModActionType.ClearTimeout:
 			if (!(action.target instanceof Member))
-				return { user: action.target, error: ERR_NOT_A_MEMBER };
+				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
 			await action.target.edit({
 				communicationDisabledUntil: null,
@@ -71,7 +71,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 			break;
 		case ModActionType.Kick:
 			if (!(action.target instanceof Member))
-				return { user: action.target, error: ERR_NOT_A_MEMBER };
+				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
 			await action.target.kick();
 			break;
@@ -89,11 +89,11 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 		if (!(error instanceof DiscordRESTError))
 			throw error;
 
-		return { user: action.target, error: formatRESTError(error) };
+		return { target: action.target, error: formatRESTError(error) };
 	}
 
 	const caseNumber = await createCase(action.guild.id, action, dmDelivered);
-	const result = { action, caseNumber, dmDelivered };
+	const result = { ...action, caseNumber, dmDelivered };
 
 	await onModAction.fire(result);
 
@@ -132,7 +132,7 @@ function canModerate(ranking: MemberRanking, actor: Member, target: Member): boo
 }
 
 export interface BulkModActionResult {
-	successful: ModActionSuccess[];
+	successful: CommitedModAction[];
 	unsuccessful: ModActionFailure[];
 }
 
@@ -160,7 +160,7 @@ export async function performModActions(
 					throw error;
 
 				result.unsuccessful.push({
-					user: { id },
+					target: { id },
 					error: "User fetch failed: " + formatRESTError(error)
 				});
 				continue;

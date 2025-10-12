@@ -2,15 +2,15 @@ import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID }
 import { escapeMarkdown, makeMarkdownQuote } from "#common/discord/markdown.ts";
 import { dateToUnixSecs, humanizeDuration } from "#common/time.ts";
 import type { ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
-import { ModActionType, type ModActionSuccess } from "#plugin/moderation/public/modAction.ts";
+import { ModActionType, type CommitedModAction } from "#plugin/moderation/public/modAction.ts";
 import { type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 
-export function formatModActionSuccess(result: ModActionSuccess): string {
-	return `${formatUserBold(result.action.target)} ${result.dmDelivered ? "with direct message " : ""}(case #${result.caseNumber})`;
+export function formatModActionSuccess(result: CommitedModAction): string {
+	return `${formatUserBold(result.target)} ${result.dmDelivered ? "with direct message " : ""}(case #${result.caseNumber})`;
 }
 
 export function formatModActionFailure(result: ModActionFailure): string {
-	return `${formatUserBold(result.user)}: ${escapeMarkdown(result.error)}`;
+	return `${formatUserBold(result.target)}: ${escapeMarkdown(result.error)}`;
 }
 
 function caseExpired(info: CaseInfo, date: number = Date.now()): boolean {

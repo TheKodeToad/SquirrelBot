@@ -1,6 +1,5 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
-import { formatRESTError, formatUserBold } from "#common/discord/format.ts";
-import { escapeMarkdown } from "#common/discord/markdown.ts";
+import { formatRESTError } from "#common/discord/format.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -9,7 +8,7 @@ import { MemberRanking } from "#plugin/moderation/config.ts";
 import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
 import { performModAction, type ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { ModActionType, type ModAction, type ModActionSuccess } from "#plugin/moderation/public/modAction.ts";
+import { ModActionType, type ModAction, type CommitedModAction } from "#plugin/moderation/public/modAction.ts";
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 
 export default defineCommand({
@@ -33,14 +32,14 @@ export default defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.unban),
 	async run(context, args) {
-		const successful: ModActionSuccess[] = [];
+		const successful: CommitedModAction[] = [];
 		const unsuccessful: ModActionFailure[] = [];
 
 		for (const target of args.user) {
 			const cachedMember = context.guild.members.get(target);
 			if (cachedMember !== undefined) {
 				unsuccessful.push({
-					user: cachedMember.user,
+					target: cachedMember.user,
 					error: "User is not banned",
 				});
 				continue;
@@ -54,7 +53,7 @@ export default defineCommand({
 
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
 					unsuccessful.push({
-						user: await fetchUserCachedSupressed(target),
+						target: await fetchUserCachedSupressed(target),
 						error: "User is not banned",
 					});
 				} else {
@@ -63,7 +62,7 @@ export default defineCommand({
 						: await fetchUserCachedSupressed(target);
 
 					unsuccessful.push({
-						user,
+						target: user,
 						error: `Ban fetch failed: ${formatRESTError(error)}`,
 					});
 				}

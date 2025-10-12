@@ -55,8 +55,7 @@ export interface ModAction {
 	directMessage?: CreateMessageOptions;
 }
 
-export interface ModActionSuccess {
-	action: ModAction;
+export interface CommitedModAction extends ModAction {
 	caseNumber?: number;
 	dmDelivered: boolean;
 }
