@@ -29,8 +29,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       oceanic.js:
-        specifier: ~1.12.0
-        version: 1.12.0
+        specifier: github:OceanicJS/Oceanic#6f7323950137151c4ebe285dcaf835c360c322a8
+        version: https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -1192,8 +1192,9 @@ packages:
   oceanic-component-helper@1.0.1:
     resolution: {integrity: sha512-wQQgT6nit6JL0H/T9NQGBpYt5NmXjZSv8btqECkT2/1FypboTVkFV32ellcSniNsI4gsR694eZ8OnPBn59oJNg==}
 
-  oceanic.js@1.12.0:
-    resolution: {integrity: sha512-e3h5ptwBfbX4/gDz13UFiIfAFsaZrXDwJbfTdV7YEKdQG6d0A6of2KGzkBbqXrVC5wmM/7TWAYeh2fe9zuxGYA==}
+  oceanic.js@https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8:
+    resolution: {tarball: https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8}
+    version: 1.12.0
     engines: {node: '>=18.13.0'}
 
   optionator@0.9.4:
@@ -1441,8 +1442,8 @@ packages:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
 
-  ws@8.18.2:
-    resolution: {integrity: sha512-DMricUmwGZUVr++AEAe2uiVM7UoO9MAVZMDu05UQOaUII0lp+zOzLLU4Xqh/JvTqklB1T4uELaaPBKyjE1r4fQ==}
+  ws@8.18.3:
+    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -1714,7 +1715,7 @@ snapshots:
       discord-api-types: 0.37.120
       prism-media: 1.3.5
       tslib: 2.8.1
-      ws: 8.18.2
+      ws: 8.18.3
     transitivePeerDependencies:
       - '@discordjs/opus'
       - bufferutil
@@ -2579,10 +2580,10 @@ snapshots:
 
   oceanic-component-helper@1.0.1: {}
 
-  oceanic.js@1.12.0:
+  oceanic.js@https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8:
     dependencies:
       tslib: 2.8.1
-      ws: 8.18.2
+      ws: 8.18.3
     optionalDependencies:
       '@discordjs/voice': 0.18.0
     transitivePeerDependencies:
@@ -2797,7 +2798,7 @@ snapshots:
 
   word-wrap@1.2.5: {}
 
-  ws@8.18.2: {}
+  ws@8.18.3: {}
 
   xtend@4.0.2: {}
 
