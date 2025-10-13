@@ -99,10 +99,9 @@ async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 				author: {
 					id: entry.authorID,
 					tag: entry.authorName,
-					avatar: entry.authorAvatarHash
+					avatar: avatarURL
 				},
-				author_avatar: avatarURL,
-				content: entry.content,
+				message: { content: entry.content }
 			};
 		}
 	);
