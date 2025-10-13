@@ -10,12 +10,9 @@ export default [
 ];
 
 async function handleAdd(member: Member): Promise<void> {
-	await logEvent(
-		member.guild,
-		null,
-		events => events.member_join,
-		() => ({ user: makeMemberUserView(member) })
-	);
+	await logEvent(member.guild, null, "member_join", () => ({
+		user: makeMemberUserView(member)
+	}));
 }
 
 async function handleRemove(user: Member | User, guild: Guild | Uncached): Promise<void> {
@@ -27,11 +24,8 @@ async function handleRemove(user: Member | User, guild: Guild | Uncached): Promi
 	if (config === undefined)
 		return;
 
-	await logEvent(
-		guild,
-		null,
-		events => events.member_leave,
-		() => ({ user: "guildID" in user ? makeMemberUserView(user) : makeUserView(user) })
-	);
+	await logEvent(guild, null, "member_leave", () => ({
+		user: "guildID" in user ? makeMemberUserView(user) : makeUserView(user)
+	}));
 }
 

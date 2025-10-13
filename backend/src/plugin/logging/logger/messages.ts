@@ -59,11 +59,7 @@ async function handleUpdate(message: Message): Promise<void> {
 	if (message.guild === null)
 		return;
 
-	await logEvent(
-		message.guild,
-		message.channelID,
-		events => events.message_edit,
-		async () => {
+	await logEvent(message.guild, message.channelID, "message_edit", async () => {
 			const entry = await getMessageCacheEntry(message.guild!.id, message.channelID, message.id);
 
 			if (entry?.content === message.content)
@@ -89,11 +85,7 @@ async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 	if (message.guild == null)
 		return;
 
-	await logEvent(
-		message.guild,
-		message.channelID,
-		events => events.message_delete,
-		async () => {
+	await logEvent(message.guild, message.channelID, "message_delete", async () => {
 			const entry = await takeMessageCacheEntry(message.guild!.id, message.channelID, message.id);
 
 			if (entry === null)

@@ -1,11 +1,23 @@
-import type { Awaitable } from "#common/general.ts";
+import type { LoggerConfig } from "#plugin/logging/config/index.ts";
+import { makeModEventView } from "#plugin/logging/config/modEvents.ts";
+import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
-import type { ModEvent } from "#plugin/moderation/public/modEvent.ts";
+import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
 
 export default [
 	onModAction(handleModAction)
 ];
 
-function handleModAction(action: ModEvent): Awaitable<void> {
-	// TODO: the stuff
+async function handleModAction(event: ModEvent): Promise<void> {
+	let key: keyof LoggerConfig["events"];
+
+	switch (event.type) {
+	case ModEventType.Ban:
+		key = "user_ban";
+		break;
+	default:
+		return;
+	}
+
+	await logEvent(event.guild, null, key, async () => makeModEventView(event));
 }

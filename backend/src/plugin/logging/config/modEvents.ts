@@ -11,12 +11,18 @@ import { Member } from "oceanic.js";
 export const ModEventView = m.object({
 	guild: GuildView,
 
-	performedAt: TimestampView,
-	expiresAt: TimestampView,
+	performed_at: TimestampView,
+	expires_at: TimestampView,
 	duration: DurationView,
 
-	actor: UserView,
+	moderator: UserView,
 	target: UserView,
+
+	reason: m.terminal({ noEscape: true }),
+
+	purge_duration: DurationView,
+	dm_delivered: m.terminal({ noEscape: true }),
+	case_number: m.terminal({ noEscape: true }),
 });
 export type ModEventView = InferView<typeof ModEventView>;
 
@@ -24,16 +30,24 @@ export function makeModEventView(action: ModEvent): ModEventView {
 	const result = {
 		guild: makeGuildView(action.guild),
 
-		performedAt: makeTimestampView(action.performedAt),
-		expiresAt: action.expiresAt !== undefined ? makeTimestampView(action.expiresAt) : undefined,
+		performed_at: makeTimestampView(action.performedAt),
+		expires_at: action.expiresAt !== undefined ? makeTimestampView(action.expiresAt) : undefined,
 		duration: action.expiresAt !== undefined
 			? makeDurationView(action.expiresAt.getTime() - action.performedAt.getTime())
 			: undefined,
 
-		actor: makeMemberUserView(action.actor),
+		moderator: makeMemberUserView(action.actor),
 		target: action.target instanceof Member
 			? makeMemberUserView(action.target)
-			: makeUserView(action.target)
+			: makeUserView(action.target),
+
+		reason: action.reason,
+
+		purge_duration: action.deleteMessageSeconds !== undefined && action.deleteMessageSeconds !== 0
+			? makeDurationView(action.deleteMessageSeconds * 1000)
+			: undefined,
+		dm_delivered: action.dmDelivered,
+		case_number: action.caseNumber,
 	};
 
 	return result;
@@ -43,14 +57,16 @@ export const UserBanEvent = eventConfig(
 	messageTemplate(ModEventView),
 	{
 		embeds: [{
-			title: "User Banned",
+			title: "User Banned {{#case_number}}(Case #{{.}}){{/case_number}}",
+			color: "red",
 			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
-			description: "{{#reason}}>>> {{.}}{{/reason}}",
 			fields: [
-				{ name: "Moderator", value: "{{moderator.name_bold_mention}}" },
-				{ name: "Duration", value: "{{duration}} (expires at {{expires_at}})" },
-				{ name: "Deleted Messages", value: "Last {{purge_duration}}" }
-			]
+				{ name: "Reason", value: "{{reason}}" },
+				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Duration", value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}" },
+				{ name: "Deleted Messages", value: "{{#purge_duration}}Last {{.}}{{/purge_duration}}" }
+			],
+			footer: { text: "Target ID: {{target.id}}" }
 		}]
 	}
 );

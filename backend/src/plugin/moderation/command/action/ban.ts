@@ -50,7 +50,9 @@ export default defineCommand({
 			})
 			: undefined;
 
-		const deleteMessageSeconds = (args.purge ?? config.ban.purge_messages);
+		const deleteMessageSeconds = args.purge !== null
+				? args.purge / 1000
+				: config.ban.purge_messages;
 
 		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
 			guild: context.guild,

@@ -1,12 +1,15 @@
 import { createDMCached, fetchMembersCached, fetchUserCached } from "#common/discord/cachedRequest.ts";
 import { formatRESTError } from "#common/discord/format.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
+import { moduleLogger } from "#common/logger/index.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
 import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
 import { createCase } from "#plugin/moderation/storage/cases.ts";
 import { DiscordRESTError, Guild, Member, Permissions, User, type CreateMessageOptions, type Uncached } from "oceanic.js";
+
+const logger = moduleLogger();
 
 export type ModActionResult = ModEvent | ModActionFailure;
 
@@ -102,7 +105,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 	const result: ModEvent = { ...action, performedAt, dmDelivered };
 	result.caseNumber = await createCase(action.guild.id, result);
 
-	await onModAction.fire(result);
+	onModAction.fire(result).catch(error => logger.error?.("Error in onModAction", error));
 
 	return result;
 }

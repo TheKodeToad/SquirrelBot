@@ -11,7 +11,7 @@ type EventConfigView<T extends EventConfig> = Parameters<Exclude<T, false>["rend
 export async function logEvent<T extends EventConfig>(
 	guild: Guild,
 	channel: string | null,
-	select: (events: LoggerConfig["events"]) => T,
+	key: keyof LoggerConfig["events"],
 	supply: () => Awaitable<EventConfigView<T> | null>,
 ): Promise<void> {
 	const config = loggingConfigStore.get(guild.id);
@@ -24,7 +24,7 @@ export async function logEvent<T extends EventConfig>(
 	const tasks: (() => Promise<void>)[] = [];
 
 	for (const logger of config.loggers) {
-		const event = select(logger.events);
+		const event = logger.events[key];
 
 		if (!event)
 			continue;

@@ -34,11 +34,7 @@ async function handleCreate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 	if (entry.targetID === null || entry.userID === null)
 		return;
 
-	await logEvent(
-		guild,
-		null,
-		events => events.role_create,
-		async () => {
+	await logEvent(guild, null, "role_create", async () => {
 			const changes = parseRoleUpdates(entry.changes ?? []);
 			const actor = await fetchMemberCached(guild, entry.userID!);
 
@@ -63,11 +59,7 @@ async function handleUpdate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 	if (entry.targetID === null || entry.userID === null)
 		return;
 
-	await logEvent(
-		guild,
-		null,
-		events => events.role_update,
-		async () => {
+	await logEvent(guild, null, "role_update", async () => {
 			const changes = parseRoleUpdates(entry.changes ?? []);
 			const name = changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
 
@@ -108,11 +100,7 @@ async function handleDelete(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 	if (entry.targetID === null || entry.userID === null)
 		return;
 
-	await logEvent(
-		guild,
-		null,
-		events => events.role_delete,
-		async () => {
+	await logEvent(guild, null, "role_delete", async () => {
 			const changes = parseRoleUpdates(entry.changes ?? []);
 			const actor = await fetchUserCached(entry.userID!);
 
