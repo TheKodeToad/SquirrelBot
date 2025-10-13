@@ -4,11 +4,11 @@ import { getHighestRole } from "#common/discord/permissions.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
-import { ModActionType, type ModAction, type CommitedModAction } from "#plugin/moderation/public/modAction.ts";
+import { ModActionType, type ModAction, type CommittedModAction } from "#plugin/moderation/public/modAction.ts";
 import { createCase } from "#plugin/moderation/storage/cases.ts";
 import { DiscordRESTError, Guild, Member, Permissions, User, type Uncached } from "oceanic.js";
 
-export type ModActionResult = CommitedModAction | ModActionFailure;
+export type ModActionResult = CommittedModAction | ModActionFailure;
 
 export interface ModActionFailure {
 	target: User | Member | Uncached;
@@ -38,6 +38,8 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 	}
 
 	const ERR_NOT_A_MEMBER = "User is not a member of the server";
+
+	const performedAt = new Date;
 
 	try {
 		switch (action.type) {
@@ -92,8 +94,8 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 		return { target: action.target, error: formatRESTError(error) };
 	}
 
-	const caseNumber = await createCase(action.guild.id, action, dmDelivered);
-	const result = { ...action, caseNumber, dmDelivered };
+	const result: CommittedModAction = { ...action, performedAt, dmDelivered };
+	result.caseNumber = await createCase(action.guild.id, result);
 
 	await onModAction.fire(result);
 
@@ -132,7 +134,7 @@ function canModerate(ranking: MemberRanking, actor: Member, target: Member): boo
 }
 
 export interface BulkModActionResult {
-	successful: CommitedModAction[];
+	successful: CommittedModAction[];
 	unsuccessful: ModActionFailure[];
 }
 

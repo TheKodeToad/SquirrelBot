@@ -4,7 +4,7 @@ import { UserView } from "#common/template/user.ts";
 import { eventConfig } from "#plugin/logging/config/index.ts";
 import { m } from "mousetache";
 
-export const roleCreateEvent = eventConfig(
+export const RoleCreateEvent = eventConfig(
 	messageTemplate(m.object({
 		actor: UserView,
 		role: RoleView,
@@ -26,7 +26,7 @@ export const roleCreateEvent = eventConfig(
 	}
 );
 
-export const roleUpdateEvent = eventConfig(
+export const RoleUpdateEvent = eventConfig(
 	messageTemplate(m.object({
 		actor: UserView,
 		old_role: RoleView,
@@ -53,7 +53,7 @@ export const roleUpdateEvent = eventConfig(
 	}
 );
 
-export const roleDeleteEvent = eventConfig(
+export const RoleDeleteEvent = eventConfig(
 	messageTemplate(m.object({
 		actor: UserView,
 		role: RoleView,

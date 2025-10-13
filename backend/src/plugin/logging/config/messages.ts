@@ -8,7 +8,7 @@ export const MessageLogView = m.object({
 });
 export type MessageLogView = InferView<typeof MessageLogView>;
 
-export const messageEditEvent = eventConfig(
+export const MessageEditEvent = eventConfig(
 	messageTemplate(m.object({
 		author: UserView,
 		old_message: MessageLogView,
@@ -28,7 +28,7 @@ export const messageEditEvent = eventConfig(
 	}
 );
 
-export const messageDeleteEvent = eventConfig(
+export const MessageDeleteEvent = eventConfig(
 	messageTemplate(m.object({
 		author: UserView,
 		message: MessageLogView,

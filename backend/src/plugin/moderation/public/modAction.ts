@@ -39,6 +39,9 @@ export function reverseModActionType(type: ModActionType): ModActionType | null 
 	}
 }
 
+// TODO: maybe it should be split into ModEvent and ModAction
+
+/** Represents a ModAction pending perform. */
 export interface ModAction {
 	guild: Guild;
 
@@ -55,7 +58,9 @@ export interface ModAction {
 	directMessage?: CreateMessageOptions;
 }
 
-export interface CommitedModAction extends ModAction {
-	caseNumber?: number;
+/** Represents a performed ModAction. */
+export interface CommittedModAction extends ModAction {
+	performedAt: Date;
 	dmDelivered: boolean;
+	caseNumber?: number;
 }

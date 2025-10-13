@@ -1,6 +1,6 @@
 import { dbParse, postgres } from "#storage/index.ts";
 import { z } from "zod/v4";
-import { ModActionType, reverseModActionType, type ModAction } from "../public/modAction.ts";
+import { ModActionType, reverseModActionType, type CommittedModAction, type ModAction } from "../public/modAction.ts";
 
 export const CaseInfo = z.strictObject({
 	guildID: z.string(),
@@ -114,7 +114,7 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	return dbParse(CaseInfoArray, result.rows);
 }
 
-export async function createCase(guildID: string, action: ModAction, dmDelivered: boolean): Promise<number> {
+export async function createCase(guildID: string, action: CommittedModAction): Promise<number> {
 	// TODO: might have edge cases but it's pretty darn unlikely
 
 	const client = await postgres.connect();
@@ -143,13 +143,13 @@ export async function createCase(guildID: string, action: ModAction, dmDelivered
 			[
 				guildID,
 				action.type,
-				new Date,
+				action.performedAt,
 				action.expiresAt ?? null,
 				action.actor.id,
 				action.target.id,
 				action.reason ?? null,
 				action.deleteMessageSeconds ?? null,
-				dmDelivered ?? null,
+				action.dmDelivered ?? null,
 			]
 		);
 		const newNumber = dbParse(JustNumber, result.rows[0]).number;

@@ -4,6 +4,7 @@ import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { LoggingConfig } from "#plugin/logging/config/index.ts";
 import memberLogger from "#plugin/logging/logger/members.ts";
 import messageLogger from "#plugin/logging/logger/messages.ts";
+import modActionLogger from "#plugin/logging/logger/modActions.ts";
 import roleLogger from "#plugin/logging/logger/roles.ts";
 
 export const loggingConfigStore = new ConfigStore(LoggingConfig);
@@ -29,5 +30,6 @@ export default definePlugin({
 		...messageLogger,
 		...roleLogger,
 		...memberLogger,
+		...modActionLogger,
 	],
 });

@@ -3,8 +3,9 @@
 import { APP_NAME } from "#brand.ts";
 import { Snowflake } from "#common/schema/general.ts";
 import { MemberJoinEvent, MemberLeaveEvent } from "#plugin/logging/config/members.ts";
-import { messageDeleteEvent as MessageDeleteEvent, messageEditEvent as MessageEditEvent } from "#plugin/logging/config/messages.ts";
-import { roleCreateEvent as RoleCreateEvent, roleDeleteEvent as RoleDeleteEvent, roleUpdateEvent as RoleUpdateEvent } from "#plugin/logging/config/roles.ts";
+import { MessageDeleteEvent, MessageEditEvent } from "#plugin/logging/config/messages.ts";
+import { UserBanEvent } from "#plugin/logging/config/modActions.ts";
+import { RoleCreateEvent, RoleDeleteEvent, RoleUpdateEvent } from "#plugin/logging/config/roles.ts";
 import { z } from "zod/v4";
 
 export function eventConfig<T extends z.ZodType>(object: T, defaultObject: z.input<T>) {
@@ -30,6 +31,8 @@ export const LoggerConfig = z.strictObject({
 		role_create: RoleCreateEvent,
 		role_update: RoleUpdateEvent,
 		role_delete: RoleDeleteEvent,
+
+		user_ban: UserBanEvent,
 	}).describe("Customize what happens when events happen in the server — set them to true to use the default presentation")
 });
 
