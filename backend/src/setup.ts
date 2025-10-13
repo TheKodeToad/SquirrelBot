@@ -9,7 +9,7 @@ const logger = moduleLogger();
  */
 export async function preMain(): Promise<void> {
 	// not sure if this is good practice but we certainly don't want a crash because we forgot await
-	process.on("rejectionHandled", error => {
+	process.on("unhandledRejection", error => {
 		logger.error?.("Unhandled Promise rejection!", error);
 	});
 
