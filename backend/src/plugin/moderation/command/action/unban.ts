@@ -6,9 +6,9 @@ import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
-import { performModAction, type ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
+import { performModAction, type ModAction, type ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { ModActionType, type ModAction, type CommitedModAction } from "#plugin/moderation/public/modAction.ts";
+import { ModEventType, type ModEvent} from "#plugin/moderation/public/modEvent.ts";
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 
 export default defineCommand({
@@ -32,7 +32,7 @@ export default defineCommand({
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.unban),
 	async run(context, args) {
-		const successful: CommitedModAction[] = [];
+		const successful: ModEvent[] = [];
 		const unsuccessful: ModActionFailure[] = [];
 
 		for (const target of args.user) {
@@ -73,7 +73,7 @@ export default defineCommand({
 			const action: ModAction = {
 				guild: context.guild,
 
-				type: ModActionType.Unban,
+				type: ModEventType.Unban,
 
 				actor: context.member,
 				target: ban.user,

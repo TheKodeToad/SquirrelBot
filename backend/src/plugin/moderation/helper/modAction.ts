@@ -4,11 +4,16 @@ import { getHighestRole } from "#common/discord/permissions.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
-import { ModActionType, type ModAction, type CommittedModAction } from "#plugin/moderation/public/modAction.ts";
+import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
 import { createCase } from "#plugin/moderation/storage/cases.ts";
-import { DiscordRESTError, Guild, Member, Permissions, User, type Uncached } from "oceanic.js";
+import { DiscordRESTError, Guild, Member, Permissions, User, type CreateMessageOptions, type Uncached } from "oceanic.js";
 
-export type ModActionResult = CommittedModAction | ModActionFailure;
+export type ModActionResult = ModEvent | ModActionFailure;
+
+export interface ModAction extends Omit<ModEvent, "performedAt" | "dmDelivered" | "caseNumber"> {
+	ranking: MemberRanking;
+	directMessage?: CreateMessageOptions;
+}
 
 export interface ModActionFailure {
 	target: User | Member | Uncached;
@@ -43,14 +48,14 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 
 	try {
 		switch (action.type) {
-		case ModActionType.Note:
-		case ModActionType.VoiceMute:
-		case ModActionType.VoiceUnmute:
-		case ModActionType.Unwarn:
+		case ModEventType.Note:
+		case ModEventType.VoiceMute:
+		case ModEventType.VoiceUnmute:
+		case ModEventType.Unwarn:
 			throw new Error("TODO");
-		case ModActionType.Warn:
+		case ModEventType.Warn:
 			break;
-		case ModActionType.Timeout:
+		case ModEventType.Timeout:
 			if (!(action.target instanceof Member))
 				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
@@ -62,7 +67,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 				reason: action.reason,
 			});
 			break;
-		case ModActionType.ClearTimeout:
+		case ModEventType.ClearTimeout:
 			if (!(action.target instanceof Member))
 				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
@@ -71,19 +76,19 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 				reason: action.reason,
 			});
 			break;
-		case ModActionType.Kick:
+		case ModEventType.Kick:
 			if (!(action.target instanceof Member))
 				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
 			await action.target.kick();
 			break;
-		case ModActionType.Ban:
+		case ModEventType.Ban:
 			await action.guild.createBan(action.target.id, {
 				deleteMessageSeconds: action.deleteMessageSeconds,
 				reason: action.reason,
 			});
 			break;
-		case ModActionType.Unban:
+		case ModEventType.Unban:
 			await action.guild.removeBan(action.target.id, action.reason);
 			break;
 		}
@@ -94,7 +99,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 		return { target: action.target, error: formatRESTError(error) };
 	}
 
-	const result: CommittedModAction = { ...action, performedAt, dmDelivered };
+	const result: ModEvent = { ...action, performedAt, dmDelivered };
 	result.caseNumber = await createCase(action.guild.id, result);
 
 	await onModAction.fire(result);
@@ -102,10 +107,10 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 	return result;
 }
 
-function botNeedsPerm(actionType: ModActionType) {
-	switch (actionType) {
-	case ModActionType.Note:
-	case ModActionType.Warn:
+function botNeedsPerm(type: ModEventType) {
+	switch (type) {
+	case ModEventType.Note:
+	case ModEventType.Warn:
 		return false;
 	default:
 		return true;
@@ -134,7 +139,7 @@ function canModerate(ranking: MemberRanking, actor: Member, target: Member): boo
 }
 
 export interface BulkModActionResult {
-	successful: CommittedModAction[];
+	successful: ModEvent[];
 	unsuccessful: ModActionFailure[];
 }
 
@@ -172,12 +177,12 @@ export async function performModActions(
 		const action = makeAction(target);
 
 		// TODO: parallelism
-		const actionResult = await performModAction(action);
+		const event = await performModAction(action);
 
-		if ("error" in actionResult)
-			result.unsuccessful.push(actionResult);
+		if ("error" in event)
+			result.unsuccessful.push(event);
 		else
-			result.successful.push(actionResult);
+			result.successful.push(event);
 	}
 
 	return result;

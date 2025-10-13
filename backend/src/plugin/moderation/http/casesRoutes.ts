@@ -1,7 +1,7 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { definePluginGuildRoutes } from "#http/extensionPoints.ts";
 import { validate } from "#http/middleware/zod.ts";
-import { ModActionType } from "#plugin/moderation/public/modAction.ts";
+import { ModEventType } from "#plugin/moderation/public/modEvent.ts";
 import { getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod/v4";
@@ -9,7 +9,7 @@ import { z } from "zod/v4";
 const querySchema = z.strictObject({
 	before: z.coerce.number().optional(),
 	after: z.coerce.number().optional(),
-	type: z.pipe(z.coerce.number(), z.enum(ModActionType)),
+	type: z.pipe(z.coerce.number(), z.enum(ModEventType)),
 	"created-before": z.coerce.date().optional(),
 	"created-after": z.coerce.date().optional(),
 	actor: Snowflake.optional(),
@@ -70,7 +70,7 @@ function serializeCaseObject(info: CaseInfo): SerializedCaseObject {
 
 interface SerializedCaseObject {
 	number: number;
-	type: ModActionType;
+	type: ModEventType;
 	createdAt: number;
 	expiresAt: number | null;
 	actorID: string;

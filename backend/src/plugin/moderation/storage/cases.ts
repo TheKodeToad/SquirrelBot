@@ -1,13 +1,13 @@
 import { dbParse, postgres } from "#storage/index.ts";
 import { z } from "zod/v4";
-import { ModActionType, reverseModActionType, type CommittedModAction, type ModAction } from "../public/modAction.ts";
+import { ModEventType, reverseModEventType, type ModEvent } from "../public/modEvent.ts";
 
 export const CaseInfo = z.strictObject({
 	guildID: z.string(),
 	number: z.number(),
 
 	// required since Zod won't allow merged declarations in enums
-	type: z.enum(ModActionType),
+	type: z.enum(ModEventType),
 	createdAt: z.date(),
 	expiresAt: z.date().nullable(),
 	shadowedBy: z.number().nullable(),
@@ -28,7 +28,7 @@ export interface CaseQuery {
 	numberLessThan?: number;
 	numberGreaterThan?: number;
 
-	types?: ModActionType[];
+	types?: ModEventType[];
 	createdBefore?: Date;
 	createdAfter?: Date;
 	expiresBefore?: Date;
@@ -114,7 +114,7 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	return dbParse(CaseInfoArray, result.rows);
 }
 
-export async function createCase(guildID: string, action: CommittedModAction): Promise<number> {
+export async function createCase(guildID: string, event: ModEvent): Promise<number> {
 	// TODO: might have edge cases but it's pretty darn unlikely
 
 	const client = await postgres.connect();
@@ -142,21 +142,21 @@ export async function createCase(guildID: string, action: CommittedModAction): P
 			`,
 			[
 				guildID,
-				action.type,
-				action.performedAt,
-				action.expiresAt ?? null,
-				action.actor.id,
-				action.target.id,
-				action.reason ?? null,
-				action.deleteMessageSeconds ?? null,
-				action.dmDelivered ?? null,
+				event.type,
+				event.performedAt,
+				event.expiresAt ?? null,
+				event.actor.id,
+				event.target.id,
+				event.reason ?? null,
+				event.deleteMessageSeconds ?? null,
+				event.dmDelivered ?? null,
 			]
 		);
 		const newNumber = dbParse(JustNumber, result.rows[0]).number;
 
-		const reverseType = reverseModActionType(action.type);
+		const reverseType = reverseModEventType(event.type);
 
-		if (!(reverseType === null || reverseType === ModActionType.Warn || reverseType === ModActionType.Unwarn)) {
+		if (!(reverseType === null || reverseType === ModEventType.Warn || reverseType === ModEventType.Unwarn)) {
 			await client.query(
 				`
 					WITH "shadowed" AS (
@@ -177,7 +177,7 @@ export async function createCase(guildID: string, action: CommittedModAction): P
 						"moderation_cases"."guildID" = "shadowed"."guildID"
 						AND "moderation_cases"."number" = "shadowed"."number"
 				`,
-				[newNumber, action.target.id, action.type, reverseType, new Date]
+				[newNumber, event.target.id, event.type, reverseType, new Date]
 			);
 		}
 

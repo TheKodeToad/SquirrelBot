@@ -1,11 +1,11 @@
 import type { Awaitable } from "#common/general.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
-import type { CommittedModAction } from "#plugin/moderation/public/modAction.ts";
+import type { ModEvent } from "#plugin/moderation/public/modEvent.ts";
 
 export default [
 	onModAction(handleModAction)
 ];
 
-function handleModAction(action: CommittedModAction): Awaitable<void> {
+function handleModAction(action: ModEvent): Awaitable<void> {
 	// TODO: the stuff
 }

@@ -1,4 +1,4 @@
 import { makeEventExtensionPoint } from "#loader/extensionPoint.ts";
-import type { CommittedModAction } from "./modAction.ts";
+import type { ModEvent } from "./modEvent.ts";
 
-export const onModAction = makeEventExtensionPoint<CommittedModAction>();
+export const onModAction = makeEventExtensionPoint<ModEvent>();

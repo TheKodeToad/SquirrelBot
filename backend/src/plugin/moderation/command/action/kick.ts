@@ -7,7 +7,7 @@ import { icons } from "#plugin/core/public/icons.ts";
 import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
 import { performModActions } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { ModActionType } from "#plugin/moderation/public/modAction.ts";
+import { ModEventType } from "#plugin/moderation/public/modEvent.ts";
 import type { CreateMessageOptions } from "oceanic.js";
 
 export default defineCommand({
@@ -50,7 +50,7 @@ export default defineCommand({
 		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
 			guild: context.guild,
 
-			type: ModActionType.Kick,
+			type: ModEventType.Kick,
 
 			actor: context.member,
 			target,

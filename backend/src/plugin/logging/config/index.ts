@@ -4,7 +4,7 @@ import { APP_NAME } from "#brand.ts";
 import { Snowflake } from "#common/schema/general.ts";
 import { MemberJoinEvent, MemberLeaveEvent } from "#plugin/logging/config/members.ts";
 import { MessageDeleteEvent, MessageEditEvent } from "#plugin/logging/config/messages.ts";
-import { UserBanEvent } from "#plugin/logging/config/modActions.ts";
+import { UserBanEvent } from "#plugin/logging/config/modEvents.ts";
 import { RoleCreateEvent, RoleDeleteEvent, RoleUpdateEvent } from "#plugin/logging/config/roles.ts";
 import { z } from "zod/v4";
 

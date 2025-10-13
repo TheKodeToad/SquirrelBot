@@ -4,11 +4,11 @@ import { GuildView, makeGuildView } from "#common/template/guild.ts";
 import { makeTimestampView, TimestampView } from "#common/template/timestamp.ts";
 import { makeMemberUserView, makeUserView, UserView } from "#common/template/user.ts";
 import { eventConfig } from "#plugin/logging/config/index.ts";
-import type { CommittedModAction } from "#plugin/moderation/public/modAction.ts";
+import type { ModEvent } from "#plugin/moderation/public/modEvent.ts";
 import { m, type InferView } from "mousetache";
 import { Member } from "oceanic.js";
 
-export const CommittedModActionView = m.object({
+export const ModEventView = m.object({
 	guild: GuildView,
 
 	performedAt: TimestampView,
@@ -18,9 +18,9 @@ export const CommittedModActionView = m.object({
 	actor: UserView,
 	target: UserView,
 });
-export type CommittedModActionView = InferView<typeof CommittedModActionView>;
+export type ModEventView = InferView<typeof ModEventView>;
 
-export function makeCommittedModActionView(action: CommittedModAction): CommittedModActionView {
+export function makeModEventView(action: ModEvent): ModEventView {
 	const result = {
 		guild: makeGuildView(action.guild),
 
@@ -40,7 +40,7 @@ export function makeCommittedModActionView(action: CommittedModAction): Committe
 }
 
 export const UserBanEvent = eventConfig(
-	messageTemplate(CommittedModActionView),
+	messageTemplate(ModEventView),
 	{
 		embeds: [{
 			title: "User Banned",
