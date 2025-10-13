@@ -17,7 +17,7 @@
 		"@hono/node-server": "^1.14.4",
 		"@hono/zod-validator": "^0.7.0",
 		"async-lock": "^1.4.1",
-		"hono": "^4.9.7",
+		"hono": "^4.9.12",
 		"mousetache": "github:TheKodeToad/mousetache#b34b2ad8f0e19e1f0932a2efe82e1484449beb8b",
 		"oceanic-component-helper": "^1.0.1",
 		"oceanic.js": "github:OceanicJS/Oceanic#6f7323950137151c4ebe285dcaf835c360c322a8",

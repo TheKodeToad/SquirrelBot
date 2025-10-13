@@ -12,16 +12,16 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.14.4
-        version: 1.14.4(hono@4.9.7)
+        version: 1.14.4(hono@4.9.12)
       '@hono/zod-validator':
         specifier: ^0.7.0
-        version: 0.7.0(hono@4.9.7)(zod@3.25.76)
+        version: 0.7.0(hono@4.9.12)(zod@3.25.76)
       async-lock:
         specifier: ^1.4.1
         version: 1.4.1
       hono:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.12
+        version: 4.9.12
       mousetache:
         specifier: github:TheKodeToad/mousetache#b34b2ad8f0e19e1f0932a2efe82e1484449beb8b
         version: https://codeload.github.com/TheKodeToad/mousetache/tar.gz/b34b2ad8f0e19e1f0932a2efe82e1484449beb8b
@@ -1078,8 +1078,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.9.7:
-    resolution: {integrity: sha512-t4Te6ERzIaC48W3x4hJmBwgNlLhmiEdEE5ViYb02ffw4ignHNHa5IBtPjmbKstmtKa8X6C35iWwK4HaqvrzG9w==}
+  hono@4.9.12:
+    resolution: {integrity: sha512-SrTC0YxqPwnN7yKa8gg/giLyQ2pILCKoideIHbYbFQlWZjYt68D2A4Ae1hehO/aDQ6RmTcpqOV/O2yBtMzx/VQ==}
     engines: {node: '>=16.9.0'}
 
   html-entities@2.3.3:
@@ -1872,13 +1872,13 @@ snapshots:
       '@codemirror/view': 6.38.0
       '@lezer/highlight': 1.2.1
 
-  '@hono/node-server@1.14.4(hono@4.9.7)':
+  '@hono/node-server@1.14.4(hono@4.9.12)':
     dependencies:
-      hono: 4.9.7
+      hono: 4.9.12
 
-  '@hono/zod-validator@0.7.0(hono@4.9.7)(zod@3.25.76)':
+  '@hono/zod-validator@0.7.0(hono@4.9.12)(zod@3.25.76)':
     dependencies:
-      hono: 4.9.7
+      hono: 4.9.12
       zod: 3.25.76
 
   '@humanfs/core@0.19.1': {}
@@ -2491,7 +2491,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.9.7: {}
+  hono@4.9.12: {}
 
   html-entities@2.3.3: {}
 
