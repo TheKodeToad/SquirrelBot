@@ -98,7 +98,7 @@ function applyEmbedTemplate<T extends Shape>(template: Embed<ZTemplate<T>>, view
 		name: name?.render(view),
 		value: value?.render(view),
 		...field
-	}));
+	})).filter(({ value }) => value.length !== 0);
 
 	const footer = template.footer !== undefined
 		? {

@@ -39,7 +39,7 @@ async function handleCreate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 			const actor = await fetchMemberCached(guild, entry.userID!);
 
 			return {
-				actor: makeMemberUserView(actor),
+				moderator: makeMemberUserView(actor),
 				role: makeRoleView({
 					id: entry.targetID!,
 					name: changes.name!.new!,
@@ -69,7 +69,7 @@ async function handleUpdate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 			const actor = await fetchMemberCached(guild, entry.userID!);
 
 			return {
-				actor: makeMemberUserView(actor),
+				moderator: makeMemberUserView(actor),
 				name_changed: changes.name?.new !== undefined,
 				color_changed: changes.color?.new !== undefined,
 				hoisted_changed: changes.hoist?.new !== undefined,
@@ -105,7 +105,7 @@ async function handleDelete(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 			const actor = await fetchUserCached(entry.userID!);
 
 			return {
-				actor: makeUserView(actor),
+				moderator: makeUserView(actor),
 				role: makeRoleView({
 					id: entry.targetID!,
 					name: changes.name!.new!,

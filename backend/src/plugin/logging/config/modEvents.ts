@@ -66,7 +66,73 @@ export const UserBanEvent = eventConfig(
 				{ name: "Duration", value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}" },
 				{ name: "Deleted Messages", value: "{{#purge_duration}}Last {{.}}{{/purge_duration}}" }
 			],
-			footer: { text: "Target ID: {{target.id}}" }
+			footer: { text: "Target ID: {{target.id}}" },
+		}]
+	}
+);
+
+export const UserUnbanEvent = eventConfig(
+	messageTemplate(ModEventView),
+	{
+		embeds: [{
+			title: "Ban Revoked {{#case_number}}(Case #{{.}}){{/case_number}}",
+			color: "green",
+			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			fields: [
+				{ name: "Reason", value: "{{reason}}" },
+				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+			],
+			footer: { text: "Target ID: {{target.id}}" },
+		}]
+	}
+);
+
+export const UserKickEvent = eventConfig(
+	messageTemplate(ModEventView),
+	{
+		embeds: [{
+			title: "User Kicked {{#case_number}}(Case #{{.}}){{/case_number}}",
+			color: "red",
+			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			fields: [
+				{ name: "Reason", value: "{{reason}}" },
+				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+			],
+			footer: { text: "Target ID: {{target.id}}" },
+		}]
+	}
+);
+
+export const UserTimeoutEvent = eventConfig(
+	messageTemplate(ModEventView),
+	{
+		embeds: [{
+			title: "User Timed Out {{#case_number}}(Case #{{.}}){{/case_number}}",
+			color: "fuchsia",
+			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			fields: [
+				{ name: "Reason", value: "{{reason}}" },
+				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Duration", value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}" },
+			],
+			footer: { text: "Target ID: {{target.id}}" },
+		}]
+	}
+);
+
+export const UserWarnEvent = eventConfig(
+	messageTemplate(ModEventView),
+	{
+		embeds: [{
+			title: "Warned User {{#case_number}}(Case #{{.}}){{/case_number}}",
+			color: "yellow",
+			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			fields: [
+				{ name: "Reason", value: "{{reason}}" },
+				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Duration", value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}" },
+			],
+			footer: { text: "Target ID: {{target.id}}" },
 		}]
 	}
 );

@@ -15,6 +15,15 @@ async function handleModAction(event: ModEvent): Promise<void> {
 	case ModEventType.Ban:
 		key = "user_ban";
 		break;
+	case ModEventType.Unban:
+		key = "user_unban";
+		break;
+	case ModEventType.Kick:
+		key = "user_kick";
+		break;
+	case ModEventType.Warn:
+		key = "user_warn";
+		break;
 	default:
 		return;
 	}
