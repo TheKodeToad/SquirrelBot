@@ -87,8 +87,8 @@ importers:
         specifier: 6.2.0
         version: 6.2.0(@codemirror/language@6.11.1)(@codemirror/state@6.5.2)(@codemirror/view@6.38.0)(@lezer/highlight@1.2.1)
       '@solid-primitives/deep':
-        specifier: ^0.3.2
-        version: 0.3.2(solid-js@1.9.7)
+        specifier: ^0.3.3
+        version: 0.3.3(solid-js@1.9.7)
       '@solidjs/router':
         specifier: ^0.15.3
         version: 0.15.3(solid-js@1.9.7)
@@ -630,23 +630,23 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@solid-primitives/deep@0.3.2':
-    resolution: {integrity: sha512-DBZ4gxNCsV+0Mzx3yXL8aeQgGGOkzyAToiyh6Qios/rKdYa7kxQDRIACKybX/gXlicuJ5oK5Zv3xP4RrPPrWhQ==}
+  '@solid-primitives/deep@0.3.3':
+    resolution: {integrity: sha512-YnCV2OFbBlNYlww0lSD7oDpk9zN20KQWr699s6euwd6+oRE1nbI+vqrfYuqC7E0WPDfk0DIG+ylY1xvY31ZlTg==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/memo@1.4.2':
-    resolution: {integrity: sha512-1w2MoD/25tZOImCI+dEL08n8dyyc6sg6o0zc14sZXBBa4XSz6TDuPYgQ24r+dQerXWoP6OgZ1VZz+Mo7c1Lmvg==}
+  '@solid-primitives/memo@1.4.3':
+    resolution: {integrity: sha512-CA+n9yaoqbYm+My5tY2RWb6EE16tVyehM4GzwQF4vCwvjYPAYk1JSRIVuMC0Xuj5ExD2XQJE5E2yAaKY2HTUsg==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/scheduled@1.5.1':
-    resolution: {integrity: sha512-WKg/zvAyDIgQ/Xo48YaUY7ISaPyWTZNDzIVWP2R84CuLH+nZN/2O0aFn/gQlWY6y/Bfi/LdDt6Og2/PRzPY7mA==}
+  '@solid-primitives/scheduled@1.5.2':
+    resolution: {integrity: sha512-/j2igE0xyNaHhj6kMfcUQn5rAVSTLbAX+CDEBm25hSNBmNiHLu2lM7Usj2kJJ5j36D67bE8wR1hBNA8hjtvsQA==}
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@solid-primitives/utils@6.3.1':
-    resolution: {integrity: sha512-4/Z59nnwu4MPR//zWZmZm2yftx24jMqQ8CSd/JobL26TPfbn4Ph8GKNVJfGJWShg1QB98qObJSskqizbTvcLLA==}
+  '@solid-primitives/utils@6.3.2':
+    resolution: {integrity: sha512-hZ/M/qr25QOCcwDPOHtGjxTD8w2mNyVAYvcfgwzBHq2RwNqHNdDNsMZYap20+ruRwW4A3Cdkczyoz0TSxLCAPQ==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -1984,22 +1984,22 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@5.3.0':
     optional: true
 
-  '@solid-primitives/deep@0.3.2(solid-js@1.9.7)':
+  '@solid-primitives/deep@0.3.3(solid-js@1.9.7)':
     dependencies:
-      '@solid-primitives/memo': 1.4.2(solid-js@1.9.7)
+      '@solid-primitives/memo': 1.4.3(solid-js@1.9.7)
       solid-js: 1.9.7
 
-  '@solid-primitives/memo@1.4.2(solid-js@1.9.7)':
+  '@solid-primitives/memo@1.4.3(solid-js@1.9.7)':
     dependencies:
-      '@solid-primitives/scheduled': 1.5.1(solid-js@1.9.7)
-      '@solid-primitives/utils': 6.3.1(solid-js@1.9.7)
+      '@solid-primitives/scheduled': 1.5.2(solid-js@1.9.7)
+      '@solid-primitives/utils': 6.3.2(solid-js@1.9.7)
       solid-js: 1.9.7
 
-  '@solid-primitives/scheduled@1.5.1(solid-js@1.9.7)':
+  '@solid-primitives/scheduled@1.5.2(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
 
-  '@solid-primitives/utils@6.3.1(solid-js@1.9.7)':
+  '@solid-primitives/utils@6.3.2(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
 
