@@ -27,7 +27,7 @@ async function init(): Promise<void> {
 
 const configUpdateLock = new AsyncLock;
 
-function acquireConfig<T>(guildID: string, pluginID: string, action: () => Awaitable<T>) {
+function acquireConfig<T>(guildID: string, pluginID: string, action: () => Awaitable<T>): Promise<T> {
 	return configUpdateLock.acquire(guildID + "::" + pluginID, action);
 }
 
@@ -109,7 +109,7 @@ async function createAndLoadConfigs(guildID: string): Promise<void> {
 
 async function unloadConfigs(guildID: string): Promise<void> {
 	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
-		await acquireConfig(guildID, plugin.id, async () => config.store.delete(guildID));
+		await acquireConfig(guildID, plugin.id, () => config.store.delete(guildID));
 	}));
 }
 

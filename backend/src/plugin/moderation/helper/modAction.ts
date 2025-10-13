@@ -110,7 +110,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 	return result;
 }
 
-function botNeedsPerm(type: ModEventType) {
+function botNeedsPerm(type: ModEventType): boolean {
 	switch (type) {
 	case ModEventType.Note:
 	case ModEventType.Warn:

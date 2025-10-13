@@ -24,7 +24,7 @@ export interface RoleViewable {
 }
 
 export function makeRoleView(role: RoleViewable): RoleView {
-	return {
+	const result = {
 		id: role.id,
 		name: role.name,
 		get color() {
@@ -50,5 +50,7 @@ export function makeRoleView(role: RoleViewable): RoleView {
 			return `**${escapeMarkdown(role.name)}** ${this.mention}`;
 		},
 	};
+
+	return result;
 }
 

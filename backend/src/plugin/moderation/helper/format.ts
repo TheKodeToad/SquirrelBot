@@ -6,7 +6,15 @@ import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.
 import { type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 
 export function formatModActionSuccess(event: ModEvent): string {
-	return `${formatUserBold(event.target)} ${event.dmDelivered ? "with direct message " : ""}(case #${event.caseNumber})`;
+	let result = formatUserBold(event.target);
+
+	if (event.dmDelivered)
+		result += " with direct message";
+
+	if (event.caseNumber !== undefined)
+		result += ` (case #${event.caseNumber})`;
+
+	return result;
 }
 
 export function formatModActionFailure(error: ModActionFailure): string {

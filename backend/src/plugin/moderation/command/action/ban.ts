@@ -5,7 +5,7 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
-import { performModAction, performModActions } from "#plugin/moderation/helper/modAction.ts";
+import { performModActions } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { ModEventType } from "#plugin/moderation/public/modEvent.ts";
 

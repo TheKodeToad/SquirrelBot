@@ -28,5 +28,5 @@ async function handleModAction(event: ModEvent): Promise<void> {
 		return;
 	}
 
-	await logEvent(event.guild, null, key, async () => makeModEventView(event));
+	await logEvent(event.guild, null, key, () => makeModEventView(event));
 }
