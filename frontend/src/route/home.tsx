@@ -32,7 +32,7 @@ function GuildsComponent() {
 		<div class="content mainContent">
 			<h1>Servers</h1>
 			<p>
-				Server not showing? Provided it has been given access — <a href={INVITE_URL}>add the app</a> if needed, and ask the owner for permissions.
+				Server not showing? <a href={INVITE_URL}>Add the app</a> if needed, and ask the owner for permissions.
 			</p>
 			<div class={"guilds"}>
 				{guildsChildren()}
