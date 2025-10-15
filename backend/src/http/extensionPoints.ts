@@ -3,7 +3,9 @@ import { makeArrayExtensionPoint, makeMultiMapExtensionPoint } from "#loader/ext
 import type { Plugin } from "#loader/plugin.ts";
 import type { Hono } from "hono";
 
-export const defineGlobalPluginRoutes = makeArrayExtensionPoint<(plugin: Plugin, app: Hono) => void>();
-
+/** Added to plugins/[YOUR PLUGIN]  */
+export const definePluginRoutes = makeArrayExtensionPoint<(plugin: Plugin, app: Hono) => void>();
+/** Added to guilds/[*]/plugins/[YOUR PLUGIN] */
 export const definePluginGuildRoutes = makeMultiMapExtensionPoint<(app: Hono<{ Variables: GuildAuthVars; }>) => void>();
+/** Added to guilds/[*]/plugins/[*] */
 export const defineGlobalPluginGuildRoutes = makeArrayExtensionPoint<(plugin: Plugin, app: Hono<{ Variables: GuildAuthVars; }>) => void>();

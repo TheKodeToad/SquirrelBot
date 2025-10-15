@@ -1,4 +1,4 @@
-import { defineGlobalPluginRoutes } from "#http/extensionPoints.ts";
+import { definePluginRoutes } from "#http/extensionPoints.ts";
 import { getPlugins } from "#loader/index.ts";
 import { Hono } from "hono";
 
@@ -16,7 +16,7 @@ export default (): Hono => {
 	for (const plugin of getPlugins()) {
 		const pluginRouter = new Hono;
 
-		for (const setup of defineGlobalPluginRoutes.contributions)
+		for (const setup of definePluginRoutes.contributions)
 			setup(plugin, pluginRouter);
 
 		app.route("/" + encodeURIComponent(plugin.id), pluginRouter);
