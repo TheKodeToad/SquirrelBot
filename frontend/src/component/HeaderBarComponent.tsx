@@ -37,7 +37,7 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 			<nav id="headerBar" class="hbox">
 				<span id="headerBar-breadcrumb"><A href="/">{APP_NAME} Dashboard</A>{breadcrumbChildren()}</span>
 				<AccountButton account={account()} />
-				<Button color="transparent" icon={IconSettings}>
+				<Button color="transparent3" icon={IconSettings}>
 					Preferences
 				</Button>
 			</nav>
@@ -55,7 +55,7 @@ function AccountButton(props: { account: Account | null; }) {
 				</Button>
 			</Match>
 			<Match when={props.account !== null}>
-				<Button onClick={() => logOut()} color="transparent" style={{ "margin-left": "auto" }}>
+				<Button onClick={() => logOut()} color="transparent3" style={{ "margin-left": "auto" }}>
 					<img src={useAvatarURL()} class="avatar" /> {props.account!.username} <IconLogout size="1em" />
 				</Button>
 			</Match>

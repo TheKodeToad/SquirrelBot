@@ -33,7 +33,7 @@ export function GuildComponent() {
 
 export function PluginWidget(props: { plugin: Plugin; active: boolean; activate: () => void; }) {
 	return (
-		<Button color="transparent" active={props.active} onClick={() => props.activate()}>
+		<Button color="transparent2" active={props.active} onClick={() => props.activate()}>
 			{props.plugin.name}
 		</Button>
 	);

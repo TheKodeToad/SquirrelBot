@@ -3,7 +3,7 @@ import { JSX } from "solid-js/jsx-runtime";
 import { Dynamic } from "solid-js/web";
 
 export interface ButtonProps {
-	color?: "transparent" | "primary" | "secondary" | "danger" | "success";
+	color?: `transparent${"2" | "3"}` | "primary" | "secondary" | "danger" | "success";
 	small?: boolean;
 	icon?: typeof IconCube;
 	onClick?: JSX.HTMLElementTags["button"]["onClick"];

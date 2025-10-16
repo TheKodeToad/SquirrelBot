@@ -173,12 +173,16 @@ body {
 	background-color: var(--success-dark);
 }
 
-.button-transparent {
+.button-transparent2, .button-transparent3 {
 	color: var(--fg);
 	background-color: transparent;
 }
 
-.button-transparent:not(:disabled):hover, .button-transparent.button-active {
+.button-transparent2:not(:disabled):hover, .button-transparent2.button-active {
+	background-color: var(--bg2);
+}
+
+.button-transparent3:not(:disabled):hover, .button-transparent3.button-active {
 	background-color: var(--bg3);
 }
 
