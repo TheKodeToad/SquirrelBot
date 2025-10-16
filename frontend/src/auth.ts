@@ -1,8 +1,7 @@
-import { logIn as requestLogIn, logOut as requestLogOut } from "../client";
-import { Uint8Array_toBase64 } from "../common/polyfill";
-
-import { CLIENT_ID, REDIRECT_URI } from "../constants";
-import { account, setAccount } from "../state/account";
+import { logIn as requestLogIn, logOut as requestLogOut } from "./client";
+import { Uint8Array_toBase64 } from "./common/polyfill";
+import { CLIENT_ID, REDIRECT_URI } from "./constants";
+import { account, setAccount } from "./state/account";
 
 export async function logIn(): Promise<void> {
 	const buffer = new Uint8Array(64);

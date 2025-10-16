@@ -1,6 +1,6 @@
 import { IconArrowRight } from "@tabler/icons-solidjs";
 import { JSX, Show } from "solid-js";
-import { logIn } from "../helper/auth";
+import { logIn } from "../auth";
 import { account } from "../state/account";
 import { Button } from "./common/Button";
 

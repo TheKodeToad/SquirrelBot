@@ -3,7 +3,7 @@ import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/i
 import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { APP_NAME } from "../constants";
-import { logIn, logOut } from "../helper/auth";
+import { logIn, logOut } from "../auth";
 import { account, Account, useAvatarURL } from "../state/account";
 import { useGuild } from "../state/guilds";
 import { Button } from "./common/Button";

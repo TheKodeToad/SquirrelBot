@@ -1,7 +1,7 @@
 import { Route, Router } from "@solidjs/router";
 import { render } from "solid-js/web";
+import { handleLoginCallback } from "./auth";
 import { HeaderBarComponent } from "./component/HeaderBarComponent";
-import { handleLoginCallback } from "./helper/auth";
 import { Guild } from "./route/guild";
 import { Home } from "./route/home";
 import { NotFound } from "./route/notFound";
