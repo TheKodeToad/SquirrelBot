@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.4",
-		"@hono/zod-validator": "^0.7.0",
+		"@hono/zod-validator": "^0.7.4",
 		"async-lock": "^1.4.1",
 		"hono": "^4.9.12",
 		"mousetache": "github:TheKodeToad/mousetache#b34b2ad8f0e19e1f0932a2efe82e1484449beb8b",
