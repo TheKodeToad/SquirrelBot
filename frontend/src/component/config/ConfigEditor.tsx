@@ -18,10 +18,10 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 
 	return (
 		<Switch fallback="Please wait...">
-			<Match when={resource() !== undefined}>
+			<Match when={resource.state === "ready"}>
 				<CodeMirror value={resource()!} extensions={baseExtensions} />
 			</Match>
-			<Match when={resource.error !== undefined}> // TODO: doesn't work
+			<Match when={resource.state === "errored"}>
 				{String(resource.error)}
 			</Match>
 		</Switch>
