@@ -1,11 +1,11 @@
 import { A, useMatch } from "@solidjs/router";
 import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
-import { Match, Show, Switch } from "solid-js";
+import { Match, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { APP_NAME } from "../constants";
 import { logIn, logOut } from "../auth";
 import { account, Account, useAvatarURL } from "../state/account";
-import { useGuild } from "../state/guilds";
+import { guilds, useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
 import { GuildIcon } from "./common/GuildIcon";
 
@@ -21,10 +21,20 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 			return (
 				<>
 					<IconChevronRight size="1em" />
-					<Show when={guild !== undefined}>
-						<GuildIcon id={guild!.id} iconHash={guild!.iconHash} size={24} />
-					</Show>
-					<A href={`/guilds/${guildID}`}>{guild?.name ?? "<unknown>"}</A>
+					<GuildIcon id={guildID} iconHash={guild?.iconHash ?? null} size={24} />
+					<A href={`/guilds/${guildID}`}>
+						<Switch>
+							<Match when={guild !== undefined}>
+								{guild!.name}
+							</Match>
+							<Match when={guilds.loading}>
+								Loading
+							</Match>
+							<Match when={true}>
+								Unknown
+							</Match>
+						</Switch>
+					</A>
 				</>
 			);
 		}

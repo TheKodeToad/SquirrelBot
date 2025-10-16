@@ -3,7 +3,7 @@ import { JSX, Match, Resource, Switch } from "solid-js";
 export function StatusFallback(props: { children: JSX.Element; resource: Resource<unknown>; }) {
 	return (
 		<Switch>
-			<Match when={props.resource.state === "ready"}>
+			<Match when={props.resource.state === "ready" && props.resource() !== undefined}>
 				{props.children}
 			</Match>
 			<Match when={props.resource.state === "errored"}>
