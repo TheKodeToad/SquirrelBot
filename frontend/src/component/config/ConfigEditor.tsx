@@ -1,10 +1,10 @@
-import { createResource, Match } from "solid-js";
+import { createResource } from "solid-js";
 import { baseExtensions } from ".";
 import { getGuildConfig } from "../../client";
 import { account } from "../../state/account";
 import { useGuild } from "../../state/guilds";
 import { CodeMirror } from "../common/CodeMirror";
-import { Switch } from "solid-js";
+import { StatusFallback } from "../common/StatusFallback";
 
 export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
@@ -17,13 +17,8 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	});
 
 	return (
-		<Switch fallback="Please wait...">
-			<Match when={resource.state === "ready"}>
-				<CodeMirror value={resource()!} extensions={baseExtensions} />
-			</Match>
-			<Match when={resource.state === "errored"}>
-				{String(resource.error)}
-			</Match>
-		</Switch>
+		<StatusFallback resource={resource}>
+			<CodeMirror value={resource()!} extensions={baseExtensions} />
+		</StatusFallback>
 	);
 }

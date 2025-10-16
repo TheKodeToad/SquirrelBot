@@ -4,6 +4,7 @@ import { GuildIcon } from "../component/common/GuildIcon";
 import { LoginGate } from "../component/LoginGate";
 import { APP_INVITE_PERMISSIONS, CLIENT_ID } from "../constants";
 import { guilds } from "../state/guilds";
+import { StatusFallback } from "../component/common/StatusFallback";
 
 export const Home = () => <LoginGate><GuildsComponent /></LoginGate>;
 
@@ -15,19 +16,6 @@ const INVITE_URL = "https://discord.com/oauth2/authorize?" + new URLSearchParams
 });
 
 function GuildsComponent() {
-	const guildsChildren = () => {
-		const guildList = guilds();
-
-		if (guildList === undefined)
-			return;
-
-		return (
-			<For each={guildList}>
-				{guild => <GuildCard {...guild} />}
-			</For>
-		);
-	};
-
 	return (
 		<div class="content">
 			<div class="mainContent">
@@ -36,7 +24,11 @@ function GuildsComponent() {
 					Server not showing? <a href={INVITE_URL}>Add the app</a> if needed, and ask the owner for permissions.
 				</p>
 				<div class={"guilds"}>
-					{guildsChildren()}
+					<StatusFallback resource={guilds}>
+						<For each={guilds()}>
+							{guild => <GuildCard {...guild} />}
+						</For>
+					</StatusFallback>
 				</div>
 			</div>
 		</div>
