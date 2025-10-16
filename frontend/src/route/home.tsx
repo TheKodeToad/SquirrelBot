@@ -29,13 +29,15 @@ function GuildsComponent() {
 	};
 
 	return (
-		<div class="content mainContent">
-			<h1>Servers</h1>
-			<p>
-				Server not showing? <a href={INVITE_URL}>Add the app</a> if needed, and ask the owner for permissions.
-			</p>
-			<div class={"guilds"}>
-				{guildsChildren()}
+		<div class="content">
+			<div class="mainContent">
+				<h1>Servers</h1>
+				<p>
+					Server not showing? <a href={INVITE_URL}>Add the app</a> if needed, and ask the owner for permissions.
+				</p>
+				<div class={"guilds"}>
+					{guildsChildren()}
+				</div>
 			</div>
 		</div>
 	);

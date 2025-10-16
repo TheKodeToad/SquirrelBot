@@ -7,19 +7,27 @@ export interface ButtonProps {
 	small?: boolean;
 	icon?: typeof IconCube;
 	onClick?: JSX.HTMLElementTags["button"]["onClick"];
+	active?: boolean;
 	disabled?: boolean;
 	children?: JSX.Element;
 	style?: JSX.HTMLAttributes<unknown>["style"];
 }
 
 export function Button(props: ButtonProps) {
-	let classes = `button button-${props.color ?? "secondary"}`;
+	const classes = () => {
+		let result = `button button-${props.color ?? "secondary"}`;
 
-	if (props.small)
-		classes += " button-small";
+		if (props.small)
+			result += " button-small";
+
+		if (props.active)
+			result += " button-active";
+
+		return result;
+	};
 
 	return (
-		<button class={classes} style={props.style} onClick={props.onClick} disabled={props.disabled}>
+		<button class={classes()} style={props.style} onClick={props.onClick} disabled={props.disabled}>
 			<span class={"button-inner"}>
 				{props.icon && <Dynamic component={props.icon} size={"1em"} />}
 				{props.children}

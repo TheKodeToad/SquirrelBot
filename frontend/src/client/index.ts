@@ -15,8 +15,8 @@ function extractMessage(body: unknown) {
 export class RESTError extends Error {
 	body: unknown;
 
-	constructor(status: number, body: unknown) {
-		super(`${status} - ${extractMessage(body)}`);
+	constructor(status: number, route: string, body: unknown) {
+		super(`${status} at ${route} - ${extractMessage(body)}`);
 		this.name = "RESTError";
 		this.body = body;
 	}
@@ -62,7 +62,7 @@ async function request<T>(route: string, method: HTTPMethod, token?: string, bod
 	const responseBody = isJson ? await response.json() : await response.text();
 
 	if (!response.ok)
-		throw new RESTError(response.status, responseBody);
+		throw new RESTError(response.status, route, responseBody);
 
 	return responseBody;
 }

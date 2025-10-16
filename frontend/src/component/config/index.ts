@@ -2,7 +2,7 @@ import { indentLess, insertTab } from "@codemirror/commands";
 import { continuedIndent, indentNodeProp, LRLanguage } from "@codemirror/language";
 import { EditorView, keymap } from "@codemirror/view";
 import { gruvboxDark } from "@fsegurai/codemirror-theme-gruvbox-dark";
-import { basicSetup } from "codemirror";
+import { minimalSetup } from "codemirror";
 import { parser } from "lezer-toml";
 
 const parserWithMetadata = parser.configure({
@@ -12,7 +12,7 @@ const parserWithMetadata = parser.configure({
 });
 
 export const baseExtensions = [
-	basicSetup,
+	minimalSetup,
 	LRLanguage.define({
 		parser: parserWithMetadata,
 	}),

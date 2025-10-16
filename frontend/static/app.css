@@ -62,9 +62,13 @@ body {
 .content {
 	overflow-y: auto;
 	flex: 1;
+
+	display: flex;
 }
 
 .mainContent {
+	flex: 1;
+
 	padding-left: 24px;
 	padding-right: 24px;
 }
@@ -97,6 +101,17 @@ body {
 
 #headerBar-breadcrumb a[aria-current=page] {
 	font-weight: bold;
+}
+
+#sidebar {
+	align-items: stretch;
+	padding: 12px;
+
+	border-right: 2px solid var(--bg1);
+}
+
+.cm-editor {
+	flex: 1;
 }
 
 .button {
@@ -136,7 +151,7 @@ body {
 	background-color: var(--accent);
 }
 
-.button-primary:not(:disabled):hover {
+.button-primary:not(:disabled):hover, .button-primary.button-active {
 	background-color: var(--accent-dark);
 }
 
@@ -145,7 +160,7 @@ body {
 	background-color: var(--bg1);
 }
 
-.button-secondary:not(:disabled):hover {
+.button-secondary:not(:disabled):hover, .button-secondary.button-active {
 	background-color: var(--bg2);
 }
 
@@ -154,7 +169,7 @@ body {
 	background-color: var(--success);
 }
 
-.button-success:not(:disabled):hover {
+.button-success:not(:disabled):hover, .button-success.button-active {
 	background-color: var(--success-dark);
 }
 
@@ -163,7 +178,7 @@ body {
 	background-color: transparent;
 }
 
-.button-transparent:not(:disabled):hover {
+.button-transparent:not(:disabled):hover, .button-transparent.button-active {
 	background-color: var(--bg3);
 }
 

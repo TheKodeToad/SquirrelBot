@@ -1,5 +1,6 @@
 import { APP_DESCRIPTION, APP_INVITE_PERMISSIONS, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
 import { CLIENT_ID, REDIRECT_URI } from "#environment.ts";
+import { getPlugins } from "#loader/index.ts";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { randomBytes } from "crypto";
 import { Hono } from "hono";
@@ -7,22 +8,33 @@ import { compress } from "hono/compress";
 import { etag } from "hono/etag";
 import { html, raw } from "hono/html";
 
-const constants = JSON.stringify({
-	CLIENT_ID,
-	REDIRECT_URI,
-
-	APP_NAME,
-	APP_DESCRIPTION,
-	APP_SOURCE_CODE,
-	APP_LIBRARIES_LINK,
-	APP_INVITE_PERMISSIONS: APP_INVITE_PERMISSIONS.toString(),
-}).replaceAll("<", "\\u003c").replaceAll(">", "\\u003e");
 
 export default (): Hono => {
 	const app = new Hono;
 
-	// TODO: disturbing
+	// TODO: worrying
 	app.use("/static/*", compress(), etag(), serveStatic({ root: "../frontend" })); // yea
+
+	const env = {
+		CLIENT_ID,
+		REDIRECT_URI,
+
+		APP_NAME,
+		APP_DESCRIPTION,
+		APP_SOURCE_CODE,
+		APP_LIBRARIES_LINK,
+		APP_INVITE_PERMISSIONS: APP_INVITE_PERMISSIONS.toString(),
+	};
+
+	const plugins = [...getPlugins()].map(plugin => ({
+		id: plugin.id,
+		name: plugin.name,
+		description: plugin.description,
+	}))
+
+	const constants = JSON.stringify({ env, plugins })
+		.replaceAll("<", "\\u003c")
+		.replaceAll(">", "\\u003e");
 
 	app.get("/*", context => {
 		const nonce = randomBytes(16).toString("base64");
