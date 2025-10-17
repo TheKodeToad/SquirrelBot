@@ -16,7 +16,9 @@ const toml = LRLanguage.define({
 	}
 });
 
-export function baseExtensions(saveAction: Command) {
+export function baseExtensions(options: {
+	save: Command
+}) {
 	return [
 		basicSetup,
 		toml,
@@ -27,7 +29,7 @@ export function baseExtensions(saveAction: Command) {
 		}]),
 		keymap.of([{
 			key: "Mod-s",
-			run: saveAction,
+			run: options.save,
 		}]),
 		indentUnit.of("\t"),
 		gruvboxDark,
