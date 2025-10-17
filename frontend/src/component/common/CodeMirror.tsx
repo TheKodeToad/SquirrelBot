@@ -5,6 +5,7 @@ import { createEffect, on } from "solid-js";
 export interface CodeMirrorProps {
 	value: string;
 	extensions: any[];
+	viewRef?: (view: EditorView) => void;
 }
 
 export function CodeMirror(props: CodeMirrorProps) {
@@ -12,6 +13,8 @@ export function CodeMirror(props: CodeMirrorProps) {
 		extensions: props.extensions,
 		doc: props.value,
 	});
+
+	props.viewRef?.(view);
 
 	createEffect(on(() => props.value, () => {
 		view.update([

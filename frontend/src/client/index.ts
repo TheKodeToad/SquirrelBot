@@ -40,20 +40,34 @@ export interface GuildResponse {
 	ownerID: string;
 }
 
-async function request<T>(route: string, method: HTTPMethod, token?: string, body?: any): Promise<T> {
+export interface RequestOptions {
+	token?: string;
+	body?: {
+		contentType: "application/json";
+		value: unknown;
+	} | {
+		contentType: string;
+		data: string;
+	};
+}
+
+async function request<T>(method: HTTPMethod, route: string, options: RequestOptions = {}): Promise<T> {
 	const headers = new Headers;
 
-	if (body != null)
-		headers.set("Content-Type", "application/json");
+	let body: string | undefined;
 
-	if (token !== undefined)
-		headers.set("Authorization", token);
+	if (options.body !== undefined) {
+		headers.set("Content-Type", options.body.contentType);
+		if ("value" in options.body)
+			body = JSON.stringify(options.body.value);
+		else
+			body = options.body.data;
+	}
 
-	const response = await fetch(route, {
-		method: method,
-		body: body !== undefined ? JSON.stringify(body) : undefined,
-		headers,
-	});
+	if (options.token !== undefined)
+		headers.set("Authorization", options.token);
+
+	const response = await fetch(route, { method, body, headers });
 
 	if (response.status === 204)
 		return null as T;
@@ -68,17 +82,32 @@ async function request<T>(route: string, method: HTTPMethod, token?: string, bod
 }
 
 export function logIn(code: string, codeVerifier: string) {
-	return request<LogInResponse>(AUTH_LOG_IN, "POST", undefined, { code, codeVerifier });
+	return request<LogInResponse>("POST", AUTH_LOG_IN, {
+		body: {
+			contentType: "application/json",
+			value: { code, codeVerifier },
+		}
+	});
 }
 
-export function logOut(token: string) {
-	return request<null>(AUTH_LOG_OUT, "GET", token);
+export async function logOut(token: string) {
+	await request<null>("GET", AUTH_LOG_OUT, { token });
 }
 
 export function getGuilds(token: string) {
-	return request<GuildResponse[]>(GUILDS, "GET", token);
+	return request<GuildResponse[]>("GET", GUILDS, { token });
 }
 
-export async function getGuildConfig(token: string, guildID: string, config: string) {
-	return request<string>(PLUGIN_CONFIG(guildID, config), "GET", token);
+export function getGuildConfig(token: string, guildID: string, plugin: string) {
+	return request<string>("GET", PLUGIN_CONFIG(guildID, plugin), { token });
+}
+
+export async function writeGuildConfig(token: string, guildID: string, plugin: string, text: string) {
+	await request<null>("PUT", PLUGIN_CONFIG(guildID, plugin), {
+		token,
+		body: {
+			contentType: "application/toml",
+			data: text,
+		},
+	});
 }

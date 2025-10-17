@@ -15,7 +15,7 @@ export function GuildComponent() {
 	return (
 		<div class="content">
 			<div id="sidebar" class="vbox">
-				<h2 style={{ margin: 0 }}>Plugins</h2>
+				<div class="sidebarHeading">Plugins</div>
 				<For each={PLUGINS}>
 					{plugin => (
 						<PluginWidget
