@@ -29,6 +29,15 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const save = async () => {
 		setSaving(true);
 
+		const lastLine = view.state.doc.line(view.state.doc.lines).text;
+		if (lastLine.length !== 0) {
+			view.update([
+				view.state.update({
+					changes: { from: view.state.doc.length, insert: "\n" }
+				})
+			]);
+		}
+
 		try {
 			await writeGuildConfig(
 				account()!.token,
