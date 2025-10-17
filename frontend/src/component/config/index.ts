@@ -1,6 +1,6 @@
-import { indentLess, indentWithTab, insertTab } from "@codemirror/commands";
+import { indentLess, insertTab } from "@codemirror/commands";
 import { continuedIndent, indentNodeProp, LRLanguage } from "@codemirror/language";
-import { EditorView, keymap } from "@codemirror/view";
+import { Command, EditorView, keymap } from "@codemirror/view";
 import { gruvboxDark } from "@fsegurai/codemirror-theme-gruvbox-dark";
 import { basicSetup } from "codemirror";
 import { parser } from "lezer-toml";
@@ -11,21 +11,27 @@ const parserWithMetadata = parser.configure({
 	]
 });
 
-export const baseExtensions = [
-	basicSetup,
-	LRLanguage.define({
-		parser: parserWithMetadata,
-	}),
-	keymap.of([{
-		key: "Tab",
-		run: insertTab,
-		shift: indentLess,
-	}]),
-	gruvboxDark,
-	EditorView.theme({
-		"&.cm-focused": {
-			outline: "none",
-			"box-shadow": "none !important", // HACK
-		}
-	}),
-];
+export function baseExtensions(saveAction: Command) {
+	return [
+		basicSetup,
+		LRLanguage.define({
+			parser: parserWithMetadata,
+		}),
+		keymap.of([{
+			key: "Tab",
+			run: insertTab,
+			shift: indentLess,
+		}]),
+		keymap.of([{
+			key: "Mod-s",
+			run: saveAction
+		}]),
+		gruvboxDark,
+		EditorView.theme({
+			"&.cm-focused": {
+				outline: "none",
+				"box-shadow": "none !important", // HACK
+			}
+		}),
+	];
+}
