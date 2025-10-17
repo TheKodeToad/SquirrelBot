@@ -225,6 +225,7 @@ export async function cancelGuildInfoDeletion(id: string): Promise<void> {
 	);
 }
 
+// TODO: use this darn thing!
 export async function deleteExpiredGuildInfo(): Promise<void> {
 	await postgres.query(
 		`
