@@ -17,7 +17,8 @@ const toml = LRLanguage.define({
 });
 
 export function baseExtensions(options: {
-	save: Command
+	save: Command,
+	markDirty: () => void,
 }) {
 	return [
 		basicSetup,
@@ -39,5 +40,9 @@ export function baseExtensions(options: {
 				"box-shadow": "none !important", // HACK
 			}
 		}),
+		EditorView.updateListener.of(update => {
+			if (update.docChanged)
+				options.markDirty();
+		})
 	];
 }

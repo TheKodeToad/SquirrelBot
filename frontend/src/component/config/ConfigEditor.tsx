@@ -7,6 +7,7 @@ import { StatusFallback } from "../common/StatusFallback";
 import { Button } from "../common/Button";
 import { EditorView } from "codemirror";
 import { IconDeviceFloppy } from "@tabler/icons-solidjs";
+import { EditorState } from "@codemirror/state";
 
 export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
@@ -19,7 +20,8 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	});
 
 	const [saving, setSaving] = createSignal(false);
-	const saveDisabled = () => saving() || resource.loading || resource() === undefined;
+	const [dirty, setDirty] = createSignal(false);
+	const saveDisabled = () => !dirty() || saving() || resource.loading || resource() === undefined;
 
 	const owner = getOwner();
 
@@ -42,29 +44,37 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 				props.plugin,
 				view.state.doc.toString()
 			);
+			setDirty(false);
 		} finally {
 			setSaving(false);
 		}
 	});
 
-	const view = new EditorView({
-		extensions: baseExtensions({
-			save: () => (save(), true)
-		})
-	});
+	const view = new EditorView();
 
 	createEffect(on(resource, () => {
-		view.update([
-			view.state.update({
-				changes: { from: 0, to: view.state.doc.length, insert: resource() }
+		setDirty(false);
+
+		view.setState(EditorState.create({
+			doc: resource(),
+			extensions: baseExtensions({
+				save: () => (save(), true),
+				markDirty: () => setDirty(true)
 			})
-		]);
+		}));
 	}, { defer: true }));
 
 	return (
 		<div class="configEditor">
 			<div class="hbox">
-				<Button color="success" onClick={save} disabled={saveDisabled()} icon={IconDeviceFloppy}>Save</Button>
+				<Button
+					color={dirty() ? "success" : "secondary"}
+					onClick={save}
+					disabled={saveDisabled()}
+					icon={IconDeviceFloppy}
+				>
+					{dirty() ? "Save" : "Saved"}
+				</Button>
 			</div>
 			<StatusFallback resource={resource}>{view.dom}</StatusFallback>
 		</div>
