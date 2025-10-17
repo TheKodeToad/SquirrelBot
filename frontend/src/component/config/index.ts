@@ -5,18 +5,21 @@ import { gruvboxDark } from "@fsegurai/codemirror-theme-gruvbox-dark";
 import { basicSetup } from "codemirror";
 import { parser } from "lezer-toml";
 
-const parserWithMetadata = parser.configure({
-	props: [
-		indentNodeProp.add({ Array: continuedIndent({ except: /^\s*]/ }) }),
-	]
+const toml = LRLanguage.define({
+	parser: parser.configure({
+		props: [
+			indentNodeProp.add({ Array: continuedIndent({ except: /^\s*]/ }) }),
+		]
+	}),
+	languageData: {
+		commentTokens: { line: "#" }
+	}
 });
 
 export function baseExtensions(saveAction: Command) {
 	return [
 		basicSetup,
-		LRLanguage.define({
-			parser: parserWithMetadata,
-		}),
+		toml,
 		keymap.of([{
 			key: "Tab",
 			run: insertTab,
