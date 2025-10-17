@@ -221,6 +221,7 @@ body {
 	grid-auto-rows: 80px;
 	gap: 16px;
 	max-width: 1000px;
+	overflow: hidden;
 }
 
 .guildCard {
