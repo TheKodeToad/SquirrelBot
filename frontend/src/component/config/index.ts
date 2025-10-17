@@ -27,7 +27,7 @@ export function baseExtensions(saveAction: Command) {
 		}]),
 		keymap.of([{
 			key: "Mod-s",
-			run: saveAction
+			run: saveAction,
 		}]),
 		indentUnit.of("\t"),
 		gruvboxDark,
