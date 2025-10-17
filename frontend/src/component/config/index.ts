@@ -1,5 +1,5 @@
 import { indentLess, insertTab } from "@codemirror/commands";
-import { continuedIndent, indentNodeProp, LRLanguage } from "@codemirror/language";
+import { continuedIndent, indentNodeProp, indentUnit, LRLanguage } from "@codemirror/language";
 import { Command, EditorView, keymap } from "@codemirror/view";
 import { gruvboxDark } from "@fsegurai/codemirror-theme-gruvbox-dark";
 import { basicSetup } from "codemirror";
@@ -26,6 +26,7 @@ export function baseExtensions(saveAction: Command) {
 			key: "Mod-s",
 			run: saveAction
 		}]),
+		indentUnit.of("\t"),
 		gruvboxDark,
 		EditorView.theme({
 			"&.cm-focused": {
