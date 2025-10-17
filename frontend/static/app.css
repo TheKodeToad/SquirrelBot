@@ -272,5 +272,7 @@ body {
 
 .configEditor > .cm-editor {
 	flex: 1;
-	width: 100%;
+	overflow: auto;
+	border-top-left-radius: var(--base-rounding);
+	border-bottom-left-radius: var(--base-rounding);
 }

@@ -1,3 +1,4 @@
+import { createSignal } from "solid-js";
 import { logIn as requestLogIn, logOut as requestLogOut } from "./client";
 import { Uint8Array_toBase64 } from "./common/polyfill";
 import { CLIENT_ID, REDIRECT_URI } from "./constants";
@@ -28,7 +29,13 @@ export async function logIn(): Promise<void> {
 	window.location.assign(url);
 }
 
-export function handleLoginCallback() {
+export type CallbackStatus = { state: "working" } | { state: "errored", error: unknown };
+
+const [callbackStatus, setCallbackStatus] = createSignal<CallbackStatus | null>(null);
+
+export const loginCallbackStatus = callbackStatus;
+
+export async function handleLoginCallback() {
 	if (window.location.pathname !== "/log-in")
 		return;
 
@@ -50,15 +57,20 @@ export function handleLoginCallback() {
 	if (verifier === null)
 		throw new Error("Login was not initiated in the same session");
 
-	requestLogIn(code, verifier).then(response => {
-		// TODO handle errors
+	setCallbackStatus({ state: "working" });
 
+	try {
+		const response = await requestLogIn(code, verifier)
 		setAccount({
 			token: response.token,
 			username: response.username,
 			avatar: response.avatar
 		});
-	});
+		setCallbackStatus(null);
+	} catch (error) {
+		console.error("Login failure:", error);
+		setCallbackStatus({ state: "errored", error });
+	}
 }
 
 export async function logOut() {

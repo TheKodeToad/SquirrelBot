@@ -1,9 +1,9 @@
 import { A, useMatch } from "@solidjs/router";
 import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
-import { Match, Switch } from "solid-js";
+import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { APP_NAME } from "../constants";
-import { logIn, logOut } from "../auth";
+import { logOut } from "../auth";
 import { account, Account, useAvatarURL } from "../state/account";
 import { guilds, useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
@@ -46,7 +46,10 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 		<>
 			<nav id="headerBar" class="hbox">
 				<span id="headerBar-breadcrumb"><A href="/">{APP_NAME} Dashboard</A>{breadcrumbChildren()}</span>
-				<AccountButton account={account()} />
+				<span style={{ "margin-left": "auto" }} />
+				<Show when={account() !== null}>
+					<AccountButton account={account()!} />
+				</Show>
 				<Button color="transparent3" icon={IconSettings}>
 					Preferences
 				</Button>
@@ -56,20 +59,11 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 		</>
 	);
 };
-function AccountButton(props: { account: Account | null; }) {
+function AccountButton(props: { account: Account; }) {
 	return (
-		<Switch>
-			<Match when={props.account === null}>
-				<Button onClick={logIn} color="primary" icon={IconLogin} style={{ "margin-left": "auto" }}>
-					Log In
-				</Button>
-			</Match>
-			<Match when={props.account !== null}>
-				<Button onClick={() => logOut()} color="transparent3" style={{ "margin-left": "auto" }}>
-					<img src={useAvatarURL()} class="avatar" /> {props.account!.username} <IconLogout size="1em" />
-				</Button>
-			</Match>
-		</Switch>
+		<Button onClick={() => logOut()} color="transparent3">
+			<img src={useAvatarURL()} class="avatar" /> {props.account!.username} <IconLogout size="1em" />
+		</Button>
 	);
 }
 
