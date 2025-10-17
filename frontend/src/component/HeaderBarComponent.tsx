@@ -45,7 +45,7 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 	return (
 		<>
 			<nav id="headerBar" class="hbox">
-				<span id="headerBar-breadcrumb"><A href="/">{APP_NAME} Dashboard</A>{breadcrumbChildren()}</span>
+				<span id="headerBar-breadcrumb"><A href="/">Dashboard</A>{breadcrumbChildren()}</span>
 				<span style={{ "margin-left": "auto" }} />
 				<Show when={account() !== null}>
 					<AccountButton account={account()!} />
