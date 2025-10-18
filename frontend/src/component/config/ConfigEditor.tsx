@@ -8,6 +8,7 @@ import { Button } from "../common/Button";
 import { EditorView } from "codemirror";
 import { IconDeviceFloppy } from "@tabler/icons-solidjs";
 import { EditorState } from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
 
 export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
@@ -62,6 +63,18 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 				markDirty: () => setDirty(true)
 			})
 		}));
+		const tree = syntaxTree(view.state);
+		tree.iterate({
+			enter: node => {
+				console.group(node.type.name);
+				console.log(view.state.doc.slice(node.from, node.to).toString())
+				return true;
+			},
+			leave: node => {
+				console.groupEnd();
+				return false;
+			}
+		})
 	}, { defer: true }));
 
 	return (
