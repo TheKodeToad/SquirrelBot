@@ -3,7 +3,8 @@ import { debugFormatChannel } from "#common/discord/debugFormat.ts";
 import { isTextableChannel, isThreadChannelType } from "#common/discord/general.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { dateToHMSString, dateToUnixSecs } from "#common/time.ts";
+import { startPollingScheduler, type PollingSchedulerHandle } from "#common/pollingScheduler.ts";
+import { dateToHMSString, dateToUnixSecs, SECOND } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -13,45 +14,25 @@ import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } 
 
 const logger = moduleLogger();
 
-const TIMEOUT_POLL_RATE = 60 * 1000;
-
-let nextExpiryStartTime = new Date(0);
+let scheduler: PollingSchedulerHandle<Reminder> | null = null;
 
 export default [onBotInit(beginPollingReminders)];
 
 async function beginPollingReminders(): Promise<void> {
-	await poll();
-	setInterval(poll, TIMEOUT_POLL_RATE).unref();
+	scheduler = await startPollingScheduler({
+		discriminator: "reminders",
+		pollRate: 60 * SECOND,
+
+		poll: (start, end) => getRemindersByFiresAt(start, end),
+		run: fire,
+
+		getTimestamp: task => task.firesAt,
+		debugFormat: debugFormatReminder
+	});
 }
 
 export function trackNewReminder(reminder: Reminder): void {
-	if (reminder.firesAt.getTime() >= nextExpiryStartTime.getTime())
-		return;
-
-	setTimeout(() => fire(reminder), Math.max(0, reminder.firesAt.getTime() - Date.now())).unref();
-}
-
-async function poll(): Promise<void> {
-	const end = new Date(Date.now() + TIMEOUT_POLL_RATE);
-
-	logger.debug?.(
-		nextExpiryStartTime.getTime() === 0
-			? "Setting initial timeouts for missed and upcoming reminders until " + dateToHMSString(end)
-			: "Setting timeouts for reminders from " + dateToHMSString(nextExpiryStartTime) + " to " + dateToHMSString(end)
-	);
-
-	const reminders = await getRemindersByFiresAt(nextExpiryStartTime, end);
-	nextExpiryStartTime = end;
-
-	for (const reminder of reminders)
-		setFireTimeout(reminder);
-}
-
-function setFireTimeout(reminder: Reminder): void {
-	const delay = Math.max(0, reminder.firesAt.getTime() - Date.now());
-	setTimeout(() => fire(reminder), delay);
-
-	logger.debug?.(`Setting up timeout for reminder ${debugFormatReminder(reminder)} with delay ${delay}`);
+	scheduler?.track(reminder);
 }
 
 async function fire(reminder: Reminder): Promise<void> {
