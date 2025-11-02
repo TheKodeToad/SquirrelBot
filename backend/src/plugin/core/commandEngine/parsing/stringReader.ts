@@ -1,7 +1,6 @@
 const WORD_END_PATTERN = /\s/g;
 const WHITESPACE_EATER_PATTERN = /\s+/y;
 
-// TODO: likely has unicode oversights
 export class StringReader {
 	private _input: string;
 	// TODO: track the next item instead of the current?
