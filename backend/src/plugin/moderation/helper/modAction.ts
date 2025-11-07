@@ -54,10 +54,6 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 	try {
 		switch (action.type) {
 		case ModEventType.Note:
-		case ModEventType.VoiceMute:
-		case ModEventType.VoiceUnmute:
-		case ModEventType.Unwarn:
-			throw new Error("TODO");
 		case ModEventType.Warn:
 			break;
 		case ModEventType.Timeout:

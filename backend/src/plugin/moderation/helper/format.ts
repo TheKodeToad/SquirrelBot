@@ -31,12 +31,6 @@ function caseSummaryBase(type: ModEventType, target: string): string {
 		return `Note added for ${target}`;
 	case ModEventType.Warn:
 		return `Warned ${target}`;
-	case ModEventType.Unwarn:
-		return `Unwarned ${target}`;
-	case ModEventType.VoiceMute:
-		return `Voice-muted ${target}`;
-	case ModEventType.VoiceUnmute:
-		return `Voice-unmuted ${target}`;
 	case ModEventType.Timeout:
 		return `Timed out ${target}`;
 	case ModEventType.ClearTimeout:
@@ -114,15 +108,6 @@ export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> 
 		break;
 	case ModEventType.Warn:
 		result += `${target} warned by ${actor}`;
-		break;
-	case ModEventType.Unwarn:
-		result += `${target} unwarned by ${actor}`;
-		break;
-	case ModEventType.VoiceMute:
-		result += `${target} voice-muted by ${actor}`;
-		break;
-	case ModEventType.VoiceUnmute:
-		result += `${target} voice-unmuted by ${actor}`;
 		break;
 	case ModEventType.Timeout:
 		result += `${target} muted by ${actor}`;

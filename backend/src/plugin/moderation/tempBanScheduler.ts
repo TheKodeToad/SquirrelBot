@@ -38,7 +38,7 @@ export function trackNewTempBan(tempBan: TempBan): void {
 	scheduler?.track(tempBan);
 }
 
-export function untrackTempBan(guildID: string, targetID: string): string {
+export function untrackTempBan(guildID: string, targetID: string): void {
 	scheduler?.untrack(getTempBanKey(guildID, targetID));
 }
 
