@@ -7,6 +7,8 @@ import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
 import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
 import { createCase } from "#plugin/moderation/storage/cases.ts";
+import { deleteTempBan, upsertTempBan, type TempBan } from "#plugin/moderation/storage/tempBans.ts";
+import { trackNewTempBan, untrackTempBan } from "#plugin/moderation/tempBanScheduler.ts";
 import { DiscordRESTError, Guild, Member, Permissions, User, type CreateMessageOptions, type Uncached } from "oceanic.js";
 
 const logger = moduleLogger();
@@ -90,6 +92,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 				deleteMessageSeconds: action.deleteMessageSeconds,
 				reason: action.reason,
 			});
+
 			break;
 		case ModEventType.Unban:
 			await action.guild.removeBan(action.target.id, action.reason);
@@ -104,6 +107,25 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 
 	const result: ModEvent = { ...action, performedAt, dmDelivered };
 	result.caseNumber = await createCase(action.guild.id, result);
+
+	if (action.type === ModEventType.Ban) {
+		untrackTempBan(action.guild.id, action.target.id);
+
+		// FIXME: race condition
+		if (action.expiresAt !== undefined) {
+			const tempBan: TempBan = {
+				guildID: action.guild.id,
+				targetID: action.target.id,
+
+				endsAt: action.expiresAt,
+				caseNumber: result.caseNumber,
+			};
+
+			await upsertTempBan(action.guild.id, tempBan);
+			trackNewTempBan(tempBan);
+		} else
+			await deleteTempBan(action.guild.id, action.target.id);
+	}
 
 	onModAction.fire(result).catch(error => logger.error?.("Error in onModAction", error));
 

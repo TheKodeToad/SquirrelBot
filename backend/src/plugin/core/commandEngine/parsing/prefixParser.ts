@@ -49,9 +49,16 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 
 		const [key, option] = foundByPosition;
 
+		const prevCursor = reader.cursor;
 		const value = readCommandArg(reader, option, false);
 
 		if (value === null) {
+			if (option.skipIfInvalid) {
+				reader.cursor = prevCursor;
+				++positionalIndex;
+				continue;
+			}
+
 			return {
 				error: ArgsParseError.BadPoisitionalValue,
 				index: positionalIndex,
@@ -151,19 +158,18 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 	const result: AnyArgsValueItem[] = [];
 
 	while (reader.canRead() && !reader.match(ARRAY_TERMINATOR)) {
-		reader.mark();
+		const prevCursor = reader.cursor;
 
 		const item = readCommandArgValue(reader, option.type);
 
 		if (item === null) {
-			reader.reset();
+			reader.cursor = prevCursor;
 
 			if (propagateArrayError)
 				return null;
 			else
 				break; // just keep the array without item
-		} else
-			reader.unmark();
+		}
 
 		result.push(item);
 

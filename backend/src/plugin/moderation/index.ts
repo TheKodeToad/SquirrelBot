@@ -12,6 +12,7 @@ import caseShow from "#plugin/moderation/command/case/caseShow.ts";
 import purge from "#plugin/moderation/command/util/purge.ts";
 import { ModerationConfig } from "#plugin/moderation/config.ts";
 import casesRoutes from "#plugin/moderation/http/casesRoutes.ts";
+import tempBanScheduler from "#plugin/moderation/tempBanScheduler.ts";
 
 export const moderationConfigStore = new ConfigStore(ModerationConfig);
 
@@ -40,6 +41,7 @@ export default definePlugin({
 			store: moderationConfigStore,
 			defaultValue: defaultConfig,
 		}),
+		...tempBanScheduler,
 
 		ban, unban, kick, timeout, warn, purge, caseShow, caseDelete, caseList,
 

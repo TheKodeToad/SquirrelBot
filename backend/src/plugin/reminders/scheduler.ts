@@ -1,22 +1,25 @@
 import { fetchMemberCached, fetchThreadCached } from "#common/discord/cachedRequest.ts";
-import { debugFormatChannel } from "#common/discord/debugFormat.ts";
+import { debugFormatChannel, debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { isTextableChannel, isThreadChannelType } from "#common/discord/general.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { startPollingScheduler, type PollingSchedulerHandle } from "#common/pollingScheduler.ts";
-import { dateToHMSString, dateToUnixSecs, SECOND } from "#common/time.ts";
+import { dateToUnixSecs, SECOND } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { debugFormatReminder, remindersConfigStore } from "#plugin/reminders/index.ts";
+import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";
 import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
 
 const logger = moduleLogger();
-
 let scheduler: PollingSchedulerHandle<Reminder> | null = null;
 
 export default [onBotInit(beginPollingReminders)];
+
+function debugFormatReminder(reminder: Reminder): string {
+    return `reminder #${reminder.number} in ${debugFormatGuildByID(reminder.guildID)}`;
+}
 
 async function beginPollingReminders(): Promise<void> {
 	scheduler = await startPollingScheduler({
@@ -26,8 +29,9 @@ async function beginPollingReminders(): Promise<void> {
 		poll: (start, end) => getRemindersByFiresAt(start, end),
 		run: fire,
 
-		getTimestamp: task => task.firesAt,
-		debugFormat: debugFormatReminder
+		getKey: task => task.guildID + "::" + task.number,
+		getTimestamp: reminder => reminder.firesAt,
+		debugFormat: debugFormatReminder,
 	});
 }
 
@@ -49,7 +53,7 @@ async function fire(reminder: Reminder): Promise<void> {
 	// members could also be bulk requested ahead of time
 
 	if (guild === undefined) {
-		logger.debug?.(`Bot user is not in guild; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`Bot user is not in guild; not sending ${debugFormatReminder(reminder)}`);
 		return; // no access to guild?
 	}
 
@@ -62,7 +66,7 @@ async function fire(reminder: Reminder): Promise<void> {
 			if (!(error instanceof DiscordRESTError))
 				throw error;
 
-			logger.debug?.(`Thread was deleted; not sending reminder ${debugFormatReminder(reminder)}`);
+			logger.debug?.(`Thread was deleted; not sending ${debugFormatReminder(reminder)}`);
 			return;
 		}
 
@@ -74,7 +78,7 @@ async function fire(reminder: Reminder): Promise<void> {
 		const potentialChannel = guild.channels.get(reminder.channelID);
 
 		if (potentialChannel === undefined) {
-			logger.debug?.(`Channel was deleted; not sending reminder ${debugFormatReminder(reminder)}`);
+			logger.debug?.(`Channel was deleted; not sending ${debugFormatReminder(reminder)}`);
 			return;
 		}
 
@@ -85,7 +89,7 @@ async function fire(reminder: Reminder): Promise<void> {
 	}
 
 	if (!canWriteInChannel(channel, guild.clientMember)) {
-		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending ${debugFormatReminder(reminder)}`);
 		return;
 	}
 
@@ -101,7 +105,7 @@ async function fire(reminder: Reminder): Promise<void> {
 	// TODO: doesn't account for private thread but I don't think this really matters that much
 	// don't allow perm bypass
 	if (!canWriteInChannel(channel, reminderOwner)) {
-		logger.debug?.(`Owner cannot send messages in ${debugFormatChannel(channel)}; not sending reminder ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`Owner cannot send messages in ${debugFormatChannel(channel)}; not sending ${debugFormatReminder(reminder)}`);
 		return;
 	}
 

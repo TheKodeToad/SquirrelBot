@@ -93,6 +93,7 @@ interface BaseOption {
 	name: NameList;
 	description?: string;
 	required?: boolean;
+	skipIfInvalid?: boolean;
 	array?: boolean;
 	position?: number;
 }

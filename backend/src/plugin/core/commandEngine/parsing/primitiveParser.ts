@@ -110,21 +110,21 @@ const DURATION_SEPARATOR = /(,|\s|and)*/yi;
 export function readDuration(reader: StringReader): number | null {
 	let total = null;
 
-	reader.mark();
+	let prevCursor = reader.cursor;
 
 	while (reader.canRead()) {
 		const lengthString = reader.readUntil(DURATION_UNIT_BOUNDARY);
 		const length = parseFloat(lengthString);
 
 		if (Number.isNaN(length)) {
-			reader.reset();
+			reader.cursor = prevCursor;
 			break;
 		}
 
 		reader.skipWhitespace();
 
 		if (!reader.canRead()) {
-			reader.reset();
+			reader.cursor = prevCursor;
 			break;
 		}
 
@@ -133,16 +133,14 @@ export function readDuration(reader: StringReader): number | null {
 		const ms = durationToMS(length, unit);
 
 		if (ms === null) {
-			reader.reset();
+			reader.cursor = prevCursor;
 			break;
 		}
 
 		total ??= 0;
 		total += ms;
 
-		reader.unmark();
-
-		reader.mark();
+		prevCursor = reader.cursor;
 		reader.skipOver(DURATION_SEPARATOR);
 	}
 

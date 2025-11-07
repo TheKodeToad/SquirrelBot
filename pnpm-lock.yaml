@@ -29,8 +29,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       oceanic.js:
-        specifier: github:OceanicJS/Oceanic#6f7323950137151c4ebe285dcaf835c360c322a8
-        version: https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8
+        specifier: ~1.13.0
+        version: 1.13.0
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -1193,9 +1193,8 @@ packages:
   oceanic-component-helper@1.0.1:
     resolution: {integrity: sha512-wQQgT6nit6JL0H/T9NQGBpYt5NmXjZSv8btqECkT2/1FypboTVkFV32ellcSniNsI4gsR694eZ8OnPBn59oJNg==}
 
-  oceanic.js@https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8:
-    resolution: {tarball: https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8}
-    version: 1.12.0
+  oceanic.js@1.13.0:
+    resolution: {integrity: sha512-WXE8KhAZI9Fv/OsD+mEYMnRq363XfDHlPLiYe52SF+ND7+HyUxYuhBxDhPx2DqXUuC7fiB4ocxiMZGvlvHLVCQ==}
     engines: {node: '>=18.13.0'}
 
   optionator@0.9.4:
@@ -2581,7 +2580,7 @@ snapshots:
 
   oceanic-component-helper@1.0.1: {}
 
-  oceanic.js@https://codeload.github.com/OceanicJS/Oceanic/tar.gz/6f7323950137151c4ebe285dcaf835c360c322a8:
+  oceanic.js@1.13.0:
     dependencies:
       tslib: 2.8.1
       ws: 8.18.3

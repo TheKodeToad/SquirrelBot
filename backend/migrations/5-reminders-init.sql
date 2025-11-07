@@ -1,9 +1,9 @@
 CREATE TABLE "reminders_reminders" (
-	"guildID" NUMERIC(20, 0) NOT NULL,
+	"guildID" SNOWFLAKE NOT NULL,
 	"number" INT NOT NULL,
 
-	"ownerID" NUMERIC(20, 0) NOT NULL,
-	"channelID" NUMERIC(20, 0) NOT NULL,
+	"ownerID" SNOWFLAKE NOT NULL,
+	"channelID" SNOWFLAKE NOT NULL,
 
 	"createdAt" TIMESTAMPTZ NOT NULL,
 	"firesAt" TIMESTAMPTZ NOT NULL,

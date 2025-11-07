@@ -21,10 +21,16 @@ export default defineCommand({
 			required: true,
 			position: 0,
 		},
+		duration: {
+			type: OptionType.Duration,
+			name: ["duration", "d", "for"],
+			position: 1,
+			skipIfInvalid: true,
+		},
 		reason: {
 			type: OptionType.String,
 			name: ["reason", "r"],
-			position: 1,
+			position: 2,
 		},
 		dm: {
 			type: OptionType.Flag,
@@ -58,6 +64,7 @@ export default defineCommand({
 			guild: context.guild,
 
 			type: ModEventType.Ban,
+			expiresAt: args.duration !== null ? new Date(Date.now() + args.duration) : undefined,
 
 			actor: context.member,
 			target: target,

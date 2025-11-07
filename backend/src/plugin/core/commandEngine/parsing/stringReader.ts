@@ -2,16 +2,14 @@ const WORD_END_PATTERN = /\s/g;
 const WHITESPACE_EATER_PATTERN = /\s+/y;
 
 export class StringReader {
-	private _input: string;
+	input: string;
 	// TODO: track the next item instead of the current?
-	private _cursor: number;
-	private _markedCursor: number | null;
+	cursor: number;
 	private _ops: number;
 
 	constructor(input: string) {
-		this._input = input;
-		this._cursor = -1;
-		this._markedCursor = null;
+		this.input = input;
+		this.cursor = -1;
 		this._ops = 100_000;
 	}
 
@@ -21,15 +19,15 @@ export class StringReader {
 	}
 
 	private _canRead(offset = 1): boolean {
-		const i = this._cursor + offset;
-		return i >= 0 && i < this._input.length;
+		const i = this.cursor + offset;
+		return i >= 0 && i < this.input.length;
 	}
 
 	private _read(): string {
 		if (!this._canRead())
 			throw new Error("canRead() = false");
 
-		return this._input[++this._cursor]!;
+		return this.input[++this.cursor]!;
 	}
 
 	canRead(offset = 1): boolean {
@@ -50,27 +48,7 @@ export class StringReader {
 		if (!this._canRead(offset))
 			throw new Error(`canRead(${offset}) = false`);
 
-		return this._input[this._cursor + offset]!;
-	}
-
-	mark(): void {
-		if (this._markedCursor !== null)
-			throw new Error("Already marked");
-
-		this._markedCursor = this._cursor;
-	}
-
-	unmark(): void {
-		this._markedCursor = null;
-	}
-
-	reset(): void {
-		if (this._markedCursor === null)
-			throw new Error("No mark set");
-
-		this._cursor = this._markedCursor;
-
-		this._markedCursor = null;
+		return this.input[this.cursor + offset]!;
 	}
 
 	readUntil(pattern: string | RegExp): string {
@@ -78,26 +56,26 @@ export class StringReader {
 
 		this._read();
 
-		let endIndex = this._input.length;
+		let endIndex = this.input.length;
 
 		if (pattern instanceof RegExp) {
 			if (!pattern.global)
 				throw new Error("Non-global RegExp passed");
 
-			pattern.lastIndex = this._cursor;
-			const match = pattern.exec(this._input);
+			pattern.lastIndex = this.cursor;
+			const match = pattern.exec(this.input);
 
 			if (match !== null)
 				endIndex = match.index;
 		} else {
-			const match = this._input.indexOf(pattern, this._cursor);
+			const match = this.input.indexOf(pattern, this.cursor);
 
 			if (match !== -1)
 				endIndex = match;
 		}
 
-		const result = this._input.substring(this._cursor, endIndex);
-		this._cursor = endIndex - 1;
+		const result = this.input.substring(this.cursor, endIndex);
+		this.cursor = endIndex - 1;
 
 		return result;
 	}
@@ -109,45 +87,45 @@ export class StringReader {
 	match(sequence: string | RegExp, offset = 1): boolean {
 		this._trackOp();
 
-		if (this._cursor >= this._input.length)
+		if (this.cursor >= this.input.length)
 			return false;
 
 		if (sequence instanceof RegExp) {
 			if (!sequence.sticky)
 				throw new Error("Non-sticky RegExp passed");
 
-			sequence.lastIndex = this._cursor + offset;
+			sequence.lastIndex = this.cursor + offset;
 
-			const match = sequence.exec(this._input);
+			const match = sequence.exec(this.input);
 			return match !== null;
 		} else
-			return this._input.startsWith(sequence, this._cursor + offset);
+			return this.input.startsWith(sequence, this.cursor + offset);
 	}
 
 	skipOver(sequence: string | RegExp): boolean {
 		this._trackOp();
 
-		if (this._cursor >= this._input.length)
+		if (this.cursor >= this.input.length)
 			return false;
 
 		if (sequence instanceof RegExp) {
 			if (!sequence.sticky)
 				throw new Error("Non-sticky RegExp passed");
 
-			sequence.lastIndex = this._cursor + 1;
-			const match = sequence.exec(this._input);
+			sequence.lastIndex = this.cursor + 1;
+			const match = sequence.exec(this.input);
 
 			if (match === null || match.length === 0)
 				return false;
 
-			this._cursor += match[0].length;
+			this.cursor += match[0].length;
 
 			return true;
 		} else {
-			if (!this._input.startsWith(sequence, this._cursor + 1))
+			if (!this.input.startsWith(sequence, this.cursor + 1))
 				return false;
 
-			this._cursor += sequence.length;
+			this.cursor += sequence.length;
 
 			return true;
 		}

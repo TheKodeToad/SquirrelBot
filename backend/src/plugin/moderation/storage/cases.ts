@@ -6,7 +6,6 @@ export const CaseInfo = z.strictObject({
 	guildID: z.string(),
 	number: z.number(),
 
-	// required since Zod won't allow merged declarations in enums
 	type: z.enum(ModEventType),
 	createdAt: z.date(),
 	expiresAt: z.date().nullable(),
