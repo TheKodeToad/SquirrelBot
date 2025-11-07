@@ -12,7 +12,7 @@ let scheduler: PollingSchedulerHandle<TempBan> | null = null;
 
 export default [onBotInit(beginPollingTempBans)];
 
-function debugFormatTempBan(tempBan: TempBan) {
+function debugFormatTempBan(tempBan: TempBan): string {
 	return `temp ban for @${tempBan.targetID} in ${debugFormatGuildByID(tempBan.guildID)}`;
 }
 
@@ -38,7 +38,7 @@ export function trackNewTempBan(tempBan: TempBan): void {
 	scheduler?.track(tempBan);
 }
 
-export function untrackTempBan(guildID: string, targetID: string) {
+export function untrackTempBan(guildID: string, targetID: string): string {
 	scheduler?.untrack(getTempBanKey(guildID, targetID));
 }
 
@@ -52,7 +52,7 @@ async function trigger(ban: TempBan): Promise<void> {
 
 	try {
 		logger.debug?.(`Lifting expired ban of ${ban.targetID} in ${debugFormatGuild(guild)}`)
-		guild.removeBan(ban.targetID, "Ban expired");
+		await guild.removeBan(ban.targetID, "Ban expired");
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;

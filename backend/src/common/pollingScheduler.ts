@@ -73,7 +73,7 @@ async function poll<T>(state: State<T>): Promise<void> {
 		setRunTimeout(state, task);
 }
 
-async function setRunTimeout<T>(state: State<T>, task: T) {
+function setRunTimeout<T>(state: State<T>, task: T): void {
 	const delay = Math.max(0, state.options.getTimestamp(task).getTime() - Date.now());
 
 	logger.debug?.(`Setting up timeout for #${state.options.discriminator} task ${state.options.debugFormat(task)} with delay ${delay}`);
