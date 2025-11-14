@@ -35,7 +35,7 @@ export default defineCommand({
 		await respondWithPaginator<CaseInfo, number>(
 			context,
 			{
-				pageSize: args.compact ? 16 : 4,
+				pageSize: args.compact ? 16 : 3,
 				getKey: entry => entry.number,
 				lookUp: (context, query) => lookUpCases(context, query, args.actorID, args.targetID),
 				render: cases => renderCases(cases, args.compact ?? false),
