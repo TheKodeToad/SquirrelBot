@@ -25,6 +25,8 @@ export interface ModActionFailure {
 	error: string;
 }
 
+
+
 export async function performModAction(action: ModAction): Promise<ModActionResult> {
 	let dmDelivered = false;
 
@@ -45,9 +47,27 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 					throw error;
 			}
 		}
-	}
 
-	const ERR_NOT_A_MEMBER = "User is not a member of the server";
+		switch (action.type) {
+		case ModEventType.Timeout:
+			if (action.target.permissions.has(Permissions.ADMINISTRATOR))
+				return { target: action.target, error: "Member has admin permissions" };
+
+			break;
+		case ModEventType.ClearTimeout:
+			if (action.target.communicationDisabledUntil === null || action.target.communicationDisabledUntil.getTime() < Date.now())
+				return { target: action.target, error: "Member is not muted" };
+
+			break;
+		}
+	} else {
+		switch (action.type) {
+		case ModEventType.Timeout:
+		case ModEventType.ClearTimeout:
+		case ModEventType.Kick:
+			return { target: action.target, error: "User is not a member of the server" };
+		}
+	}
 
 	const performedAt = new Date;
 
@@ -57,34 +77,19 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 		case ModEventType.Warn:
 			break;
 		case ModEventType.Timeout:
-			if (!(action.target instanceof Member))
-				return { target: action.target, error: ERR_NOT_A_MEMBER };
-
-			if (action.target.permissions.has(Permissions.ADMINISTRATOR))
-				return { target: action.target, error: "Member has admin permissions" };
-
-			await action.target.edit({
+			await action.guild.editMember(action.target.id, {
 				communicationDisabledUntil: action.expiresAt?.toISOString() ?? null,
 				reason: action.reason,
 			});
 			break;
 		case ModEventType.ClearTimeout:
-			if (!(action.target instanceof Member))
-				return { target: action.target, error: ERR_NOT_A_MEMBER };
-
-			if (action.target.communicationDisabledUntil === null || action.target.communicationDisabledUntil.getTime() < Date.now())
-				return { target: action.target, error: "Member is not muted" };
-
-			await action.target.edit({
+			await action.guild.editMember(action.target.id, {
 				communicationDisabledUntil: null,
 				reason: action.reason,
 			});
 			break;
 		case ModEventType.Kick:
-			if (!(action.target instanceof Member))
-				return { target: action.target, error: ERR_NOT_A_MEMBER };
-
-			await action.target.kick();
+			await action.guild.removeMember(action.target.id);
 			break;
 		case ModEventType.Ban:
 			await action.guild.createBan(action.target.id, {
