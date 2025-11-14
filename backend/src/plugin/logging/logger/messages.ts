@@ -1,3 +1,4 @@
+import { getDefaultAvatarURL } from "#common/discord/urls.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
@@ -97,7 +98,7 @@ async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 
 			const avatarURL = entry.authorAvatarHash !== null
 				? bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
-				: undefined;
+				: getDefaultAvatarURL(BigInt(entry.authorID));
 
 			return {
 				author: {

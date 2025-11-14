@@ -34,7 +34,7 @@ export function makeUserView(user: User): UserView {
 		get age() { return makeDurationView(Date.now() - user.createdAt.getTime()); },
 		get tag() { return user.tag; },
 		get display_name() { return user.globalName ?? user.tag; },
-		get avatar() { return user.avatarURL() ?? user.defaultAvatarURL(); },
+		get avatar() { return user.avatarURL(); },
 		get global_name() { return this.display_name; },
 		get global_avatar() { return this.avatar; },
 
@@ -56,7 +56,7 @@ export function makeMemberUserView(member: Member): UserView {
 		get age() { return makeDurationView(Date.now() - member.createdAt.getTime()); },
 		get tag() { return member.tag; },
 		get display_name() { return member.displayName; },
-		get avatar() { return member.avatarURL() ?? member.user.defaultAvatarURL(); },
+		get avatar() { return member.avatarURL(); },
 
 		get guild() { return makeGuildView(member.guild); },
 		get joined_at() {
