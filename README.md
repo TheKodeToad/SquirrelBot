@@ -29,6 +29,9 @@ The overall goal is to implement a set of plugins focused on moderation and util
 - [ ] Support for non-English languages
   - is this viable? maybe just for slash commands as localising prefix options would be a nightmare - but so would localising duration parsing
 - [x] Log things properly instead of just using console
+- [ ] Use more standard things
+  - [ ] Use [dbmate](https://github.com/amacneil/dbmate) or something instead of rolling my own sql migration
+  - [ ] Maybe also use a logging library? (eww...)
 - 🚧 Unit testing
 - 🚧 Moderation
   - [x] Ban
