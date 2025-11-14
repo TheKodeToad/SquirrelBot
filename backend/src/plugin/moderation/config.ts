@@ -65,7 +65,7 @@ export const ModerationConfig = z.strictObject({
 	kick: z.strictObject({
 		send_direct_message: z.boolean().default(false),
 		direct_message: messageTemplate(actionParams).prefault({
-			content: "You were kicked from {{server}}:\n{{reason}}"
+			content: "You were kicked in **{{server}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}"
 		}),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure kick behavior"),
@@ -77,6 +77,14 @@ export const ModerationConfig = z.strictObject({
 			duration: DurationView,
 		})).prefault({
 			content: "You were timed out in **{{server}}** for **{{duration}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}"
+		}),
+		preset_reasons: PresetReason.array().default(discordReasons), // TODO
+	}).prefault({}).describe("Configure timeout behavior"),
+
+	remove_timeout: z.strictObject({
+		send_direct_message: z.boolean().default(false),
+		direct_message: messageTemplate(actionParams).prefault({
+			content: "Your timeout was removed in **{{server}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}"
 		}),
 		preset_reasons: PresetReason.array().default(discordReasons), // TODO
 	}).prefault({}).describe("Configure timeout behavior"),

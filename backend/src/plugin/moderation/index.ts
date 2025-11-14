@@ -3,6 +3,7 @@ import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import ban from "#plugin/moderation/command/action/ban.ts";
 import kick from "#plugin/moderation/command/action/kick.ts";
+import removeTimeout from "#plugin/moderation/command/action/removeTimeout.ts";
 import timeout from "#plugin/moderation/command/action/timeout.ts";
 import unban from "#plugin/moderation/command/action/unban.ts";
 import warn from "#plugin/moderation/command/action/warn.ts";
@@ -43,7 +44,7 @@ export default definePlugin({
 		}),
 		...tempBanScheduler,
 
-		ban, unban, kick, timeout, warn, purge, caseShow, caseDelete, caseList,
+		ban, unban, kick, timeout, removeTimeout, warn, purge, caseShow, caseDelete, caseList,
 
 		casesRoutes,
 	]

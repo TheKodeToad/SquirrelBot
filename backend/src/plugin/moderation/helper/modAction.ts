@@ -72,6 +72,9 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 			if (!(action.target instanceof Member))
 				return { target: action.target, error: ERR_NOT_A_MEMBER };
 
+			if (action.target.communicationDisabledUntil === null || action.target.communicationDisabledUntil.getTime() < Date.now())
+				return { target: action.target, error: "Member is not muted" };
+
 			await action.target.edit({
 				communicationDisabledUntil: null,
 				reason: action.reason,
