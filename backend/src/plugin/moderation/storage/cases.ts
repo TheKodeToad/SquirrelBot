@@ -10,6 +10,7 @@ export const CaseInfo = z.strictObject({
 	createdAt: z.date(),
 	expiresAt: z.date().nullable(),
 	shadowedBy: z.number().nullable(),
+	reversed: z.boolean(),
 
 	actorID: z.string(),
 	targetID: z.string(),
@@ -155,7 +156,7 @@ export async function createCase(guildID: string, event: ModEvent): Promise<numb
 
 		const reverseType = reverseModEventType(event.type);
 
-		if (!(reverseType === null || reverseType === ModEventType.Warn || reverseType === ModEventType.Unwarn)) {
+		if (reverseType !== null) {
 			await client.query(
 				`
 					WITH "shadowed" AS (
@@ -170,7 +171,9 @@ export async function createCase(guildID: string, event: ModEvent): Promise<numb
 						LIMIT 1
 					)
 					UPDATE "moderation_cases"
-					SET "shadowedBy" = $1
+					SET
+						"shadowedBy" = $1,
+						"reversed" = ("type" = $4)
 					FROM "shadowed"
 					WHERE
 						"moderation_cases"."guildID" = "shadowed"."guildID"

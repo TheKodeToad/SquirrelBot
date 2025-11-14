@@ -47,9 +47,12 @@ function caseSummaryBase(type: ModEventType, target: string): string {
 export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): Promise<string> {
 	let title = "Case #" + info.number;
 
-	if (info.shadowedBy !== null)
-		title = `~~${title}~~ (refined or reversed by #${info.shadowedBy})`;
-	else if (caseExpired(info))
+	if (info.shadowedBy !== null) {
+		if (info.reversed)
+			title = `~~${title}~~ (reversed by #${info.shadowedBy})`;
+		else
+			title = `~~${title}~~ (refined by #${info.shadowedBy})`;
+	} else if (caseExpired(info))
 		title = `~~${title}~~ (expired)`;
 
 	if (bigTitle)
