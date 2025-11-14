@@ -1,4 +1,3 @@
-import { isSnowflake } from "#common/snowflake.ts";
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
 import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/command.ts";
 
@@ -149,9 +148,6 @@ function validateType(type: OptionType, value: unknown): void {
 	case OptionType.Channel:
 		if (typeof value !== "string")
 			throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
-
-		if (!isSnowflake(value))
-			throw new Error(`isSnowflake('${value}') is false`);
 
 		break;
 	case OptionType.Duration:
