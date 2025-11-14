@@ -39,7 +39,7 @@ async function handleCreate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 			const actor = await fetchMemberCached(guild, entry.userID!);
 
 			return {
-				moderator: makeMemberUserView(actor),
+				actor: makeMemberUserView(actor),
 				role: makeRoleView({
 					id: entry.targetID!,
 					name: changes.name!.new!,
@@ -69,7 +69,7 @@ async function handleUpdate(guild: Guild | Uncached, entry: AuditLogEntry): Prom
 			const actor = await fetchMemberCached(guild, entry.userID!);
 
 			return {
-				moderator: makeMemberUserView(actor),
+				actor: makeMemberUserView(actor),
 				name_changed: changes.name?.new !== undefined,
 				color_changed: changes.color?.new !== undefined,
 				hoisted_changed: changes.hoist?.new !== undefined,
