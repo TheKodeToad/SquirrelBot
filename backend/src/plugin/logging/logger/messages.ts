@@ -65,6 +65,10 @@ async function handleUpdate(message: Message): Promise<void> {
 			if (entry?.content === message.content)
 				return null;
 
+			// discord really loves to spam edit events when viewing old messages
+			if (message.content.length === 0)
+				return null;
+
 			await upsertMessageCacheEntry(message.guild!.id, message.channelID, message.id, {
 				authorID: message.author.id,
 				authorName: message.author.tag,

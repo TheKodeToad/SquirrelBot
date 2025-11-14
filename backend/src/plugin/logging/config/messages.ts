@@ -19,7 +19,7 @@ export const MessageEditEvent = eventConfig(
 			title: "Message Edited",
 			author: { name: "{{author.tag}}", icon_url: "{{author.avatar}}" },
 			fields: [
-				{ name: "Old Content", value: "{{old_message.content}}", },
+				{ name: "Old Content", value: "{{#old_message.content}}{{^old_message.content}}Unknown{{/old_message.content}}", },
 				{ name: "New Content", value: "{{new_message.content}}", }
 			],
 			color: "yellow",
