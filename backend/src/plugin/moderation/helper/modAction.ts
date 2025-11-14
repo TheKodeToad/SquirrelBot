@@ -37,17 +37,6 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 		if (botNeedsPerm(action.type) && !canModerate(MemberRanking.HighestRole, action.guild.clientMember, action.target))
 			return { target: action.target, error: "App lacks permission to moderate the user" };
 
-		if (action.directMessage !== undefined && !action.target.bot) {
-			const dmChannel = await createDMCached(action.target.id);
-			try {
-				await dmChannel.createMessage(action.directMessage);
-				dmDelivered = true;
-			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
-					throw error;
-			}
-		}
-
 		switch (action.type) {
 		case ModEventType.Timeout:
 			if (action.target.permissions.has(Permissions.ADMINISTRATOR))
@@ -59,6 +48,17 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 				return { target: action.target, error: "Member is not muted" };
 
 			break;
+		}
+
+		if (action.directMessage !== undefined && !action.target.bot) {
+			const dmChannel = await createDMCached(action.target.id);
+			try {
+				await dmChannel.createMessage(action.directMessage);
+				dmDelivered = true;
+			} catch (error) {
+				if (!(error instanceof DiscordRESTError))
+					throw error;
+			}
 		}
 	} else {
 		switch (action.type) {
