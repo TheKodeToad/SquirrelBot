@@ -1,6 +1,5 @@
 import { defineGlobalPluginGuildRoutes } from "#http/extensionPoints.ts";
 import { getGuildConfig, updateGuildConfig } from "#plugin/core/storage/configs.ts";
-import { notifyChannel } from "#storage/notification.ts";
 import { HTTPException } from "hono/http-exception";
 
 export default defineGlobalPluginGuildRoutes((plugin, app) => {
@@ -23,13 +22,13 @@ export default defineGlobalPluginGuildRoutes((plugin, app) => {
 		if (!exists)
 			throw new HTTPException(404, { message: "Config does not exist" });
 
-		await notifyChannel(
-			"core_configUpdate",
-			JSON.stringify({
-				guildID: context.var.discordGuildID,
-				pluginID: plugin.id,
-			})
-		);
+		//await notifyChannel(
+		//	"core_configUpdate",
+		//	JSON.stringify({
+		//		guildID: context.var.discordGuildID,
+		//		pluginID: plugin.id,
+		//	})
+		//);
 
 		return context.body(null, 204);
 	});

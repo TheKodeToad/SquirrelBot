@@ -1,4 +1,4 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import { z } from "zod/v4";
 import { ModEventType, reverseModEventType, type ModEvent } from "../public/modEvent.ts";
 
@@ -45,32 +45,31 @@ export interface CaseQuery {
 	limit: number;
 }
 
-const JustNumber = z.strictObject({ number: z.number() });
+const JustCounter = z.strictObject({ counter: z.number() });
 
-export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
+export function getCase(guildID: string, number: number): CaseInfo | null {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			SELECT *
 			FROM "moderation_cases"
 			WHERE "guildID" = $1
 			AND "number" = $2
-		`,
-		[guildID, number]
-	);
+		`
+	).get(guildID, number);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(CaseInfo, result.rows[0]);
+	return dbParse(CaseInfo, result);
 }
 
-export async function getCases(guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
+export function getCases(guildID: string, query: CaseQuery): CaseInfo[] {
 	query.reversed ??= false;
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			SELECT *
 			FROM "moderation_cases"
@@ -91,121 +90,110 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 			)
 			ORDER BY (CASE WHEN $14 THEN -"number" ELSE "number" END) ASC
 			LIMIT $15
-		`,
-		[
-			guildID,
-			query.numberLessThan,
-			query.numberGreaterThan,
-			query.types,
-			query.createdBefore,
-			query.createdAfter,
-			query.expiresBefore,
-			query.expiresAfter,
-			query.actorIDs,
-			query.targetIDs,
-			query.deleteMessageSecondsLessThan,
-			query.deleteMessageSecondsGreaterThan,
-			query.dmDelivered,
-			query.reversed,
-			query.limit,
-		]
+		`
+	).get(
+		guildID,
+		query.numberLessThan,
+		query.numberGreaterThan,
+		query.types,
+		query.createdBefore,
+		query.createdAfter,
+		query.expiresBefore,
+		query.expiresAfter,
+		query.actorIDs,
+		query.targetIDs,
+		query.deleteMessageSecondsLessThan,
+		query.deleteMessageSecondsGreaterThan,
+		query.dmDelivered,
+		query.reversed,
+		query.limit,
 	);
 
-	return dbParse(CaseInfoArray, result.rows);
+	return dbParse(CaseInfoArray, result);
 }
 
-export async function createCase(guildID: string, event: ModEvent): Promise<number> {
-	// TODO: might have edge cases but it's pretty darn unlikely
+export const createCase = sqlite.transaction((guildID: string, event: ModEvent): number => {
+	const counterResult = sqlite.prepare(
+		`
+			INSERT INTO "moderation_caseNumberCounter" ("guildID", "counter")
+			VALUES (?, 1)
+			ON CONFLICT ("guildID")
+			DO UPDATE SET "counter" = "moderation_caseNumberCounter"."counter" + 1
+			RETURNING "counter"
+		`
+	).get(guildID);
 
-	const client = await postgres.connect();
+	const newNumber = dbParse(JustCounter, counterResult).counter;
 
-	let done = false;
+	sqlite.prepare(
+		`
+			INSERT INTO "moderation_cases" (
+				"guildID",
+				"type",
+				"createdAt",
+				"expiresAt",
+				"actorID",
+				"targetID",
+				"reason",
+				"deleteMessageSeconds",
+				"dmDelivered"
+			)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			RETURNING "number"
+		`,
+	).run(
+		guildID,
+		event.type,
+		event.performedAt,
+		event.expiresAt ?? null,
+		event.actor.id,
+		event.target.id,
+		event.reason ?? null,
+		event.deleteMessageSeconds ?? null,
+		event.dmDelivered ?? null,
+	);
 
-	try {
-		await client.query("BEGIN");
+	const reverseType = reverseModEventType(event.type);
 
-		const result = await client.query(
+	if (reverseType !== null) {
+		sqlite.prepare(
 			`
-				INSERT INTO "moderation_cases" (
-					"guildID",
-					"type",
-					"createdAt",
-					"expiresAt",
-					"actorID",
-					"targetID",
-					"reason",
-					"deleteMessageSeconds",
-					"dmDelivered"
-				)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-				RETURNING "number"
-			`,
-			[
-				guildID,
-				event.type,
-				event.performedAt,
-				event.expiresAt ?? null,
-				event.actor.id,
-				event.target.id,
-				event.reason ?? null,
-				event.deleteMessageSeconds ?? null,
-				event.dmDelivered ?? null,
-			]
-		);
-		const newNumber = dbParse(JustNumber, result.rows[0]).number;
-
-		const reverseType = reverseModEventType(event.type);
-
-		if (reverseType !== null) {
-			await client.query(
-				`
-					WITH "shadowed" AS (
-						SELECT "guildID", "number"
-						FROM "moderation_cases"
-						WHERE
-							"number" != $1
-							AND ("targetID" = $2)
-							AND ("type" = $3 OR "type" = $4)
-							AND ("expiresAt" IS NULL OR "expiresAt" > $5)
-						ORDER BY "number" DESC
-						LIMIT 1
-					)
-					UPDATE "moderation_cases"
-					SET
-						"shadowedBy" = $1,
-						"reversed" = ("type" = $4)
-					FROM "shadowed"
+				WITH "shadowed" AS (
+					SELECT "guildID", "number"
+					FROM "moderation_cases"
 					WHERE
-						"moderation_cases"."guildID" = "shadowed"."guildID"
-						AND "moderation_cases"."number" = "shadowed"."number"
-				`,
-				[newNumber, event.target.id, event.type, reverseType, new Date]
-			);
-		}
-
-		await client.query("COMMIT");
-		done = true;
-
-		return newNumber;
-	} finally {
-		if (!done)
-			await client.query("ROLLBACK");
-
-		client.release();
+						"number" != $newNumber
+						AND ("targetID" = $targetID)
+						AND ("type" = $type OR "type" = $reverseType)
+						AND ("expiresAt" IS NULL OR "expiresAt" > $now)
+					ORDER BY "number" DESC
+					LIMIT 1
+				)
+				UPDATE "moderation_cases"
+				SET
+					"shadowedBy" = $newNumber,
+					"reversed" = ("type" = $reverseType)
+				FROM "shadowed"
+				WHERE
+					"moderation_cases"."guildID" = "shadowed"."guildID"
+					AND "moderation_cases"."number" = "shadowed"."number"
+			`
+		).run(newNumber, event.target.id, event.type, reverseType, new Date);
 	}
-}
 
-export async function deleteCase(guildID: string, number: number): Promise<boolean> {
+	return newNumber;
+});
+
+export function deleteCase(guildID: string, number: number): boolean {
 	if (number < 0 || number >= 2 ** 32)
 		return false;
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "moderation_cases"
 			WHERE "guildID" = $1 AND "number" = $2
-		`,
-		[guildID, number]
-	);
+		`
+	).run(guildID, number);
 
-	return result.rowCount === 1;
+	return result.changes === 1;
 }

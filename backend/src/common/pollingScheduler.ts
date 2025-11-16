@@ -7,7 +7,7 @@ export interface PollingSchedulerOptions<T> {
 	discriminator: string;
 	pollRate: number;
 
-	poll: (startInclusive: Date, endExclusive: Date) => Promise<T[]>;
+	poll: (startInclusive: Date, endExclusive: Date) => T[];
 	run: (task: T) => Promise<void>;
 
 	getKey: (task: T) => string;
@@ -37,7 +37,7 @@ export async function startPollingScheduler<T>(options: PollingSchedulerOptions<
 		timeouts: new Map,
 	};
 
-	await poll(state);
+	poll(state);
 	setInterval(() => poll(state), state.options.pollRate).unref();
 
 	return {
@@ -66,7 +66,7 @@ async function poll<T>(state: State<T>): Promise<void> {
 				+ ` to ${dateToHMSString(end)}`
 	);
 
-	const tasks = await state.options.poll(state.nextStartTimestamp, end);
+	const tasks = state.options.poll(state.nextStartTimestamp, end);
 	state.nextStartTimestamp = end;
 
 	for (const task of tasks)

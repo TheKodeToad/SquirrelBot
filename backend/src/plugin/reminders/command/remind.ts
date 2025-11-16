@@ -35,7 +35,8 @@ export default defineCommand({
 		const now = Date.now();
 		const firesAt = now + args.delay;
 
-		const reminder = await createReminder(context.guild.id, {
+
+		const options = {
 			ownerID: context.user.id,
 			channelID: context.channel.id,
 			channelType: context.channel.type,
@@ -43,14 +44,19 @@ export default defineCommand({
 			firesAt: new Date(firesAt),
 			message: args.message ?? undefined,
 			silent: ((context.message?.flags ?? 0) & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0,
-		});
+		};
+		const number = createReminder(context.guild.id, options);
 
-		trackNewReminder(reminder);
+		trackNewReminder({
+			...options,
+			guildID: context.guild.id,
+			number
+		});
 
 		const firesAtSecs = dateToUnixSecs(firesAt);
 
 		await context.respond(
-			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${reminder.number})!\n`
+			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${number})!\n`
 			+ `${icons.tip} No notification will be sent if you are timed out or not present in the server.`
 		);
 	}

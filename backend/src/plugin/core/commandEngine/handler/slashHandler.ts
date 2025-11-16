@@ -2,7 +2,7 @@ import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
-import { CACHE_PATH } from "#environment.ts";
+import { DATA_PATH } from "#environment.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { type CommandCacheEntry, getCommandByName, getCommands } from "#plugin/core/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
@@ -97,7 +97,7 @@ const PLACEHOLDER_DESCRIPTION = "No description provided.";
 async function syncSlashCommands(): Promise<void> {
 	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(mapCommand);
 
-	const cacheFile = path.resolve(CACHE_PATH, "core_syncSlashCommandsHash.bin");
+	const cacheFile = path.resolve(DATA_PATH, "core_syncSlashCommandsHash.bin");
 
 	const newHash = new Uint8Array(await crypto.subtle.digest("sha-1", new TextEncoder().encode(JSON.stringify(commands))));
 

@@ -1,66 +1,62 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import { z } from "zod/v4";
 
 const JustValueSchema = z.strictObject({ value: z.string() });
 
-export async function getGuildConfig(guildID: string, pluginID: string): Promise<string | null> {
-	const result = await postgres.query(
+export function getGuildConfig(guildID: string, pluginID: string): string | null {
+	const result = sqlite.prepare(
 		`
 			SELECT "value"
 			FROM "core_guildConfigs"
-			WHERE "guildID" = $1 AND "pluginID" = $2
-		`,
-		[guildID, pluginID]
-	);
+			WHERE "guildID" = ? AND "pluginID" = ?
+		`
+	).get(guildID, pluginID);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(JustValueSchema, result.rows[0]).value;
+	return dbParse(JustValueSchema, result).value;
 }
 
 export async function insertGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",
 				"pluginID",
 				"value"
 			)
-			VALUES ($1, $2, $3)
+			VALUES (?, ?, ?)
 			ON CONFLICT ("guildID", "pluginID") DO NOTHING
-		`,
-		[guildID, pluginID, value]
-	);
+		`
+	).run(guildID, pluginID, value);
 
-	return result.rowCount === 1;
+	return result.changes === 1;
 }
 
 export async function updateGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			UPDATE "core_guildConfigs"
-			SET "value" = $3
-			WHERE "guildID" = $1 AND "pluginID" = $2
-		`,
-		[guildID, pluginID, value]
-	);
+			SET "value" = ?
+			WHERE "guildID" = ? AND "pluginID" = ?
+		`
+	).run(value, guildID, pluginID);
 
-	return result.rowCount === 1;
+	return result.changes === 1;
 }
 
 export async function upsertGuildConfig(guildID: string, pluginID: string, value: string): Promise<void> {
-	await postgres.query(
+	sqlite.prepare(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",
 				"pluginID",
 				"value"
 			)
-			VALUES ($1, $2, $3)
+			VALUES ($guildID, $pluginID, $value)
 			ON CONFLICT ("guildID", "pluginID")
-			DO UPDATE SET "value" = $3
-		`,
-		[guildID, pluginID, value]
-	);
+			DO UPDATE SET "value" = $value
+		`
+	).run({ guildID, pluginID, value });
 }

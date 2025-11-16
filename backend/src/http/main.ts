@@ -6,7 +6,7 @@ import frontend from "#http/route/frontend.ts";
 import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
 import { loadPlugins } from "#loader/index.ts";
 import { preMain, setupGracefulShutdown } from "#setup.ts";
-import { postgres } from "#storage/index.ts";
+import { sqlite } from "#storage/index.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -60,7 +60,7 @@ async function beginDeleteTokenLoop(): Promise<void> {
 	try {
 		logger.debug?.("Deleting expired tokens");
 
-		const deletedCount = await deleteExpiredTokens();
+		const deletedCount = deleteExpiredTokens();
 
 		logger.debug?.(`Deleted ${deletedCount} tokens`);
 	} finally {
@@ -81,6 +81,5 @@ setupGracefulShutdown(async () => {
 		else
 			resolve();
 	}));
-
-	await postgres.end();
+	sqlite.close();
 });

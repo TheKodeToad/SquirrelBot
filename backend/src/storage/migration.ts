@@ -1,6 +1,6 @@
 /* eslint no-console: 0 */
 
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
@@ -39,12 +39,12 @@ class MigrationError extends Error {
 const JustChecksumBuffer = z.strictObject({ checksum: z.instanceof(Buffer) });
 
 async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
-	await postgres.query(`
+	sqlite.prepare(`
 		CREATE TABLE IF NOT EXISTS "migration_files" (
 			"number" INT NOT NULL PRIMARY KEY,
 			"checksum" BYTEA NOT NULL
 		)
-	`);
+	`).run();
 
 	let runCount = 0;
 	const files: string[] = [];
@@ -75,14 +75,13 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 		if (file === undefined)
 			throw new MigrationError(`Migration files are missing or numbers were skipped`);
 
-		const { rows } = await postgres.query(
+		const rows = sqlite.prepare(
 			`
 				SELECT "checksum"
 				FROM "migration_files"
-				WHERE "number" = $1
-			`,
-			[number]
-		);
+				WHERE "number" = ?
+			`
+		).all(number);
 
 		const content = await fs.readFile(file, "utf-8");
 		const contentChecksum = crypto.createHash("sha1").update(content).digest();
@@ -96,14 +95,13 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 
 				if (ignoreChanges) {
 					console.warn(message);
-					await postgres.query(
+					sqlite.prepare(
 						`
 							UPDATE "migration_files"
-							SET "checksum" = $2
-							WHERE "number" = $1
-						`,
-						[number, contentChecksum]
-					);
+							SET "checksum" = ?
+							WHERE "number" = ?
+						`
+					).run(contentChecksum, number);
 					continue;
 				} else
 					throw new MigrationError(message + " - you may bypass this with pnpm migration perform --ignore-changes");
@@ -124,30 +122,20 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 
 		console.log(`Running file "${file}"`);
 
-		const client = await postgres.connect();
-
-		let done = false;
-		try {
-
-			await client.query("BEGIN");
-
-			await client.query(content);
-			await client.query(
+		let run = () => {
+			sqlite.exec(content);
+			sqlite.prepare(
 				`
 					INSERT INTO "migration_files" ("number", "checksum")
-					VALUES ($1, $2)
-				`,
-				[number, contentChecksum]
-			);
-
-			await client.query("COMMIT");
-			done = true;
-		} finally {
-			if (!done)
-				await client.query("ROLLBACK");
-
-			client.release();
+					VALUES (?, ?)
+				`
+			).run(number, contentChecksum);
 		}
+
+		if (!content.startsWith("-- no-transaction"))
+			run = sqlite.transaction(run);
+
+		run();
 	}
 
 	return runCount;

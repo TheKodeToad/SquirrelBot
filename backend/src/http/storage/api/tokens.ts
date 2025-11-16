@@ -1,5 +1,5 @@
 import { DAY } from "#common/time.ts";
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import crypto from "crypto";
 import { z } from "zod/v4";
 
@@ -18,7 +18,7 @@ export async function generateToken(userID: string): Promise<[token: string, exp
 
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret));
 
-	await postgres.query(
+	sqlite.prepare(
 		`
 			INSERT INTO "api_tokens" (
 				"userID",
@@ -26,9 +26,8 @@ export async function generateToken(userID: string): Promise<[token: string, exp
 				"expiresAt"
 			)
 			VALUES ($1, $2, $3)
-		`,
-		[userID, hash, expiresAt]
-	);
+		`
+	).run(userID, hash, expiresAt);
 
 	return [BigInt(userID).toString(16) + "." + secret.toString("hex"), expiresAt];
 }
@@ -69,40 +68,37 @@ export async function validateToken(token: string): Promise<string | null> {
 	if (key === null)
 		return null;
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			SELECT "userID", "expiresAt"
 			FROM "api_tokens"
 			WHERE "userID" = $1 AND "hash" = $2
-		`,
-		key
-	);
+		`
+	).all(key);
 
-	if (result.rowCount !== 1)
+	if (result.length !== 1)
 		return null;
 
-	const { expiresAt, userID } = dbParse(TokenInfo, result.rows[0]);
+	const { expiresAt, userID } = dbParse(TokenInfo, result[0]);
 
 	if (Date.now() >= expiresAt.getTime()) {
-		await postgres.query(
+		sqlite.prepare(
 			`
 				DELETE FROM "api_tokens"
 				WHERE "userID" = $1 AND "hash" = $2
-			`,
-			key
-		);
+			`
+		).run(key);
 		return null;
 	}
 
 	if (Date.now() - expiresAt.getTime() >= TOKEN_REFRESH_THRESHOLD) {
-		await postgres.query(
+		sqlite.prepare(
 			`
 				UPDATE "api_tokens"
 				SET "expiresAt" = $1
 				WHERE "userID" = $2 AND "hash" = $3
-			`,
-			[new Date(Date.now() + TOKEN_LIFETIME), userID, key[1]]
-		);
+			`
+		).run(new Date(Date.now() + TOKEN_LIFETIME), userID, key[1]);
 	}
 
 	return userID;
@@ -114,25 +110,23 @@ export async function deleteToken(token: string): Promise<boolean> {
 	if (key === null)
 		return false;
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "api_tokens"
 			WHERE "userID" = $1 AND "hash" = $2
-		`,
-		key
-	);
+		`
+	).run(key);
 
-	return result.rowCount === 1;
+	return result.changes === 1;
 }
 
-export async function deleteExpiredTokens(): Promise<number> {
-	const result = await postgres.query(
+export function deleteExpiredTokens(): number {
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "api_tokens"
 			WHERE "expiresAt" <= $1
-		`,
-		[new Date]
-	);
+		`
+	).run(new Date);
 
-	return result.rowCount ?? 0;
+	return result.changes;
 }

@@ -1,8 +1,8 @@
-import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
-import pg from "pg";
+import { DATA_PATH, INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
+import Database from 'better-sqlite3';
 import { z } from "zod/v4";
 
-export const postgres = new pg.Pool;
+export const sqlite = new Database(DATA_PATH + "/db.sqlite3");
 
 export function dbParse<T extends z.ZodType>(type: T, input: unknown): z.infer<T> {
 	if (INTERNAL_TYPE_INTEGRITY)

@@ -1,6 +1,6 @@
 /* eslint no-console: 0 */
 
-import { postgres } from "#storage/index.ts";
+import { sqlite } from "#storage/index.ts";
 import { checkMigrations, migrate } from "#storage/migration.ts";
 
 const [_runtime, _script, command, ...args] = process.argv;
@@ -8,7 +8,7 @@ const [_runtime, _script, command, ...args] = process.argv;
 switch (command) {
 case "perform": {
 	const count = await migrate(args.includes("--ignore-changes"));
-	await postgres.end();
+	sqlite.close();
 
 	if (count > 0)
 		console.log(`Done ${count} migrations!`);
@@ -19,7 +19,7 @@ case "perform": {
 }
 case "check": {
 	const count = await checkMigrations();
-	await postgres.end();
+	sqlite.close();
 
 	if (count > 0) {
 		console.error(`${count} migrations needed!`);

@@ -1,4 +1,4 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import z from "zod/v4";
 
 const MessageCacheEntry = z.strictObject({
@@ -21,14 +21,14 @@ interface CreateMessageCacheEntryOptions {
 	content: string;
 }
 
-export async function upsertMessageCacheEntry(
+export function upsertMessageCacheEntry(
 	guildID: string,
 	channelID: string,
 	id: string,
 	entry: CreateMessageCacheEntryOptions
-): Promise<void> {
+): void {
 	// TODO check whether this works properly
-	await postgres.query(
+	sqlite.prepare(
 		`
 			INSERT INTO "logging_messageCache" (
 				"guildID",
@@ -40,56 +40,71 @@ export async function upsertMessageCacheEntry(
 				"authorAvatarHash",
 				"content"
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			VALUES (
+				$guildID,
+				$channelID,
+				$id,
+				$lastUpdated,
+				$authorID,
+				$authorName,
+				$authorAvatarHash,
+				$content
+			)
 			ON CONFLICT ("guildID", "channelID", "id")
 				DO UPDATE
-					SET "authorID" = $5, "authorName" = $6, "authorAvatarHash" = $7, "content" = $8
-					WHERE "logging_messageCache"."lastUpdated" <= $4
-		`,
-		[guildID, channelID, id, new Date, entry.authorID, entry.authorName, entry.authorAvatarHash, entry.content]
-	);
+					SET
+						"authorID" = $authorID,
+						"authorName" = $authorName,
+						"authorAvatarHash" = $authorAvatarHash,
+						"content" = $content
+					WHERE "logging_messageCache"."lastUpdated" <= $lastUpdated
+		`
+	).run({
+		guildID,
+		channelID,
+		id,
+		lastUpdated: new Date,
+		...entry
+	});
 }
 
 export async function getMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 
 		`
 			SELECT * FROM "logging_messageCache"
-			WHERE "guildID" = $1 AND "channelID" = $2 AND "id" = $3
-		`,
-		[guildID, channelID, id]
-	);
+			WHERE "guildID" = ? AND "channelID" = ? AND "id" = ?
+		`
+	).get(guildID, channelID, id);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(MessageCacheEntry, result.rows[0]);
+	return dbParse(MessageCacheEntry, result);
 }
 
 export async function takeMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "logging_messageCache"
-			WHERE "guildID" = $1 AND "channelID" = $2 AND "id" = $3
+			WHERE "guildID" = ? AND "channelID" = ? AND "id" = ?
 			RETURNING *
-		`,
-		[guildID, channelID, id]
-	);
+		`
+	).get(guildID, channelID, id);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(MessageCacheEntry, result.rows[0]);
+	return dbParse(MessageCacheEntry, result);
 }
 
 export async function cleanUpMessageCacheEntries(threshold: Date): Promise<number> {
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "logging_messageCache"
-			WHERE "lastUpdated" <= $1
+			WHERE "lastUpdated" <= ?
 		`,
-		[threshold]
-	);
+	).run(threshold);
 
-	return result.rowCount ?? 0;
+	return result.changes;
 }

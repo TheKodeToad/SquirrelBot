@@ -1,4 +1,4 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
 import { z } from "zod/v4";
 
@@ -44,76 +44,78 @@ export interface ReminderQuery {
 	limit: number;
 }
 
-const JustNumberSchema = z.strictObject({ number: z.number() });
+const JustCounter = z.strictObject({ counter: z.number() });
 
-export async function getReminder(guildID: string, number: number): Promise<Reminder | null> {
+export function getReminder(guildID: string, number: number): Reminder | null {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			SELECT * FROM "reminders_reminders"
 			WHERE
-				"guildID" = $1
-				AND "number" = $2
-		`,
-		[guildID, number]
-	);
+				"guildID" = ?
+				AND "number" = ?
+		`
+	).get(guildID, number);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(Reminder, result.rows[0]);
+	return dbParse(Reminder, result);
 }
 
-export async function getReminders(guildID: string, query: ReminderQuery): Promise<Reminder[]> {
-	const result = await postgres.query(
+export function getReminders(guildID: string, query: ReminderQuery): Reminder[] {
+	const result = sqlite.prepare(
 		`
 			SELECT * FROM "reminders_reminders"
 			WHERE
-				"guildID" = $1
-				AND ("ownerID" = $2 OR $2 IS NULL)
-				AND ("channelID" = $3 OR $3 IS NULL)
-				AND ("firesAt" < $4 OR $4 IS NULL)
-				AND ("firesAt" > $5 OR $5 IS NULL)
+				"guildID" = $guildID
+				AND ("ownerID" = $ownerID OR $ownerID IS NULL)
+				AND ("channelID" = $channelID OR $channelID IS NULL)
+				AND ("firesAt" < $firesBefore OR $firesBefore IS NULL)
+				AND ("firesAt" > $firesAfter OR $firesAfter IS NULL)
 			ORDER BY
-				(CASE WHEN $6 THEN "firesAt" END) DESC,
-				(CASE WHEN NOT $6 THEN "firesAt" END) ASC
-			LIMIT $7
-		`,
-		[
-			guildID,
-			query.ownerID,
-			query.channelID,
-			query.firesBefore,
-			query.firesAfter,
-			query.reversed,
-			query.limit,
-		]
-	);
+				(CASE WHEN $reversed THEN "firesAt" END) DESC,
+				(CASE WHEN NOT $reversed THEN "firesAt" END) ASC
+			LIMIT $limit
+		`
+	).all({ guildID, ...query });
 
-	return dbParse(ReminderArray, result.rows);
+	return dbParse(ReminderArray, result);
 }
 
-export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: Date): Promise<Reminder[]> {
-	const result = await postgres.query(
+export function getRemindersByFiresAt(startInclusive: Date, endExclusive: Date): Reminder[] {
+	const result = sqlite.prepare(
 		`
 			SELECT *
 			FROM "reminders_reminders"
-			WHERE "firesAt" >= $1 AND "firesAt" < $2
-		`,
-		[startInclusive, endExclusive]
-	);
+			WHERE "firesAt" >= ? AND "firesAt" < ?
+		`
+	).all(startInclusive, endExclusive);
 
-	return dbParse(ReminderArray, result.rows);
+	return dbParse(ReminderArray, result);
 }
 
-export async function createReminder(guildID: string, options: CreateReminderOptions): Promise<Reminder> {
+export const createReminder = sqlite.transaction((guildID: string, options: CreateReminderOptions): number => {
+	const counterResult = sqlite.prepare(
+		`
+			INSERT INTO "reminders_" ("guildID", "counter")
+			VALUES (?, 1)
+			ON CONFLICT ("guildID")
+			DO UPDATE SET "counter" = "moderation_caseNumberCounter"."counter" + 1
+			RETURNING "counter"
+		`
+	).get(guildID);
+
+	const newNumber = dbParse(JustCounter, counterResult).counter;
+
 	options.createdAt ??= new Date;
 
-	const result = await postgres.query(
+	sqlite.prepare(
 		`
 			INSERT INTO "reminders_reminders" (
+				"number",
 				"guildID",
 				"ownerID",
 				"channelID",
@@ -123,36 +125,31 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 				"message",
 				"silent"
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			VALUES (
+				$newNumber,
+				$guildID,
+				$ownerID,
+				$channelID,
+				$channelType,
+				$createdAt,
+				$firesAt,
+				$message,
+				$silent
+			)
 			RETURNING "number"
-		`,
-		[
-			guildID,
-			options.ownerID,
-			options.channelID,
-			options.channelType,
-			options.createdAt,
-			options.firesAt,
-			options.message ?? null,
-			options.silent,
-		]
-	);
+		`
+	).run({ newNumber, guildID, ...options });
 
-	return {
-		guildID,
-		number: dbParse(JustNumberSchema, result.rows[0]).number,
-		...options
-	} satisfies Reminder;
-}
+	return newNumber;
+});
 
-export async function deleteReminder(guildID: string, number: number): Promise<boolean> {
-	const result = await postgres.query(
+export function deleteReminder(guildID: string, number: number): boolean {
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "reminders_reminders"
-			WHERE "guildID" = $1 AND "number" = $2
-		`,
-		[guildID, number]
-	);
+			WHERE "guildID" = ? AND "number" = ?
+		`
+	).run(guildID, number);
 
-	return result.rowCount === 1;
-};
+	return result.changes === 1;
+}

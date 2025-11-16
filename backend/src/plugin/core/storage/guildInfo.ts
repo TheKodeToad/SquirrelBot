@@ -1,4 +1,4 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import { z } from "zod/v4";
 
 const GuildInfo = z.strictObject({
@@ -27,8 +27,8 @@ export interface APIGuildInfo extends z.output<typeof APIGuildInfo> { }
 
 const JustOwnerID = z.strictObject({ ownerID: z.string() });
 
-export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
-	const result = await postgres.query(
+export function getGuildInfo(id: string): GuildInfo | null {
+	const result = sqlite.prepare(
 		`
 			SELECT
 				"id",
@@ -38,22 +38,21 @@ export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 				"allowed",
 				"deleteAt"
 			FROM "core_guildInfo"
-			WHERE "id" = $1
-		`,
-		[id]
-	);
+			WHERE "id" = ?
+		`
+	).get(id);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(GuildInfo, result.rows[0]);
+	return dbParse(GuildInfo, result);
 }
 
 /**
  * Only use for caching purposes!
  */
-export async function getAllGuildInfo(): Promise<GuildInfo[]> {
-	const result = await postgres.query(
+export function getAllGuildInfo(): GuildInfo[] {
+	const result = sqlite.prepare(
 		`
 			SELECT
 				"id",
@@ -64,29 +63,28 @@ export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 				"deleteAt"
 			FROM "core_guildInfo"
 		`
-	);
+	).all();
 
-	return dbParse(GuildInfoArray, result.rows);
+	return dbParse(GuildInfoArray, result);
 }
 
-export async function getGuildOwnerID(id: string): Promise<string | null> {
-	const result = await postgres.query(
+export function getGuildOwnerID(id: string): string | null {
+	const result = sqlite.prepare(
 		`
 			SELECT "ownerID"
 			FROM "core_guildInfo"
-			WHERE "id" = $1
-		`,
-		[id]
-	);
+			WHERE "id" = ?
+		`
+	).get(id);
 
-	if (result.rowCount !== 1)
+	if (result === undefined)
 		return null;
 
-	return dbParse(JustOwnerID, result.rows[0]).ownerID;
+	return dbParse(JustOwnerID, result).ownerID;
 }
 
-export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildInfo[]> {
-	const result = await postgres.query(
+export function getAPIGuildInfoByOwner(ownerID: string): APIGuildInfo[] {
+	const result = sqlite.prepare(
 		`
 			SELECT
 				"id",
@@ -94,41 +92,38 @@ export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildI
 				"iconHash",
 				"ownerID"
 			FROM "core_guildInfo"
-			WHERE "ownerID" = $1
+			WHERE "ownerID" = ?
 			ORDER BY "name" ASC
-		`,
-		[ownerID]
-	);
+		`
+	).all(ownerID);
 
-	return dbParse(APIGuildInfoArray, result.rows);
+	return dbParse(APIGuildInfoArray, result);
 }
 
-export async function deleteGuildInfo(id: string): Promise<void> {
-	await postgres.query(
+export function deleteGuildInfo(id: string): void {
+	sqlite.prepare(
 		`
 			DELETE FROM "core_guildInfo"
-			WHERE "id" = $1
+			WHERE "id" = ?
 		`,
-		[id]
-	);
+	).run(id);
 }
 
-export async function updateGuildInfo(id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
-	await postgres.query(
+export function updateGuildInfo(id: string, name: string, iconHash: string | null, ownerID: string | null): void {
+	sqlite.prepare(
 		`
 			UPDATE "core_guildInfo"
 			SET
-				"name" = $2,
-				"iconHash" = $3,
-				"ownerID" = $4
-			WHERE "id" = $1
+				"name" = ?,
+				"iconHash" = ?,
+				"ownerID" = ?
+			WHERE "id" = ?
 		`,
-		[id, name, iconHash, ownerID]
-	);
+	).run(name, iconHash, ownerID, id);
 }
 
-export async function insertGuildInfo(id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
-	const result = await postgres.query(
+export function insertGuildInfo(id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): boolean {
+	const result = sqlite.prepare(
 		`
 			INSERT INTO "core_guildInfo" (
 				"id",
@@ -137,16 +132,15 @@ export async function insertGuildInfo(id: string, name: string | null, iconHash:
 				"ownerID",
 				"allowed"
 			)
-			VALUES ($1, $2, $3, $4, $5)
-		`,
-		[id, name, iconHash, ownerID, allowed]
-	);
+			VALUES (?, ?, ?, ?, ?)
+		`
+	).run(id, name, iconHash, ownerID, allowed);
 
-	return result.rowCount === 1;
+	return result.changes === 1;
 }
 
-export async function markGuildAllowed(id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
-	await postgres.query(
+export function markGuildAllowed(id: string, name: string | null, iconHash: string | null, ownerID: string | null): void {
+	sqlite.prepare(
 		`
 			INSERT INTO "core_guildInfo" (
 				"id",
@@ -155,83 +149,77 @@ export async function markGuildAllowed(id: string, name: string | null, iconHash
 				"ownerID",
 				"allowed"
 			)
-			VALUES ($1, $2, $3, $4, TRUE)
+			VALUES ($id, $name, $iconHash, $ownerID, TRUE)
 			ON CONFLICT ("id") DO UPDATE SET
-				"name" = $2,
-				"iconHash" = $3,
-				"ownerID" = $4,
+				"name" = $name,
+				"iconHash" = $iconHash,
+				"ownerID" = $ownerID,
 				"allowed" = TRUE,
 				"deleteAt" = NULL
-		`,
-		[id, name, iconHash, ownerID]
-	);
+		`
+	).run({ id, name, iconHash, ownerID });
 }
 
-export async function markUnknownGuildAllowed(id: string): Promise<void> {
-	await postgres.query(
+export function markUnknownGuildAllowed(id: string): void {
+	sqlite.prepare(
 		`
 			INSERT INTO "core_guildInfo" ("id", "allowed")
-			VALUES ($1, TRUE)
+			VALUES (?, TRUE)
 			ON CONFLICT ("id") DO UPDATE SET
 				"allowed" = TRUE,
 				"deleteAt" = NULL
-		`,
-		[id]
-	);
+		`
+	).run(id);
 }
 
-export async function markGuildNotAllowed(id: string): Promise<void> {
-	await postgres.query(
+export function markGuildNotAllowed(id: string): void {
+	sqlite.prepare(
 		`
 			UPDATE "core_guildInfo"
 			SET "allowed" = FALSE
-			WHERE "id" = $1
-		`,
-		[id]
-	);
+			WHERE "id" = ?
+		`
+	).run(id);
 }
 
-export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null> {
+export function scheduleGuildInfoDeletion(id: string): Date | null {
 	const date = new Date;
 	date.setDate(date.getDate() + 30);
 
-	const result = await postgres.query(
+	const result = sqlite.prepare(
 		`
 			UPDATE "core_guildInfo"
 			SET
 				"allowed" = FALSE,
-				"deleteAt" = $2
+				"deleteAt" = ?
 			WHERE
-				"id" = $1
+				"id" = ?
 				AND "deleteAt" IS NULL
-		`,
-		[id, date]
-	);
+		`
+	).run(date, id);
 
-	if (result.rowCount !== 0)
+	if (result.changes !== 0)
 		return date;
 	else
 		return null;
 }
 
-export async function cancelGuildInfoDeletion(id: string): Promise<void> {
-	await postgres.query(
+export function cancelGuildInfoDeletion(id: string): void {
+	sqlite.prepare(
 		`
 			UPDATE "core_guildInfo"
 			SET "deleteAt" = NULL
-			WHERE "id" = $1
-		`,
-		[id]
-	);
+			WHERE "id" = ?
+		`
+	).run(id);
 }
 
 // TODO: use this darn thing!
 export async function deleteExpiredGuildInfo(): Promise<void> {
-	await postgres.query(
+	sqlite.prepare(
 		`
 			DELETE FROM "core_guildInfo"
-			WHERE "deleteAt" <= $1
-		`,
-		[new Date]
-	);
+			WHERE "deleteAt" <= ?
+		`
+	).run(new Date);
 }

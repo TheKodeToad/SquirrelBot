@@ -1,13 +1,11 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { mapIterable, type Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { getPlugin } from "#loader/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
-import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/guildInfoSync.ts";
+import { getAllowedGuilds, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
-import { addChannelListener } from "#storage/notification.ts";
 import AsyncLock from "async-lock";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { z } from "zod/v4";
@@ -36,62 +34,62 @@ function formatGuildPlugin(guildID: string, pluginID: string): string {
 }
 
 async function installConfigChangeListener(): Promise<void> {
-	await addChannelListener("core_configUpdate", async payload => {
-		if (payload === undefined)
-			return;
-
-		try {
-			var payloadObject: unknown = JSON.parse(payload);
-		} catch (error) {
-			if (!(error instanceof SyntaxError))
-				throw error;
-
-			logger.warn?.("Malformed JSON in configUpdate payload", error);
-			return;
-		}
-
-		if (typeof payloadObject !== "object" || payloadObject === null) {
-			logger.warn?.("configUpdate payload is not an object");
-			return;
-		}
-
-		if (!("pluginID" in payloadObject && "guildID" in payloadObject)) {
-			logger.warn?.("configUpdate payload does not contain pluginID and guildID");
-			return;
-		}
-
-		const { guildID, pluginID } = payloadObject;
-
-		if (!(typeof guildID === "string" && typeof pluginID === "string")) {
-			logger.warn?.("configUpdate payload contains non string values");
-			return;
-		}
-
-		if (!isGuildAllowed(guildID)) {
-			logger.debug?.(`${debugFormatGuildByID(guildID)} not allowed; not updating config`);
-			return;
-		}
-
-		await acquireConfig(guildID, pluginID, async () => {
-			const plugin = getPlugin(pluginID);
-
-			if (plugin === undefined) {
-				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not exist`);
-				return;
-			}
-
-			const config = defineConfig.contributions.get(plugin);
-
-			if (config === undefined) {
-				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not have a config`);
-				return;
-			}
-
-			logger.debug?.(`Updating config for plugin ${formatGuildPlugin(guildID, pluginID)}`);
-
-			await loadConfig(guildID, plugin.id, config.store);
-		});
-	});
+	//await addChannelListener("core_configUpdate", async payload => {
+	//	if (payload === undefined)
+	//		return;
+	//
+	//	try {
+	//		var payloadObject: unknown = JSON.parse(payload);
+	//	} catch (error) {
+	//		if (!(error instanceof SyntaxError))
+	//			throw error;
+	//
+	//		logger.warn?.("Malformed JSON in configUpdate payload", error);
+	//		return;
+	//	}
+	//
+	//	if (typeof payloadObject !== "object" || payloadObject === null) {
+	//		logger.warn?.("configUpdate payload is not an object");
+	//		return;
+	//	}
+	//
+	//	if (!("pluginID" in payloadObject && "guildID" in payloadObject)) {
+	//		logger.warn?.("configUpdate payload does not contain pluginID and guildID");
+	//		return;
+	//	}
+	//
+	//	const { guildID, pluginID } = payloadObject;
+	//
+	//	if (!(typeof guildID === "string" && typeof pluginID === "string")) {
+	//		logger.warn?.("configUpdate payload contains non string values");
+	//		return;
+	//	}
+	//
+	//	if (!isGuildAllowed(guildID)) {
+	//		logger.debug?.(`${debugFormatGuildByID(guildID)} not allowed; not updating config`);
+	//		return;
+	//	}
+	//
+	//	await acquireConfig(guildID, pluginID, async () => {
+	//		const plugin = getPlugin(pluginID);
+	//
+	//		if (plugin === undefined) {
+	//			logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not exist`);
+	//			return;
+	//		}
+	//
+	//		const config = defineConfig.contributions.get(plugin);
+	//
+	//		if (config === undefined) {
+	//			logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not have a config`);
+	//			return;
+	//		}
+	//
+	//		logger.debug?.(`Updating config for plugin ${formatGuildPlugin(guildID, pluginID)}`);
+	//
+	//		await loadConfig(guildID, plugin.id, config.store);
+	//	});
+	//});
 }
 
 async function createAndLoadConfigs(guildID: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse, sqlite } from "#storage/index.ts";
 import z from "zod/v4";
 
 const TempBan = z.object({
@@ -19,21 +19,20 @@ export interface CreateTimerOptions {
 	caseNumber?: number;
 }
 
-export async function getTempBansByEndsAt(startInclusive: Date, endExclusive: Date): Promise<TempBan[]> {
-	const result = await postgres.query(
+export function getTempBansByEndsAt(startInclusive: Date, endExclusive: Date): TempBan[] {
+	const result = sqlite.prepare(
 		`
 			SELECT *
 			FROM "moderation_tempBans"
-			WHERE "endsAt" >= $1 AND "endsAt" < $2
-		`,
-		[startInclusive, endExclusive]
-	);
+			WHERE "endsAt" >= ? AND "endsAt" < ?
+		`
+	).all(startInclusive, endExclusive);
 
-	return dbParse(TempBanArray, result.rows);
+	return dbParse(TempBanArray, result);
 }
 
-export async function upsertTempBan(guildID: string, options: CreateTimerOptions): Promise<void> {
-	await postgres.query(
+export function upsertTempBan(guildID: string, options: CreateTimerOptions): void {
+	sqlite.prepare(
 		`
 			INSERT INTO "moderation_tempBans" (
 				"guildID",
@@ -41,25 +40,23 @@ export async function upsertTempBan(guildID: string, options: CreateTimerOptions
 				"endsAt",
 				"caseNumber"
 			)
-			VALUES ($1, $2, $3, $4)
+			VALUES ($guildID, $targetID, $endsAt, $caseNumber)
 			ON CONFLICT ("guildID", "targetID")
-			DO UPDATE SET "endsAt" = $3, "caseNumber" = $4
+			DO UPDATE SET "endsAt" = $endsAt, "caseNumber" = $caseNumber
 
-		`,
-		[guildID, options.targetID, options.endsAt, options.caseNumber]
-	)
+		`
+	).run({ guildID: guildID, options });
 }
 
-export async function deleteTempBan(guildID: string, targetID: string): Promise<boolean> {
-	const result = await postgres.query(
+export function deleteTempBan(guildID: string, targetID: string): boolean {
+	const result = sqlite.prepare(
 		`
 			DELETE FROM "moderation_tempBans"
 			WHERE
-				"guildID" = $1
-				AND "targetID" = $2
-		`,
-		[guildID, targetID]
-	)
+				"guildID" = ?
+				AND "targetID" = ?
+		`
+	).run(guildID, targetID);
 
-	return result.rowCount === 1;
+	return result.changes === 1;
 }

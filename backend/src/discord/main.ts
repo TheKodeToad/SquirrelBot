@@ -1,18 +1,17 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
-import { CACHE_PATH } from "#environment.ts";
+import { DATA_PATH } from "#environment.ts";
 import { loadPlugins } from "#loader/index.ts";
 import { preMain, setupGracefulShutdown } from "#setup.ts";
-import { postgres } from "#storage/index.ts";
-import { connectChannelListener, disconnectChannelListener } from "#storage/notification.ts";
+import { sqlite } from "#storage/index.ts";
 import { mkdir } from "node:fs/promises";
 
 await preMain();
 
 const logger = moduleLogger();
 
-await mkdir(CACHE_PATH, { recursive: true });
+await mkdir(DATA_PATH, { recursive: true });
 
 bot.once("ready", async () => {
 	try {
@@ -34,8 +33,8 @@ bot.once("ready", async () => {
 	setupGracefulShutdown(async () => {
 		bot.disconnect(false);
 
-		disconnectChannelListener();
-		await postgres.end();
+		//disconnectChannelListener();
+		sqlite.close();
 	});
 });
 
@@ -65,7 +64,7 @@ bot.on("warn", (info, shard) => {
 });
 
 logger.info?.("Connecting Postgres listener");
-await connectChannelListener();
+//await connectChannelListener();
 
 logger.info?.("Connecting to Discord");
 await bot.connect();

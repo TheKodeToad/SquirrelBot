@@ -22,7 +22,7 @@ export const LOG_LEVEL = logLevelByName(process.env["LOG_LEVEL"] || "info") ?? L
  */
 export const INTERNAL_TYPE_INTEGRITY = parseBoolean(process.env["INTERNAL_TYPE_INTEGRITY"]) ?? true;
 
-export const CACHE_PATH = process.env["CACHE_PATH"] ?? "./cache";
+export const DATA_PATH = process.env["DATA_PATH"] ?? "./run";
 
 function parseBoolean(string: string | undefined): boolean | undefined {
 	if (string === undefined)

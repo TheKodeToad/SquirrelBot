@@ -1,4 +1,9 @@
 packages:
-  - "backend"
-  - "frontend"
+  - backend
+  - frontend
 shellEmulator: true
+ignoredBuiltDependencies:
+  - better-sqlite3
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild

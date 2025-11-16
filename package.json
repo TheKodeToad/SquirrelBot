@@ -8,5 +8,10 @@
 		"typecheck": "pnpm --stream run -r typecheck",
 		"lint": "pnpm --stream run -r lint",
 		"test": "pnpm --stream run -r test"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"better-sqlite3"
+		]
 	}
 }

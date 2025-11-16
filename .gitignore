@@ -3,4 +3,4 @@ out/
 .env
 .idea/
 /frontend/static/app.js
-/backend/cache/
+/backend/run/
