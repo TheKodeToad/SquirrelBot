@@ -1,4 +1,8 @@
 packages:
-  - "backend"
-  - "frontend"
+  - backend
+  - frontend
+
+onlyBuiltDependencies:
+  - '@swc/core'
+
 shellEmulator: true

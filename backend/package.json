@@ -10,12 +10,13 @@
 		"migration": "pnpm run _node src/storage/main.ts",
 		"typecheck": "tsc",
 		"lint": "eslint",
-		"test": "node --import=./registerSWC.js --enable-source-maps --test src/**/*.test.ts",
-		"_node": "node --env-file=.env --disable-proto=throw --experimental-transform-types"
+		"test": "pnpm run _node --test src/**/*.test.ts",
+		"_node": "node --import=./registerSWC.js --env-file=.env --disable-proto=throw --enable-source-maps"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.4",
 		"@hono/zod-validator": "^0.7.0",
+		"@swc-node/register": "^1.10.10",
 		"async-lock": "^1.4.1",
 		"hono": "^4.9.12",
 		"mousetache": "github:TheKodeToad/mousetache#b34b2ad8f0e19e1f0932a2efe82e1484449beb8b",
@@ -27,7 +28,6 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.30.1",
-		"@swc-node/register": "^1.10.10",
 		"@types/async-lock": "^1.4.2",
 		"@types/node": "^24.7.2",
 		"@types/pg": "^8.15.2",

@@ -8,6 +8,7 @@
 		"verbatimModuleSyntax": true,
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
-		"isolatedModules": true
+		"isolatedModules": true,
+		"inlineSourceMap": true
 	}
 }
