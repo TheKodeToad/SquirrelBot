@@ -11,7 +11,7 @@
 		"typecheck": "tsc",
 		"lint": "eslint",
 		"test": "pnpm run _node --test src/**/*.test.ts",
-		"_node": "node --import=./registerSWC.js --env-file=.env --disable-proto=throw --enable-source-maps"
+		"_node": "node --import=@swc-node/register/esm-register --env-file=.env --disable-proto=throw --enable-source-maps"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.4",
