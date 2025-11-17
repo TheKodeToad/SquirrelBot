@@ -44,7 +44,8 @@ export interface ReminderQuery {
 	limit: number;
 }
 
-const JustNumberSchema = z.strictObject({ number: z.number() });
+const JustNumber = z.strictObject({ number: z.number() });
+const JustOwner = z.strictObject({ owner: z.string() });
 
 export async function getReminder(guildID: string, number: number): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32)
@@ -53,9 +54,7 @@ export async function getReminder(guildID: string, number: number): Promise<Remi
 	const result = await postgres.query(
 		`
 			SELECT * FROM "reminders_reminders"
-			WHERE
-				"guildID" = $1
-				AND "number" = $2
+			WHERE "guildID" = $1 AND "number" = $2
 		`,
 		[guildID, number]
 	);
@@ -140,18 +139,36 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 
 	return {
 		guildID,
-		number: dbParse(JustNumberSchema, result.rows[0]).number,
+		number: dbParse(JustNumber, result.rows[0]).number,
 		...options
 	} satisfies Reminder;
 }
 
 export async function deleteReminder(guildID: string, number: number): Promise<boolean> {
+	if (number < 0 || number >= 2 ** 32)
+		return false;
+
 	const result = await postgres.query(
 		`
 			DELETE FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2
 		`,
 		[guildID, number]
+	);
+
+	return result.rowCount === 1;
+}
+
+export async function deleteReminderIfOwnedBy(guildID: string, number: number, ownerID: string): Promise<boolean> {
+	if (number < 0 || number >= 2 ** 32)
+		return false;
+
+	const result = await postgres.query(
+		`
+			DELETE FROM "reminders_reminders"
+			WHERE "guildID" = $1 AND "number" = $2 AND "ownerID" = $3
+		`,
+		[guildID, number, ownerID]
 	);
 
 	return result.rowCount === 1;

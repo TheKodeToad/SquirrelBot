@@ -4,7 +4,7 @@ import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { untrackReminder } from "#plugin/reminders/scheduler.ts";
-import { deleteReminder } from "#plugin/reminders/storage/reminders.ts";
+import { deleteReminderIfOwnedBy } from "#plugin/reminders/storage/reminders.ts";
 
 export default defineCommand({
 	name: ["remindercancel", "cancelreminder"],
@@ -22,13 +22,12 @@ export default defineCommand({
 
 	preRun: context => permissionsGuard(context, remindersConfigStore, permissions => permissions.personal_reminders),
 	async run(context, { number }) {
-		const deleted = await deleteReminder(context.guild.id, number);
+		const deleted = await deleteReminderIfOwnedBy(context.guild.id, number, context.user.id);
 
-		untrackReminder(context.guild.id, number);
-
-		if (deleted)
+		if (deleted) {
+			untrackReminder(context.guild.id, number);
 			await context.respond(`${icons.success} Canceled reminder **#${number}**!`);
-		else
+		} else
 			await context.respond(`${icons.error} Reminder **#${number}** was not found!`);
 	}
 });

@@ -9,7 +9,7 @@ import { onBotInit } from "#discord/extensionPoints.ts";
 import { bot } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
-import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";
+import { deleteReminder, deleteReminderIfOwnedBy, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";
 import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
 
 const logger = moduleLogger();
