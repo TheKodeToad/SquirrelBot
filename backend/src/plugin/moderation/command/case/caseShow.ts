@@ -21,20 +21,20 @@ export default defineCommand({
 	},
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_read),
-	async run(context, { number }) {
-		const info = await getCase(context.guild.id, number);
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_read),
+	async run(ctx, { number }) {
+		const info = await getCase(ctx.discordCtx.db, ctx.guild.id, number);
 
 		if (info === null) {
-			await context.respond(`${icons.error} Case **#${number}** not found!`);
+			await ctx.respond(`${icons.error} Case **#${number}** not found!`);
 			return;
 		}
 
-		await context.respond({
+		await ctx.respond({
 			components: [Container([
-				Text(await formatCaseDescription(info, true)),
+				Text(await formatCaseDescription(ctx.bot, info, true)),
 				Divider(),
-				Text(await formatCaseFields(info)),
+				Text(await formatCaseFields(ctx.bot, info)),
 			])]
 		});
 	},

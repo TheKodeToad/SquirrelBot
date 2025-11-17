@@ -8,6 +8,7 @@ import reminderList from "#plugin/reminders/command/reminderList.ts";
 import { RemindersConfig } from "#plugin/reminders/config.ts";
 import scheduler from "#plugin/reminders/scheduler.ts";
 import type { Reminder } from "#plugin/reminders/storage/reminders.ts";
+import type { Client } from "oceanic.js";
 
 const defaultConfig = `enabled = false
 
@@ -38,6 +39,6 @@ export default definePlugin({
 	],
 });
 
-export function debugFormatReminder(reminder: Reminder): string {
-	return `#${reminder.number} in ${debugFormatGuildByID(reminder.guildID)}`;
+export function debugFormatReminder(bot: Client, reminder: Reminder): string {
+	return `#${reminder.number} in ${debugFormatGuildByID(bot, reminder.guildID)}`;
 }

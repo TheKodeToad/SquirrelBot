@@ -22,22 +22,22 @@ export default defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, coreConfigStore, permissions => permissions.help_command),
-	async run(context, args) {
+	async run(ctx, args) {
 		if (args.command !== null) {
 			const command = getCommandByName(args.command);
 
 			if (command === undefined) {
-				await context.respond(`${icons.error} No command named '${args.command}'!`);
+				await ctx.respond(`${icons.error} No command named '${args.command}'!`);
 				return;
 			}
 
-			await context.respond(renderCommandPage(context.guild.id, command));
+			await ctx.respond(renderCommandPage(ctx.guild.id, command));
 			return;
 		}
 
-		if (context.ephemeral ?? false)
-			await context.respond(renderCommandListPage(context, { page: 0, plugin: "core" }));
+		if (ctx.ephemeral ?? false)
+			await ctx.respond(renderCommandListPage(ctx, { page: 0, plugin: "core" }));
 		else
-			await context.respond(renderCommandListPageMinimal(context.guild.id));
+			await ctx.respond(renderCommandListPageMinimal(ctx.discordCtx, ctx.guild.id));
 	},
 });

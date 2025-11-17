@@ -1,22 +1,25 @@
 import type { Awaitable } from "#common/general.ts";
-import { postgres } from "#storage/index.ts";
-import type { PoolClient } from "pg";
-
-let listenerClient: PoolClient | null = null;
-const listenersLookup: Map<string, Listener[]> = new Map;
+import type { Pool } from "pg";
 
 export type Listener = (payload: string | undefined) => Awaitable<void>;
 
-export async function connectChannelListener(): Promise<void> {
-	listenerClient = await postgres.connect();
-	await listenerClient.query(
+export interface NotifDispatcher {
+	addListener(channel: string, listener: Listener): Promise<void>;
+	disconnect(): void;
+}
+
+export async function connectNotifDispatcher(pool: Pool): Promise<NotifDispatcher> {
+	const client = await pool.connect();
+	const listenersLookup: Map<string, Listener[]> = new Map;
+
+	await client.query(
 		`
 			CREATE FUNCTION pg_temp.listen(channel TEXT) RETURNS VOID
 			AS $$ BEGIN EXECUTE format('LISTEN %I', channel); END $$
 			LANGUAGE plpgsql
 		`
 	);
-	listenerClient.on("notification", notification => {
+	client.on("notification", notification => {
 		const listeners = listenersLookup.get(notification.channel);
 
 		if (listeners === undefined)
@@ -24,25 +27,21 @@ export async function connectChannelListener(): Promise<void> {
 
 		listeners.forEach(listener => listener(notification.payload));
 	});
+
+	return {
+		async addListener(channel, listener) {
+			const listeners = listenersLookup.get(channel);
+
+			if (listeners === undefined) {
+				await client.query("SELECT pg_temp.listen($1)", [channel]);
+				listenersLookup.set(channel, [listener]);
+			} else
+				listeners.push(listener);
+		},
+		disconnect: client.release
+	};
 }
 
-export function disconnectChannelListener(): void {
-	listenerClient?.release();
-}
-
-export async function addChannelListener(channel: string, listener: Listener): Promise<void> {
-	if (listenerClient === null)
-		throw new Error("connectListener() not called");
-
-	const listeners = listenersLookup.get(channel);
-
-	if (listeners === undefined) {
-		await listenerClient.query("SELECT pg_temp.listen($1)", [channel]);
-		listenersLookup.set(channel, [listener]);
-	} else
-		listeners.push(listener);
-}
-
-export async function notifyChannel(channel: string, payload: string): Promise<void> {
-	await postgres.query("SELECT pg_notify($1, $2)", [channel, payload]);
+export async function notifyChannel(pool: Pool, channel: string, payload: string): Promise<void> {
+	await pool.query("SELECT pg_notify($1, $2)", [channel, payload]);
 }

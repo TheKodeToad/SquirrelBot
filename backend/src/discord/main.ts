@@ -1,16 +1,29 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import { bot } from "#discord/index.ts";
-import { CACHE_PATH } from "#environment.ts";
-import { loadPlugins } from "#loader/index.ts";
+import { BOT_TOKEN, CACHE_PATH } from "#environment.ts";
+import { createContext, shutdownContext } from "#loader/index.ts";
 import { preMain, setupGracefulShutdown } from "#setup.ts";
-import { postgres } from "#storage/index.ts";
-import { connectChannelListener, disconnectChannelListener } from "#storage/notification.ts";
 import { mkdir } from "node:fs/promises";
+import { Client, Constants } from "oceanic.js";
 
-await preMain();
+preMain();
 
 const logger = moduleLogger();
+const loaderCtx = await createContext();
+
+const bot = new Client({
+	auth: `Bot ${BOT_TOKEN}`,
+	gateway: {
+		intents:
+			Constants.AllNonPrivilegedIntents
+			| Constants.Intents.MESSAGE_CONTENT
+			| Constants.Intents.GUILD_MEMBERS,
+		lookupDisallowedIntents: true,
+	},
+
+	allowedMentions: {},
+});
+const ctx = { ...loaderCtx, bot };
 
 await mkdir(CACHE_PATH, { recursive: true });
 
@@ -18,12 +31,8 @@ bot.once("ready", async () => {
 	try {
 		logger.debug?.("Ready event received");
 
-		logger.info?.("Starting up plugins");
-
-		await loadPlugins();
-
 		logger.debug?.("Firing onBotInit");
-		await onBotInit.fire();
+		await onBotInit.fire(ctx);
 
 		logger.info?.("I'm ready :O");
 	} catch (error) {
@@ -33,9 +42,7 @@ bot.once("ready", async () => {
 
 	setupGracefulShutdown(async () => {
 		bot.disconnect(false);
-
-		disconnectChannelListener();
-		await postgres.end();
+		shutdownContext(ctx);
 	});
 });
 
@@ -63,9 +70,6 @@ bot.on("warn", (info, shard) => {
 	else
 		logger.warn?.(`Oceanic warning: ${info}`);
 });
-
-logger.info?.("Connecting Postgres listener");
-await connectChannelListener();
 
 logger.info?.("Connecting to Discord");
 await bot.connect();

@@ -1,4 +1,5 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
+import type { Pool } from "pg";
 import z from "zod/v4";
 
 const TempBan = z.object({
@@ -19,8 +20,8 @@ export interface CreateTimerOptions {
 	caseNumber?: number;
 }
 
-export async function getTempBansByEndsAt(startInclusive: Date, endExclusive: Date): Promise<TempBan[]> {
-	const result = await postgres.query(
+export async function getTempBansByEndsAt(db: Pool, startInclusive: Date, endExclusive: Date): Promise<TempBan[]> {
+	const result = await db.query(
 		`
 			SELECT *
 			FROM "moderation_tempBans"
@@ -32,8 +33,8 @@ export async function getTempBansByEndsAt(startInclusive: Date, endExclusive: Da
 	return dbParse(TempBanArray, result.rows);
 }
 
-export async function upsertTempBan(guildID: string, options: CreateTimerOptions): Promise<void> {
-	await postgres.query(
+export async function upsertTempBan(db: Pool, guildID: string, options: CreateTimerOptions): Promise<void> {
+	await db.query(
 		`
 			INSERT INTO "moderation_tempBans" (
 				"guildID",
@@ -50,8 +51,8 @@ export async function upsertTempBan(guildID: string, options: CreateTimerOptions
 	)
 }
 
-export async function deleteTempBan(guildID: string, targetID: string): Promise<boolean> {
-	const result = await postgres.query(
+export async function deleteTempBan(db: Pool, guildID: string, targetID: string): Promise<boolean> {
+	const result = await db.query(
 		`
 			DELETE FROM "moderation_tempBans"
 			WHERE

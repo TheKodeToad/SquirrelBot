@@ -1,6 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSecs } from "#common/time.ts";
-import { bot } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/guildInfoSync.ts";
 import { OptionType, type CommandContext } from "#plugin/core/public/command.ts";
@@ -8,8 +7,8 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 
 // for now
-function checkForMe(context: CommandContext): boolean {
-	return context.user.id === "706152404072267788";
+function checkForMe(ctx: CommandContext): boolean {
+	return ctx.user.id === "706152404072267788";
 }
 
 const grantAccessCommand = defineCommand({
@@ -27,13 +26,13 @@ const grantAccessCommand = defineCommand({
 	},
 
 	preRun: checkForMe,
-	async run(context, args) {
-		const guildName = bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
+	async run(ctx, args) {
+		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
 
-		if (await grantAccess(args.guild))
-			await context.respond(`${icons.success} Granted access to **${escapeMarkdown(guildName)}**!`);
+		if (await grantAccess(ctx.discordCtx, args.guild))
+			await ctx.respond(`${icons.success} Granted access to **${escapeMarkdown(guildName)}**!`);
 		else
-			await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** already has access to the app!`);
+			await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** already has access to the app!`);
 	},
 });
 
@@ -52,28 +51,28 @@ const revokeAccessCommand = defineCommand({
 	},
 
 	preRun: checkForMe,
-	async run(context, args) {
-		const guildName = bot.guilds.get(args.guild)?.name ?? "<unknown>";
+	async run(ctx, args) {
+		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown>";
 
-		const result = await revokeAccess(args.guild);
+		const result = await revokeAccess(ctx.discordCtx, args.guild);
 
 		if (result !== false) {
 			if (result instanceof Date)
-				await context.respond(
+				await ctx.respond(
 					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
 					+ `Plugin data will be purged on <t:${dateToUnixSecs(result)}:d>.`
 				);
 			else
-				await context.respond(
+				await ctx.respond(
 					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
 					+ "The server might still have access if it is configured in the environment."
 				);
 
 		} else {
 			if (BOT_ALLOWED_GUILDS.includes(args.guild))
-				await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** cannot be removed as it is configured in the app's environment!`);
+				await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** cannot be removed as it is configured in the app's environment!`);
 			else
-				await context.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** does not have access to the app!`);
+				await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** does not have access to the app!`);
 		}
 	},
 });

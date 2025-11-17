@@ -1,4 +1,4 @@
-import { OptionType, type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import { OptionType, type BaseCommandContext, type ReplyObject } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
@@ -8,6 +8,7 @@ import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } fro
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { getCases, type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
+import type { Client } from "oceanic.js";
 
 export default defineCommand({
 	name: ["caselist", "casesearch", "cases", "listcases", "searchcases"],
@@ -31,36 +32,36 @@ export default defineCommand({
 	trackUpdates: true,
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_read),
-	async run(context, args) {
+	async run(ctx, args) {
 		await respondWithPaginator<CaseInfo, number>(
-			context,
+			ctx,
 			{
 				pageSize: args.compact ? 16 : 3,
 				getKey: entry => entry.number,
 				lookUp: (context, query) => lookUpCases(context, query, args.actorID, args.targetID),
-				render: cases => renderCases(cases, args.compact ?? false),
+				render: cases => renderCases(ctx.bot, cases, args.compact ?? false),
 			}
 		);
 	},
 });
 
 async function lookUpCases(
-	context: BaseContext,
+	ctx: BaseCommandContext,
 	query: PaginatorQuery<number>,
 	actorID: string | null,
 	targetID: string | null
 ): Promise<CaseInfo[]> {
-	const config = moderationConfigStore.get(context.guild.id);
+	const config = moderationConfigStore.get(ctx.guild.id);
 
 	if (config === undefined)
 		return [];
 
-	const permissions = resolvePermissions(config, context.member, context.channel);
+	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
 	if (!permissions.case_read)
 		return [];
 
-	return await getCases(context.guild.id, {
+	return await getCases(ctx.discordCtx.db, ctx.guild.id, {
 		actorIDs: actorID !== null ? [actorID] : undefined,
 		targetIDs: targetID !== null ? [targetID] : undefined,
 		limit: query.limit,
@@ -71,7 +72,7 @@ async function lookUpCases(
 	});
 }
 
-async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
+async function renderCases(bot: Client, cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
 	const container = Container([Text("## Cases")]);
 
 	if (cases.length === 0) {
@@ -83,14 +84,14 @@ async function renderCases(cases: CaseInfo[], compact: boolean): Promise<ReplyOb
 		let content = "";
 
 		for (const info of cases)
-			content += await formatCompactCaseSummary(info) + "\n";
+			content += await formatCompactCaseSummary(bot, info) + "\n";
 
 		container.components.push(Text(content));
 	} else {
 		for (const info of cases) {
 			container.components.push(Divider());
-			container.components.push(Text(await formatCaseDescription(info, false)));
-			container.components.push(Text(await formatCaseFields(info)));
+			container.components.push(Text(await formatCaseDescription(bot, info, false)));
+			container.components.push(Text(await formatCaseFields(bot, info)));
 		}
 	}
 

@@ -1,22 +1,23 @@
 /* eslint no-console: 0 */
 
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import { z } from "zod/v4";
 import "../environment.ts";
+import type { ClientBase } from "pg";
 
-export async function migrate(ignoreChanges: boolean): Promise<number> {
-	return await processMigrations(false, ignoreChanges);
+export async function migrate(db: ClientBase, ignoreChanges: boolean): Promise<number> {
+	return await _processMigrations(db, false, ignoreChanges);
 }
 
-export async function checkMigrations(): Promise<number> {
-	return await processMigrations(true, false);
+export async function checkMigrations(db: ClientBase): Promise<number> {
+	return await _processMigrations(db, true, false);
 }
 
-export async function checkMigrationsOrExit(): Promise<void> {
-	const migrationsNeeded = await checkMigrations();
+export async function checkMigrationsOrExit(db: ClientBase): Promise<void> {
+	const migrationsNeeded = await checkMigrations(db);
 
 	if (migrationsNeeded === null)
 		process.exit(1);
@@ -38,8 +39,8 @@ class MigrationError extends Error {
 
 const JustChecksumBuffer = z.strictObject({ checksum: z.instanceof(Buffer) });
 
-async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
-	await postgres.query(`
+async function _processMigrations(client: ClientBase, checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
+	await client.query(`
 		CREATE TABLE IF NOT EXISTS "migration_files" (
 			"number" INT NOT NULL PRIMARY KEY,
 			"checksum" BYTEA NOT NULL
@@ -75,7 +76,7 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 		if (file === undefined)
 			throw new MigrationError(`Migration files are missing or numbers were skipped`);
 
-		const { rows } = await postgres.query(
+		const { rows } = await client.query(
 			`
 				SELECT "checksum"
 				FROM "migration_files"
@@ -96,7 +97,7 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 
 				if (ignoreChanges) {
 					console.warn(message);
-					await postgres.query(
+					await client.query(
 						`
 							UPDATE "migration_files"
 							SET "checksum" = $2
@@ -124,8 +125,6 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 
 		console.log(`Running file "${file}"`);
 
-		const client = await postgres.connect();
-
 		let done = false;
 		try {
 
@@ -145,8 +144,6 @@ async function processMigrations(checkOnly: boolean, ignoreChanges: boolean): Pr
 		} finally {
 			if (!done)
 				await client.query("ROLLBACK");
-
-			client.release();
 		}
 	}
 

@@ -1,27 +1,27 @@
 import { APP_NAME } from "#brand.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import type { Awaitable } from "#common/general.ts";
-import { bot } from "#discord/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#plugin/logging/storage/webhooks.ts";
 import AsyncLock from "async-lock";
 import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
 
-export async function logViaWebhook(channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
-	return acquireWebhook(channel, async ({ webhookID, token }) => {
+export async function logViaWebhook(ctx: DiscordContext, channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
+	return acquireWebhook(ctx, channel, async ({ webhookID, token }) => {
 		if (isThreadChannel(channel))
 			message.threadID = channel.id;
 
-		await bot.rest.webhooks.execute(webhookID, token, message);
+		await channel.client.rest.webhooks.execute(webhookID, token, message);
 	});
 }
 
 const webhookLock = new AsyncLock();
 
-async function acquireWebhook(channel: AnyTextableGuildChannel, action: (auth: WebhookAuth) => Awaitable<void>): Promise<void> {
+async function acquireWebhook(ctx: DiscordContext, channel: AnyTextableGuildChannel, action: (auth: WebhookAuth) => Awaitable<void>): Promise<void> {
 	return webhookLock.acquire(channel.id, async () => {
 		const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
 
-		const existingWebhook = await getLoggingWebhook(channel.guildID, channel.id);
+		const existingWebhook = await getLoggingWebhook(ctx.db, channel.guildID, channel.id);
 
 		if (existingWebhook !== null) {
 			try {
@@ -48,9 +48,9 @@ async function acquireWebhook(channel: AnyTextableGuildChannel, action: (auth: W
 		const auth: WebhookAuth = { webhookID: webhook.id, token: webhook.token! };
 
 		if (existingWebhook !== null)
-			await updateLoggingWebhook(channel.guildID, channel.id, auth);
+			await updateLoggingWebhook(ctx.db, channel.guildID, channel.id, auth);
 		else
-			await insertLoggingWebhook(channel.guildID, channel.id, auth);
+			await insertLoggingWebhook(ctx.db, channel.guildID, channel.id, auth);
 
 		await action(auth);
 	});

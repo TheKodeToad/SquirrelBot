@@ -1,3 +1,4 @@
+import type { DiscordContext } from "#discord/index.ts";
 import type { LoggerConfig } from "#plugin/logging/config/index.ts";
 import { makeModEventView } from "#plugin/logging/config/modEvents.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
@@ -8,7 +9,7 @@ export default [
 	onModAction(handleModAction)
 ];
 
-async function handleModAction(event: ModEvent): Promise<void> {
+async function handleModAction(ctx: DiscordContext, event: ModEvent): Promise<void> {
 	let key: keyof LoggerConfig["events"];
 
 	switch (event.type) {
@@ -28,5 +29,5 @@ async function handleModAction(event: ModEvent): Promise<void> {
 		return;
 	}
 
-	await logEvent(event.guild, null, key, () => makeModEventView(event));
+	await logEvent(ctx, event.guild, null, key, () => makeModEventView(event));
 }

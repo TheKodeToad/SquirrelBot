@@ -36,23 +36,23 @@ export default defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.kick),
-	async run(context, args, { config }) {
+	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage: CreateMessageOptions | undefined =
 			sendDirectMessage ?
 				config.kick.direct_message.render({
-					server: makeGuildView(context.guild),
-					moderator: makeUserView(context.user),
+					server: makeGuildView(ctx.guild),
+					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
 				})
 				: undefined;
 
-		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
-			guild: context.guild,
+		const { successful, unsuccessful } = await performModActions(ctx.discordCtx, ctx.guild, args.user, target => ({
+			guild: ctx.guild,
 
 			type: ModEventType.Kick,
 
-			actor: context.member,
+			actor: ctx.member,
 			target,
 			ranking: config.member_ranking,
 
@@ -63,23 +63,23 @@ export default defineCommand({
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Kicked ${formatModActionSuccess(successful[0]!)}!`);
+				await ctx.respond(`${icons.success} Kicked ${formatModActionSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not kick ${formatModActionFailure(unsuccessful[0]!)}!`);
+				await ctx.respond(`${icons.error} Could not kick ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.success} Kicked all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.error} None of **${args.user.length} users** were kicked:\n${unsuccessfulMessage}`
 				);
 			} else {
-				await context.respond(
+				await ctx.respond(
 					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were kicked!\n`
 					+ `Successful kicks:\n${successfulMessage}\n`
 					+ `Unsuccessful kicks:\n${unsuccessfulMessage}`

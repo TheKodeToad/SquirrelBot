@@ -1,14 +1,14 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { mapIterable, type Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { getPlugin } from "#loader/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
-import { addChannelListener } from "#storage/notification.ts";
 import AsyncLock from "async-lock";
+import type { Client } from "oceanic.js";
 import { parse as parseToml, TomlError } from "smol-toml";
 import { z } from "zod/v4";
 
@@ -17,12 +17,12 @@ const logger = moduleLogger();
 export default [
 	onGuildInfoReady(init),
 	onGuildAccessGranted(createAndLoadConfigs),
-	onGuildAccessRevoked(unloadConfigs),
+	onGuildAccessRevoked((_, ctx) => unloadConfigs(ctx)),
 ];
 
-async function init(): Promise<void> {
-	await Promise.all(mapIterable(getAllowedGuilds(), createAndLoadConfigs));
-	await installConfigChangeListener();
+async function init(ctx: DiscordContext): Promise<void> {
+	await Promise.all(mapIterable(getAllowedGuilds(), guildID => createAndLoadConfigs(ctx, guildID)));
+	await installConfigChangeListener(ctx);
 }
 
 const configUpdateLock = new AsyncLock;
@@ -31,12 +31,12 @@ function acquireConfig<T>(guildID: string, pluginID: string, action: () => Await
 	return configUpdateLock.acquire(guildID + "::" + pluginID, action);
 }
 
-function formatGuildPlugin(guildID: string, pluginID: string): string {
-	return `#${pluginID} in ${debugFormatGuildByID(guildID)}`;
+function formatGuildPlugin(bot: Client, guildID: string, pluginID: string): string {
+	return `#${pluginID} in ${debugFormatGuildByID(bot, guildID)}`;
 }
 
-async function installConfigChangeListener(): Promise<void> {
-	await addChannelListener("core_configUpdate", async payload => {
+async function installConfigChangeListener(ctx: DiscordContext): Promise<void> {
+	await ctx.dbNotifs.addListener("core_configUpdate", async payload => {
 		if (payload === undefined)
 			return;
 
@@ -68,12 +68,12 @@ async function installConfigChangeListener(): Promise<void> {
 		}
 
 		if (!isGuildAllowed(guildID)) {
-			logger.debug?.(`${debugFormatGuildByID(guildID)} not allowed; not updating config`);
+			logger.debug?.(`${debugFormatGuildByID(ctx.bot, guildID)} not allowed; not updating config`);
 			return;
 		}
 
 		await acquireConfig(guildID, pluginID, async () => {
-			const plugin = getPlugin(pluginID);
+			const plugin = ctx.plugins.get(pluginID);
 
 			if (plugin === undefined) {
 				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not exist`);
@@ -87,22 +87,22 @@ async function installConfigChangeListener(): Promise<void> {
 				return;
 			}
 
-			logger.debug?.(`Updating config for plugin ${formatGuildPlugin(guildID, pluginID)}`);
+			logger.debug?.(`Updating config for plugin ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`);
 
-			await loadConfig(guildID, plugin.id, config.store);
+			await loadConfig(ctx, guildID, plugin.id, config.store);
 		});
 	});
 }
 
-async function createAndLoadConfigs(guildID: string): Promise<void> {
+async function createAndLoadConfigs(ctx: DiscordContext, guildID: string): Promise<void> {
 	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
 			await acquireConfig(guildID, plugin.id, async () => {
-				const inserted = await insertGuildConfig(guildID, plugin.id, config.defaultValue);
+				const inserted = await insertGuildConfig(ctx.db, guildID, plugin.id, config.defaultValue);
 
 				if (inserted)
-					logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(guildID)}`);
+					logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(ctx.bot, guildID)}`);
 
-				await loadConfig(guildID, plugin.id, config.store);
+				await loadConfig(ctx, guildID, plugin.id, config.store);
 			});
 	}));
 }
@@ -115,8 +115,8 @@ async function unloadConfigs(guildID: string): Promise<void> {
 
 const coreConfigDefault = CoreConfig.parse({} satisfies z.input<typeof CoreConfig>);
 
-async function loadConfig(guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
-	const value = await parseConfig(guildID, pluginID, configStore);
+async function loadConfig(ctx: DiscordContext, guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
+	const value = await parseConfig(ctx, guildID, pluginID, configStore);
 
 	if (value !== null)
 		configStore.set(guildID, value);
@@ -128,8 +128,8 @@ async function loadConfig(guildID: string, pluginID: string, configStore: Config
 	}
 }
 
-async function parseConfig(guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
-	const rawValue = await getGuildConfig(guildID, pluginID);
+async function parseConfig(ctx: DiscordContext, guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
+	const rawValue = await getGuildConfig(ctx.db, guildID, pluginID);
 
 	if (rawValue === null)
 		return null;
@@ -140,14 +140,14 @@ async function parseConfig(guildID: string, pluginID: string, configCache: Confi
 		if (!(error instanceof TomlError))
 			logger.error?.("Unexpected error parsing TOML (bug)", error);
 		else
-			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatGuildPlugin(guildID, pluginID)}`, error);
+			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`, error);
 
 		return null;
 	}
 
 	if (pluginID !== "core") {
 		if (typeof table.enabled !== "boolean") {
-			logger.debug?.(`Missing { enabled: boolean; } in plugin config of ${formatGuildPlugin(guildID, pluginID)}`);
+			logger.debug?.(`Missing { enabled: boolean; } in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`);
 			return null;
 		}
 
@@ -166,7 +166,7 @@ async function parseConfig(guildID: string, pluginID: string, configCache: Confi
 	}
 
 	if (!result.success) {
-		logger.debug?.(`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(guildID)}`, z.prettifyError(result.error));
+		logger.debug?.(`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(ctx.bot, guildID)}`, z.prettifyError(result.error));
 		return null;
 	}
 

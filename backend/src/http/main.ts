@@ -1,25 +1,24 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { HOUR } from "#common/time.ts";
 import { HTTP_PORT } from "#environment.ts";
+import type { HTTPContext } from "#http/index.ts";
 import api from "#http/route/api/index.ts";
 import frontend from "#http/route/frontend.ts";
 import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
-import { loadPlugins } from "#loader/index.ts";
+import { createContext, shutdownContext } from "#loader/index.ts";
 import { preMain, setupGracefulShutdown } from "#setup.ts";
-import { postgres } from "#storage/index.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
 
-await preMain();
+preMain();
 
 const logger = moduleLogger();
-const app = new Hono;
+const ctx: HTTPContext = await createContext();
 
-logger.info?.("Loading plugins");
-await loadPlugins();
+const app = new Hono;
 
 app.use(nortonAntivirusPlus());
 app.use(async (context, next) => {
@@ -36,8 +35,8 @@ Disallow: /api/`;
 
 app.get("/robots.txt", context => context.text(ROBOTS));
 
-app.route("/api", api());
-app.route("/", frontend());
+app.route("/api", api(ctx));
+app.route("/", frontend(ctx));
 
 app.onError((error, context) => {
 	if (error instanceof HTTPException) {
@@ -60,7 +59,7 @@ async function beginDeleteTokenLoop(): Promise<void> {
 	try {
 		logger.debug?.("Deleting expired tokens");
 
-		const deletedCount = await deleteExpiredTokens();
+		const deletedCount = await deleteExpiredTokens(ctx.db);
 
 		logger.debug?.(`Deleted ${deletedCount} tokens`);
 	} finally {
@@ -70,10 +69,6 @@ async function beginDeleteTokenLoop(): Promise<void> {
 
 await beginDeleteTokenLoop();
 
-process.on("unhandledRejection", rejection => {
-	logger.error?.("Unhandled Promise rejection!", rejection);
-});
-
 setupGracefulShutdown(async () => {
 	await new Promise<void>((resolve, reject) => server.close(error => {
 		if (error !== undefined)
@@ -82,5 +77,5 @@ setupGracefulShutdown(async () => {
 			resolve();
 	}));
 
-	await postgres.end();
+	shutdownContext(ctx);
 });

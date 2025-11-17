@@ -2,13 +2,14 @@ import { isSnowflake } from "#common/snowflake.ts";
 import { getGuildOwnerID } from "#plugin/core/storage/guildInfo.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import type { Pool } from "pg";
 
 export type GuildAuthVars = {
 	discordGuildID: string;
 	discordUserID: string;
 };
 
-export const guildAuthMiddleware = createMiddleware<{ Variables: GuildAuthVars; }>(async (context, next) => {
+export const guildAuthMiddleware = (db: Pool) => createMiddleware<{ Variables: GuildAuthVars; }>(async (context, next) => {
 	const { discordUserID } = context.var;
 	const guildID = context.req.param("guildID");
 
@@ -21,7 +22,7 @@ export const guildAuthMiddleware = createMiddleware<{ Variables: GuildAuthVars; 
 	if (!isSnowflake(guildID))
 		throw new HTTPException(400, { message: "Malformed guild id" });
 
-	const owner = await getGuildOwnerID(guildID);
+	const owner = await getGuildOwnerID(db, guildID);
 
 	if (owner === null || owner !== discordUserID)
 		throw new HTTPException(403, { message: "Missing permission" });

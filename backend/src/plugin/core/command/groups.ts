@@ -23,27 +23,27 @@ export default defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, coreConfigCache, permissions => permissions.groups_command),
-	async run(context, args) {
-		const coreConfig = coreConfigCache.get(context.guild.id);
+	async run(ctx, args) {
+		const coreConfig = coreConfigCache.get(ctx.guild.id);
 
 		if (coreConfig === undefined)
 			return;
 
-		let member = context.member;
+		let member = ctx.member;
 
 		if (args.user !== null) {
 			try {
-				member = await fetchMemberCached(context.guild, args.user);
+				member = await fetchMemberCached(ctx.bot, ctx.guild, args.user);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				if (error.code === JSONErrorCodes.UNKNOWN_MEMBER) {
-					await context.respond(`${icons.error} The specified user is not a member of the server!`);
+					await ctx.respond(`${icons.error} The specified user is not a member of the server!`);
 					return;
 				}
 
-				await context.respond(`${icons.error} User fetch failed: ${escapeMarkdown(formatRESTError(error))}!`);
+				await ctx.respond(`${icons.error} User fetch failed: ${escapeMarkdown(formatRESTError(error))}!`);
 				return;
 			}
 		}
@@ -52,8 +52,8 @@ export default defineCommand({
 
 		if (result.groups.size !== 0) {
 			const groups = Array.from(result.groups).toSorted().map(makeMarkdownInlineCodeblock);
-			await context.respond(`${icons.info} Groups for ${formatUserBold(context.user)}: ${groups.join(", ")} (permission level ${result.level})`);
+			await ctx.respond(`${icons.info} Groups for ${formatUserBold(ctx.user)}: ${groups.join(", ")} (permission level ${result.level})`);
 		} else
-			await context.respond(`${icons.info} ${formatUserBold(context.user)} is not in any groups!`);
+			await ctx.respond(`${icons.info} ${formatUserBold(ctx.user)} is not in any groups!`);
 	},
 });

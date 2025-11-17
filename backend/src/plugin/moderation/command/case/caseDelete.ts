@@ -18,13 +18,13 @@ export default defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_delete),
-	async run(context, { number }) {
-		const deleted = await deleteCase(context.guild.id, number);
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_delete),
+	async run(ctx, { number }) {
+		const deleted = await deleteCase(ctx.discordCtx.db, ctx.guild.id, number);
 
 		if (deleted)
-			await context.respond(`${icons.success} Deleted case **#${number}**!`);
+			await ctx.respond(`${icons.success} Deleted case **#${number}**!`);
 		else
-			await context.respond(`${icons.error} Case **#${number}** was not found!`);
+			await ctx.respond(`${icons.error} Case **#${number}** was not found!`);
 	}
 });

@@ -1,10 +1,11 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
+import type { Pool } from "pg";
 import { z } from "zod/v4";
 
 const JustValueSchema = z.strictObject({ value: z.string() });
 
-export async function getGuildConfig(guildID: string, pluginID: string): Promise<string | null> {
-	const result = await postgres.query(
+export async function getGuildConfig(db: Pool, guildID: string, pluginID: string): Promise<string | null> {
+	const result = await db.query(
 		`
 			SELECT "value"
 			FROM "core_guildConfigs"
@@ -19,8 +20,8 @@ export async function getGuildConfig(guildID: string, pluginID: string): Promise
 	return dbParse(JustValueSchema, result.rows[0]).value;
 }
 
-export async function insertGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {
-	const result = await postgres.query(
+export async function insertGuildConfig(db: Pool, guildID: string, pluginID: string, value: string): Promise<boolean> {
+	const result = await db.query(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",
@@ -36,8 +37,8 @@ export async function insertGuildConfig(guildID: string, pluginID: string, value
 	return result.rowCount === 1;
 }
 
-export async function updateGuildConfig(guildID: string, pluginID: string, value: string): Promise<boolean> {
-	const result = await postgres.query(
+export async function updateGuildConfig(db: Pool, guildID: string, pluginID: string, value: string): Promise<boolean> {
+	const result = await db.query(
 		`
 			UPDATE "core_guildConfigs"
 			SET "value" = $3
@@ -49,8 +50,8 @@ export async function updateGuildConfig(guildID: string, pluginID: string, value
 	return result.rowCount === 1;
 }
 
-export async function upsertGuildConfig(guildID: string, pluginID: string, value: string): Promise<void> {
-	await postgres.query(
+export async function upsertGuildConfig(db: Pool, guildID: string, pluginID: string, value: string): Promise<void> {
+	await db.query(
 		`
 			INSERT INTO "core_guildConfigs" (
 				"guildID",

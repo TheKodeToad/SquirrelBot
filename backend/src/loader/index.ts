@@ -1,17 +1,53 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import type { Plugin } from "#loader/plugin.ts";
+import { checkMigrationsOrExit } from "#storage/migration.ts";
+import { connectNotifDispatcher, type NotifDispatcher } from "#storage/notification.ts";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
+import { Pool } from "pg";
 
 const logger = moduleLogger();
 
-let plugins: Map<string, Plugin> | null = null;
+export interface Context {
+	plugins: Map<string, Plugin>;
+	db: Pool;
+	dbNotifs: NotifDispatcher;
+}
 
-export async function loadPlugins(): Promise<void> {
-	if (plugins !== null)
-		throw new Error("Plugins already loaded");
+export async function createContext(): Promise<Context> {
+	const db = new Pool;
 
-	plugins = new Map;
+	const client = await db.connect();
+	try {
+		await checkMigrationsOrExit(client);
+	} finally {
+		client.release();
+	}
+
+	const plugins = await loadPlugins();
+
+	logger.info?.(
+		`Plugins (${plugins.size}):`,
+		[...plugins.keys()].map(id => "- " + id).join("\n")
+	);
+
+	logger.info?.("Connecting Postgres notification dispatcher");
+	const dbNotifs = await connectNotifDispatcher(db);
+
+	return {
+		plugins,
+		db,
+		dbNotifs,
+	};
+}
+
+export function shutdownContext(context: Context): void {
+	context.dbNotifs.disconnect();
+	context.db.end();
+}
+
+async function loadPlugins(): Promise<Map<string, Plugin>> {
+	const result: Map<string, Plugin> = new Map;
 
 	const pluginDir = path.join(import.meta.dirname, "..", "plugin");
 	const entries = await readdir(pluginDir, { withFileTypes: true });
@@ -43,43 +79,17 @@ export async function loadPlugins(): Promise<void> {
 	});
 
 	for (const plugin of loaded) {
-		if (plugins.has(plugin.id))
+		if (result.has(plugin.id))
 			throw new Error(`Duplicate plugin #${plugin.id}`);
 
-		plugins.set(plugin.id, plugin);
+		result.set(plugin.id, plugin);
 	}
 
-	logger.info?.(
-		`Plugins (${getPluginCount()}):`,
-		[...getPluginIDs()].map(id => "- " + id).join("\n")
-	);
+	return result;
 }
 
 function initPlugin(plugin: Plugin): void {
 	if (plugin.contributions !== undefined)
 		for (const contribution of plugin.contributions)
 			contribution(plugin);
-}
-
-function pluginsMap(): Map<string, Plugin> {
-	if (plugins === null)
-		throw new Error("Plugins not loaded");
-
-	return plugins;
-}
-
-export function getPlugins(): MapIterator<Plugin> {
-	return pluginsMap().values();
-}
-
-export function getPluginCount(): number {
-	return pluginsMap().size;
-}
-
-export function getPlugin(id: string): Plugin | undefined {
-	return pluginsMap().get(id);
-}
-
-export function getPluginIDs(): MapIterator<string> {
-	return pluginsMap().keys();
 }

@@ -1,4 +1,5 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
+import type { Pool } from "pg";
 import z from "zod/v4";
 
 const MessageCacheEntry = z.strictObject({
@@ -22,13 +23,14 @@ interface CreateMessageCacheEntryOptions {
 }
 
 export async function upsertMessageCacheEntry(
+	db: Pool,
 	guildID: string,
 	channelID: string,
 	id: string,
 	entry: CreateMessageCacheEntryOptions
 ): Promise<void> {
 	// TODO check whether this works properly
-	await postgres.query(
+	await db.query(
 		`
 			INSERT INTO "logging_messageCache" (
 				"guildID",
@@ -50,8 +52,8 @@ export async function upsertMessageCacheEntry(
 	);
 }
 
-export async function getMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
-	const result = await postgres.query(
+export async function getMessageCacheEntry(db: Pool, guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
+	const result = await db.query(
 
 		`
 			SELECT * FROM "logging_messageCache"
@@ -66,8 +68,8 @@ export async function getMessageCacheEntry(guildID: string, channelID: string, i
 	return dbParse(MessageCacheEntry, result.rows[0]);
 }
 
-export async function takeMessageCacheEntry(guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
-	const result = await postgres.query(
+export async function takeMessageCacheEntry(db: Pool, guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
+	const result = await db.query(
 		`
 			DELETE FROM "logging_messageCache"
 			WHERE "guildID" = $1 AND "channelID" = $2 AND "id" = $3
@@ -82,8 +84,8 @@ export async function takeMessageCacheEntry(guildID: string, channelID: string, 
 	return dbParse(MessageCacheEntry, result.rows[0]);
 }
 
-export async function cleanUpMessageCacheEntries(threshold: Date): Promise<number> {
-	const result = await postgres.query(
+export async function cleanUpMessageCacheEntries(db: Pool, threshold: Date): Promise<number> {
+	const result = await db.query(
 		`
 			DELETE FROM "logging_messageCache"
 			WHERE "lastUpdated" <= $1

@@ -3,7 +3,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import { bot } from "#discord/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
@@ -22,19 +22,19 @@ export default [
 	onBotEvent({ type: "messageDelete", listener: handleDelete }),
 ];
 
-async function beginMessageCleanupLoop(): Promise<void> {
+async function beginMessageCleanupLoop(ctx: DiscordContext): Promise<void> {
 	try {
 		logger.debug?.("Cleaning up old message cache entries");
 
-		const deletedCount = await cleanUpMessageCacheEntries(new Date(Date.now() - MESSAGE_CLEANUP_THRESHOLD));
+		const deletedCount = await cleanUpMessageCacheEntries(ctx.db, new Date(Date.now() - MESSAGE_CLEANUP_THRESHOLD));
 
 		logger.debug?.(`Deleted ${deletedCount} message cache entries`);
 	} finally {
-		setTimeout(beginMessageCleanupLoop, MESSAGE_CLEANUP_INTERVAL).unref();
+		setTimeout(() => beginMessageCleanupLoop(ctx), MESSAGE_CLEANUP_INTERVAL).unref();
 	}
 }
 
-async function handleCreate(message: Message): Promise<void> {
+async function handleCreate(ctx: DiscordContext, message: Message): Promise<void> {
 	if (message.guildID === null)
 		return;
 
@@ -48,7 +48,7 @@ async function handleCreate(message: Message): Promise<void> {
 	if (!shouldTrack)
 		return;
 
-	await upsertMessageCacheEntry(message.guildID, message.channelID, message.id, {
+	await upsertMessageCacheEntry(ctx.db, message.guildID, message.channelID, message.id, {
 		authorID: message.author.id,
 		authorName: message.author.tag,
 		authorAvatarHash: message.author.avatar,
@@ -56,12 +56,12 @@ async function handleCreate(message: Message): Promise<void> {
 	});
 }
 
-async function handleUpdate(message: Message): Promise<void> {
+async function handleUpdate(ctx: DiscordContext, message: Message): Promise<void> {
 	if (message.guild === null)
 		return;
 
-	await logEvent(message.guild, message.channelID, "message_edit", async () => {
-			const entry = await getMessageCacheEntry(message.guild!.id, message.channelID, message.id);
+	await logEvent(ctx, message.guild, message.channelID, "message_edit", async () => {
+			const entry = await getMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
 
 			if (entry?.content === message.content)
 				return null;
@@ -70,7 +70,7 @@ async function handleUpdate(message: Message): Promise<void> {
 			if (message.content.length === 0)
 				return null;
 
-			await upsertMessageCacheEntry(message.guild!.id, message.channelID, message.id, {
+			await upsertMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id, {
 				authorID: message.author.id,
 				authorName: message.author.tag,
 				authorAvatarHash: message.author.avatar,
@@ -86,19 +86,19 @@ async function handleUpdate(message: Message): Promise<void> {
 	);
 }
 
-async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
+async function handleDelete(ctx: DiscordContext, message: PossiblyUncachedMessage): Promise<void> {
 	if (message.guild == null)
 		return;
 
-	await logEvent(message.guild, message.channelID, "message_delete", async () => {
-			const entry = await takeMessageCacheEntry(message.guild!.id, message.channelID, message.id);
+	await logEvent(ctx, message.guild, message.channelID, "message_delete", async () => {
+			const entry = await takeMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
 
 			if (entry === null)
 				return null;
 
 			const avatarURL = entry.authorAvatarHash !== null
-				? bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
-				: getDefaultAvatarURL(BigInt(entry.authorID));
+				? ctx.bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
+				: getDefaultAvatarURL(ctx.bot, BigInt(entry.authorID));
 
 			return {
 				author: {

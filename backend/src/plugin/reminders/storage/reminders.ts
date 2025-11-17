@@ -1,5 +1,6 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
+import type { Pool } from "pg";
 import { z } from "zod/v4";
 
 const Reminder = z.strictObject({
@@ -45,13 +46,12 @@ export interface ReminderQuery {
 }
 
 const JustNumber = z.strictObject({ number: z.number() });
-const JustOwner = z.strictObject({ owner: z.string() });
 
-export async function getReminder(guildID: string, number: number): Promise<Reminder | null> {
+export async function getReminder(db: Pool, guildID: string, number: number): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			SELECT * FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2
@@ -65,8 +65,8 @@ export async function getReminder(guildID: string, number: number): Promise<Remi
 	return dbParse(Reminder, result.rows[0]);
 }
 
-export async function getReminders(guildID: string, query: ReminderQuery): Promise<Reminder[]> {
-	const result = await postgres.query(
+export async function getReminders(db: Pool, guildID: string, query: ReminderQuery): Promise<Reminder[]> {
+	const result = await db.query(
 		`
 			SELECT * FROM "reminders_reminders"
 			WHERE
@@ -94,8 +94,8 @@ export async function getReminders(guildID: string, query: ReminderQuery): Promi
 	return dbParse(ReminderArray, result.rows);
 }
 
-export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: Date): Promise<Reminder[]> {
-	const result = await postgres.query(
+export async function getRemindersByFiresAt(db: Pool, startInclusive: Date, endExclusive: Date): Promise<Reminder[]> {
+	const result = await db.query(
 		`
 			SELECT *
 			FROM "reminders_reminders"
@@ -107,10 +107,10 @@ export async function getRemindersByFiresAt(startInclusive: Date, endExclusive: 
 	return dbParse(ReminderArray, result.rows);
 }
 
-export async function createReminder(guildID: string, options: CreateReminderOptions): Promise<Reminder> {
+export async function createReminder(db: Pool, guildID: string, options: CreateReminderOptions): Promise<Reminder> {
 	options.createdAt ??= new Date;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			INSERT INTO "reminders_reminders" (
 				"guildID",
@@ -144,11 +144,11 @@ export async function createReminder(guildID: string, options: CreateReminderOpt
 	} satisfies Reminder;
 }
 
-export async function deleteReminder(guildID: string, number: number): Promise<boolean> {
+export async function deleteReminder(db: Pool, guildID: string, number: number): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32)
 		return false;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			DELETE FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2
@@ -159,11 +159,11 @@ export async function deleteReminder(guildID: string, number: number): Promise<b
 	return result.rowCount === 1;
 }
 
-export async function deleteReminderIfOwnedBy(guildID: string, number: number, ownerID: string): Promise<boolean> {
+export async function deleteReminderIfOwnedBy(db: Pool, guildID: string, number: number, ownerID: string): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32)
 		return false;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			DELETE FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2 AND "ownerID" = $3

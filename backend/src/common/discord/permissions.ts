@@ -1,5 +1,4 @@
-import { bot } from "#discord/index.ts";
-import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role } from "oceanic.js";
+import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role, Client } from "oceanic.js";
 
 /**
  * Resolve member roles from cached guild.
@@ -20,7 +19,7 @@ export function getHighestRole(member: Member): Role {
 
 const QUARANTINE = GuildMemberFlags.AUTOMOD_QUARANTINED_BIO | GuildMemberFlags.AUTOMOD_QUARANTINED_CLAN_TAG | GuildMemberFlags.AUTOMOD_QUARANTINED_USERNAME_OR_GUILD_NICKNAME;
 
-export function canWriteInChannel(channel: AnyGuildChannel, member: Member): boolean {
+export function canWriteInChannel(bot: Client, channel: AnyGuildChannel, member: Member): boolean {
 	// channel was deleted
 	if (bot.getChannel(channel.id) === undefined)
 		return false;

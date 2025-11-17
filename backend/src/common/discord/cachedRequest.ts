@@ -1,14 +1,13 @@
 import { isTextableGuildChannel, isThreadChannel } from "#common/discord/general.ts";
-import { bot } from "#discord/index.ts";
-import { type AnyTextableGuildChannel, type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User, Client } from "oceanic.js";
 
-export async function fetchUserCached(userID: string): Promise<User> {
+export async function fetchUserCached(bot: Client, userID: string): Promise<User> {
 	return bot.users.get(userID) ?? await bot.rest.users.get(userID);
 }
 
-export async function fetchUserCachedSupressed(userID: string): Promise<User | Uncached> {
+export async function fetchUserCachedSupressed(bot: Client, userID: string): Promise<User | Uncached> {
 	try {
-		return await fetchUserCached(userID);
+		return await fetchUserCached(bot, userID);
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;
@@ -17,19 +16,19 @@ export async function fetchUserCachedSupressed(userID: string): Promise<User | U
 	}
 }
 
-export async function fetchMemberCached(guild: Guild, userID: string): Promise<Member> {
+export async function fetchMemberCached(bot: Client, guild: Guild, userID: string): Promise<Member> {
 	return guild.members.get(userID) ?? await bot.rest.guilds.getMember(guild.id, userID);
 }
 
-export function fetchBotUserCached(guild: Guild): Promise<Member> {
-	return fetchMemberCached(guild, bot.user.id);
+export function fetchBotUserCached(bot: Client, guild: Guild): Promise<Member> {
+	return fetchMemberCached(bot, guild, bot.user.id);
 }
 
-export async function createDMCached(userID: string): Promise<PrivateChannel> {
+export async function createDMCached(bot: Client, userID: string): Promise<PrivateChannel> {
 	return bot.privateChannels.find(channel => channel.recipient.id === userID) ?? await bot.rest.users.createDM(userID);
 }
 
-export async function fetchThreadCached(guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
+export async function fetchThreadCached(bot: Client, guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
 	const cached = guild.threads.get(threadID);
 
 	if (cached !== undefined)
@@ -49,7 +48,7 @@ export async function fetchThreadCached(guild: Guild, threadID: string): Promise
 	return fetched;
 }
 
-export async function fetchTextableGuildChannelCached(guild: Guild, channelID: string): Promise<AnyTextableGuildChannel | null> {
+export async function fetchTextableGuildChannelCached(bot: Client, guild: Guild, channelID: string): Promise<AnyTextableGuildChannel | null> {
 	const cachedRegularChannel = guild.channels.get(channelID);
 
 	if (cachedRegularChannel !== undefined) {

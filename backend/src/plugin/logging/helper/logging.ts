@@ -1,5 +1,6 @@
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import type { Awaitable, ValuesOf } from "#common/general.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import type { LoggerConfig } from "#plugin/logging/config/index.ts";
 import { logViaWebhook } from "#plugin/logging/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
@@ -9,6 +10,7 @@ type EventConfig = ValuesOf<LoggerConfig["events"]>;
 type EventConfigView<T extends EventConfig> = Parameters<Exclude<T, false>["render"]>[0];
 
 export async function logEvent<T extends EventConfig>(
+	ctx: DiscordContext,
 	guild: Guild,
 	channel: string | null,
 	key: keyof LoggerConfig["events"],
@@ -39,12 +41,12 @@ export async function logEvent<T extends EventConfig>(
 				return;
 
 			tasks.push(async () => {
-				const channel = await fetchTextableGuildChannelCached(guild, logger.channel);
+				const channel = await fetchTextableGuildChannelCached(ctx.bot, guild, logger.channel);
 
 				if (channel === null)
 					return;
 
-				await logViaWebhook(channel, {
+				await logViaWebhook(ctx, channel, {
 					...event.render(view),
 					username: logger.displayName,
 					avatarURL: logger.avatar ?? guild.clientMember.avatarURL(),

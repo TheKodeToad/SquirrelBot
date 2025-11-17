@@ -1,14 +1,15 @@
 import type { Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { bot } from "#discord/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { isGuildAllowed } from "#plugin/core/guildInfoSync.ts";
 import type { ClientEvents } from "oceanic.js";
 
 const logger = moduleLogger();
 
 export function wrapListener<E extends keyof ClientEvents>(
+	ctx: DiscordContext,
 	event: E,
-	listener: (...args: ClientEvents[E]) => Awaitable<void>
+	listener: (ctx: DiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
 ) {
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
@@ -22,7 +23,7 @@ export function wrapListener<E extends keyof ClientEvents>(
 		}
 
 		try {
-			await listener(...args);
+			await listener(ctx, ...args);
 		} catch (error) {
 			logger.error?.(`Error handling event "${event}"`, error);
 		}
@@ -30,10 +31,11 @@ export function wrapListener<E extends keyof ClientEvents>(
 }
 
 export function installWrappedListener<E extends keyof ClientEvents>(
+	ctx: DiscordContext,
 	event: E,
-	listener: (...args: ClientEvents[E]) => Awaitable<void>
+	listener: (ctx: DiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
 ): void {
-	bot.on(event, wrapListener(event, listener));
+	ctx.bot.on(event, wrapListener(ctx, event, listener));
 }
 
 const EVENT_TO_GUILD: {

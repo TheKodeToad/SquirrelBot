@@ -37,22 +37,22 @@ export default defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.timeout),
-	async run(context, args, { config }) {
+	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.remove_timeout.send_direct_message;
 		const directMessage = sendDirectMessage
 			? config.remove_timeout.direct_message.render({
-				server: makeGuildView(context.guild),
-				moderator: makeUserView(context.user),
+				server: makeGuildView(ctx.guild),
+				moderator: makeUserView(ctx.user),
 				reason: args.reason ?? undefined,
 			})
 			: undefined;
 
-		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
-			guild: context.guild,
+		const { successful, unsuccessful } = await performModActions(ctx.discordCtx, ctx.guild, args.user, target => ({
+			guild: ctx.guild,
 
 			type: ModEventType.ClearTimeout,
 
-			actor: context.member,
+			actor: ctx.member,
 			target,
 			ranking: config.member_ranking,
 
@@ -63,23 +63,23 @@ export default defineCommand({
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Removed timeout from ${formatModActionSuccess(successful[0]!)}!`);
+				await ctx.respond(`${icons.success} Removed timeout from ${formatModActionSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not remove timeout from ${formatModActionFailure(unsuccessful[0]!)}!`);
+				await ctx.respond(`${icons.error} Could not remove timeout from ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.success} Removed timeout for all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.error} None of **${args.user.length} users** had their timeouts removed:\n${unsuccessfulMessage}`
 				);
 			} else {
-				await context.respond(
+				await ctx.respond(
 					`${icons.warning} Only **${successful.length} of ${args.user.length} users** had their timeouts removed!\n`
 					+ `Successful removals:\n${successfulMessage}\n`
 					+ `Unsuccessful removals:\n${unsuccessfulMessage}`

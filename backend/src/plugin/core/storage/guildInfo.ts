@@ -1,4 +1,5 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
+import type { Pool } from "pg";
 import { z } from "zod/v4";
 
 const GuildInfo = z.strictObject({
@@ -27,8 +28,8 @@ export interface APIGuildInfo extends z.output<typeof APIGuildInfo> { }
 
 const JustOwnerID = z.strictObject({ ownerID: z.string() });
 
-export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
-	const result = await postgres.query(
+export async function getGuildInfo(db: Pool, id: string): Promise<GuildInfo | null> {
+	const result = await db.query(
 		`
 			SELECT
 				"id",
@@ -52,8 +53,8 @@ export async function getGuildInfo(id: string): Promise<GuildInfo | null> {
 /**
  * Only use for caching purposes!
  */
-export async function getAllGuildInfo(): Promise<GuildInfo[]> {
-	const result = await postgres.query(
+export async function getAllGuildInfo(db: Pool): Promise<GuildInfo[]> {
+	const result = await db.query(
 		`
 			SELECT
 				"id",
@@ -69,8 +70,8 @@ export async function getAllGuildInfo(): Promise<GuildInfo[]> {
 	return dbParse(GuildInfoArray, result.rows);
 }
 
-export async function getGuildOwnerID(id: string): Promise<string | null> {
-	const result = await postgres.query(
+export async function getGuildOwnerID(db: Pool, id: string): Promise<string | null> {
+	const result = await db.query(
 		`
 			SELECT "ownerID"
 			FROM "core_guildInfo"
@@ -85,8 +86,8 @@ export async function getGuildOwnerID(id: string): Promise<string | null> {
 	return dbParse(JustOwnerID, result.rows[0]).ownerID;
 }
 
-export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildInfo[]> {
-	const result = await postgres.query(
+export async function getAPIGuildInfoByOwner(db: Pool, ownerID: string): Promise<APIGuildInfo[]> {
+	const result = await db.query(
 		`
 			SELECT
 				"id",
@@ -103,8 +104,8 @@ export async function getAPIGuildInfoByOwner(ownerID: string): Promise<APIGuildI
 	return dbParse(APIGuildInfoArray, result.rows);
 }
 
-export async function deleteGuildInfo(id: string): Promise<void> {
-	await postgres.query(
+export async function deleteGuildInfo(db: Pool, id: string): Promise<void> {
+	await db.query(
 		`
 			DELETE FROM "core_guildInfo"
 			WHERE "id" = $1
@@ -113,8 +114,8 @@ export async function deleteGuildInfo(id: string): Promise<void> {
 	);
 }
 
-export async function updateGuildInfo(id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
-	await postgres.query(
+export async function updateGuildInfo(db: Pool, id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
+	await db.query(
 		`
 			UPDATE "core_guildInfo"
 			SET
@@ -127,8 +128,8 @@ export async function updateGuildInfo(id: string, name: string, iconHash: string
 	);
 }
 
-export async function insertGuildInfo(id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
-	const result = await postgres.query(
+export async function insertGuildInfo(db: Pool, id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
+	const result = await db.query(
 		`
 			INSERT INTO "core_guildInfo" (
 				"id",
@@ -145,8 +146,8 @@ export async function insertGuildInfo(id: string, name: string | null, iconHash:
 	return result.rowCount === 1;
 }
 
-export async function markGuildAllowed(id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
-	await postgres.query(
+export async function markGuildAllowed(db: Pool, id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
+	await db.query(
 		`
 			INSERT INTO "core_guildInfo" (
 				"id",
@@ -167,8 +168,8 @@ export async function markGuildAllowed(id: string, name: string | null, iconHash
 	);
 }
 
-export async function markUnknownGuildAllowed(id: string): Promise<void> {
-	await postgres.query(
+export async function markUnknownGuildAllowed(db: Pool, id: string): Promise<void> {
+	await db.query(
 		`
 			INSERT INTO "core_guildInfo" ("id", "allowed")
 			VALUES ($1, TRUE)
@@ -180,8 +181,8 @@ export async function markUnknownGuildAllowed(id: string): Promise<void> {
 	);
 }
 
-export async function markGuildNotAllowed(id: string): Promise<void> {
-	await postgres.query(
+export async function markGuildNotAllowed(db: Pool, id: string): Promise<void> {
+	await db.query(
 		`
 			UPDATE "core_guildInfo"
 			SET "allowed" = FALSE
@@ -191,11 +192,11 @@ export async function markGuildNotAllowed(id: string): Promise<void> {
 	);
 }
 
-export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null> {
+export async function scheduleGuildInfoDeletion(db: Pool, id: string): Promise<Date | null> {
 	const date = new Date;
 	date.setDate(date.getDate() + 30);
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			UPDATE "core_guildInfo"
 			SET
@@ -214,8 +215,8 @@ export async function scheduleGuildInfoDeletion(id: string): Promise<Date | null
 		return null;
 }
 
-export async function cancelGuildInfoDeletion(id: string): Promise<void> {
-	await postgres.query(
+export async function cancelGuildInfoDeletion(db: Pool, id: string): Promise<void> {
+	await db.query(
 		`
 			UPDATE "core_guildInfo"
 			SET "deleteAt" = NULL
@@ -226,8 +227,8 @@ export async function cancelGuildInfoDeletion(id: string): Promise<void> {
 }
 
 // TODO: use this darn thing!
-export async function deleteExpiredGuildInfo(): Promise<void> {
-	await postgres.query(
+export async function deleteExpiredGuildInfo(db: Pool): Promise<void> {
+	await db.query(
 		`
 			DELETE FROM "core_guildInfo"
 			WHERE "deleteAt" <= $1

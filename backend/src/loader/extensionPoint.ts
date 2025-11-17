@@ -63,21 +63,21 @@ export const enum EventListenerPhase {
 	Post,
 }
 
-type EventListener<T> = (event: T) => Awaitable<void>;
+type EventListener<T extends unknown[]> = (...args: T) => Awaitable<void>;
 
-export function makeEventExtensionPoint<T>(): ((listener: EventListener<T>, phase?: EventListenerPhase) => Contribution) & { fire(event: T): Promise<void>; } {
+export function makeEventExtensionPoint<T extends unknown[]>(): ((listener: EventListener<T>, phase?: EventListenerPhase) => Contribution) & { fire(...args: T): Promise<void>; } {
 	const contributions: Map<EventListenerPhase, EventListener<T>[]> = new Map;
-	const firePhase = async (event: T, phase: EventListenerPhase): Promise<void> => {
+	const firePhase = async (args: T, phase: EventListenerPhase): Promise<void> => {
 		const listeners = contributions.get(phase);
 
 		if (listeners === undefined)
 			return;
 
-		await Promise.all(listeners.map(listener => listener(event)));
+		await Promise.all(listeners.map(listener => listener(...args)));
 	};
 
 	return Object.assign(
-		function (listener: (event: T) => void, phase = EventListenerPhase.Default) {
+		function (listener: (...args: T) => void, phase = EventListenerPhase.Default) {
 			return (_: Plugin) => {
 				if (contributions.has(phase))
 					contributions.get(phase)!.push(listener);
@@ -86,10 +86,10 @@ export function makeEventExtensionPoint<T>(): ((listener: EventListener<T>, phas
 			};
 		},
 		{
-			async fire(event: T) {
-				await firePhase(event, EventListenerPhase.Pre);
-				await firePhase(event, EventListenerPhase.Default);
-				await firePhase(event, EventListenerPhase.Post);
+			async fire(...args: T) {
+				await firePhase(args, EventListenerPhase.Pre);
+				await firePhase(args, EventListenerPhase.Default);
+				await firePhase(args, EventListenerPhase.Post);
 			}
 		}
 	);
