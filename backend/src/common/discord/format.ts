@@ -1,6 +1,6 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { DiscordRESTError, Member, User, UserFlags, type Uncached } from "oceanic.js";
+import { Client, DiscordRESTError, Member, User, UserFlags, type Uncached } from "oceanic.js";
 
 export function formatRESTError(restError: DiscordRESTError): string {
 	if (restError.resBody !== null
@@ -11,16 +11,16 @@ export function formatRESTError(restError: DiscordRESTError): string {
 	return `HTTP Error ${restError.status}: ${escapeMarkdown(restError.statusText)}`;
 }
 
-export async function formatUserTagByID(id: string): Promise<string> {
-	return formatUserTag(await fetchUserCachedSupressed(id));
+export async function formatUserTagByID(bot: Client, id: string): Promise<string> {
+	return formatUserTag(await fetchUserCachedSupressed(bot, id));
 }
 
-export async function formatUserByID(id: string): Promise<string> {
-	return formatUser(await fetchUserCachedSupressed(id));
+export async function formatUserByID(bot: Client, id: string): Promise<string> {
+	return formatUser(await fetchUserCachedSupressed(bot, id));
 }
 
-export async function formatUserBoldByID(id: string): Promise<string> {
-	return formatUserBold(await fetchUserCachedSupressed(id));
+export async function formatUserBoldByID(bot: Client, id: string): Promise<string> {
+	return formatUserBold(await fetchUserCachedSupressed(bot, id));
 }
 
 type UserLike = { id: string; tag: string; } | Uncached;

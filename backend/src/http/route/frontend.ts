@@ -1,6 +1,6 @@
 import { APP_DESCRIPTION, APP_INVITE_PERMISSIONS, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
 import { CLIENT_ID, REDIRECT_URI } from "#environment.ts";
-import { getPlugins } from "#loader/index.ts";
+import type { HTTPContext } from "#http/index.ts";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { randomBytes } from "crypto";
 import { Hono } from "hono";
@@ -9,7 +9,7 @@ import { etag } from "hono/etag";
 import { html, raw } from "hono/html";
 
 
-export default (): Hono => {
+export default (httpCtx: HTTPContext): Hono => {
 	const app = new Hono;
 
 	// TODO: worrying
@@ -26,7 +26,7 @@ export default (): Hono => {
 		APP_INVITE_PERMISSIONS: APP_INVITE_PERMISSIONS.toString(),
 	};
 
-	const plugins = [...getPlugins()].map(plugin => ({
+	const plugins = [...httpCtx.plugins.values()].map(plugin => ({
 		id: plugin.id,
 		name: plugin.name,
 		description: plugin.description,

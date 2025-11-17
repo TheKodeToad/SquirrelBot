@@ -1,5 +1,6 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { definePlugin } from "#loader/plugin.ts";
 import about from "#plugin/core/command/about.ts";
@@ -66,9 +67,9 @@ export default definePlugin({
 	],
 });
 
-function postInit(): void {
+function postInit(ctx: DiscordContext): void {
 	logger.debug?.("Installing onBotEvent listeners");
 
 	for (const listener of onBotEvent.contributions)
-		installWrappedListener(listener.type, listener.listener.bind(listener));
+		installWrappedListener(ctx, listener.type, listener.listener.bind(listener));
 }

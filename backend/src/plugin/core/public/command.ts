@@ -1,4 +1,5 @@
-import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User } from "oceanic.js";
+import type { DiscordContext } from "#discord/index.ts";
+import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User, Client } from "oceanic.js";
 
 type NameList = [string, ...string[]];
 
@@ -15,20 +16,22 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 	/**
 	 * Check preconditions - return false to abort execution and anything else to proceed.
 	 * Note: to prevent nasty bugs this may not return null or undefined!
-	 * @param context Contextual information
+	 * @param ctx Contextual information
 	 */
-	preRun(context: CommandContext): D | false;
+	preRun(ctx: CommandContext): D | false;
 
 	/**
 	 * Invoke the command, and call context.respond to display output.
-	 * @param context Contextual information
+	 * @param ctx Contextual information
 	 * @param args Parsed options
 	 * @param data The result from preRun
 	 */
-	run(context: CommandContext, args: { readonly [K in keyof O]: OptionValue<O[K]> }, data: D): Promise<void> | void;
+	run(ctx: CommandContext, args: { readonly [K in keyof O]: OptionValue<O[K]> }, data: D): Promise<void> | void;
 }
 
-export interface BaseContext {
+export interface BaseCommandContext {
+	bot: Client;
+	discordCtx: DiscordContext;
 	shard: Shard;
 	guild: Guild;
 	user: User;
@@ -37,13 +40,13 @@ export interface BaseContext {
 	respond: (reply: Reply) => Promise<void>;
 }
 
-export interface CommandContext extends BaseContext {
+export interface CommandContext extends BaseCommandContext {
 	command: Command;
 	ephemeral?: boolean;
 	message?: Message<AnyTextableGuildChannel>;
 }
 
-export interface ComponentContext extends BaseContext {
+export interface ComponentContext extends BaseCommandContext {
 	/** The ID of the user who initially ran the command */
 	originalUserID: string;
 	edit: (reply: Reply) => Promise<void>;

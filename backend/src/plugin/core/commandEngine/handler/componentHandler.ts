@@ -1,5 +1,6 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
 import type { ComponentContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
@@ -21,7 +22,7 @@ export default [
 	onBotEvent({ type: "interactionCreate", listener: handle })
 ];
 
-async function handle(interaction: AnyInteractionGateway): Promise<void> {
+async function handle(discordCtx: DiscordContext, interaction: AnyInteractionGateway): Promise<void> {
 	if (!interaction.inCachedGuildChannel())
 		return;
 
@@ -33,15 +34,15 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 	if (handler === undefined)
 		return;
 
-	const context = new ComponentContextImpl(interaction, handler.originalUserID);
+	const ctx = new ComponentContextImpl(discordCtx, interaction, handler.originalUserID);
 
 	try {
 		const values = "values" in interaction.data ? interaction.data.values.raw : undefined;
 
-		await handler.callback(context, interaction.data.customID, values);
+		await handler.callback(ctx, interaction.data.customID, values);
 	} catch (error) {
 		try {
-			await context.respond({
+			await ctx.respond({
 				components: [Text(":boom: Something went wrong while processing your action")],
 				flags: MessageFlags.EPHEMERAL
 			});
@@ -50,7 +51,7 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 		}
 		throw error;
 	} finally {
-		await context._abandon();
+		await ctx._abandon();
 	}
 }
 
@@ -63,16 +64,25 @@ export function unlistenForInteractions(messageID: string): void {
 }
 
 class ComponentContextImpl implements ComponentContext {
-	private _interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
-	private _responseID: string | null;
-	private _acked: boolean;
-	private _edited: boolean;
-	private _ackPromise: Promise<void> | null;
-	private _ackTimeout: NodeJS.Timeout | null;
-
 	originalUserID: string;
 
-	constructor(interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalUserID: string) {
+	discordCtx: DiscordContext;
+	get bot() { return this.discordCtx.bot; }
+	get shard(): Shard { return this._interaction.guild.shard; }
+	get guild(): Guild { return this._interaction.guild; }
+	get user(): User { return this._interaction.user; };
+	get member(): Member { return this._interaction.member; }
+	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
+
+	_interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>;
+	_responseID: string | null;
+	_acked: boolean;
+	_edited: boolean;
+	_ackPromise: Promise<void> | null;
+	_ackTimeout: NodeJS.Timeout | null;
+
+	constructor(discordCtx: DiscordContext, interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalUserID: string) {
+		this.discordCtx = discordCtx;
 		this._interaction = interaction;
 		this.originalUserID = originalUserID;
 		this._responseID = null;
@@ -85,12 +95,6 @@ class ComponentContextImpl implements ComponentContext {
 		}, Math.max(0, AUTO_DEFER_AFTER - (Date.now() - interaction.createdAt.getTime()))).unref();
 		this._ackPromise = null;
 	}
-
-	get shard(): Shard { return this._interaction.guild.shard; }
-	get guild(): Guild { return this._interaction.guild; }
-	get user(): User { return this._interaction.user; };
-	get member(): Member { return this._interaction.member; }
-	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
 
 	async respond(reply: Reply): Promise<void> {
 		const messageOptions = transformReply(reply);

@@ -1,5 +1,5 @@
 import { dateToUnixSecs } from "#common/time.ts";
-import { type BaseContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import { type BaseCommandContext, type ReplyObject } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
@@ -29,19 +29,19 @@ export default defineCommand({
 	},
 });
 
-async function lookUpReminders(context: BaseContext, query: PaginatorQuery<Date>): Promise<Reminder[]> {
-	const config = remindersConfigStore.get(context.guild.id);
+async function lookUpReminders(ctx: BaseCommandContext, query: PaginatorQuery<Date>): Promise<Reminder[]> {
+	const config = remindersConfigStore.get(ctx.guild.id);
 
 	if (config === undefined)
 		return [];
 
-	const permissions = resolvePermissions(config, context.member, context.channel);
+	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
 	if (!permissions.personal_reminders)
 		return [];
 
-	return getReminders(context.guild.id, {
-		ownerID: context.user.id,
+	return getReminders(ctx.discordCtx.db, ctx.guild.id, {
+		ownerID: ctx.user.id,
 		limit: query.limit,
 		firesBefore: query.before,
 		firesAfter: query.after,

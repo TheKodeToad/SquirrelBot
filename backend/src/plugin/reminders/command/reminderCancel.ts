@@ -20,14 +20,14 @@ export default defineCommand({
 	},
 
 
-	preRun: context => permissionsGuard(context, remindersConfigStore, permissions => permissions.personal_reminders),
-	async run(context, { number }) {
-		const deleted = await deleteReminderIfOwnedBy(context.guild.id, number, context.user.id);
+	preRun: ctx => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
+	async run(ctx, { number }) {
+		const deleted = await deleteReminderIfOwnedBy(ctx.discordCtx.db, ctx.guild.id, number, ctx.user.id);
 
 		if (deleted) {
-			untrackReminder(context.guild.id, number);
-			await context.respond(`${icons.success} Canceled reminder **#${number}**!`);
+			untrackReminder(ctx.guild.id, number);
+			await ctx.respond(`${icons.success} Canceled reminder **#${number}**!`);
 		} else
-			await context.respond(`${icons.error} Reminder **#${number}** was not found!`);
+			await ctx.respond(`${icons.error} Reminder **#${number}** was not found!`);
 	}
 });

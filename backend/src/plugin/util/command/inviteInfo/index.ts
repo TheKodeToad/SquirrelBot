@@ -1,7 +1,6 @@
 import { formatRESTError } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { bot } from "#discord/index.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -10,7 +9,7 @@ import { renderFriendInvite } from "#plugin/util/command/inviteInfo/friend.ts";
 import { renderGroupDMInvite } from "#plugin/util/command/inviteInfo/groupDM.ts";
 import { renderGuildInvite } from "#plugin/util/command/inviteInfo/guild.ts";
 import { utilConfigStore } from "#plugin/util/index.ts";
-import { DiscordRESTError, InviteTypes, JSONErrorCodes, type ContainerComponent } from "oceanic.js";
+import { Client, DiscordRESTError, InviteTypes, JSONErrorCodes, type ContainerComponent } from "oceanic.js";
 
 const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 
@@ -37,26 +36,26 @@ export default defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, utilConfigStore, permissions => permissions.invite_info_command),
-	async run(context, args) {
+	async run(ctx, args) {
 		const matches = REGEX.exec(args.link);
 
 		if (matches === null) {
-			await context.respond(`${icons.error} Provided link does not contain invite code!`);
+			await ctx.respond(`${icons.error} Provided link does not contain invite code!`);
 			return;
 		}
 
 		const code = matches[1]!;
 
 		try {
-			var invite = await stealthyGetInvite(code);
+			var invite = await stealthyGetInvite(ctx.bot, code);
 		} catch (error) {
 			if (!(error instanceof DiscordRESTError))
 				throw error;
 
 			if (error.code === JSONErrorCodes.UNKNOWN_INVITE)
-				await context.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! It might not be visible to apps.`);
+				await ctx.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! It might not be visible to apps.`);
 			else
-				await context.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
+				await ctx.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
 
 			return;
 		}
@@ -78,18 +77,18 @@ export default defineCommand({
 		} else if (invite.type === InviteTypes.FRIEND && invite.inviter !== undefined)
 			container = renderFriendInvite(invite.inviter, invite.expiresAt, args.hideImages ?? false);
 		else if (invite.type === InviteTypes.GROUP_DM && invite.channel !== null)
-			container = renderGroupDMInvite(invite.channel, invite.inviter, invite.approximateMemberCount, invite.expiresAt, args.hideImages ?? false);
+			container = renderGroupDMInvite(ctx.bot, invite.channel, invite.inviter, invite.approximateMemberCount, invite.expiresAt, args.hideImages ?? false);
 		else {
-			await context.respond(`${icons.error} Unknown invite type!`);
+			await ctx.respond(`${icons.error} Unknown invite type!`);
 			return;
 		}
 
-		await context.respond({ components: [container] });
+		await ctx.respond({ components: [container] });
 	},
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function stealthyGetInvite(code: string) {
+function stealthyGetInvite(bot: Client, code: string) {
 	// HACK: I am very sorry
 	// remove Bot prefix because Discord API lets you resolve more invites for some reason (??)
 

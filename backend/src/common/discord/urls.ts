@@ -1,7 +1,6 @@
-import { bot } from "#discord/index.ts";
-import { Routes, type ImageFormat } from "oceanic.js";
+import { Client, Routes, type ImageFormat } from "oceanic.js";
 
-export function getChannelIconURL(channel: { id: string; icon?: string | null; }, format?: ImageFormat, size?: number): string | null {
+export function getChannelIconURL(bot: Client, channel: { id: string; icon?: string | null; }, format?: ImageFormat, size?: number): string | null {
 	if (channel.icon == null)
 		return null;
 
@@ -9,6 +8,6 @@ export function getChannelIconURL(channel: { id: string; icon?: string | null; }
 }
 
 // based on User.defaultAvatar and defaultAvatarURL
-export function getDefaultAvatarURL(id: bigint) {
+export function getDefaultAvatarURL(bot: Client, id: bigint) {
 	return bot.util.formatImage(Routes.EMBED_AVATAR(Number(id >> 22n) % 6));
 }

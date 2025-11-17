@@ -35,7 +35,7 @@ export default defineCommand({
 		const now = Date.now();
 		const firesAt = now + args.delay;
 
-		const reminder = await createReminder(context.guild.id, {
+		const reminder = await createReminder(context.discordCtx.db, context.guild.id, {
 			ownerID: context.user.id,
 			channelID: context.channel.id,
 			channelType: context.channel.type,

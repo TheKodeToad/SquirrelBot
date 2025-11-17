@@ -16,8 +16,8 @@ export interface PollingSchedulerOptions<T> {
 }
 
 export interface PollingSchedulerHandle<T> {
-	track: (task: T) => void;
-	untrack: (key: string) => void;
+	track(task: T): void;
+	untrack(key: string): void;
 }
 
 interface State<T> {

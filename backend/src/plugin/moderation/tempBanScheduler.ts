@@ -3,34 +3,34 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { startPollingScheduler, type PollingSchedulerHandle } from "#common/pollingScheduler.ts";
 import { SECOND } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import { bot } from "#discord/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { deleteTempBan, getTempBansByEndsAt, type TempBan } from "#plugin/moderation/storage/tempBans.ts";
-import { Constants, DiscordRESTError } from "oceanic.js";
+import { Client, Constants, DiscordRESTError } from "oceanic.js";
 
 const logger = moduleLogger();
 let scheduler: PollingSchedulerHandle<TempBan> | null = null;
 
 export default [onBotInit(beginPollingTempBans)];
 
-function debugFormatTempBan(tempBan: TempBan): string {
-	return `temp ban for @${tempBan.targetID} in ${debugFormatGuildByID(tempBan.guildID)}`;
+function debugFormatTempBan(bot: Client, tempBan: TempBan): string {
+	return `temp ban for @${tempBan.targetID} in ${debugFormatGuildByID(bot, tempBan.guildID)}`;
 }
 
 function getTempBanKey(guildID: string, targetID: string): string {
 	return guildID + "::" + targetID;
 }
 
-async function beginPollingTempBans(): Promise<void> {
+async function beginPollingTempBans(ctx: DiscordContext): Promise<void> {
 	scheduler = await startPollingScheduler({
 		discriminator: "moderationTempBans",
 		pollRate: 60 * SECOND,
 
-		poll: (start, end) => getTempBansByEndsAt(start, end),
-		run: trigger,
+		poll: (start, end) => getTempBansByEndsAt(ctx.db, start, end),
+		run: ban => trigger(ctx, ban),
 
-		getKey: tempBan => getTempBanKey(tempBan.guildID, tempBan.targetID),
-		getTimestamp: tempBan => tempBan.endsAt,
-		debugFormat: debugFormatTempBan,
+		getKey: ban => getTempBanKey(ban.guildID, ban.targetID),
+		getTimestamp: ban => ban.endsAt,
+		debugFormat: ban => debugFormatTempBan(ctx.bot, ban),
 	})
 }
 
@@ -42,11 +42,11 @@ export function untrackTempBan(guildID: string, targetID: string): void {
 	scheduler?.untrack(getTempBanKey(guildID, targetID));
 }
 
-async function trigger(ban: TempBan): Promise<void> {
-	const guild = bot.guilds.get(ban.guildID);
+async function trigger(ctx: DiscordContext, ban: TempBan): Promise<void> {
+	const guild = ctx.bot.guilds.get(ban.guildID);
 
 	if (guild === undefined) {
-		logger.debug?.(`Bot user is not in guild; not triggering ${debugFormatTempBan(ban)}`);
+		logger.debug?.(`Bot user is not in guild; not triggering ${debugFormatTempBan(ctx.bot, ban)}`);
 		return;
 	}
 
@@ -61,6 +61,6 @@ async function trigger(ban: TempBan): Promise<void> {
 			logger.debug?.(`Failed to lift expired ban of ${ban.targetID} in ${debugFormatGuild(guild)}`);
 	} finally {
 		// TODO: does this always run, even if the catch throws
-		await deleteTempBan(ban.guildID, ban.targetID);
+		await deleteTempBan(ctx.db, ban.guildID, ban.targetID);
 	}
 }

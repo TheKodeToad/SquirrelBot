@@ -3,9 +3,10 @@ import { getChannelIconURL } from "#common/discord/urls.ts";
 import { dateToUnixSecs } from "#common/time.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
-import { type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
+import { Client, type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
 
 export function renderGroupDMInvite(
+	bot: Client,
 	channel: PartialInviteChannel,
 	inviter: User | undefined,
 	totalMembers: number | undefined,
@@ -23,7 +24,7 @@ export function renderGroupDMInvite(
 		mainInfo.push(`${icons.online} ${total} Members`);
 	}
 
-	const iconURL: string | null = getChannelIconURL(channel);
+	const iconURL: string | null = getChannelIconURL(bot, channel);
 
 	if (iconURL === null || hideImages) {
 		result.components.push(...mainInfo.map(content => Text(content)));

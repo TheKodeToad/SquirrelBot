@@ -1,9 +1,9 @@
 import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
-import { getPlugin, getPlugins } from "#loader/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { getCommandsByPlugin } from "#plugin/core/commandEngine/commandCache.ts";
 import { canRunCommand } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import type { BaseContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
+import type { BaseCommandContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { ActionRow, Container, Divider, StringSelect, Text, TextButton } from "oceanic-component-helper";
@@ -15,11 +15,11 @@ interface CommandListState {
 	entries?: ContainerComponent["components"][];
 }
 
-export function renderCommandListPageMinimal(guildID: string): Reply {
+export function renderCommandListPageMinimal(ctx: DiscordContext, guildID: string): Reply {
 	return {
 		components: [
 			Text("**Select a plugin to view commands**"),
-			ActionRow([renderPluginSelection(null, guildID)]),
+			ActionRow([renderPluginSelection(ctx, null, guildID)]),
 			Text(`${icons.tip} You can also pass in the name of a command to view it directly.`)
 		],
 		async componentHandler(context, customID, values) {
@@ -36,10 +36,10 @@ export function renderCommandListPageMinimal(guildID: string): Reply {
 	};
 }
 
-function renderPluginSelection(selected: string | null, guildID: string): StringSelectMenu {
+function renderPluginSelection(ctx: DiscordContext, selected: string | null, guildID: string): StringSelectMenu {
 	const select = StringSelect("plugin");
 
-	for (const plugin of getPlugins()) {
+	for (const plugin of ctx.plugins.values()) {
 		const config = defineConfig.contributions.get(plugin);
 
 		if (config !== undefined && !config.store.has(guildID))
@@ -56,8 +56,8 @@ function renderPluginSelection(selected: string | null, guildID: string): String
 	return select;
 }
 
-export function renderCommandListPage(context: BaseContext, state: CommandListState): ReplyObject {
-	const plugin = getPlugin(state.plugin);
+export function renderCommandListPage(ctx: BaseCommandContext, state: CommandListState): ReplyObject {
+	const plugin = ctx.discordCtx.plugins.get(state.plugin);
 
 	if (plugin === undefined) {
 		return {
@@ -67,14 +67,14 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 
 	const container = Container([Text("## Help")]);
 
-	container.components.push(ActionRow([renderPluginSelection(state.plugin, context.guild.id)]));
+	container.components.push(ActionRow([renderPluginSelection(ctx.discordCtx, state.plugin, ctx.guild.id)]));
 
 	let entries = state.entries;
 
 	if (entries === undefined) {
 		entries = [];
 
-		const prefix = coreConfigStore.get(context.guild.id)?.prefix_commands.prefix ?? "";
+		const prefix = coreConfigStore.get(ctx.guild.id)?.prefix_commands.prefix ?? "";
 
 		for (const entry of getCommandsByPlugin(plugin.name) ?? []) {
 			const { command } = entry;
@@ -82,7 +82,7 @@ export function renderCommandListPage(context: BaseContext, state: CommandListSt
 			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true)))
 				continue;
 
-			if (!canRunCommand(command, context.member, context.channel))
+			if (!canRunCommand(ctx.discordCtx, command, ctx.member, ctx.channel))
 				continue;
 
 			const summaryComponent = Text("### " + command.name[0] + "\n");

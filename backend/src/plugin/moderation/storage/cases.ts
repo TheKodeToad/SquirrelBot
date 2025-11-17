@@ -1,6 +1,7 @@
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
 import { z } from "zod/v4";
 import { ModEventType, reverseModEventType, type ModEvent } from "../public/modEvent.ts";
+import type { Pool } from "pg";
 
 export const CaseInfo = z.strictObject({
 	guildID: z.string(),
@@ -47,11 +48,11 @@ export interface CaseQuery {
 
 const JustNumber = z.strictObject({ number: z.number() });
 
-export async function getCase(guildID: string, number: number): Promise<CaseInfo | null> {
+export async function getCase(db: Pool, guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
 		return null;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			SELECT *
 			FROM "moderation_cases"
@@ -67,10 +68,10 @@ export async function getCase(guildID: string, number: number): Promise<CaseInfo
 	return dbParse(CaseInfo, result.rows[0]);
 }
 
-export async function getCases(guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
+export async function getCases(db: Pool, guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
 	query.reversed ??= false;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			SELECT *
 			FROM "moderation_cases"
@@ -114,10 +115,10 @@ export async function getCases(guildID: string, query: CaseQuery): Promise<CaseI
 	return dbParse(CaseInfoArray, result.rows);
 }
 
-export async function createCase(guildID: string, event: ModEvent): Promise<number> {
+export async function createCase(db: Pool, guildID: string, event: ModEvent): Promise<number> {
 	// TODO: might have edge cases but it's pretty darn unlikely
 
-	const client = await postgres.connect();
+	const client = await db.connect();
 
 	let done = false;
 
@@ -195,11 +196,11 @@ export async function createCase(guildID: string, event: ModEvent): Promise<numb
 	}
 }
 
-export async function deleteCase(guildID: string, number: number): Promise<boolean> {
+export async function deleteCase(db: Pool, guildID: string, number: number): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32)
 		return false;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			DELETE FROM "moderation_cases"
 			WHERE "guildID" = $1 AND "number" = $2

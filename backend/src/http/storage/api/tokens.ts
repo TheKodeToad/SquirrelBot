@@ -1,6 +1,7 @@
 import { DAY } from "#common/time.ts";
-import { dbParse, postgres } from "#storage/index.ts";
+import { dbParse } from "#storage/index.ts";
 import crypto from "crypto";
+import type { Pool } from "pg";
 import { z } from "zod/v4";
 
 const ALGORITHM = "sha-256";
@@ -12,13 +13,13 @@ const TokenInfo = z.strictObject({
 	expiresAt: z.date()
 });
 
-export async function generateToken(userID: string): Promise<[token: string, expiry: Date]> {
+export async function generateToken(db: Pool, userID: string): Promise<[token: string, expiry: Date]> {
 	const secret = crypto.randomBytes(16);
 	const expiresAt = new Date(Date.now() + TOKEN_LIFETIME);
 
 	const hash = Buffer.from(await crypto.subtle.digest(ALGORITHM, secret));
 
-	await postgres.query(
+	await db.query(
 		`
 			INSERT INTO "api_tokens" (
 				"userID",
@@ -63,13 +64,13 @@ async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
 /**
  * @returns user ID if valid
  */
-export async function validateToken(token: string): Promise<string | null> {
+export async function validateToken(db: Pool, token: string): Promise<string | null> {
 	const key: [bigint, Buffer] | null = await tokenKey(token);
 
 	if (key === null)
 		return null;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			SELECT "userID", "expiresAt"
 			FROM "api_tokens"
@@ -84,7 +85,7 @@ export async function validateToken(token: string): Promise<string | null> {
 	const { expiresAt, userID } = dbParse(TokenInfo, result.rows[0]);
 
 	if (Date.now() >= expiresAt.getTime()) {
-		await postgres.query(
+		await db.query(
 			`
 				DELETE FROM "api_tokens"
 				WHERE "userID" = $1 AND "hash" = $2
@@ -95,7 +96,7 @@ export async function validateToken(token: string): Promise<string | null> {
 	}
 
 	if (Date.now() - expiresAt.getTime() >= TOKEN_REFRESH_THRESHOLD) {
-		await postgres.query(
+		await db.query(
 			`
 				UPDATE "api_tokens"
 				SET "expiresAt" = $1
@@ -108,13 +109,13 @@ export async function validateToken(token: string): Promise<string | null> {
 	return userID;
 }
 
-export async function deleteToken(token: string): Promise<boolean> {
+export async function deleteToken(db: Pool, token: string): Promise<boolean> {
 	const key = await tokenKey(token);
 
 	if (key === null)
 		return false;
 
-	const result = await postgres.query(
+	const result = await db.query(
 		`
 			DELETE FROM "api_tokens"
 			WHERE "userID" = $1 AND "hash" = $2
@@ -125,8 +126,8 @@ export async function deleteToken(token: string): Promise<boolean> {
 	return result.rowCount === 1;
 }
 
-export async function deleteExpiredTokens(): Promise<number> {
-	const result = await postgres.query(
+export async function deleteExpiredTokens(db: Pool): Promise<number> {
+	const result = await db.query(
 		`
 			DELETE FROM "api_tokens"
 			WHERE "expiresAt" <= $1

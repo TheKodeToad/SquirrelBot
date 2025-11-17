@@ -1,7 +1,7 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import { bot } from "#discord/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { EventListenerPhase } from "#loader/extensionPoint.ts";
 import { type CommandCacheEntry, getCommandByName, getCommands } from "#plugin/core/commandEngine/commandCache.ts";
@@ -16,17 +16,17 @@ import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { readFile, writeFile } from "fs/promises";
-import { type AnyInteractionGateway, type AnyTextableGuildChannel, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, type ApplicationCommandOptions as SlashOptions, ApplicationCommandOptionTypes as SlashOptionTypes, ApplicationCommandTypes as SlashTypes, User } from "oceanic.js";
+import { type AnyInteractionGateway, type AnyTextableGuildChannel, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, type ApplicationCommandOptions as SlashOptions, ApplicationCommandOptionTypes as SlashOptionTypes, ApplicationCommandTypes as SlashTypes, User, Client } from "oceanic.js";
 import path from "path";
 
 const logger = moduleLogger();
 
 export default [
-	onBotInit(syncSlashCommands, EventListenerPhase.Pre),
+	onBotInit(ctx => syncSlashCommands(ctx.bot), EventListenerPhase.Pre),
 	onBotEvent({ type: "interactionCreate", listener: handle }),
 ];
 
-async function handle(interaction: AnyInteractionGateway): Promise<void> {
+async function handle(discordCtx: DiscordContext, interaction: AnyInteractionGateway): Promise<void> {
 	if (!interaction.inCachedGuildChannel())
 		return;
 
@@ -53,14 +53,14 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 	const privateOption = interaction.data.options.getNumber("private")
 		?? Number(commandEntry.command.ephemeralByDefault);
 	const ephemeral = perms.ephemeral_response && Boolean(privateOption);
-	const context = new SlashContext(commandEntry.command, interaction, ephemeral);
+	const ctx = new SlashContext(discordCtx, commandEntry.command, interaction, ephemeral);
 
-	const data = commandEntry.command.preRun(context);
+	const data = commandEntry.command.preRun(ctx);
 
 	if (data === false) {
-		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
-		context._ephemeral = true;
-		await context.respond(`${icons.error} You lack permission to execute the command in this channel.`);
+		logger.debug?.(`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(ctx.member, ctx.channel)}`);
+		ctx._ephemeral = true;
+		await ctx.respond(`${icons.error} You lack permission to execute the command in this channel.`);
 		return;
 	}
 
@@ -70,8 +70,8 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
 
 	if (args.error !== null) {
-		context._ephemeral = true;
-		await context.respond(`${icons.error} ${formatArgsParseError(args)}`);
+		ctx._ephemeral = true;
+		await ctx.respond(`${icons.error} ${formatArgsParseError(args)}`);
 		return;
 	}
 
@@ -79,22 +79,22 @@ async function handle(interaction: AnyInteractionGateway): Promise<void> {
 
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		await commandEntry.command.run(context, args.result as any, data);
+		await commandEntry.command.run(ctx, args.result as any, data);
 	} catch (error) {
 		try {
-			await context.respond(`:boom: Failed to execute command`);
+			await ctx.respond(`:boom: Failed to execute command`);
 		} catch (error) {
 			logger.error?.("Error responding with error message for slash command", error);
 		}
 		throw error;
 	} finally {
-		context._clearTimeout();
+		ctx._clearTimeout();
 	}
 }
 
 const PLACEHOLDER_DESCRIPTION = "No description provided.";
 
-async function syncSlashCommands(): Promise<void> {
+async function syncSlashCommands(bot: Client): Promise<void> {
 	const commands = getCommands().filter(({ command }) => command.supportSlash ?? true).map(mapCommand);
 
 	const cacheFile = path.resolve(CACHE_PATH, "core_syncSlashCommandsHash.bin");
@@ -196,6 +196,17 @@ function mapCommand({ command }: CommandCacheEntry): CreateApplicationCommandOpt
 }
 
 class SlashContext implements CommandContext {
+	command: Command;
+	get ephemeral(): boolean { return this._ephemeral; }
+
+	discordCtx: DiscordContext;
+	get bot(): Client { return this.discordCtx.bot; }
+	get shard(): Shard { return this._interaction.guild.shard; }
+	get guild(): Guild { return this._interaction.guild; }
+	get user(): User { return this._interaction.user; }
+	get member(): Member { return this._interaction.member; }
+	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
+
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;
 	_responseID: string | null;
 	_acked: boolean;
@@ -203,16 +214,8 @@ class SlashContext implements CommandContext {
 	_deferPromise: Promise<void> | null;
 	_ephemeral: boolean;
 
-	command: Command;
-	get ephemeral(): boolean { return this._ephemeral; }
-
-	get shard(): Shard { return this._interaction.guild.shard; }
-	get guild(): Guild { return this._interaction.guild; }
-	get user(): User { return this._interaction.user; }
-	get member(): Member { return this._interaction.member; }
-	get channel(): AnyTextableGuildChannel { return this._interaction.channel; }
-
-	constructor(command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, ephemeral: boolean) {
+	constructor(discordCtx: DiscordContext, command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, ephemeral: boolean) {
+		this.discordCtx = discordCtx;
 		this.command = command;
 		this._interaction = interaction;
 		this._responseID = null;

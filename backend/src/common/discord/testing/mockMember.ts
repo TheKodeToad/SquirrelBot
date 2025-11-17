@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
-
 import { todo } from "#common/general.ts";
-import { bot } from "#discord/index.ts";
-import { Base, Permission, type Member } from "oceanic.js";
+import { Permission, type Member } from "oceanic.js";
 
 export type MockMemberProps = Partial<Member> & { id: string; };
 
@@ -13,11 +11,10 @@ export function mockMember(props: MockMemberProps): Member {
 }
 
 // @ts-expect-error Class 'MockMember' incorrectly implements class 'Member' - no way to properly implement
-class MockMember extends Base implements Member {
+class MockMember implements Member {
 	private _props: MockMemberProps;
 
 	constructor(props: MockMemberProps) {
-		super(props.id, bot);
 		this._props = props;
 	}
 
@@ -70,7 +67,7 @@ class MockMember extends Base implements Member {
 	get bot() { return this._props.bot ?? false; }
 	get discriminator() { return this._props.discriminator ?? "0"; }
 	get guild() { return this._props.guild ?? todo(); }
-	get mention(): string { return this._props.mention ?? `<@${this.id}>`; }
+	get mention(): string { return this._props.mention ?? `<@${this._props.id}>`; }
 	get permissions() { return this._props.permissions ?? new Permission(0n); }
 	get publicFlags() { return this._props.publicFlags ?? 0; }
 	get system() { return this._props.system ?? false; }

@@ -1,6 +1,5 @@
 import { isUndeletableMessageType } from "#common/discord/general.ts";
 import { WEEK } from "#common/time.ts";
-import { bot } from "#discord/index.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -39,13 +38,13 @@ export default defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.purge),
-	async run(context, args) {
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.purge),
+	async run(ctx, args) {
 		let purged = 0;
 
-		const iter = bot.rest.channels.getMessagesIterator(context.channel.id, {
+		const iter = ctx.bot.rest.channels.getMessagesIterator(ctx.channel.id, {
 			limit: args.count,
-			before: context.message?.id,
+			before: ctx.message?.id,
 		});
 
 		for await (const messages of iter) {
@@ -77,7 +76,7 @@ export default defineCommand({
 				toDelete.push(message.id);
 			}
 
-			await context.channel.deleteMessages(toDelete);
+			await ctx.channel.deleteMessages(toDelete);
 			purged += toDelete.length;
 
 			if (stop)
@@ -85,8 +84,8 @@ export default defineCommand({
 		}
 
 		if (purged === 0)
-			await context.respond(`${icons.error} No messages were purged!`);
+			await ctx.respond(`${icons.error} No messages were purged!`);
 		else
-			await context.respond(`${icons.success} Purged **${purged} messages**!`);
+			await ctx.respond(`${icons.success} Purged **${purged} messages**!`);
 	},
 });

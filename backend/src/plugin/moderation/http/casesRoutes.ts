@@ -33,24 +33,24 @@ const querySchema = z.strictObject({
 	limit: input.limit,
 } satisfies CaseQuery));
 
-export default definePluginGuildRoutes(app => {
-	app.get("/cases/:number{\\d+}", async context => {
-		const number = Number(context.req.param("number"));
+export default definePluginGuildRoutes((httpCtx, app) => {
+	app.get("/cases/:number{\\d+}", async ctx => {
+		const number = Number(ctx.req.param("number"));
 
 		if (!Number.isSafeInteger(number))
 			throw new HTTPException(400, { message: "Bad case number" });
 
-		const info = await getCase(context.var.discordGuildID, number);
+		const info = await getCase(httpCtx.db, ctx.var.discordGuildID, number);
 
 		if (info === null)
 			throw new HTTPException(404, { message: "Case not found" });
 
-		return context.json(serializeCaseObject(info));
+		return ctx.json(serializeCaseObject(info));
 	});
 
-	app.get("/", validate("query", querySchema), async context => {
-		const result = await getCases(context.var.discordGuildID, context.req.valid("query"));
-		return context.json(result.map(serializeCaseObject));
+	app.get("/", validate("query", querySchema), async ctx => {
+		const result = await getCases(httpCtx.db, ctx.var.discordGuildID, ctx.req.valid("query"));
+		return ctx.json(result.map(serializeCaseObject));
 	});
 });
 

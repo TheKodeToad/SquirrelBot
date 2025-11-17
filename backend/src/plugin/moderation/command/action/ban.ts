@@ -46,12 +46,12 @@ export default defineCommand({
 	},
 
 	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.ban),
-	async run(context, args, { config }) {
+	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
 			? config.ban.direct_message.render({
-				server: makeGuildView(context.guild),
-				moderator: makeUserView(context.user),
+				server: makeGuildView(ctx.guild),
+				moderator: makeUserView(ctx.user),
 				reason: args.reason ?? undefined,
 			})
 			: undefined;
@@ -60,13 +60,13 @@ export default defineCommand({
 				? args.purge / 1000
 				: config.ban.purge_messages;
 
-		const { successful, unsuccessful } = await performModActions(context.guild, args.user, target => ({
-			guild: context.guild,
+		const { successful, unsuccessful } = await performModActions(ctx.discordCtx, ctx.guild, args.user, target => ({
+			guild: ctx.guild,
 
 			type: ModEventType.Ban,
 			expiresAt: args.duration !== null ? new Date(Date.now() + args.duration) : undefined,
 
-			actor: context.member,
+			actor: ctx.member,
 			target: target,
 			ranking: config.member_ranking,
 
@@ -78,23 +78,23 @@ export default defineCommand({
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Banned ${formatModActionSuccess(successful[0]!)}!`);
+				await ctx.respond(`${icons.success} Banned ${formatModActionSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not ban ${formatModActionFailure(unsuccessful[0]!)}!`);
+				await ctx.respond(`${icons.error} Could not ban ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.success} Banned all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.error} None of **${args.user.length} users** were banned:\n${unsuccessfulMessage}`
 				);
 			} else {
-				await context.respond(
+				await ctx.respond(
 					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n`
 					+ `Successful:\n${successfulMessage}\n`
 					+ `Unsuccessful:\n${unsuccessfulMessage}`

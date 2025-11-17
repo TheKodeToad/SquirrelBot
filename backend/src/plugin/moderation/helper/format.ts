@@ -4,6 +4,7 @@ import { dateToUnixSecs, humanizeDuration } from "#common/time.ts";
 import type { ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
 import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
 import { type CaseInfo } from "#plugin/moderation/storage/cases.ts";
+import type { Client } from "oceanic.js";
 
 export function formatModActionSuccess(event: ModEvent): string {
 	let result = formatUserBold(event.target);
@@ -44,7 +45,7 @@ function caseSummaryBase(type: ModEventType, target: string): string {
 	}
 }
 
-export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): Promise<string> {
+export async function formatCaseDescription(bot: Client, info: CaseInfo, bigTitle: boolean): Promise<string> {
 	let title = "Case #" + info.number;
 
 	if (info.shadowedBy !== null) {
@@ -60,7 +61,7 @@ export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): 
 	else
 		title = "### " + title;
 
-	const target = await formatUserBoldByID(info.targetID);
+	const target = await formatUserBoldByID(bot, info.targetID);
 
 	let summary = caseSummaryBase(info.type, target);
 
@@ -75,10 +76,10 @@ export async function formatCaseDescription(info: CaseInfo, bigTitle: boolean): 
 	return title + "\n" + summary;
 }
 
-export async function formatCaseFields(info: CaseInfo): Promise<string> {
+export async function formatCaseFields(bot: Client, info: CaseInfo): Promise<string> {
 	let result = "";
 
-	result += `**Moderator:** ${await formatUserByID(info.actorID)}\n`;
+	result += `**Moderator:** ${await formatUserByID(bot, info.actorID)}\n`;
 
 	const creationSecs = dateToUnixSecs(info.createdAt);
 	result += `**Performed At:** <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
@@ -92,9 +93,9 @@ export async function formatCaseFields(info: CaseInfo): Promise<string> {
 	return result;
 }
 
-export async function formatCompactCaseSummary(info: CaseInfo): Promise<string> {
-	const actor = await formatUserTagByID(info.actorID);
-	const target = await formatUserTagByID(info.targetID);
+export async function formatCompactCaseSummary(bot: Client, info: CaseInfo): Promise<string> {
+	const actor = await formatUserTagByID(bot, info.actorID);
+	const target = await formatUserTagByID(bot, info.targetID);
 
 	let result = `<t:${dateToUnixSecs(info.createdAt)}:d> `;
 

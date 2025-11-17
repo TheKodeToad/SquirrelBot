@@ -1,13 +1,12 @@
 import type { Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { checkMigrationsOrExit } from "#storage/migration.ts";
 
 const logger = moduleLogger();
 
 /**
  * Common pre-startup code.
  */
-export async function preMain(): Promise<void> {
+export function preMain(): void {
 	// not sure if this is good practice but we certainly don't want a crash because we forgot await
 	process.on("unhandledRejection", error => {
 		logger.error?.("Unhandled Promise rejection!", error);
@@ -18,8 +17,6 @@ export async function preMain(): Promise<void> {
 
 	Object.freeze(Object.prototype);
 	Object.freeze(Array.prototype);
-
-	await checkMigrationsOrExit();
 }
 
 function hasProto(): boolean {

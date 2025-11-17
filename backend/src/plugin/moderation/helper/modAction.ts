@@ -2,6 +2,7 @@ import { createDMCached, fetchMembersCached, fetchUserCached } from "#common/dis
 import { formatRESTError } from "#common/discord/format.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
@@ -25,7 +26,7 @@ export interface ModActionFailure {
 	error: string;
 }
 
-export async function performModAction(action: ModAction): Promise<ModActionResult> {
+export async function performModAction(ctx: DiscordContext, action: ModAction): Promise<ModActionResult> {
 	let dmDelivered = false;
 
 	if (action.target instanceof Member) {
@@ -49,7 +50,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 		}
 
 		if (action.directMessage !== undefined && !action.target.bot) {
-			const dmChannel = await createDMCached(action.target.id);
+			const dmChannel = await createDMCached(ctx.bot, action.target.id);
 			try {
 				await dmChannel.createMessage(action.directMessage);
 				dmDelivered = true;
@@ -108,7 +109,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 	}
 
 	const result: ModEvent = { ...action, performedAt, dmDelivered };
-	result.caseNumber = await createCase(action.guild.id, result);
+	result.caseNumber = await createCase(ctx.db, action.guild.id, result);
 
 	if (action.type === ModEventType.Ban) {
 		untrackTempBan(action.guild.id, action.target.id);
@@ -123,13 +124,13 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 				caseNumber: result.caseNumber,
 			};
 
-			await upsertTempBan(action.guild.id, tempBan);
+			await upsertTempBan(ctx.db, action.guild.id, tempBan);
 			trackNewTempBan(tempBan);
 		} else
-			await deleteTempBan(action.guild.id, action.target.id);
+			await deleteTempBan(ctx.db, action.guild.id, action.target.id);
 	}
 
-	onModAction.fire(result).catch(error => logger.error?.("Error in onModAction", error));
+	onModAction.fire(ctx, result).catch(error => logger.error?.("Error in onModAction", error));
 
 	return result;
 }
@@ -171,6 +172,7 @@ export interface BulkModActionResult {
 }
 
 export async function performModActions(
+	ctx: DiscordContext,
 	guild: Guild,
 	ids: readonly string[],
 	makeAction: (target: Member | User) => ModAction
@@ -188,7 +190,7 @@ export async function performModActions(
 			target = member;
 		else {
 			try {
-				target = await fetchUserCached(id);
+				target = await fetchUserCached(ctx.bot, id);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
@@ -204,7 +206,7 @@ export async function performModActions(
 		const action = makeAction(target);
 
 		// TODO: parallelism
-		const event = await performModAction(action);
+		const event = await performModAction(ctx, action);
 
 		if ("error" in event)
 			result.unsuccessful.push(event);

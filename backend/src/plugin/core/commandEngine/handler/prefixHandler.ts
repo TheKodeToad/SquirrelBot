@@ -3,6 +3,7 @@ import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
 import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
@@ -15,12 +16,12 @@ import type { Command, CommandContext, Reply } from "#plugin/core/public/command
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
-import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
+import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User, Client } from "oceanic.js";
 
 const logger = moduleLogger();
 
 export default [
-	onBotEvent({ type: "messageCreate", listener: async message => void await handle(message) }),
+	onBotEvent({ type: "messageCreate", listener: async (ctx, message) => void await handle(ctx, message) }),
 	onBotEvent({ type: "messageUpdate", listener: handleEdit }),
 	onBotEvent({ type: "messageDelete", listener: handleDelete }),
 ];
@@ -31,7 +32,7 @@ const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
-async function handle(message: Message, prevResponse?: Message): Promise<boolean> {
+async function handle(discordCtx: DiscordContext, message: Message, prevResponse?: Message): Promise<boolean> {
 	if (!message.inCachedGuildChannel())
 		return false;
 
@@ -42,7 +43,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
 		return false;
 
-	if (!canWriteInChannel(message.channel, message.channel.guild.clientMember))
+	if (!canWriteInChannel(discordCtx.bot, message.channel, message.channel.guild.clientMember))
 		return false;
 
 	const config = coreConfigStore.get(message.guildID);
@@ -71,7 +72,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 		return false;
 	}
 
-	const context = new PrefixContext(commandEntry.command, message, prevResponse);
+	const context = new PrefixContext(discordCtx, commandEntry.command, message, prevResponse);
 
 	const data = commandEntry.command.preRun(context);
 
@@ -118,7 +119,7 @@ async function handle(message: Message, prevResponse?: Message): Promise<boolean
 	return true;
 }
 
-async function handleEdit(message: Message): Promise<void> {
+async function handleEdit(ctx: DiscordContext, message: Message): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response)
@@ -129,11 +130,11 @@ async function handleEdit(message: Message): Promise<void> {
 
 	trackedMessages.delete(message.id);
 
-	if (!await handle(message, response))
+	if (!await handle(ctx, message, response))
 		await response.delete();
 }
 
-async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
+async function handleDelete(_: DiscordContext, message: PossiblyUncachedMessage): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response)
@@ -144,19 +145,22 @@ async function handleDelete(message: PossiblyUncachedMessage): Promise<void> {
 	await response.delete();
 }
 
-
 class PrefixContext implements CommandContext {
 	command: Command;
 	message: Message<AnyTextableGuildChannel>;
-	_response: Message | null;
 
+	discordCtx: DiscordContext;
+	get bot(): Client { return this.discordCtx.bot; }
 	get shard(): Shard { return this.message.guild.shard; }
 	get guild(): Guild { return this.message.guild; }
 	get user(): User { return this.message.author; }
 	get member(): Member { return this.message.member; }
 	get channel(): AnyTextableGuildChannel { return this.message.channel; }
 
-	constructor(command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
+	_response: Message | null;
+
+	constructor(discordCtx: DiscordContext, command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
+		this.discordCtx = discordCtx;
 		this.command = command;
 		this.message = message;
 		this._response = response ?? null;
@@ -171,7 +175,7 @@ class PrefixContext implements CommandContext {
 		}
 
 		if (this.message.channel instanceof GuildChannel
-			&& !canWriteInChannel(this.message.channel, this.message.channel.guild.clientMember))
+			&& !canWriteInChannel(this.bot, this.message.channel, this.message.channel.guild.clientMember))
 			return;
 
 		if (this._response === null) {

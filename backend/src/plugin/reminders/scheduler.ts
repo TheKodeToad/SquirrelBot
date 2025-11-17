@@ -6,36 +6,36 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { startPollingScheduler, type PollingSchedulerHandle } from "#common/pollingScheduler.ts";
 import { dateToUnixSecs, SECOND } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import { bot } from "#discord/index.ts";
+import type { DiscordContext } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
-import { deleteReminder, deleteReminderIfOwnedBy, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";
-import { DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
+import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";
+import { Client, DiscordRESTError, MessageFlags, Permissions, type AnyTextableChannel } from "oceanic.js";
 
 const logger = moduleLogger();
 let scheduler: PollingSchedulerHandle<Reminder> | null = null;
 
 export default [onBotInit(beginPollingReminders)];
 
-function debugFormatReminder(reminder: Reminder): string {
-    return `reminder #${reminder.number} in ${debugFormatGuildByID(reminder.guildID)}`;
+function debugFormatReminder(bot: Client, reminder: Reminder): string {
+    return `reminder #${reminder.number} in ${debugFormatGuildByID(bot, reminder.guildID)}`;
 }
 
 function getReminderKey(guildID: string, number: number): string {
 	return guildID + "::" + number;
 }
 
-async function beginPollingReminders(): Promise<void> {
+async function beginPollingReminders(ctx: DiscordContext): Promise<void> {
 	scheduler = await startPollingScheduler({
 		discriminator: "reminders",
 		pollRate: 60 * SECOND,
 
-		poll: (start, end) => getRemindersByFiresAt(start, end),
-		run: fire,
+		poll: (start, end) => getRemindersByFiresAt(ctx.db, start, end),
+		run: reminder => fire(ctx, reminder),
 
 		getKey: reminder => getReminderKey(reminder.guildID, reminder.number),
 		getTimestamp: reminder => reminder.firesAt,
-		debugFormat: debugFormatReminder,
+		debugFormat: reminder => debugFormatReminder(ctx.bot, reminder),
 	});
 }
 
@@ -47,21 +47,21 @@ export function untrackReminder(guildID: string, number: number): void {
 	scheduler?.untrack(getReminderKey(guildID, number));
 }
 
-async function fire(reminder: Reminder): Promise<void> {
+async function fire(ctx: DiscordContext, reminder: Reminder): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!
-	if (!await deleteReminder(reminder.guildID, reminder.number))
+	if (!await deleteReminder(ctx.db, reminder.guildID, reminder.number))
 		return;
 
 	if (!remindersConfigStore.has(reminder.guildID))
 		return;
 
-	const guild = bot.guilds.get(reminder.guildID);
+	const guild = ctx.bot.guilds.get(reminder.guildID);
 
 	// TODO: should these issues be reported to somebody
 	// members could also be bulk requested ahead of time
 
 	if (guild === undefined) {
-		logger.debug?.(`Bot user is not in guild; not sending ${debugFormatReminder(reminder)}`);
+		logger.debug?.(`Bot user is not in guild; not sending ${debugFormatReminder(ctx.bot, reminder)}`);
 		return; // no access to guild?
 	}
 
@@ -69,12 +69,12 @@ async function fire(reminder: Reminder): Promise<void> {
 
 	if (isThreadChannelType(reminder.channelType)) {
 		try {
-			var potentialThread = await fetchThreadCached(guild, reminder.channelID);
+			var potentialThread = await fetchThreadCached(ctx.bot, guild, reminder.channelID);
 		} catch (error) {
 			if (!(error instanceof DiscordRESTError))
 				throw error;
 
-			logger.debug?.(`Thread was deleted; not sending ${debugFormatReminder(reminder)}`);
+			logger.debug?.(`Thread was deleted; not sending ${debugFormatReminder(ctx.bot, reminder)}`);
 			return;
 		}
 
@@ -86,7 +86,7 @@ async function fire(reminder: Reminder): Promise<void> {
 		const potentialChannel = guild.channels.get(reminder.channelID);
 
 		if (potentialChannel === undefined) {
-			logger.debug?.(`Channel was deleted; not sending ${debugFormatReminder(reminder)}`);
+			logger.debug?.(`Channel was deleted; not sending ${debugFormatReminder(ctx.bot, reminder)}`);
 			return;
 		}
 
@@ -96,13 +96,13 @@ async function fire(reminder: Reminder): Promise<void> {
 		channel = potentialChannel;
 	}
 
-	if (!canWriteInChannel(channel, guild.clientMember)) {
-		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending ${debugFormatReminder(reminder)}`);
+	if (!canWriteInChannel(ctx.bot, channel, guild.clientMember)) {
+		logger.debug?.(`Bot user cannot send messages in ${debugFormatChannel(channel)}; not sending ${debugFormatReminder(ctx.bot, reminder)}`);
 		return;
 	}
 
 	try {
-		var reminderOwner = await fetchMemberCached(guild, reminder.ownerID);
+		var reminderOwner = await fetchMemberCached(ctx.bot, guild, reminder.ownerID);
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))
 			throw error;
@@ -112,8 +112,8 @@ async function fire(reminder: Reminder): Promise<void> {
 
 	// TODO: doesn't account for private thread but I don't think this really matters that much
 	// don't allow perm bypass
-	if (!canWriteInChannel(channel, reminderOwner)) {
-		logger.debug?.(`Owner cannot send messages in ${debugFormatChannel(channel)}; not sending ${debugFormatReminder(reminder)}`);
+	if (!canWriteInChannel(ctx.bot, channel, reminderOwner)) {
+		logger.debug?.(`Owner cannot send messages in ${debugFormatChannel(channel)}; not sending ${debugFormatReminder(ctx.bot, reminder)}`);
 		return;
 	}
 

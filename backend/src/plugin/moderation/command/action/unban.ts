@@ -30,13 +30,13 @@ export default defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.unban),
-	async run(context, args) {
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.unban),
+	async run(ctx, args) {
 		const successful: ModEvent[] = [];
 		const unsuccessful: ModActionFailure[] = [];
 
 		for (const target of args.user) {
-			const cachedMember = context.guild.members.get(target);
+			const cachedMember = ctx.guild.members.get(target);
 			if (cachedMember !== undefined) {
 				unsuccessful.push({
 					target: cachedMember.user,
@@ -46,20 +46,20 @@ export default defineCommand({
 			}
 
 			try {
-				var ban = await context.guild.getBan(target);
+				var ban = await ctx.guild.getBan(target);
 			} catch (error) {
 				if (!(error instanceof DiscordRESTError))
 					throw error;
 
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
 					unsuccessful.push({
-						target: await fetchUserCachedSupressed(target),
+						target: await fetchUserCachedSupressed(ctx.bot, target),
 						error: "User is not banned",
 					});
 				} else {
 					const user = error.code === JSONErrorCodes.UNKNOWN_USER
 						? { id: target }
-						: await fetchUserCachedSupressed(target);
+						: await fetchUserCachedSupressed(ctx.bot, target);
 
 					unsuccessful.push({
 						target: user,
@@ -71,18 +71,18 @@ export default defineCommand({
 			}
 
 			const action: ModAction = {
-				guild: context.guild,
+				guild: ctx.guild,
 
 				type: ModEventType.Unban,
 
-				actor: context.member,
+				actor: ctx.member,
 				target: ban.user,
 				ranking: MemberRanking.None,
 
 				reason: args.reason ?? undefined,
 			};
 
-			const actionResult = await performModAction(action);
+			const actionResult = await performModAction(ctx.discordCtx, action);
 
 			if ("error" in actionResult)
 				unsuccessful.push(actionResult);
@@ -92,23 +92,23 @@ export default defineCommand({
 
 		if (args.user.length === 1) {
 			if (successful.length === 1)
-				await context.respond(`${icons.success} Unbanned ${formatModActionSuccess(successful[0]!)}!`);
+				await ctx.respond(`${icons.success} Unbanned ${formatModActionSuccess(successful[0]!)}!`);
 			else if (unsuccessful.length === 1)
-				await context.respond(`${icons.error} Could not unban ${formatModActionFailure(unsuccessful[0]!)}!`);
+				await ctx.respond(`${icons.error} Could not unban ${formatModActionFailure(unsuccessful[0]!)}!`);
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
 
 			if (unsuccessful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.success} Unbanned all **${args.user.length} users**:\n${successfulMessage}`
 				);
 			} else if (successful.length === 0) {
-				await context.respond(
+				await ctx.respond(
 					`${icons.error} None of **${args.user.length} users** were unbanned:\n${unsuccessfulMessage}`
 				);
 			} else {
-				await context.respond(
+				await ctx.respond(
 					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were unbanned!\n`
 					+ `Successful:\n${successfulMessage}\n`
 					+ `Unsuccessful:\n${unsuccessfulMessage}`

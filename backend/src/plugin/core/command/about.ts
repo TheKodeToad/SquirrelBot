@@ -1,5 +1,4 @@
 import { APP_DESCRIPTION, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
-import { bot } from "#discord/index.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
@@ -42,7 +41,7 @@ export default defineCommand({
 		const container = Container([
 			Section(
 				[`## About ${APP_NAME}\n${APP_DESCRIPTION}`],
-				Thumbnail(bot.user.avatarURL())
+				Thumbnail(context.bot.user.avatarURL())
 			),
 			Divider(),
 			Text("**Source Code**\n" + APP_SOURCE_CODE),

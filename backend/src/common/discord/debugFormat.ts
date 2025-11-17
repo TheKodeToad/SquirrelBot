@@ -1,5 +1,4 @@
-import { bot } from "#discord/index.ts";
-import type { AnyChannel, Guild, Member, Uncached, User } from "oceanic.js";
+import type { AnyChannel, Client, Guild, Member, Uncached, User } from "oceanic.js";
 
 export function debugFormatUser(user: User): string {
 	return `@${user.tag}[${user.id}]`;
@@ -14,7 +13,7 @@ export function debugFormatChannel(channel: AnyChannel): string {
 	return `#${name}[${channel.id}]`;
 }
 
-export function debugFormatGuildByID(id: string): string {
+export function debugFormatGuildByID(bot: Client, id: string): string {
 	return debugFormatGuild(bot.guilds.get(id) ?? { id });
 }
 
