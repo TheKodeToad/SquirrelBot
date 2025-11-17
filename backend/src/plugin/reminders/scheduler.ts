@@ -21,6 +21,10 @@ function debugFormatReminder(reminder: Reminder): string {
     return `reminder #${reminder.number} in ${debugFormatGuildByID(reminder.guildID)}`;
 }
 
+function getReminderKey(guildID: string, number: number): string {
+	return guildID + "::" + number;
+}
+
 async function beginPollingReminders(): Promise<void> {
 	scheduler = await startPollingScheduler({
 		discriminator: "reminders",
@@ -29,7 +33,7 @@ async function beginPollingReminders(): Promise<void> {
 		poll: (start, end) => getRemindersByFiresAt(start, end),
 		run: fire,
 
-		getKey: task => task.guildID + "::" + task.number,
+		getKey: reminder => getReminderKey(reminder.guildID, reminder.number),
 		getTimestamp: reminder => reminder.firesAt,
 		debugFormat: debugFormatReminder,
 	});
@@ -37,6 +41,10 @@ async function beginPollingReminders(): Promise<void> {
 
 export function trackNewReminder(reminder: Reminder): void {
 	scheduler?.track(reminder);
+}
+
+export function untrackReminder(guildID: string, number: number): void {
+	scheduler?.untrack(getReminderKey(guildID, number));
 }
 
 async function fire(reminder: Reminder): Promise<void> {

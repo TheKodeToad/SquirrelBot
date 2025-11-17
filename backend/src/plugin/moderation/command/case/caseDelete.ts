@@ -25,6 +25,6 @@ export default defineCommand({
 		if (deleted)
 			await context.respond(`${icons.success} Deleted case **#${number}**!`);
 		else
-			await context.respond(`${icons.error} Case **#${number}** does not exist!`);
+			await context.respond(`${icons.error} Case **#${number}** was not found!`);
 	}
 });

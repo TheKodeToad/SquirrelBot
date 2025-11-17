@@ -3,6 +3,7 @@ import { definePlugin } from "#loader/plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import remind from "#plugin/reminders/command/remind.ts";
+import reminderCancel from "#plugin/reminders/command/reminderCancel.ts";
 import reminderList from "#plugin/reminders/command/reminderList.ts";
 import { RemindersConfig } from "#plugin/reminders/config.ts";
 import scheduler from "#plugin/reminders/scheduler.ts";
@@ -33,7 +34,7 @@ export default definePlugin({
 		}),
 		...scheduler,
 
-		remind, reminderList,
+		remind, reminderList, reminderCancel,
 	],
 });
 
