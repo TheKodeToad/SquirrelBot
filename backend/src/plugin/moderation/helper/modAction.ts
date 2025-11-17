@@ -25,8 +25,6 @@ export interface ModActionFailure {
 	error: string;
 }
 
-
-
 export async function performModAction(action: ModAction): Promise<ModActionResult> {
 	let dmDelivered = false;
 
@@ -45,7 +43,7 @@ export async function performModAction(action: ModAction): Promise<ModActionResu
 			break;
 		case ModEventType.ClearTimeout:
 			if (action.target.communicationDisabledUntil === null || action.target.communicationDisabledUntil.getTime() < Date.now())
-				return { target: action.target, error: "Member is not muted" };
+				return { target: action.target, error: "Member is not timed out" };
 
 			break;
 		}
