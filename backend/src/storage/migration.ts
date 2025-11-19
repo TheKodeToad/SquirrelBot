@@ -9,11 +9,11 @@ import "../environment.ts";
 import type { ClientBase } from "pg";
 
 export async function migrate(db: ClientBase, ignoreChanges: boolean): Promise<number> {
-	return await _processMigrations(db, false, ignoreChanges);
+	return await processMigrations(db, false, ignoreChanges);
 }
 
 export async function checkMigrations(db: ClientBase): Promise<number> {
-	return await _processMigrations(db, true, false);
+	return await processMigrations(db, true, false);
 }
 
 export async function checkMigrationsOrExit(db: ClientBase): Promise<void> {
@@ -39,7 +39,7 @@ class MigrationError extends Error {
 
 const JustChecksumBuffer = z.strictObject({ checksum: z.instanceof(Buffer) });
 
-async function _processMigrations(client: ClientBase, checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
+async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
 	await client.query(`
 		CREATE TABLE IF NOT EXISTS "migration_files" (
 			"number" INT NOT NULL PRIMARY KEY,
