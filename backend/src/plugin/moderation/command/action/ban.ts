@@ -45,7 +45,7 @@ export default defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.ban),
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.ban),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
@@ -60,7 +60,7 @@ export default defineCommand({
 				? args.purge / 1000
 				: config.ban.purge_messages;
 
-		const { successful, unsuccessful } = await performModActions(ctx.discordCtx, ctx.guild, args.user, target => ({
+		const { successful, unsuccessful } = await performModActions(ctx.squirrelCtx, ctx.guild, args.user, target => ({
 			guild: ctx.guild,
 
 			type: ModEventType.Ban,

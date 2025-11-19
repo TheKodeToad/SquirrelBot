@@ -27,29 +27,29 @@ export default defineCommand({
 		}
 	},
 
-	preRun: (context) => permissionsGuard(context, remindersConfigStore, permissions => permissions.personal_reminders),
-	async run(context, args) {
-		if (context.guild === null)
+	preRun: (ctx) => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
+	async run(ctx, args) {
+		if (ctx.guild === null)
 			return;
 
 		const now = Date.now();
 		const firesAt = now + args.delay;
 
-		const reminder = await createReminder(context.discordCtx.db, context.guild.id, {
-			ownerID: context.user.id,
-			channelID: context.channel.id,
-			channelType: context.channel.type,
+		const reminder = await createReminder(ctx.squirrelCtx.db, ctx.guild.id, {
+			ownerID: ctx.user.id,
+			channelID: ctx.channel.id,
+			channelType: ctx.channel.type,
 			createdAt: new Date(now),
 			firesAt: new Date(firesAt),
 			message: args.message ?? undefined,
-			silent: ((context.message?.flags ?? 0) & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0,
+			silent: ((ctx.message?.flags ?? 0) & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0,
 		});
 
 		trackNewReminder(reminder);
 
 		const firesAtSecs = dateToUnixSecs(firesAt);
 
-		await context.respond(
+		await ctx.respond(
 			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${reminder.number})!\n`
 			+ `${icons.tip} No notification will be sent if you are timed out or not present in the server.`
 		);

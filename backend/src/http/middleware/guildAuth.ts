@@ -9,9 +9,9 @@ export type GuildAuthVars = {
 	discordUserID: string;
 };
 
-export const guildAuthMiddleware = (db: Pool) => createMiddleware<{ Variables: GuildAuthVars; }>(async (context, next) => {
-	const { discordUserID } = context.var;
-	const guildID = context.req.param("guildID");
+export const guildAuthMiddleware = (db: Pool) => createMiddleware<{ Variables: GuildAuthVars; }>(async (ctx, next) => {
+	const { discordUserID } = ctx.var;
+	const guildID = ctx.req.param("guildID");
 
 	if (typeof discordUserID !== "string")
 		throw new Error("Missing auth middleware");
@@ -27,6 +27,6 @@ export const guildAuthMiddleware = (db: Pool) => createMiddleware<{ Variables: G
 	if (owner === null || owner !== discordUserID)
 		throw new HTTPException(403, { message: "Missing permission" });
 
-	context.set("discordGuildID", guildID);
+	ctx.set("discordGuildID", guildID);
 	await next();
 });

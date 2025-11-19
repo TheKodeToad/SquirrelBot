@@ -30,8 +30,8 @@ const LogInPayload = z.strictObject({
 export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 	const app = new Hono;
 
-	app.post("/", validate("json", LogInPayload), async context => {
-		const { code, codeVerifier } = context.req.valid("json");
+	app.post("/", validate("json", LogInPayload), async ctx => {
+		const { code, codeVerifier } = ctx.req.valid("json");
 
 		if (typeof code !== "string")
 			throw new HTTPException(400, { message: "Missing code" });
@@ -83,7 +83,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 
 		const [token, expiresAt] = await generateToken(squirrelCtx.db, userJSON.id);
 
-		return context.json({
+		return ctx.json({
 			token,
 			expiresAt: expiresAt.getTime(),
 			username: userJSON.username,

@@ -20,33 +20,33 @@ const logger = moduleLogger();
 const app = new Hono;
 
 app.use(nortonAntivirusPlus());
-app.use(async (context, next) => {
+app.use(async (ctx, next) => {
 	await next();
 
 	const cspHeader: ResponseHeader = "Content-Security-Policy";
 
-	if (!context.res.headers.has(cspHeader))
-		context.res.headers.set(cspHeader, "self-src 'none'");
+	if (!ctx.res.headers.has(cspHeader))
+		ctx.res.headers.set(cspHeader, "self-src 'none'");
 });
 
 const ROBOTS = `User-agent: *
 Disallow: /api/`;
 
-app.get("/robots.txt", context => context.text(ROBOTS));
+app.get("/robots.txt", ctx => ctx.text(ROBOTS));
 
 app.route("/api", api(ctx));
 app.route("/", frontend(ctx));
 
-app.onError((error, context) => {
+app.onError((error, ctx) => {
 	if (error instanceof HTTPException) {
 		if (error.res !== undefined)
 			return error.getResponse();
 
-		return context.json({ error: error.message }, error.status);
+		return ctx.json({ error: error.message }, error.status);
 	}
 
 	logger.error?.("Something went wrong while serving an endpoint!", error);
-	return context.json({ message: "Internal server error" }, 500);
+	return ctx.json({ message: "Internal server error" }, 500);
 });
 
 const server = serve(

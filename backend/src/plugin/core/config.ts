@@ -50,7 +50,7 @@ export type CoreConfig = z.output<typeof CoreConfig>;
 const MAX_INHERITANCE_DEPTH = 1000;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function transformCoreGroups(input: Record<string, CoreGroup>, context: z.RefinementCtx<Record<string, CoreGroup>>) {
+function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.RefinementCtx<Record<string, CoreGroup>>) {
 	// show all errors for invalid inherits references at once
 	let hasIssues = false;
 
@@ -62,7 +62,7 @@ function transformCoreGroups(input: Record<string, CoreGroup>, context: z.Refine
 
 		value.inherits?.forEach((reference, index) => {
 			if (!Object.hasOwn(input, reference)) {
-				context.addIssue({
+				ctx.addIssue({
 					message: `Invalid group reference: Received ${reference}`,
 					path: [key, "inherits", index]
 				});
@@ -85,7 +85,7 @@ function transformCoreGroups(input: Record<string, CoreGroup>, context: z.Refine
 		const inherits = flattenInheritence(value, key, input);
 
 		if (inherits === null) {
-			context.addIssue({
+			ctx.addIssue({
 				message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
 				path: [key, "inherits"]
 			});

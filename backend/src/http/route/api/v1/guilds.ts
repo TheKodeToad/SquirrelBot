@@ -24,7 +24,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 
 	const app = new Hono;
 	app.route("/:guildID/plugins", guildRouter);
-	app.get("/", authMiddleware(squirrelCtx.db), async context => context.json(await getAPIGuildInfoByOwner(squirrelCtx.db, context.var.discordUserID)));
+	app.get("/", authMiddleware(squirrelCtx.db), async ctx => ctx.json(await getAPIGuildInfoByOwner(squirrelCtx.db, ctx.var.discordUserID)));
 
 	return app;
 };

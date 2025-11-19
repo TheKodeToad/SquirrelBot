@@ -7,7 +7,7 @@ import { z } from "zod/v4";
 export type ZTemplate<T extends Shape> = ReturnType<typeof zTemplate<T>>;
 
 export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
-	return z.string().transform((input, context) => {
+	return z.string().transform((input, ctx) => {
 		try {
 			return compileTemplate(input, shape, {
 				fallbackValue: "",
@@ -17,7 +17,7 @@ export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 			if (!(error instanceof TemplateCompileError || error instanceof TemplateParseError))
 				throw error;
 
-			context.addIssue({ message: error.message });
+			ctx.addIssue({ message: error.message });
 			return z.NEVER;
 		}
 	});

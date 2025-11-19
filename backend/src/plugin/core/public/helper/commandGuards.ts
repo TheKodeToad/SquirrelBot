@@ -4,16 +4,16 @@ import { resolvePermissions, type ConfigWithPermissions } from "#plugin/core/pub
 import { z } from "zod/v4";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(
-	context: CommandContext,
+	ctx: CommandContext,
 	configCache: ConfigStore<z.ZodType<C>>,
 	requirement?: (permissions: C["default_permissions"], config: C) => boolean
 ): false | PermissionsGuardData<C> {
-	const config = configCache.get(context.guild.id);
+	const config = configCache.get(ctx.guild.id);
 
 	if (config === undefined)
 		return false;
 
-	const permissions = resolvePermissions(config, context.member, context.channel);
+	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
 	if (requirement !== undefined && !requirement(permissions, config))
 		return false;

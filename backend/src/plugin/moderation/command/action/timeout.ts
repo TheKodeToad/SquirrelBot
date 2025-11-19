@@ -42,7 +42,7 @@ export default defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.timeout),
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.timeout),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.timeout.send_direct_message;
 		const directMessage = sendDirectMessage
