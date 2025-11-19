@@ -1,20 +1,22 @@
 import { moduleLogger } from "#common/logger/index.ts";
-import type { Plugin } from "#loader/plugin.ts";
+import type { Plugin } from "#plugin.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";
-import { connectNotifDispatcher, type NotifDispatcher } from "#storage/notification.ts";
+import { type NotifDispatcher, connectNotifDispatcher } from "#storage/notification.ts";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { Pool } from "pg";
 
-const logger = moduleLogger();
-
-export interface Context {
+export interface SquirrelContext {
 	plugins: Map<string, Plugin>;
 	db: Pool;
 	dbNotifs: NotifDispatcher;
 }
 
-export async function createContext(): Promise<Context> {
+const logger = moduleLogger();
+
+export async function squirrelInit(): Promise<SquirrelContext> {
+	preInit();
+
 	const db = new Pool;
 
 	const client = await db.connect();
@@ -41,15 +43,38 @@ export async function createContext(): Promise<Context> {
 	};
 }
 
-export function shutdownContext(context: Context): void {
-	context.dbNotifs.disconnect();
-	context.db.end();
+export async function squirrelShutdown(ctx: SquirrelContext) {
+	ctx.db.end();
+	ctx.dbNotifs.disconnect();
+}
+
+function preInit() {
+	// not sure if this is good practice but we certainly don't want a crash because we forgot await
+	process.on("unhandledRejection", error => {
+		logger.error?.("Unhandled Promise rejection!", error);
+	});
+
+	if (hasProto())
+		logger.warn?.("The app is tested with --disable-proto=throw. Running without this option is unnecessary and not recommended!");
+
+	Object.freeze(Object.prototype);
+	Object.freeze(Array.prototype);
+}
+
+function hasProto(): boolean {
+	const foo = {};
+	try {
+		// @ts-expect-error deliberate access of legacy prop
+		return foo.__proto__ != null;
+	} catch {
+		return false;
+	}
 }
 
 async function loadPlugins(): Promise<Map<string, Plugin>> {
 	const result: Map<string, Plugin> = new Map;
 
-	const pluginDir = path.join(import.meta.dirname, "..", "plugin");
+	const pluginDir = path.join(import.meta.dirname, "plugin");
 	const entries = await readdir(pluginDir, { withFileTypes: true });
 	const loaded: Plugin[] = [];
 

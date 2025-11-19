@@ -1,5 +1,5 @@
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "#environment.ts";
-import type { HTTPContext } from "#http/index.ts";
+import type { SquirrelHTTPContext } from "#http/index.ts";
 import { validate } from "#http/middleware/zod.ts";
 import { generateToken } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
@@ -27,7 +27,7 @@ const LogInPayload = z.strictObject({
 	codeVerifier: z.string(),
 });
 
-export default (httpCtx: HTTPContext): Hono => {
+export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 	const app = new Hono;
 
 	app.post("/", validate("json", LogInPayload), async context => {
@@ -81,7 +81,7 @@ export default (httpCtx: HTTPContext): Hono => {
 			})
 		});
 
-		const [token, expiresAt] = await generateToken(httpCtx.db, userJSON.id);
+		const [token, expiresAt] = await generateToken(squirrelCtx.db, userJSON.id);
 
 		return context.json({
 			token,

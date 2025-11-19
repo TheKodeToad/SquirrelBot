@@ -1,7 +1,6 @@
 import type { Awaitable } from "#common/general.ts";
-import type { Plugin } from "#loader/plugin.ts";
-
-export type Contribution = (plugin: Plugin) => void;
+import type { Contribution } from "#index.ts";
+import type { Plugin } from "#index.ts";
 
 /**
  * Create an extension point collecting values into an array.

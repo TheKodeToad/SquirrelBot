@@ -6,7 +6,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { startPollingScheduler, type PollingSchedulerHandle } from "#common/pollingScheduler.ts";
 import { dateToUnixSecs, SECOND } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { deleteReminder, getRemindersByFiresAt, type Reminder } from "#plugin/reminders/storage/reminders.ts";
@@ -25,7 +25,7 @@ function getReminderKey(guildID: string, number: number): string {
 	return guildID + "::" + number;
 }
 
-async function beginPollingReminders(ctx: DiscordContext): Promise<void> {
+async function beginPollingReminders(ctx: SquirrelDiscordContext): Promise<void> {
 	scheduler = await startPollingScheduler({
 		discriminator: "reminders",
 		pollRate: 60 * SECOND,
@@ -47,7 +47,7 @@ export function untrackReminder(guildID: string, number: number): void {
 	scheduler?.untrack(getReminderKey(guildID, number));
 }
 
-async function fire(ctx: DiscordContext, reminder: Reminder): Promise<void> {
+async function fire(ctx: SquirrelDiscordContext, reminder: Reminder): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!
 	if (!await deleteReminder(ctx.db, reminder.guildID, reminder.number))
 		return;

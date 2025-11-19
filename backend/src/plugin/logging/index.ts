@@ -1,4 +1,4 @@
-import { definePlugin } from "#loader/plugin.ts";
+import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { LoggingConfig } from "#plugin/logging/config/index.ts";

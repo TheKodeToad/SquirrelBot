@@ -1,9 +1,9 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
-import { EventListenerPhase } from "#loader/extensionPoint.ts";
+import { EventListenerPhase } from "#extensionPoint.ts";
 import { type CommandCacheEntry, getCommandByName, getCommands } from "#plugin/core/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
 import { AUTO_DEFER_AFTER } from "#plugin/core/commandEngine/index.ts";
@@ -26,7 +26,7 @@ export default [
 	onBotEvent({ type: "interactionCreate", listener: handle }),
 ];
 
-async function handle(discordCtx: DiscordContext, interaction: AnyInteractionGateway): Promise<void> {
+async function handle(squirrelCtx: SquirrelDiscordContext, interaction: AnyInteractionGateway): Promise<void> {
 	if (!interaction.inCachedGuildChannel())
 		return;
 
@@ -53,7 +53,7 @@ async function handle(discordCtx: DiscordContext, interaction: AnyInteractionGat
 	const privateOption = interaction.data.options.getNumber("private")
 		?? Number(commandEntry.command.ephemeralByDefault);
 	const ephemeral = perms.ephemeral_response && Boolean(privateOption);
-	const ctx = new SlashContext(discordCtx, commandEntry.command, interaction, ephemeral);
+	const ctx = new SlashContext(squirrelCtx, commandEntry.command, interaction, ephemeral);
 
 	const data = commandEntry.command.preRun(ctx);
 
@@ -199,8 +199,8 @@ class SlashContext implements CommandContext {
 	command: Command;
 	get ephemeral(): boolean { return this._ephemeral; }
 
-	discordCtx: DiscordContext;
-	get bot(): Client { return this.discordCtx.bot; }
+	squirrelCtx: SquirrelDiscordContext;
+	get bot(): Client { return this.squirrelCtx.bot; }
 	get shard(): Shard { return this._interaction.guild.shard; }
 	get guild(): Guild { return this._interaction.guild; }
 	get user(): User { return this._interaction.user; }
@@ -214,8 +214,8 @@ class SlashContext implements CommandContext {
 	_deferPromise: Promise<void> | null;
 	_ephemeral: boolean;
 
-	constructor(discordCtx: DiscordContext, command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, ephemeral: boolean) {
-		this.discordCtx = discordCtx;
+	constructor(squirrelCtx: SquirrelDiscordContext, command: Command, interaction: CommandInteraction<AnyTextableGuildChannel>, ephemeral: boolean) {
+		this.squirrelCtx = squirrelCtx;
 		this.command = command;
 		this._interaction = interaction;
 		this._responseID = null;

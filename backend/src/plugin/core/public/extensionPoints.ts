@@ -1,7 +1,7 @@
 import type { Awaitable } from "#common/general.ts";
-import type { DiscordContext } from "#discord/index.ts";
-import { makeMapExtensionPoint, type Contribution } from "#loader/extensionPoint.ts";
-import type { Plugin } from "#loader/plugin.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { makeMapExtensionPoint } from "#extensionPoint.ts";
+import type { Plugin, Contribution } from "#plugin.ts";
 import type { Command, Option } from "#plugin/core/public/command.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import type { ClientEvents } from "oceanic.js";
@@ -10,7 +10,7 @@ import type { ClientEvents } from "oceanic.js";
 
 export interface BotEventListener<T extends keyof ClientEvents = any> {
 	type: T;
-	listener: (ctx: DiscordContext, ...args: ClientEvents[T]) => Awaitable<void>;
+	listener: (ctx: SquirrelDiscordContext, ...args: ClientEvents[T]) => Awaitable<void>;
 }
 
 export function onBotEvent<T extends keyof ClientEvents>(listener: BotEventListener<T>): Contribution {

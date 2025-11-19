@@ -3,9 +3,9 @@ import { getGuildConfig, updateGuildConfig } from "#plugin/core/storage/configs.
 import { notifyChannel } from "#storage/notification.ts";
 import { HTTPException } from "hono/http-exception";
 
-export default defineGlobalPluginGuildRoutes((httpCtx, plugin, app) => {
+export default defineGlobalPluginGuildRoutes((squirrelCtx, plugin, app) => {
 	app.get("/config", async ctx => {
-		const config = await getGuildConfig(httpCtx.db, ctx.var.discordGuildID, plugin.id);
+		const config = await getGuildConfig(squirrelCtx.db, ctx.var.discordGuildID, plugin.id);
 
 		if (config === null)
 			throw new HTTPException(404, { message: "Config does not exist" });
@@ -18,13 +18,13 @@ export default defineGlobalPluginGuildRoutes((httpCtx, plugin, app) => {
 			throw new HTTPException(400, { message: "Content-Type is not application/toml" });
 
 		const body = await ctx.req.text();
-		const exists = await updateGuildConfig(httpCtx.db, ctx.var.discordGuildID, plugin.id, body);
+		const exists = await updateGuildConfig(squirrelCtx.db, ctx.var.discordGuildID, plugin.id, body);
 
 		if (!exists)
 			throw new HTTPException(404, { message: "Config does not exist" });
 
 		await notifyChannel(
-			httpCtx.db,
+			squirrelCtx.db,
 			"core_configUpdate",
 			JSON.stringify({
 				guildID: ctx.var.discordGuildID,

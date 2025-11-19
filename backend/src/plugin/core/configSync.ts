@@ -1,7 +1,7 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { mapIterable, type Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
 import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
@@ -20,7 +20,7 @@ export default [
 	onGuildAccessRevoked((_, ctx) => unloadConfigs(ctx)),
 ];
 
-async function init(ctx: DiscordContext): Promise<void> {
+async function init(ctx: SquirrelDiscordContext): Promise<void> {
 	await Promise.all(mapIterable(getAllowedGuilds(), guildID => createAndLoadConfigs(ctx, guildID)));
 	await installConfigChangeListener(ctx);
 }
@@ -35,7 +35,7 @@ function formatGuildPlugin(bot: Client, guildID: string, pluginID: string): stri
 	return `#${pluginID} in ${debugFormatGuildByID(bot, guildID)}`;
 }
 
-async function installConfigChangeListener(ctx: DiscordContext): Promise<void> {
+async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise<void> {
 	await ctx.dbNotifs.addListener("core_configUpdate", async payload => {
 		if (payload === undefined)
 			return;
@@ -94,7 +94,7 @@ async function installConfigChangeListener(ctx: DiscordContext): Promise<void> {
 	});
 }
 
-async function createAndLoadConfigs(ctx: DiscordContext, guildID: string): Promise<void> {
+async function createAndLoadConfigs(ctx: SquirrelDiscordContext, guildID: string): Promise<void> {
 	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
 			await acquireConfig(guildID, plugin.id, async () => {
 				const inserted = await insertGuildConfig(ctx.db, guildID, plugin.id, config.defaultValue);
@@ -115,7 +115,7 @@ async function unloadConfigs(guildID: string): Promise<void> {
 
 const coreConfigDefault = CoreConfig.parse({} satisfies z.input<typeof CoreConfig>);
 
-async function loadConfig(ctx: DiscordContext, guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
+async function loadConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
 	const value = await parseConfig(ctx, guildID, pluginID, configStore);
 
 	if (value !== null)
@@ -128,7 +128,7 @@ async function loadConfig(ctx: DiscordContext, guildID: string, pluginID: string
 	}
 }
 
-async function parseConfig(ctx: DiscordContext, guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
+async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
 	const rawValue = await getGuildConfig(ctx.db, guildID, pluginID);
 
 	if (rawValue === null)

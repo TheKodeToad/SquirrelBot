@@ -1,6 +1,6 @@
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import type { Awaitable, ValuesOf } from "#common/general.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import type { LoggerConfig } from "#plugin/logging/config/index.ts";
 import { logViaWebhook } from "#plugin/logging/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
@@ -10,7 +10,7 @@ type EventConfig = ValuesOf<LoggerConfig["events"]>;
 type EventConfigView<T extends EventConfig> = Parameters<Exclude<T, false>["render"]>[0];
 
 export async function logEvent<T extends EventConfig>(
-	ctx: DiscordContext,
+	ctx: SquirrelDiscordContext,
 	guild: Guild,
 	channel: string | null,
 	key: keyof LoggerConfig["events"],

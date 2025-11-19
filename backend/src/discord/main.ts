@@ -1,15 +1,15 @@
+import { squirrelInit, squirrelShutdown } from "#index.ts";
 import { moduleLogger } from "#common/logger/index.ts";
+import { setupShutdownHook } from "#common/shutdownHook.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { BOT_TOKEN, CACHE_PATH } from "#environment.ts";
-import { createContext, shutdownContext } from "#loader/index.ts";
-import { preMain, setupGracefulShutdown } from "#setup.ts";
 import { mkdir } from "node:fs/promises";
 import { Client, Constants } from "oceanic.js";
 
-preMain();
+const baseCtx = await squirrelInit();
+await mkdir(CACHE_PATH, { recursive: true });
 
 const logger = moduleLogger();
-const loaderCtx = await createContext();
 
 const bot = new Client({
 	auth: `Bot ${BOT_TOKEN}`,
@@ -23,13 +23,17 @@ const bot = new Client({
 
 	allowedMentions: {},
 });
-const ctx = { ...loaderCtx, bot };
 
-await mkdir(CACHE_PATH, { recursive: true });
+const ctx = { ...baseCtx, bot };
 
 bot.once("ready", async () => {
 	try {
 		logger.debug?.("Ready event received");
+
+		setupShutdownHook(() => {
+			bot.disconnect(false);
+			squirrelShutdown(ctx);
+		});
 
 		logger.debug?.("Firing onBotInit");
 		await onBotInit.fire(ctx);
@@ -39,11 +43,6 @@ bot.once("ready", async () => {
 		logger.error?.("Unhandled error during initialization", error);
 		process.exit(1);
 	}
-
-	setupGracefulShutdown(async () => {
-		bot.disconnect(false);
-		shutdownContext(ctx);
-	});
 });
 
 bot.on("shardPreReady", id => logger.debug?.(`Shard #${id} received READY packet`));

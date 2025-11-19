@@ -1,15 +1,15 @@
 import type { Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { isGuildAllowed } from "#plugin/core/guildInfoSync.ts";
 import type { ClientEvents } from "oceanic.js";
 
 const logger = moduleLogger();
 
 export function wrapListener<E extends keyof ClientEvents>(
-	ctx: DiscordContext,
+	ctx: SquirrelDiscordContext,
 	event: E,
-	listener: (ctx: DiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
+	listener: (ctx: SquirrelDiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
 ) {
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
@@ -31,9 +31,9 @@ export function wrapListener<E extends keyof ClientEvents>(
 }
 
 export function installWrappedListener<E extends keyof ClientEvents>(
-	ctx: DiscordContext,
+	ctx: SquirrelDiscordContext,
 	event: E,
-	listener: (ctx: DiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
+	listener: (ctx: SquirrelDiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
 ): void {
 	ctx.bot.on(event, wrapListener(ctx, event, listener));
 }

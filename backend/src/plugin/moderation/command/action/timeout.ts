@@ -54,7 +54,7 @@ export default defineCommand({
 			})
 			: undefined;
 
-		const { successful, unsuccessful } = await performModActions(ctx.discordCtx, ctx.guild, args.user, target => ({
+		const { successful, unsuccessful } = await performModActions(ctx.squirrelCtx, ctx.guild, args.user, target => ({
 			guild: ctx.guild,
 
 			type: ModEventType.Timeout,

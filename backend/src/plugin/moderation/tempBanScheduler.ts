@@ -3,7 +3,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { startPollingScheduler, type PollingSchedulerHandle } from "#common/pollingScheduler.ts";
 import { SECOND } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { deleteTempBan, getTempBansByEndsAt, type TempBan } from "#plugin/moderation/storage/tempBans.ts";
 import { Client, Constants, DiscordRESTError } from "oceanic.js";
 
@@ -20,7 +20,7 @@ function getTempBanKey(guildID: string, targetID: string): string {
 	return guildID + "::" + targetID;
 }
 
-async function beginPollingTempBans(ctx: DiscordContext): Promise<void> {
+async function beginPollingTempBans(ctx: SquirrelDiscordContext): Promise<void> {
 	scheduler = await startPollingScheduler({
 		discriminator: "moderationTempBans",
 		pollRate: 60 * SECOND,
@@ -42,7 +42,7 @@ export function untrackTempBan(guildID: string, targetID: string): void {
 	scheduler?.untrack(getTempBanKey(guildID, targetID));
 }
 
-async function trigger(ctx: DiscordContext, ban: TempBan): Promise<void> {
+async function trigger(ctx: SquirrelDiscordContext, ban: TempBan): Promise<void> {
 	const guild = ctx.bot.guilds.get(ban.guildID);
 
 	if (guild === undefined) {

@@ -1,12 +1,12 @@
 import { APP_NAME } from "#brand.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import type { Awaitable } from "#common/general.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { getLoggingWebhook, insertLoggingWebhook, updateLoggingWebhook, type WebhookAuth } from "#plugin/logging/storage/webhooks.ts";
 import AsyncLock from "async-lock";
 import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildChannel, type ExecuteWebhookOptions } from "oceanic.js";
 
-export async function logViaWebhook(ctx: DiscordContext, channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
+export async function logViaWebhook(ctx: SquirrelDiscordContext, channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
 	return acquireWebhook(ctx, channel, async ({ webhookID, token }) => {
 		if (isThreadChannel(channel))
 			message.threadID = channel.id;
@@ -17,7 +17,7 @@ export async function logViaWebhook(ctx: DiscordContext, channel: AnyTextableGui
 
 const webhookLock = new AsyncLock();
 
-async function acquireWebhook(ctx: DiscordContext, channel: AnyTextableGuildChannel, action: (auth: WebhookAuth) => Awaitable<void>): Promise<void> {
+async function acquireWebhook(ctx: SquirrelDiscordContext, channel: AnyTextableGuildChannel, action: (auth: WebhookAuth) => Awaitable<void>): Promise<void> {
 	return webhookLock.acquire(channel.id, async () => {
 		const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
 

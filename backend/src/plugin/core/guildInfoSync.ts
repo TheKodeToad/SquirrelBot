@@ -1,8 +1,8 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
-import { EventListenerPhase, makeEventExtensionPoint } from "#loader/extensionPoint.ts";
+import { EventListenerPhase, makeEventExtensionPoint } from "#extensionPoint.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";
@@ -13,9 +13,9 @@ const logger = moduleLogger();
 const allowedGuilds: Set<string> = new Set;
 
 export type GuildAccessListener = (guildID: string) => void;
-export const onGuildAccessGranted = makeEventExtensionPoint<[ctx: DiscordContext, id: string]>();
-export const onGuildAccessRevoked = makeEventExtensionPoint<[ctx: DiscordContext, id: string]>();
-export const onGuildInfoReady = makeEventExtensionPoint<[ctx: DiscordContext]>();
+export const onGuildAccessGranted = makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
+export const onGuildAccessRevoked = makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
+export const onGuildInfoReady = makeEventExtensionPoint<[ctx: SquirrelDiscordContext]>();
 
 export default [
 	onBotInit(init, EventListenerPhase.Pre),
@@ -23,7 +23,7 @@ export default [
 	onBotEvent({ type: "guildUpdate", listener: (ctx, guild, oldGuild) => handleUpdate(ctx.db, guild, oldGuild) }),
 ];
 
-async function init(ctx: DiscordContext): Promise<void> {
+async function init(ctx: SquirrelDiscordContext): Promise<void> {
 	logger.debug?.("Initializing guild info");
 
 	const guildsInfo = await getAllGuildInfo(ctx.db);
@@ -115,7 +115,7 @@ export function* getAllowedGuilds(): Generator<string> {
 		yield id;
 }
 
-export async function grantAccess(ctx: DiscordContext, id: string): Promise<boolean> {
+export async function grantAccess(ctx: SquirrelDiscordContext, id: string): Promise<boolean> {
 	if (allowedGuilds.has(id))
 		return false;
 
@@ -140,7 +140,7 @@ export async function grantAccess(ctx: DiscordContext, id: string): Promise<bool
 	return true;
 }
 
-export async function revokeAccess(ctx: DiscordContext, id: string): Promise<false | true | Date> {
+export async function revokeAccess(ctx: SquirrelDiscordContext, id: string): Promise<false | true | Date> {
 	if (!allowedGuilds.has(id))
 		return false;
 

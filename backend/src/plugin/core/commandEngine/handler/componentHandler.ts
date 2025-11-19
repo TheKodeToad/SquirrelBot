@@ -1,6 +1,6 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { AUTO_DEFER_AFTER, STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
 import type { ComponentContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
@@ -22,7 +22,7 @@ export default [
 	onBotEvent({ type: "interactionCreate", listener: handle })
 ];
 
-async function handle(discordCtx: DiscordContext, interaction: AnyInteractionGateway): Promise<void> {
+async function handle(squirrelCtx: SquirrelDiscordContext, interaction: AnyInteractionGateway): Promise<void> {
 	if (!interaction.inCachedGuildChannel())
 		return;
 
@@ -34,7 +34,7 @@ async function handle(discordCtx: DiscordContext, interaction: AnyInteractionGat
 	if (handler === undefined)
 		return;
 
-	const ctx = new ComponentContextImpl(discordCtx, interaction, handler.originalUserID);
+	const ctx = new ComponentContextImpl(squirrelCtx, interaction, handler.originalUserID);
 
 	try {
 		const values = "values" in interaction.data ? interaction.data.values.raw : undefined;
@@ -66,8 +66,8 @@ export function unlistenForInteractions(messageID: string): void {
 class ComponentContextImpl implements ComponentContext {
 	originalUserID: string;
 
-	discordCtx: DiscordContext;
-	get bot() { return this.discordCtx.bot; }
+	squirrelCtx: SquirrelDiscordContext;
+	get bot() { return this.squirrelCtx.bot; }
 	get shard(): Shard { return this._interaction.guild.shard; }
 	get guild(): Guild { return this._interaction.guild; }
 	get user(): User { return this._interaction.user; };
@@ -81,8 +81,8 @@ class ComponentContextImpl implements ComponentContext {
 	_ackPromise: Promise<void> | null;
 	_ackTimeout: NodeJS.Timeout | null;
 
-	constructor(discordCtx: DiscordContext, interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalUserID: string) {
-		this.discordCtx = discordCtx;
+	constructor(squirrelCtx: SquirrelDiscordContext, interaction: ComponentInteraction<MessageComponentTypes, AnyTextableGuildChannel>, originalUserID: string) {
+		this.squirrelCtx = squirrelCtx;
 		this._interaction = interaction;
 		this.originalUserID = originalUserID;
 		this._responseID = null;

@@ -61,7 +61,7 @@ async function lookUpCases(
 	if (!permissions.case_read)
 		return [];
 
-	return await getCases(ctx.discordCtx.db, ctx.guild.id, {
+	return await getCases(ctx.squirrelCtx.db, ctx.guild.id, {
 		actorIDs: actorID !== null ? [actorID] : undefined,
 		targetIDs: targetID !== null ? [targetID] : undefined,
 		limit: query.limit,

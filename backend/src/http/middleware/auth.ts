@@ -1,4 +1,4 @@
-import type { HTTPContext } from "#http/index.ts";
+import type { SquirrelHTTPContext } from "#http/index.ts";
 import { validateToken } from "#http/storage/api/tokens.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";

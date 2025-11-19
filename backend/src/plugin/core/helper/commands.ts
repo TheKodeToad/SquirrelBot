@@ -1,4 +1,4 @@
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { type Command, type Reply, type ReplyObject } from "#plugin/core/public/command.ts";
 import { Text } from "oceanic-component-helper";
 import { Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
@@ -15,10 +15,10 @@ export function transformReply(reply: Reply): ReplyObject & { flags: number; } {
 	return { ...reply, flags: reply.flags };
 }
 
-export function canRunCommand(discordCtx: DiscordContext, command: Command, member: Member, channel: AnyTextableGuildChannel): boolean {
+export function canRunCommand(squirrelCtx: SquirrelDiscordContext, command: Command, member: Member, channel: AnyTextableGuildChannel): boolean {
 	const data = command.preRun({
-		discordCtx,
-		bot: discordCtx.bot,
+		squirrelCtx,
+		bot: squirrelCtx.bot,
 		command,
 		member,
 		channel,
