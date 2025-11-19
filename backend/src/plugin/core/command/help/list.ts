@@ -22,16 +22,16 @@ export function renderCommandListPageMinimal(ctx: SquirrelDiscordContext, guildI
 			ActionRow([renderPluginSelection(ctx, null, guildID)]),
 			Text(`${icons.tip} You can also pass in the name of a command to view it directly.`)
 		],
-		async componentHandler(context, customID, values) {
+		async componentHandler(ctx, customID, values) {
 			if (customID !== "plugin")
 				return;
 
 			if (values?.length !== 1)
 				throw new Error("Selected plugin not present");
 
-			const page = renderCommandListPage(context, { plugin: values[0]!, page: 0 });
+			const page = renderCommandListPage(ctx, { plugin: values[0]!, page: 0 });
 			page.flags ??= MessageFlags.EPHEMERAL;
-			await context.respond(page);
+			await ctx.respond(page);
 		},
 	};
 }
@@ -57,7 +57,7 @@ function renderPluginSelection(ctx: SquirrelDiscordContext, selected: string | n
 }
 
 export function renderCommandListPage(ctx: BaseCommandContext, state: CommandListState): ReplyObject {
-	const plugin = ctx.discordCtx.plugins.get(state.plugin);
+	const plugin = ctx.squirrelCtx.plugins.get(state.plugin);
 
 	if (plugin === undefined) {
 		return {
@@ -67,7 +67,7 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 
 	const container = Container([Text("## Help")]);
 
-	container.components.push(ActionRow([renderPluginSelection(ctx.discordCtx, state.plugin, ctx.guild.id)]));
+	container.components.push(ActionRow([renderPluginSelection(ctx.squirrelCtx, state.plugin, ctx.guild.id)]));
 
 	let entries = state.entries;
 
@@ -82,7 +82,7 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true)))
 				continue;
 
-			if (!canRunCommand(ctx.discordCtx, command, ctx.member, ctx.channel))
+			if (!canRunCommand(ctx.squirrelCtx, command, ctx.member, ctx.channel))
 				continue;
 
 			const summaryComponent = Text("### " + command.name[0] + "\n");
@@ -131,18 +131,18 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 
 	return {
 		components: [container],
-		async componentHandler(context, customID, values) {
-			if (context.originalUserID !== context.user.id)
+		async componentHandler(ctx, customID, values) {
+			if (ctx.originalUserID !== ctx.user.id)
 				return;
 
 			if (customID === "prev") {
-				await context.edit(renderCommandListPage(context, {
+				await ctx.edit(renderCommandListPage(ctx, {
 					plugin: state.plugin,
 					entries,
 					page: state.page - 1,
 				}));
 			} else if (customID === "next") {
-				await context.edit(renderCommandListPage(context, {
+				await ctx.edit(renderCommandListPage(ctx, {
 					plugin: state.plugin,
 					entries,
 					page: state.page + 1,
@@ -151,7 +151,7 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 				if (values?.length !== 1)
 					throw new Error("Selected plugin not present");
 
-				await context.edit(renderCommandListPage(context, {
+				await ctx.edit(renderCommandListPage(ctx, {
 					plugin: values[0]!,
 					page: 0,
 				}));

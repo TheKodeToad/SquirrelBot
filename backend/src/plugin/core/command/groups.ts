@@ -22,7 +22,7 @@ export default defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, coreConfigCache, permissions => permissions.groups_command),
+	preRun: ctx => permissionsGuard(ctx, coreConfigCache, permissions => permissions.groups_command),
 	async run(ctx, args) {
 		const coreConfig = coreConfigCache.get(ctx.guild.id);
 

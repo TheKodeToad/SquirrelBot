@@ -34,7 +34,7 @@ export default defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.warn),
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.warn),
 	async run(ctx, args, { config }): Promise<void> {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage

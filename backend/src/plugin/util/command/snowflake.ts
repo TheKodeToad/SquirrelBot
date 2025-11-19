@@ -21,10 +21,10 @@ export default defineCommand({
 		},
 	},
 
-	preRun: context => permissionsGuard(context, utilConfigStore, permissions => permissions.snowflake_command),
-	async run(context, args) {
+	preRun: ctx => permissionsGuard(ctx, utilConfigStore, permissions => permissions.snowflake_command),
+	async run(ctx, args) {
 		const snowflake = BigInt(args.input);
 		const timestamp = DISCORD_EPOCH + (snowflake >> 22n);
-		await context.respond(`${icons.info} **<t:${timestamp / 1000n}>** (${timestamp} unix time)`);
+		await ctx.respond(`${icons.info} **<t:${timestamp / 1000n}>** (${timestamp} unix time)`);
 	},
 });

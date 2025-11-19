@@ -21,7 +21,7 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 	preRun(ctx: CommandContext): D | false;
 
 	/**
-	 * Invoke the command, and call context.respond to display output.
+	 * Invoke the command, and call ctx.respond to display output.
 	 * @param ctx Contextual information
 	 * @param args Parsed options
 	 * @param data The result from preRun
@@ -31,7 +31,7 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 
 export interface BaseCommandContext {
 	bot: Client;
-	discordCtx: SquirrelDiscordContext;
+	squirrelCtx: SquirrelDiscordContext;
 	shard: Shard;
 	guild: Guild;
 	user: User;
@@ -54,7 +54,7 @@ export interface ComponentContext extends BaseCommandContext {
 
 export interface ReplyObject extends Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> {
 	components: MessageComponent[];
-	componentHandler?(this: void, context: ComponentContext, customID: string, values?: string[]): Promise<void> | void;
+	componentHandler?(this: void, ctx: ComponentContext, customID: string, values?: string[]): Promise<void> | void;
 }
 
 export type Reply = ReplyObject | string;

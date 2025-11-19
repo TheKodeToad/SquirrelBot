@@ -22,7 +22,7 @@ export default defineCommand({
 
 	preRun: ctx => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
 	async run(ctx, { number }) {
-		const deleted = await deleteReminderIfOwnedBy(ctx.discordCtx.db, ctx.guild.id, number, ctx.user.id);
+		const deleted = await deleteReminderIfOwnedBy(ctx.squirrelCtx.db, ctx.guild.id, number, ctx.user.id);
 
 		if (deleted) {
 			untrackReminder(ctx.guild.id, number);

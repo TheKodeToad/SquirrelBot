@@ -36,7 +36,7 @@ export default defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.timeout),
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.timeout),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.remove_timeout.send_direct_message;
 		const directMessage = sendDirectMessage
@@ -47,7 +47,7 @@ export default defineCommand({
 			})
 			: undefined;
 
-		const { successful, unsuccessful } = await performModActions(ctx.discordCtx, ctx.guild, args.user, target => ({
+		const { successful, unsuccessful } = await performModActions(ctx.squirrelCtx, ctx.guild, args.user, target => ({
 			guild: ctx.guild,
 
 			type: ModEventType.ClearTimeout,

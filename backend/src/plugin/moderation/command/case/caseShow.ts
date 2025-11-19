@@ -23,7 +23,7 @@ export default defineCommand({
 
 	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_read),
 	async run(ctx, { number }) {
-		const info = await getCase(ctx.discordCtx.db, ctx.guild.id, number);
+		const info = await getCase(ctx.squirrelCtx.db, ctx.guild.id, number);
 
 		if (info === null) {
 			await ctx.respond(`${icons.error} Case **#${number}** not found!`);

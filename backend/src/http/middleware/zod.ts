@@ -5,10 +5,10 @@ import type { z } from "zod/v4";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function validate<TSchema extends z.ZodType, TTarget extends keyof ValidationTargets>(target: TTarget, schema: TSchema) {
-	return zValidator(target, schema, (result, context) => {
+	return zValidator(target, schema, (result, ctx) => {
 		if (!result.success) {
 			throw new HTTPException(400, {
-				res: context.json({
+				res: ctx.json({
 					error: "Schema validation failed",
 					issues: result.error.issues
 				})

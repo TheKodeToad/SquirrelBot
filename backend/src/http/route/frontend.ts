@@ -36,7 +36,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 		.replaceAll("<", "\\u003c")
 		.replaceAll(">", "\\u003e");
 
-	app.get("/*", context => {
+	app.get("/*", ctx => {
 		const nonce = randomBytes(16).toString("base64");
 
 		const csp = [];
@@ -62,7 +62,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
   </body>
 </html>`;
 
-		return context.html(generated, 200, { "Content-Security-Policy": csp.join("; ") });
+		return ctx.html(generated, 200, { "Content-Security-Policy": csp.join("; ") });
 	});
 
 	return app;

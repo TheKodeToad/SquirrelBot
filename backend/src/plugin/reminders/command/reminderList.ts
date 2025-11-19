@@ -15,14 +15,14 @@ export default defineCommand({
 
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, remindersConfigStore, permissions => permissions.personal_reminders),
-	async run(context) {
+	preRun: ctx => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
+	async run(ctx) {
 		await respondWithPaginator<Reminder, Date>(
-			context,
+			ctx,
 			{
 				pageSize: 10,
 				getKey: entry => entry.firesAt,
-				lookUp: (context, query) => lookUpReminders(context, query),
+				lookUp: (ctx, query) => lookUpReminders(ctx, query),
 				render: renderReminders,
 			}
 		);
@@ -40,7 +40,7 @@ async function lookUpReminders(ctx: BaseCommandContext, query: PaginatorQuery<Da
 	if (!permissions.personal_reminders)
 		return [];
 
-	return getReminders(ctx.discordCtx.db, ctx.guild.id, {
+	return getReminders(ctx.squirrelCtx.db, ctx.guild.id, {
 		ownerID: ctx.user.id,
 		limit: query.limit,
 		firesBefore: query.before,

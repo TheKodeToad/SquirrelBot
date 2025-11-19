@@ -31,14 +31,14 @@ export default defineCommand({
 	},
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, moderationConfigStore, permissions => permissions.case_read),
+	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_read),
 	async run(ctx, args) {
 		await respondWithPaginator<CaseInfo, number>(
 			ctx,
 			{
 				pageSize: args.compact ? 16 : 3,
 				getKey: entry => entry.number,
-				lookUp: (context, query) => lookUpCases(context, query, args.actorID, args.targetID),
+				lookUp: (ctx, query) => lookUpCases(ctx, query, args.actorID, args.targetID),
 				render: cases => renderCases(ctx.bot, cases, args.compact ?? false),
 			}
 		);

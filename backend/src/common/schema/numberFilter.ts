@@ -10,7 +10,7 @@ export const enum NumberFilterMode {
 }
 
 export const NumberFilter = z.string()
-	.transform((input, context) => {
+	.transform((input, ctx) => {
 		let numberString = input;
 		let mode = NumberFilterMode.Equals;
 
@@ -36,7 +36,7 @@ export const NumberFilter = z.string()
 		const number = parseInt(numberString, 10); // no hex cos it looks weird :>
 
 		if (Number.isNaN(number)) {
-			context.addIssue("Invalid value: Expected comparison operator (=, !=, >, >=, <, <=) followed by a number, but received " + input);
+			ctx.addIssue("Invalid value: Expected comparison operator (=, !=, >, >=, <, <=) followed by a number, but received " + input);
 			return z.NEVER;
 		}
 

@@ -72,12 +72,12 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 		return false;
 	}
 
-	const context = new PrefixContext(squirrelCtx, commandEntry.command, message, prevResponse);
+	const ctx = new PrefixContext(squirrelCtx, commandEntry.command, message, prevResponse);
 
-	const data = commandEntry.command.preRun(context);
+	const data = commandEntry.command.preRun(ctx);
 
 	if (data === false) {
-		logger.debug?.(`Command '${name}' rejected context - ${debugFormatPermissionContext(context.member, context.channel)}`);
+		logger.debug?.(`Command '${name}' rejected context - ${debugFormatPermissionContext(ctx.member, ctx.channel)}`);
 		return false;
 	}
 
@@ -87,14 +87,14 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 	const args = readPrefixArgs(reader, commandEntry);
 
 	if (args.error !== null) {
-		await context.respond(
+		await ctx.respond(
 			`${icons.error} ${formatArgsParseError(args)}\n`
 			+ `${icons.tip} Edit your original message to fix the error!\n`
 			+ `${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`
 		);
 
-		if (context._response !== null)
-			trackedMessages.set(message.id, context._response);
+		if (ctx._response !== null)
+			trackedMessages.set(message.id, ctx._response);
 
 		return true;
 	}
@@ -103,13 +103,13 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		await commandEntry.command.run(context, args.result as any, data);
+		await commandEntry.command.run(ctx, args.result as any, data);
 
-		if (commandEntry.command.trackUpdates && context._response !== null)
-			trackedMessages.set(message.id, context._response);
+		if (commandEntry.command.trackUpdates && ctx._response !== null)
+			trackedMessages.set(message.id, ctx._response);
 	} catch (error) {
 		try {
-			await context.respond(`:boom: Failed to execute command`);
+			await ctx.respond(`:boom: Failed to execute command`);
 		} catch (error) {
 			logger.error?.("Error responding with error message for prefix command", error);
 		}

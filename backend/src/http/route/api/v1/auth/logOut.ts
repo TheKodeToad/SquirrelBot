@@ -6,8 +6,8 @@ import { HTTPException } from "hono/http-exception";
 export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 	const app = new Hono;
 
-	app.get("/", async context => {
-		const authorization = context.req.header("Authorization");
+	app.get("/", async ctx => {
+		const authorization = ctx.req.header("Authorization");
 
 		if (authorization === undefined)
 			throw new HTTPException(401, { message: "No Authorization header provided" });
@@ -15,7 +15,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 		if (!await deleteToken(squirrelCtx.db, authorization))
 			throw new HTTPException(401, { message: "Invalid or expired token" });
 
-		return context.body(null, 204);
+		return ctx.body(null, 204);
 	});
 
 	return app;

@@ -21,7 +21,7 @@ export default defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, coreConfigStore, permissions => permissions.help_command),
+	preRun: ctx => permissionsGuard(ctx, coreConfigStore, permissions => permissions.help_command),
 	async run(ctx, args) {
 		if (args.command !== null) {
 			const command = getCommandByName(args.command);
@@ -38,6 +38,6 @@ export default defineCommand({
 		if (ctx.ephemeral ?? false)
 			await ctx.respond(renderCommandListPage(ctx, { page: 0, plugin: "core" }));
 		else
-			await ctx.respond(renderCommandListPageMinimal(ctx.discordCtx, ctx.guild.id));
+			await ctx.respond(renderCommandListPageMinimal(ctx.squirrelCtx, ctx.guild.id));
 	},
 });

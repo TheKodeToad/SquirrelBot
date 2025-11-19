@@ -35,7 +35,7 @@ export default defineCommand({
 		}
 	},
 
-	preRun: context => permissionsGuard(context, utilConfigStore, permissions => permissions.invite_info_command),
+	preRun: ctx => permissionsGuard(ctx, utilConfigStore, permissions => permissions.invite_info_command),
 	async run(ctx, args) {
 		const matches = REGEX.exec(args.link);
 

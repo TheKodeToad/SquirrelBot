@@ -6,7 +6,7 @@ import { ComponentTypes } from "oceanic.js";
 export interface Paginator<E, K> {
 	pageSize: number;
 	getKey: (entry: E) => K;
-	lookUp: (context: BaseCommandContext, query: PaginatorQuery<K>) => Awaitable<E[]>;
+	lookUp: (ctx: BaseCommandContext, query: PaginatorQuery<K>) => Awaitable<E[]>;
 	render: (entries: E[]) => Awaitable<ReplyObject>;
 }
 
@@ -17,18 +17,18 @@ export interface PaginatorQuery<K> {
 	reversed: boolean;
 }
 
-export async function respondWithPaginator<E, K>(context: CommandContext, paginator: Paginator<E, K>): Promise<void> {
-	await context.respond(await renderPaginator(context, paginator, false, undefined, undefined));
+export async function respondWithPaginator<E, K>(ctx: CommandContext, paginator: Paginator<E, K>): Promise<void> {
+	await ctx.respond(await renderPaginator(ctx, paginator, false, undefined, undefined));
 }
 
 async function renderPaginator<E, K>(
-	context: BaseCommandContext,
+	ctx: BaseCommandContext,
 	paginator: Paginator<E, K>,
 	reversed: boolean,
 	before: K | undefined,
 	after: K | undefined
 ): Promise<ReplyObject> {
-	const queryResult = await paginator.lookUp(context, {
+	const queryResult = await paginator.lookUp(ctx, {
 		before,
 		after,
 		reversed,
@@ -63,24 +63,24 @@ async function renderPaginator<E, K>(
 
 	const parentHandler = reply.componentHandler;
 
-	reply.componentHandler = async (context, customID, ...remaining) => {
-		if (context.originalUserID === context.user.id) {
+	reply.componentHandler = async (ctx, customID, ...remaining) => {
+		if (ctx.originalUserID === ctx.user.id) {
 			if (customID === "paginator-prev") {
 				const firstItem = queryResult[0];
 				const before = firstItem !== undefined ? paginator.getKey(firstItem) : undefined;
 
-				await context.edit(await renderPaginator(context, paginator, true, before, undefined));
+				await ctx.edit(await renderPaginator(ctx, paginator, true, before, undefined));
 				return;
 			} else if (customID === "paginator-next") {
 				const lastItem = queryResult[queryResult.length - 1];
 				const after = lastItem !== undefined ? paginator.getKey(lastItem) : undefined;
 
-				await context.edit(await renderPaginator(context, paginator, false, undefined, after));
+				await ctx.edit(await renderPaginator(ctx, paginator, false, undefined, after));
 				return;
 			}
 		}
 
-		await parentHandler?.(context, customID, ...remaining);
+		await parentHandler?.(ctx, customID, ...remaining);
 	};
 
 	return reply;

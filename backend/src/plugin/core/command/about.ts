@@ -20,8 +20,8 @@ export default defineCommand({
 	description: "Display information about the app.",
 	trackUpdates: true,
 
-	preRun: context => permissionsGuard(context, coreConfigStore, permissions => permissions.about_command),
-	async run(context) {
+	preRun: ctx => permissionsGuard(ctx, coreConfigStore, permissions => permissions.about_command),
+	async run(ctx) {
 		const uptime = Math.floor(process.uptime());
 		let uptimeString = "";
 
@@ -41,7 +41,7 @@ export default defineCommand({
 		const container = Container([
 			Section(
 				[`## About ${APP_NAME}\n${APP_DESCRIPTION}`],
-				Thumbnail(context.bot.user.avatarURL())
+				Thumbnail(ctx.bot.user.avatarURL())
 			),
 			Divider(),
 			Text("**Source Code**\n" + APP_SOURCE_CODE),
@@ -49,6 +49,6 @@ export default defineCommand({
 			uptimeComponent
 		]);
 
-		await context.respond({ components: [container] });
+		await ctx.respond({ components: [container] });
 	},
 });
