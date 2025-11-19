@@ -3,33 +3,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 
 const logger = moduleLogger();
 
-/**
- * Common pre-startup code.
- */
-export function preMain(): void {
-	// not sure if this is good practice but we certainly don't want a crash because we forgot await
-	process.on("unhandledRejection", error => {
-		logger.error?.("Unhandled Promise rejection!", error);
-	});
-
-	if (hasProto())
-		logger.warn?.("The app is tested with --disable-proto=throw. Running without this option is unnecessary and not recommended!");
-
-	Object.freeze(Object.prototype);
-	Object.freeze(Array.prototype);
-}
-
-function hasProto(): boolean {
-	const foo = {};
-	try {
-		// @ts-expect-error deliberate access of legacy prop
-		return foo.__proto__ != null;
-	} catch {
-		return false;
-	}
-}
-
-export function setupGracefulShutdown(callback: () => Awaitable<void>): void {
+export function setupShutdownHook(callback: () => Awaitable<void>): void {
 	let exitingAfter = 0;
 
 	const shutDown = async (signal: NodeJS.Signals): Promise<void> => {

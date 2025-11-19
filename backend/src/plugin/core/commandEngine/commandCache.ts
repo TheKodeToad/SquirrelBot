@@ -1,5 +1,5 @@
 import { onBotInit } from "#discord/extensionPoints.ts";
-import { EventListenerPhase } from "#loader/extensionPoint.ts";
+import { EventListenerPhase } from "#extensionPoint.ts";
 import { OptionType, type Command, type Option } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 

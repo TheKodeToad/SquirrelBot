@@ -1,4 +1,4 @@
-import { definePlugin } from "#loader/plugin.ts";
+import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import ban from "#plugin/moderation/command/action/ban.ts";

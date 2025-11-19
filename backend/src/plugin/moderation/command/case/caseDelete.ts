@@ -20,7 +20,7 @@ export default defineCommand({
 
 	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_delete),
 	async run(ctx, { number }) {
-		const deleted = await deleteCase(ctx.discordCtx.db, ctx.guild.id, number);
+		const deleted = await deleteCase(ctx.squirrelCtx.db, ctx.guild.id, number);
 
 		if (deleted)
 			await ctx.respond(`${icons.success} Deleted case **#${number}**!`);

@@ -1,22 +1,21 @@
 import { moduleLogger } from "#common/logger/index.ts";
+import { setupShutdownHook } from "#common/shutdownHook.ts";
 import { HOUR } from "#common/time.ts";
 import { HTTP_PORT } from "#environment.ts";
-import type { HTTPContext } from "#http/index.ts";
+import type { SquirrelHTTPContext } from "#http/index.ts";
 import api from "#http/route/api/index.ts";
 import frontend from "#http/route/frontend.ts";
 import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
-import { createContext, shutdownContext } from "#loader/index.ts";
-import { preMain, setupGracefulShutdown } from "#setup.ts";
+import { squirrelInit } from "#index.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
 
-preMain();
+const ctx: SquirrelHTTPContext = await squirrelInit();
 
 const logger = moduleLogger();
-const ctx: HTTPContext = await createContext();
 
 const app = new Hono;
 
@@ -69,7 +68,7 @@ async function beginDeleteTokenLoop(): Promise<void> {
 
 await beginDeleteTokenLoop();
 
-setupGracefulShutdown(async () => {
+setupShutdownHook(async () => {
 	await new Promise<void>((resolve, reject) => server.close(error => {
 		if (error !== undefined)
 			reject(error);
@@ -77,5 +76,5 @@ setupGracefulShutdown(async () => {
 			resolve();
 	}));
 
-	shutdownContext(ctx);
+	shutdown(ctx);
 });

@@ -1,6 +1,6 @@
-import type { Context } from "#loader/index.ts";
+import type { SquirrelContext } from "#index.ts";
 import { Client } from "oceanic.js";
 
-export interface DiscordContext extends Context {
+export interface SquirrelDiscordContext extends SquirrelContext {
 	bot: Client;
 }

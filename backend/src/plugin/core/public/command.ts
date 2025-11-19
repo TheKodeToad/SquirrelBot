@@ -1,4 +1,4 @@
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User, Client } from "oceanic.js";
 
 type NameList = [string, ...string[]];
@@ -31,7 +31,7 @@ export interface Command<O extends Record<string, Option> = Record<string, Optio
 
 export interface BaseCommandContext {
 	bot: Client;
-	discordCtx: DiscordContext;
+	discordCtx: SquirrelDiscordContext;
 	shard: Shard;
 	guild: Guild;
 	user: User;

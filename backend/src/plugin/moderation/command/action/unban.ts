@@ -82,7 +82,7 @@ export default defineCommand({
 				reason: args.reason ?? undefined,
 			};
 
-			const actionResult = await performModAction(ctx.discordCtx, action);
+			const actionResult = await performModAction(ctx.squirrelCtx, action);
 
 			if ("error" in actionResult)
 				unsuccessful.push(actionResult);

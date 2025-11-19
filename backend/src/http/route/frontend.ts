@@ -1,6 +1,6 @@
 import { APP_DESCRIPTION, APP_INVITE_PERMISSIONS, APP_LIBRARIES_LINK, APP_NAME, APP_SOURCE_CODE } from "#brand.ts";
 import { CLIENT_ID, REDIRECT_URI } from "#environment.ts";
-import type { HTTPContext } from "#http/index.ts";
+import type { SquirrelHTTPContext } from "#http/index.ts";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { randomBytes } from "crypto";
 import { Hono } from "hono";
@@ -9,7 +9,7 @@ import { etag } from "hono/etag";
 import { html, raw } from "hono/html";
 
 
-export default (httpCtx: HTTPContext): Hono => {
+export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 	const app = new Hono;
 
 	// TODO: worrying
@@ -26,7 +26,7 @@ export default (httpCtx: HTTPContext): Hono => {
 		APP_INVITE_PERMISSIONS: APP_INVITE_PERMISSIONS.toString(),
 	};
 
-	const plugins = [...httpCtx.plugins.values()].map(plugin => ({
+	const plugins = [...squirrelCtx.plugins.values()].map(plugin => ({
 		id: plugin.id,
 		name: plugin.name,
 		description: plugin.description,

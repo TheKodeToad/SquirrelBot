@@ -1,8 +1,8 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { DiscordContext } from "#discord/index.ts";
-import { EventListenerPhase } from "#loader/extensionPoint.ts";
-import { definePlugin } from "#loader/plugin.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { EventListenerPhase } from "#extensionPoint.ts";
+import { definePlugin } from "#plugin.ts";
 import about from "#plugin/core/command/about.ts";
 import access from "#plugin/core/command/access.ts";
 import groups from "#plugin/core/command/groups.ts";
@@ -67,7 +67,7 @@ export default definePlugin({
 	],
 });
 
-function postInit(ctx: DiscordContext): void {
+function postInit(ctx: SquirrelDiscordContext): void {
 	logger.debug?.("Installing onBotEvent listeners");
 
 	for (const listener of onBotEvent.contributions)

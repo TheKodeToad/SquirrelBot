@@ -2,7 +2,7 @@ import { createDMCached, fetchMembersCached, fetchUserCached } from "#common/dis
 import { formatRESTError } from "#common/discord/format.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugin/moderation/config.ts";
 import { onModAction } from "#plugin/moderation/public/extensionPoints.ts";
@@ -26,7 +26,7 @@ export interface ModActionFailure {
 	error: string;
 }
 
-export async function performModAction(ctx: DiscordContext, action: ModAction): Promise<ModActionResult> {
+export async function performModAction(ctx: SquirrelDiscordContext, action: ModAction): Promise<ModActionResult> {
 	let dmDelivered = false;
 
 	if (action.target instanceof Member) {
@@ -172,7 +172,7 @@ export interface BulkModActionResult {
 }
 
 export async function performModActions(
-	ctx: DiscordContext,
+	ctx: SquirrelDiscordContext,
 	guild: Guild,
 	ids: readonly string[],
 	makeAction: (target: Member | User) => ModAction

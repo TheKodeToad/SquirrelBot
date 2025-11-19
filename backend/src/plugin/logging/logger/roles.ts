@@ -2,7 +2,7 @@ import { parseRoleUpdates } from "#common/discord/auditLogChanges.ts";
 import { fetchMemberCached, fetchUserCached } from "#common/discord/cachedRequest.ts";
 import { makeRoleView } from "#common/template/role.ts";
 import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { AuditLogActionTypes, AuditLogEntry, Guild, type Uncached } from "oceanic.js";
@@ -11,7 +11,7 @@ export default [
 	onBotEvent({ type: "guildAuditLogEntryCreate", listener: handleAuditLog }),
 ];
 
-async function handleAuditLog(ctx: DiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
+async function handleAuditLog(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
 	if (!(guild instanceof Guild))
 		return;
 
@@ -28,7 +28,7 @@ async function handleAuditLog(ctx: DiscordContext, guild: Guild | Uncached, entr
 	}
 }
 
-async function handleCreate(ctx: DiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
+async function handleCreate(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
 	if (!(guild instanceof Guild))
 		return;
 
@@ -53,7 +53,7 @@ async function handleCreate(ctx: DiscordContext, guild: Guild | Uncached, entry:
 	);
 }
 
-async function handleUpdate(ctx: DiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
+async function handleUpdate(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
 	if (!(guild instanceof Guild))
 		return;
 
@@ -94,7 +94,7 @@ async function handleUpdate(ctx: DiscordContext, guild: Guild | Uncached, entry:
 	);
 }
 
-async function handleDelete(ctx: DiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
+async function handleDelete(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
 	if (!(guild instanceof Guild))
 		return;
 

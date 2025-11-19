@@ -1,5 +1,5 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
-import { definePlugin } from "#loader/plugin.ts";
+import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import remind from "#plugin/reminders/command/remind.ts";

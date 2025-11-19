@@ -3,7 +3,7 @@ import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
 import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
 import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
@@ -32,7 +32,7 @@ const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
-async function handle(discordCtx: DiscordContext, message: Message, prevResponse?: Message): Promise<boolean> {
+async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, prevResponse?: Message): Promise<boolean> {
 	if (!message.inCachedGuildChannel())
 		return false;
 
@@ -43,7 +43,7 @@ async function handle(discordCtx: DiscordContext, message: Message, prevResponse
 	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
 		return false;
 
-	if (!canWriteInChannel(discordCtx.bot, message.channel, message.channel.guild.clientMember))
+	if (!canWriteInChannel(squirrelCtx.bot, message.channel, message.channel.guild.clientMember))
 		return false;
 
 	const config = coreConfigStore.get(message.guildID);
@@ -72,7 +72,7 @@ async function handle(discordCtx: DiscordContext, message: Message, prevResponse
 		return false;
 	}
 
-	const context = new PrefixContext(discordCtx, commandEntry.command, message, prevResponse);
+	const context = new PrefixContext(squirrelCtx, commandEntry.command, message, prevResponse);
 
 	const data = commandEntry.command.preRun(context);
 
@@ -119,7 +119,7 @@ async function handle(discordCtx: DiscordContext, message: Message, prevResponse
 	return true;
 }
 
-async function handleEdit(ctx: DiscordContext, message: Message): Promise<void> {
+async function handleEdit(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response)
@@ -134,7 +134,7 @@ async function handleEdit(ctx: DiscordContext, message: Message): Promise<void> 
 		await response.delete();
 }
 
-async function handleDelete(_: DiscordContext, message: PossiblyUncachedMessage): Promise<void> {
+async function handleDelete(_: SquirrelDiscordContext, message: PossiblyUncachedMessage): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response)
@@ -149,8 +149,8 @@ class PrefixContext implements CommandContext {
 	command: Command;
 	message: Message<AnyTextableGuildChannel>;
 
-	discordCtx: DiscordContext;
-	get bot(): Client { return this.discordCtx.bot; }
+	squirrelCtx: SquirrelDiscordContext;
+	get bot(): Client { return this.squirrelCtx.bot; }
 	get shard(): Shard { return this.message.guild.shard; }
 	get guild(): Guild { return this.message.guild; }
 	get user(): User { return this.message.author; }
@@ -159,8 +159,8 @@ class PrefixContext implements CommandContext {
 
 	_response: Message | null;
 
-	constructor(discordCtx: DiscordContext, command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
-		this.discordCtx = discordCtx;
+	constructor(squirrelCtx: SquirrelDiscordContext, command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
+		this.squirrelCtx = squirrelCtx;
 		this.command = command;
 		this.message = message;
 		this._response = response ?? null;

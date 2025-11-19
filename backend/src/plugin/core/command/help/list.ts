@@ -1,5 +1,5 @@
 import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { getCommandsByPlugin } from "#plugin/core/commandEngine/commandCache.ts";
 import { canRunCommand } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
@@ -15,7 +15,7 @@ interface CommandListState {
 	entries?: ContainerComponent["components"][];
 }
 
-export function renderCommandListPageMinimal(ctx: DiscordContext, guildID: string): Reply {
+export function renderCommandListPageMinimal(ctx: SquirrelDiscordContext, guildID: string): Reply {
 	return {
 		components: [
 			Text("**Select a plugin to view commands**"),
@@ -36,7 +36,7 @@ export function renderCommandListPageMinimal(ctx: DiscordContext, guildID: strin
 	};
 }
 
-function renderPluginSelection(ctx: DiscordContext, selected: string | null, guildID: string): StringSelectMenu {
+function renderPluginSelection(ctx: SquirrelDiscordContext, selected: string | null, guildID: string): StringSelectMenu {
 	const select = StringSelect("plugin");
 
 	for (const plugin of ctx.plugins.values()) {

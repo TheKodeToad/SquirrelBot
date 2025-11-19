@@ -29,7 +29,7 @@ const grantAccessCommand = defineCommand({
 	async run(ctx, args) {
 		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
 
-		if (await grantAccess(ctx.discordCtx, args.guild))
+		if (await grantAccess(ctx.squirrelCtx, args.guild))
 			await ctx.respond(`${icons.success} Granted access to **${escapeMarkdown(guildName)}**!`);
 		else
 			await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** already has access to the app!`);
@@ -54,7 +54,7 @@ const revokeAccessCommand = defineCommand({
 	async run(ctx, args) {
 		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown>";
 
-		const result = await revokeAccess(ctx.discordCtx, args.guild);
+		const result = await revokeAccess(ctx.squirrelCtx, args.guild);
 
 		if (result !== false) {
 			if (result instanceof Date)

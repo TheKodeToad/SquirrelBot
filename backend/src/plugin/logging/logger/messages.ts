@@ -3,7 +3,7 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
 import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { DiscordContext } from "#discord/index.ts";
+import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
@@ -22,7 +22,7 @@ export default [
 	onBotEvent({ type: "messageDelete", listener: handleDelete }),
 ];
 
-async function beginMessageCleanupLoop(ctx: DiscordContext): Promise<void> {
+async function beginMessageCleanupLoop(ctx: SquirrelDiscordContext): Promise<void> {
 	try {
 		logger.debug?.("Cleaning up old message cache entries");
 
@@ -34,7 +34,7 @@ async function beginMessageCleanupLoop(ctx: DiscordContext): Promise<void> {
 	}
 }
 
-async function handleCreate(ctx: DiscordContext, message: Message): Promise<void> {
+async function handleCreate(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
 	if (message.guildID === null)
 		return;
 
@@ -56,7 +56,7 @@ async function handleCreate(ctx: DiscordContext, message: Message): Promise<void
 	});
 }
 
-async function handleUpdate(ctx: DiscordContext, message: Message): Promise<void> {
+async function handleUpdate(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
 	if (message.guild === null)
 		return;
 
@@ -86,7 +86,7 @@ async function handleUpdate(ctx: DiscordContext, message: Message): Promise<void
 	);
 }
 
-async function handleDelete(ctx: DiscordContext, message: PossiblyUncachedMessage): Promise<void> {
+async function handleDelete(ctx: SquirrelDiscordContext, message: PossiblyUncachedMessage): Promise<void> {
 	if (message.guild == null)
 		return;
 
