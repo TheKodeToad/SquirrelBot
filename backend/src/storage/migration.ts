@@ -127,7 +127,6 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 
 		let done = false;
 		try {
-
 			await client.query("BEGIN");
 
 			await client.query(content);
