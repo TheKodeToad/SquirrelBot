@@ -76,7 +76,8 @@ async function loadPlugins(): Promise<Map<string, Plugin>> {
 
 	const pluginDir = path.join(import.meta.dirname, "plugin");
 	const entries = await readdir(pluginDir, { withFileTypes: true });
-	const loaded: Plugin[] = [];
+
+	entries.sort((a, b) => a.name.localeCompare(b.name, "en-US"));
 
 	for (const entry of entries) {
 		if (!entry.isDirectory())
@@ -87,28 +88,14 @@ async function loadPlugins(): Promise<Map<string, Plugin>> {
 
 		initPlugin(plugin);
 
-		loaded.push(plugin);
-	}
-
-	if (loaded.length === 0)
-		throw new Error("No plugins loaded - something must be wrong!");
-
-	loaded.sort((a, b) => {
-		if (a.id < b.id)
-			return -1;
-
-		if (a.id > b.id)
-			return 1;
-
-		return 0;
-	});
-
-	for (const plugin of loaded) {
 		if (result.has(plugin.id))
 			throw new Error(`Duplicate plugin #${plugin.id}`);
 
 		result.set(plugin.id, plugin);
 	}
+
+	if (result.size === 0)
+		throw new Error("No plugins loaded - something must be wrong!");
 
 	return result;
 }
