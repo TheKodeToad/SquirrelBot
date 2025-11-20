@@ -6,7 +6,7 @@ import type { SquirrelHTTPContext } from "#http/index.ts";
 import api from "#http/route/api/index.ts";
 import frontend from "#http/route/frontend.ts";
 import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
-import { squirrelInit } from "#index.ts";
+import { squirrelInit, squirrelShutdown } from "#index.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -76,5 +76,5 @@ setupShutdownHook(async () => {
 			resolve();
 	}));
 
-	shutdown(ctx);
+	squirrelShutdown(ctx);
 });
