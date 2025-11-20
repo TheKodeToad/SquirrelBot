@@ -8,7 +8,10 @@ const [_runtime, _script, command, ...args] = process.argv;
 switch (command) {
 case "perform": {
 	const db = new Client;
+	await db.connect();
+
 	const count = await migrate(db, args.includes("--ignore-changes"));
+
 	db.end();
 
 	if (count > 0)
@@ -20,7 +23,10 @@ case "perform": {
 }
 case "check": {
 	const db = new Client;
+	await db.connect();
+
 	const count = await checkMigrations(db);
+
 	db.end();
 
 	if (count > 0) {
