@@ -19,6 +19,8 @@ export async function squirrelInit(): Promise<SquirrelContext> {
 
 	const db = new Pool;
 
+	db.on("error", error => logger.error?.("Unhandled error in Postgres Pool", error));
+
 	const client = await db.connect();
 	try {
 		await checkMigrationsOrExit(client);
