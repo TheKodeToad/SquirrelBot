@@ -1,40 +1,69 @@
-import { useParams } from "@solidjs/router";
-import { ConfigEditor } from "../component/config/ConfigEditor";
-import { LoginGate } from "../component/LoginGate";
+import { A, Route, Router, useMatch, useNavigate, useParams } from "@solidjs/router";
 import { PLUGINS, type Plugin } from "../constants";
 import { Button } from "../component/common/Button";
-import { createSignal, For } from "solid-js";
+import { createSignal, For, JSX } from "solid-js";
 
-export const Guild = () => <LoginGate><GuildComponent /></LoginGate>;
+//export const Guild = () => <LoginGate><GuildComponent /></LoginGate>;
 
-export function GuildComponent() {
+//function testComponent() {
+//	return <>hello</>;
+//}
+
+function getPluginPath(plugin: Plugin) {
+	return "/" + encodeURIComponent(plugin.id);
+}
+
+export function GuildRoutes() {
+	return (
+		<Route component={GuildLayout}>
+			<Route
+				component={() => {
+					useNavigate()("./core");
+					return undefined;
+				}}
+			/>
+			<For each={PLUGINS}>
+				{plugin => (
+					<Route path={getPluginPath(plugin)} component={() => plugin.name} />
+				)}
+			</For>
+		</Route>
+	);
+}
+
+function GuildLayout(props: { children?: JSX.Element }) {
+	return (
+		<>
+			<div class="content">
+				<div id="sidebar" class="vbox">
+					<div class="sidebarHeading">Plugins</div>
+					<For each={PLUGINS}>
+						{plugin => <PluginWidget plugin={plugin} /> }
+					</For>
+				</div>
+			{props.children}
+			</div>
+		</>
+	);
+}
+function PluginWidget(props: { plugin: Plugin; }) {
+	return (
+		<A href={"." + getPluginPath(props.plugin)}>
+			{props.plugin.name}
+		</A>
+	);
+}
+
+function GuildComponent() {
 	const guildID = () => useParams().guildID!;
 
 	const [activeID, setActiveID] = createSignal("core");
 
 	return (
-		<div class="content">
-			<div id="sidebar" class="vbox">
-				<div class="sidebarHeading">Plugins</div>
-				<For each={PLUGINS}>
-					{plugin => (
-						<PluginWidget
-							plugin={plugin}
-							active={activeID() === plugin.id}
-							activate={() => setActiveID(plugin.id)}
-						/>
-					)}
-				</For>
-			</div>
-			<ConfigEditor guildID={guildID()} plugin={activeID()} />
-		</div>
+		<Router>
+			<Route path="/test" component={() => "test page"} />
+			<Route path="/" component={() => "main page"} />
+		</Router>
 	);
 }
 
-export function PluginWidget(props: { plugin: Plugin; active: boolean; activate: () => void; }) {
-	return (
-		<Button color="transparent2" active={props.active} onClick={() => props.activate()}>
-			{props.plugin.name}
-		</Button>
-	);
-}
