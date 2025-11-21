@@ -7,6 +7,7 @@ import path from "path";
 import { z } from "zod/v4";
 import "../environment.ts";
 import type { ClientBase } from "pg";
+import { transaction } from "#common/pg/transaction.ts";
 
 export async function migrate(db: ClientBase, ignoreChanges: boolean): Promise<number> {
 	return await processMigrations(db, false, ignoreChanges);
@@ -125,10 +126,7 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 
 		console.log(`Running file "${file}"`);
 
-		let done = false;
-		try {
-			await client.query("BEGIN");
-
+		await transaction(client, async () => {
 			await client.query(content);
 			await client.query(
 				`
@@ -137,13 +135,7 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 				`,
 				[number, contentChecksum]
 			);
-
-			await client.query("COMMIT");
-			done = true;
-		} finally {
-			if (!done)
-				await client.query("ROLLBACK");
-		}
+		});
 	}
 
 	return runCount;

@@ -1,3 +1,4 @@
+import { poolTransaction } from "#common/pg/transaction.ts";
 import { dbParse } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
 import type { Pool } from "pg";
@@ -45,7 +46,7 @@ export interface ReminderQuery {
 	limit: number;
 }
 
-const JustNumber = z.strictObject({ number: z.number() });
+const JustCounter = z.strictObject({ counter: z.number() });
 
 export async function getReminder(db: Pool, guildID: string, number: number): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32)
@@ -107,41 +108,52 @@ export async function getRemindersByFiresAt(db: Pool, startInclusive: Date, endE
 	return dbParse(ReminderArray, result.rows);
 }
 
-export async function createReminder(db: Pool, guildID: string, options: CreateReminderOptions): Promise<Reminder> {
+export function createReminder(db: Pool, guildID: string, options: CreateReminderOptions): Promise<number> {
 	options.createdAt ??= new Date;
 
-	const result = await db.query(
-		`
-			INSERT INTO "reminders_reminders" (
-				"guildID",
-				"ownerID",
-				"channelID",
-				"channelType",
-				"createdAt",
-				"firesAt",
-				"message",
-				"silent"
-			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-			RETURNING "number"
-		`,
-		[
-			guildID,
-			options.ownerID,
-			options.channelID,
-			options.channelType,
-			options.createdAt,
-			options.firesAt,
-			options.message ?? null,
-			options.silent,
-		]
-	);
+	return poolTransaction(db, async client => {
+		const result = await client.query(
+			`
+				INSERT INTO "reminders_reminderNumberCounter" ("guildID", "counter")
+				VALUES ($1, 1)
+				ON CONFLICT ("guildID")
+				DO UPDATE SET "counter" = "reminders_reminderNumberCounter"."counter" + 1
+				RETURNING "counter"
+			`,
+			[guildID]
+		);
+		const newNumber = dbParse(JustCounter, result.rows[0]).counter;
 
-	return {
-		guildID,
-		number: dbParse(JustNumber, result.rows[0]).number,
-		...options
-	} satisfies Reminder;
+		await db.query(
+			`
+				INSERT INTO "reminders_reminders" (
+					"guildID",
+					"number",
+					"ownerID",
+					"channelID",
+					"channelType",
+					"createdAt",
+					"firesAt",
+					"message",
+					"silent"
+				)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			`,
+			[
+				guildID,
+				newNumber,
+				options.ownerID,
+				options.channelID,
+				options.channelType,
+				options.createdAt,
+				options.firesAt,
+				options.message ?? null,
+				options.silent,
+			]
+		);
+
+		return newNumber;
+	});
 }
 
 export async function deleteReminder(db: Pool, guildID: string, number: number): Promise<boolean> {

@@ -2,8 +2,9 @@ import { dbParse } from "#storage/index.ts";
 import { z } from "zod/v4";
 import { ModEventType, reverseModEventType, type ModEvent } from "../public/modEvent.ts";
 import type { Pool } from "pg";
+import { poolTransaction } from "#common/pg/transaction.ts";
 
-export const CaseInfo = z.strictObject({
+const CaseInfo = z.strictObject({
 	guildID: z.string(),
 	number: z.number(),
 
@@ -21,7 +22,7 @@ export const CaseInfo = z.strictObject({
 	deleteMessageSeconds: z.number().nullable(),
 	dmDelivered: z.boolean().nullable(),
 });
-export const CaseInfoArray = CaseInfo.array();
+const CaseInfoArray = CaseInfo.array();
 
 export interface CaseInfo extends z.output<typeof CaseInfo> { }
 
@@ -46,7 +47,7 @@ export interface CaseQuery {
 	limit: number;
 }
 
-const JustNumber = z.strictObject({ number: z.number() });
+const JustCounter = z.strictObject({ counter: z.number() });
 
 export async function getCase(db: Pool, guildID: string, number: number): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32)
@@ -115,20 +116,26 @@ export async function getCases(db: Pool, guildID: string, query: CaseQuery): Pro
 	return dbParse(CaseInfoArray, result.rows);
 }
 
-export async function createCase(db: Pool, guildID: string, event: ModEvent): Promise<number> {
-	// TODO: might have edge cases but it's pretty darn unlikely
-
-	const client = await db.connect();
-
-	let done = false;
-
-	try {
-		await client.query("BEGIN");
-
+export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<number> {
+	return poolTransaction(db, async client => {
+		// TODO: might have edge cases but it's pretty darn unlikely for them to occur
 		const result = await client.query(
+			`
+				INSERT INTO "moderation_caseNumberCounter" ("guildID", "counter")
+				VALUES ($1, 1)
+				ON CONFLICT ("guildID")
+				DO UPDATE SET "counter" = "moderation_caseNumberCounter"."counter" + 1
+				RETURNING "counter"
+			`,
+			[guildID]
+		);
+		const newNumber = dbParse(JustCounter, result.rows[0]).counter;
+
+		await client.query(
 			`
 				INSERT INTO "moderation_cases" (
 					"guildID",
+					"number",
 					"type",
 					"createdAt",
 					"expiresAt",
@@ -138,11 +145,11 @@ export async function createCase(db: Pool, guildID: string, event: ModEvent): Pr
 					"deleteMessageSeconds",
 					"dmDelivered"
 				)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-				RETURNING "number"
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 			`,
 			[
 				guildID,
+				newNumber,
 				event.type,
 				event.performedAt,
 				event.expiresAt ?? null,
@@ -153,7 +160,6 @@ export async function createCase(db: Pool, guildID: string, event: ModEvent): Pr
 				event.dmDelivered ?? null,
 			]
 		);
-		const newNumber = dbParse(JustNumber, result.rows[0]).number;
 
 		const reverseType = reverseModEventType(event.type);
 
@@ -184,16 +190,8 @@ export async function createCase(db: Pool, guildID: string, event: ModEvent): Pr
 			);
 		}
 
-		await client.query("COMMIT");
-		done = true;
-
 		return newNumber;
-	} finally {
-		if (!done)
-			await client.query("ROLLBACK");
-
-		client.release();
-	}
+	});
 }
 
 export async function deleteCase(db: Pool, guildID: string, number: number): Promise<boolean> {

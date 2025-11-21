@@ -1,5 +1,4 @@
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
-import pg from "pg";
 import { z } from "zod/v4";
 
 export function dbParse<T extends z.ZodType>(type: T, input: unknown): z.infer<T> {
