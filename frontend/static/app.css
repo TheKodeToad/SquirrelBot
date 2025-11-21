@@ -99,7 +99,7 @@ body {
 	text-decoration: none;
 }
 
-#headerBar-breadcrumb a[aria-current=page] {
+#headerBar-breadcrumb a.active {
 	font-weight: bold;
 }
 
