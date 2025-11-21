@@ -27,21 +27,25 @@ export default [
 ];
 
 async function handle(squirrelCtx: SquirrelDiscordContext, interaction: AnyInteractionGateway): Promise<void> {
-	if (!interaction.inCachedGuildChannel())
+	if (!interaction.inCachedGuildChannel()) {
 		return;
+	}
 
-	if (!interaction.isCommandInteraction())
+	if (!interaction.isCommandInteraction()) {
 		return;
+	}
 
 	const config = coreConfigStore.get(interaction.guildID);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return;
+	}
 
 	const perms = resolvePermissions(config, interaction.member, interaction.channel);
 
-	if (!perms.slash_commands)
+	if (!perms.slash_commands) {
 		return;
+	}
 
 	const commandEntry = getCommandByName(interaction.data.name);
 
@@ -64,8 +68,9 @@ async function handle(squirrelCtx: SquirrelDiscordContext, interaction: AnyInter
 		return;
 	}
 
-	if (data == null)
+	if (data == null) {
 		throw new Error("Nullish value returned from preRun!");
+	}
 
 	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
 
@@ -110,11 +115,13 @@ async function syncSlashCommands(bot: Client): Promise<void> {
 			return;
 		}
 	} catch (error) {
-		if (!(error instanceof Error && "code" in error && typeof "code" === "string"))
+		if (!(error instanceof Error && "code" in error && typeof "code" === "string")) {
 			throw error;
+		}
 
-		if (error.code !== "ENOENT")
+		if (error.code !== "ENOENT") {
 			throw error;
+		}
 	}
 
 	logger.debug?.("Syncing global slash commands");
@@ -127,8 +134,9 @@ function mapCommand({ command }: CommandCacheEntry): CreateApplicationCommandOpt
 	const options: SlashOptions[] = [];
 
 	for (const key in command.options) {
-		if (!Object.hasOwn(command.options, key))
+		if (!Object.hasOwn(command.options, key)) {
 			continue;
+		}
 
 		const option = command.options[key]!;
 
@@ -232,16 +240,19 @@ class SlashContext implements CommandContext {
 	async respond(reply: Reply): Promise<void> {
 		const messageOptions = transformReply(reply);
 
-		if (this._ephemeral)
+		if (this._ephemeral) {
 			messageOptions.flags |= MessageFlags.EPHEMERAL;
-		else
+		}
+		else {
 			messageOptions.flags &= ~MessageFlags.EPHEMERAL;
+		}
 
 		if (this._acked) {
 			await this._deferPromise;
 
-			if (this._responseID !== null)
+			if (this._responseID !== null) {
 				unlistenForInteractions(this._responseID);
+			}
 
 			await this._interaction.editOriginal(messageOptions).then(message => this._responseID ??= message?.id ?? null);
 		} else {
@@ -252,8 +263,9 @@ class SlashContext implements CommandContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.componentHandler !== undefined && this._responseID !== null)
+		if (typeof reply !== "string" && reply.componentHandler !== undefined && this._responseID !== null) {
 			listenForInteractions(this._responseID, this._interaction.user.id, reply.componentHandler);
+		}
 	}
 
 	_clearTimeout(): void {

@@ -15,8 +15,9 @@ export class TTLMap<K, V> {
 		const now = Date.now();
 
 		for (const [key, [_, date]] of this._map) {
-			if (!this._isExpired(now, date))
+			if (!this._isExpired(now, date)) {
 				break;
+			}
 
 			this._map.delete(key);
 		}
@@ -30,9 +31,11 @@ export class TTLMap<K, V> {
 		const now = Date.now();
 		let count = 0;
 
-		for (const [_, date] of this._map.values())
-			if (!this._isExpired(now, date))
+		for (const [_, date] of this._map.values()) {
+			if (!this._isExpired(now, date)) {
 				++count;
+			}
+		}
 
 		return count;
 	}
@@ -48,28 +51,33 @@ export class TTLMap<K, V> {
 	}
 
 	forEach(callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void, thisArg?: any): void {
-		if (thisArg != null)
+		if (thisArg != null) {
 			callbackfn = callbackfn.bind(thisArg);
+		}
 
-		for (const entry of this)
+		for (const entry of this) {
 			callbackfn(entry[1], entry[0], this);
+		}
 	}
 
 	get(key: K): V | undefined {
 		const entry = this._map.get(key);
-		if (entry === undefined)
+		if (entry === undefined) {
 			return undefined;
+		}
 
 		const [value, date] = this._map.get(key)!;
-		if (this._isExpired(Date.now(), date))
+		if (this._isExpired(Date.now(), date)) {
 			return undefined;
+		}
 
 		return value;
 	}
 
 	has(key: K): boolean {
-		if (!this._map.has(key))
+		if (!this._map.has(key)) {
 			return false;
+		}
 
 		const [_, date] = this._map.get(key)!;
 		return !this._isExpired(Date.now(), date);
@@ -83,33 +91,41 @@ export class TTLMap<K, V> {
 	*entries(): IterableIterator<[K, V]> {
 		const now = Date.now();
 
-		for (const [key, [value, date]] of this._map)
-			if (!this._isExpired(now, date))
+		for (const [key, [value, date]] of this._map) {
+			if (!this._isExpired(now, date)) {
 				yield [key, value];
+			}
+		}
 	}
 
 	*keys(): IterableIterator<K> {
 		const now = Date.now();
 
-		for (const [key, [_, date]] of this._map)
-			if (!this._isExpired(now, date))
+		for (const [key, [_, date]] of this._map) {
+			if (!this._isExpired(now, date)) {
 				yield key;
+			}
+		}
 	}
 
 	*values(): IterableIterator<V> {
 		const now = Date.now();
 
-		for (const [value, date] of this._map.values())
-			if (!this._isExpired(now, date))
+		for (const [value, date] of this._map.values()) {
+			if (!this._isExpired(now, date)) {
 				yield value;
+			}
+		}
 	}
 
 	*[Symbol.iterator](): IterableIterator<[K, V]> {
 		const now = Date.now();
 
-		for (const [key, [value, date]] of this._map)
-			if (!this._isExpired(now, date))
+		for (const [key, [value, date]] of this._map) {
+			if (!this._isExpired(now, date)) {
 				yield [key, value];
+			}
+		}
 	}
 
 	get [Symbol.toStringTag](): string {

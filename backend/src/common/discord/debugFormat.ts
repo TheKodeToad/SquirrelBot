@@ -7,8 +7,9 @@ export function debugFormatUser(user: User): string {
 export function debugFormatChannel(channel: AnyChannel): string {
 	let name = "<unnamed>";
 
-	if ("name" in channel)
+	if ("name" in channel) {
 		name = channel.name ?? name;
+	}
 
 	return `#${name}[${channel.id}]`;
 }
@@ -20,8 +21,9 @@ export function debugFormatGuildByID(bot: Client, id: string): string {
 export function debugFormatGuild(guild: Guild | Uncached): string {
 	let name = "<unknown>";
 
-	if ("name" in guild)
+	if ("name" in guild) {
 		name = guild.name;
+	}
 
 	return `*${name}[${guild.id}]`;
 }

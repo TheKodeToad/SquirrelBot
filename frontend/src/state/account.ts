@@ -11,24 +11,28 @@ export const [account, setAccount] = createSignal<Account | null>(loadFromStorag
 export function useAccountID() {
 	const theAccount = account();
 
-	if (theAccount === null)
+	if (theAccount === null) {
 		return undefined;
+	}
 
 	const splitIndex = theAccount.token.indexOf(".");
 
-	if (splitIndex === -1)
+	if (splitIndex === -1) {
 		return undefined;
+	}
 
 	const userIDPart = theAccount.token.slice(0, splitIndex);
 
-	if (userIDPart.length === 0)
+	if (userIDPart.length === 0) {
 		return undefined;
+	}
 
 	try {
 		var userID = BigInt("0x" + userIDPart);
 	} catch (error) {
-		if (!(error instanceof SyntaxError))
+		if (!(error instanceof SyntaxError)) {
 			throw error;
+		}
 
 		return undefined;
 	}
@@ -39,8 +43,9 @@ export function useAccountID() {
 export function useAvatarURL() {
 	const theAccount = account();
 
-	if (theAccount === null)
+	if (theAccount === null) {
 		return undefined;
+	}
 
 	return `https://cdn.discordapp.com/avatars/${useAccountID()!}/${theAccount.avatar}.png?size=64`;
 }
@@ -48,21 +53,24 @@ export function useAvatarURL() {
 createEffect(on(account, account => localStorage.setItem("account", JSON.stringify(account))));
 
 addEventListener("storage", event => {
-	if (event.key === "account")
+	if (event.key === "account") {
 		setAccount(loadFromStorage());
+	}
 });
 
 function loadFromStorage(): Account | null {
 	const string = localStorage.getItem("account");
 
-	if (string === null)
+	if (string === null) {
 		return null;
+	}
 
 	try {
 		return JSON.parse(string);
 	} catch (error) {
-		if (!(error instanceof SyntaxError))
+		if (!(error instanceof SyntaxError)) {
 			throw error;
+		}
 
 		console.warn("Could not parse account");
 		console.warn(error);

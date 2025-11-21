@@ -21,11 +21,13 @@ const QUARANTINE = GuildMemberFlags.AUTOMOD_QUARANTINED_BIO | GuildMemberFlags.A
 
 export function canWriteInChannel(bot: Client, channel: AnyGuildChannel, member: Member): boolean {
 	// channel was deleted
-	if (bot.getChannel(channel.id) === undefined)
+	if (bot.getChannel(channel.id) === undefined) {
 		return false;
+	}
 
-	if (member.pending)
+	if (member.pending) {
 		return false;
+	}
 
 	if ((member.flags & QUARANTINE) !== 0)
 		return false;

@@ -53,13 +53,15 @@ async function lookUpCases(
 ): Promise<CaseInfo[]> {
 	const config = moderationConfigStore.get(ctx.guild.id);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return [];
+	}
 
 	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (!permissions.case_read)
+	if (!permissions.case_read) {
 		return [];
+	}
 
 	return await getCases(ctx.squirrelCtx.db, ctx.guild.id, {
 		actorIDs: actorID !== null ? [actorID] : undefined,
@@ -83,8 +85,9 @@ async function renderCases(bot: Client, cases: CaseInfo[], compact: boolean): Pr
 	if (compact) {
 		let content = "";
 
-		for (const info of cases)
+		for (const info of cases) {
 			content += await formatCompactCaseSummary(bot, info) + "\n";
+		}
 
 		container.components.push(Text(content));
 	} else {

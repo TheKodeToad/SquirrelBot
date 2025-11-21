@@ -8,13 +8,15 @@ import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } fro
 const LIMITED_WHITESPACE_EATER_PATTERN = /\s{0,3}/y;
 
 export function readPrefixName(reader: StringReader, prefix: string): string | null {
-	if (!reader.skipOver(prefix))
+	if (!reader.skipOver(prefix)) {
 		return null;
+	}
 
 	reader.skipOver(LIMITED_WHITESPACE_EATER_PATTERN);
 
-	if (!reader.canRead())
+	if (!reader.canRead()) {
 		return null;
+	}
 
 	return reader.readWord().toLowerCase();
 }
@@ -32,11 +34,13 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 	while (reader.canRead()) {
 		const namedOptionResult = readNamedArg(reader, commandEntry, output);
 
-		if (typeof namedOptionResult !== "boolean")
+		if (typeof namedOptionResult !== "boolean") {
 			return namedOptionResult;
+		}
 
-		if (namedOptionResult)
+		if (namedOptionResult) {
 			continue;
+		}
 
 		const foundByPosition = commandEntry.optionsByPosition[positionalIndex];
 
@@ -66,8 +70,9 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 			};
 		}
 
-		if (value instanceof Array)
+		if (value instanceof Array) {
 			output.pushTo(key, ...value);
+		}
 		else
 			output.set(key, value);
 
@@ -88,18 +93,21 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 }
 
 function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, output: SafeArgs): ArgsParseResult | boolean {
-	if (!reader.skipOver("-"))
+	if (!reader.skipOver("-")) {
 		return false;
+	}
 
 	reader.skipOver("-");
 
-	if (!reader.canRead())
+	if (!reader.canRead()) {
 		return { error: ArgsParseError.BareNamedKey };
+	}
 
 	const optionName = reader.readWord().toLowerCase();
 
-	if (optionName.length === 0)
+	if (optionName.length === 0) {
 		return { error: ArgsParseError.BareNamedKey };
+	}
 
 	const foundByName = commandEntry.optionsByName.get(optionName);
 

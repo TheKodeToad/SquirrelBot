@@ -13,11 +13,13 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 	for (const plugin of squirrelCtx.plugins.values()) {
 		const pluginRouter = new Hono<{ Variables: GuildAuthVars; }>;
 
-		for (const setup of definePluginGuildRoutes.contributions.get(plugin) ?? [])
+		for (const setup of definePluginGuildRoutes.contributions.get(plugin) ?? []) {
 			setup(squirrelCtx, pluginRouter);
+		}
 
-		for (const setup of defineGlobalPluginGuildRoutes.contributions)
+		for (const setup of defineGlobalPluginGuildRoutes.contributions) {
 			setup(squirrelCtx, plugin, pluginRouter);
+		}
 
 		guildRouter.route("/" + encodeURIComponent(plugin.id), pluginRouter);
 	}

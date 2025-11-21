@@ -9,8 +9,9 @@ export async function fetchUserCachedSupressed(bot: Client, userID: string): Pro
 	try {
 		return await fetchUserCached(bot, userID);
 	} catch (error) {
-		if (!(error instanceof DiscordRESTError))
+		if (!(error instanceof DiscordRESTError)) {
 			throw error;
+		}
 
 		return { id: userID };
 	}
@@ -31,19 +32,23 @@ export async function createDMCached(bot: Client, userID: string): Promise<Priva
 export async function fetchThreadCached(bot: Client, guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
 	const cached = guild.threads.get(threadID);
 
-	if (cached !== undefined)
+	if (cached !== undefined) {
 		return cached;
+	}
 
-	if (bot.getChannel(threadID) !== undefined)
+	if (bot.getChannel(threadID) !== undefined) {
 		return null;
+	}
 
 	const fetched = await bot.rest.channels.get(threadID);
 
-	if (!isThreadChannel(fetched))
+	if (!isThreadChannel(fetched)) {
 		return null;
+	}
 
-	if (fetched.guildID !== guild.id)
+	if (fetched.guildID !== guild.id) {
 		return null;
+	}
 
 	return fetched;
 }
@@ -52,28 +57,34 @@ export async function fetchTextableGuildChannelCached(bot: Client, guild: Guild,
 	const cachedRegularChannel = guild.channels.get(channelID);
 
 	if (cachedRegularChannel !== undefined) {
-		if (isTextableGuildChannel(cachedRegularChannel))
+		if (isTextableGuildChannel(cachedRegularChannel)) {
 			return cachedRegularChannel;
-		else
+		}
+		else {
 			return null;
+		}
 	}
 
 	const cachedThreadChannel = guild.threads.get(channelID);
 
-	if (cachedThreadChannel !== undefined)
+	if (cachedThreadChannel !== undefined) {
 		return cachedThreadChannel;
+	}
 
 	// must belong to another guild
-	if (bot.getChannel(channelID))
+	if (bot.getChannel(channelID)) {
 		return null;
+	}
 
 	const fetched = await bot.rest.channels.get(channelID);
 
-	if (!isTextableGuildChannel(fetched))
+	if (!isTextableGuildChannel(fetched)) {
 		return null;
+	}
 
-	if (fetched.guildID !== guild.id)
+	if (fetched.guildID !== guild.id) {
 		return null;
+	}
 
 	return fetched;
 }
@@ -99,17 +110,20 @@ export async function fetchMembersCached(
 
 	for (const id of userIDs) {
 		const member = guild.members.get(id);
-		if (member !== undefined)
+		if (member !== undefined) {
 			result.set(id, member);
+		}
 		else {
 			queue.push(id);
-			if (queue.length === 100)
+			if (queue.length === 100) {
 				request();
+			}
 		}
 	}
 
-	if (queue.length > 0)
+	if (queue.length > 0) {
 		request();
+	}
 
 	await Promise.all(promises);
 	return result;

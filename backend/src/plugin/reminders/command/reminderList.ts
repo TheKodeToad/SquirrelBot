@@ -32,13 +32,15 @@ export default defineCommand({
 async function lookUpReminders(ctx: BaseCommandContext, query: PaginatorQuery<Date>): Promise<Reminder[]> {
 	const config = remindersConfigStore.get(ctx.guild.id);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return [];
+	}
 
 	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (!permissions.personal_reminders)
+	if (!permissions.personal_reminders) {
 		return [];
+	}
 
 	return getReminders(ctx.squirrelCtx.db, ctx.guild.id, {
 		ownerID: ctx.user.id,
@@ -50,13 +52,15 @@ async function lookUpReminders(ctx: BaseCommandContext, query: PaginatorQuery<Da
 }
 
 function renderReminders(reminders: Reminder[]): ReplyObject {
-	if (reminders.length === 0)
+	if (reminders.length === 0) {
 		return { components: [Text(`${icons.info} No reminders found!`)] };
+	}
 
 	let content = "";
 
-	for (const reminder of reminders)
+	for (const reminder of reminders) {
 		content += `<t:${dateToUnixSecs(reminder.firesAt)}:R> **#${reminder.number}:** ${reminder.message ?? "*No message provided.*"}\n`;
+	}
 
 	return {
 		components: [Container([Text("## Reminders"), Text(content)])]

@@ -50,8 +50,9 @@ export interface CaseQuery {
 const JustCounter = z.strictObject({ counter: z.number() });
 
 export async function getCase(db: Pool, guildID: string, number: number): Promise<CaseInfo | null> {
-	if (number < 0 || number >= 2 ** 32)
+	if (number < 0 || number >= 2 ** 32) {
 		return null;
+	}
 
 	const result = await db.query(
 		`
@@ -63,8 +64,9 @@ export async function getCase(db: Pool, guildID: string, number: number): Promis
 		[guildID, number]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(CaseInfo, result.rows[0]);
 }
@@ -195,8 +197,9 @@ export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<
 }
 
 export async function deleteCase(db: Pool, guildID: string, number: number): Promise<boolean> {
-	if (number < 0 || number >= 2 ** 32)
+	if (number < 0 || number >= 2 ** 32) {
 		return false;
+	}
 
 	const result = await db.query(
 		`

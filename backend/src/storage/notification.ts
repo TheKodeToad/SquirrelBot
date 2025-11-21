@@ -22,8 +22,9 @@ export async function connectNotifDispatcher(pool: Pool): Promise<NotifDispatche
 	client.on("notification", notification => {
 		const listeners = listenersLookup.get(notification.channel);
 
-		if (listeners === undefined)
+		if (listeners === undefined) {
 			return;
+		}
 
 		listeners.forEach(listener => listener(notification.payload));
 	});
@@ -35,8 +36,9 @@ export async function connectNotifDispatcher(pool: Pool): Promise<NotifDispatche
 			if (listeners === undefined) {
 				await client.query("SELECT pg_temp.listen($1)", [channel]);
 				listenersLookup.set(channel, [listener]);
-			} else
+			} else {
 				listeners.push(listener);
+			}
 		},
 		disconnect: client.release
 	};
