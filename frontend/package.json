@@ -6,6 +6,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "catalog:",
 		"esbuild": "^0.25.4",
 		"esbuild-plugin-solid": "^0.6.0",
 		"typescript": "^5.8.3"
