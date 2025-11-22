@@ -1,10 +1,10 @@
 import { A } from "@solidjs/router";
 import { For } from "solid-js";
 import { GuildIcon } from "../component/common/GuildIcon";
+import { StatusFallback } from "../component/common/StatusFallback";
 import { LoginGate } from "../component/LoginGate";
 import { APP_INVITE_PERMISSIONS, CLIENT_ID } from "../constants";
 import { guilds } from "../state/guilds";
-import { StatusFallback } from "../component/common/StatusFallback";
 
 export const Home = () => <LoginGate><GuildsComponent /></LoginGate>;
 

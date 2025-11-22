@@ -1,14 +1,14 @@
+import { syntaxTree } from "@codemirror/language";
+import { EditorState } from "@codemirror/state";
+import { IconDeviceFloppy } from "@tabler/icons-solidjs";
+import { EditorView } from "codemirror";
 import { createEffect, createResource, createSignal, getOwner, on, runWithOwner } from "solid-js";
 import { baseExtensions } from ".";
 import { getGuildConfig, writeGuildConfig } from "../../client";
 import { account } from "../../state/account";
 import { useGuild } from "../../state/guilds";
-import { StatusFallback } from "../common/StatusFallback";
 import { Button } from "../common/Button";
-import { EditorView } from "codemirror";
-import { IconDeviceFloppy } from "@tabler/icons-solidjs";
-import { EditorState } from "@codemirror/state";
-import { syntaxTree } from "@codemirror/language";
+import { StatusFallback } from "../common/StatusFallback";
 
 export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
@@ -67,14 +67,14 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 		tree.iterate({
 			enter: node => {
 				console.group(node.type.name);
-				console.log(view.state.doc.slice(node.from, node.to).toString())
+				console.log(view.state.doc.slice(node.from, node.to).toString());
 				return true;
 			},
 			leave: node => {
 				console.groupEnd();
 				return false;
 			}
-		})
+		});
 	}, { defer: true }));
 
 	return (

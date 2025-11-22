@@ -1,8 +1,7 @@
 import { A, useMatch } from "@solidjs/router";
-import { IconChevronRight, IconLogin, IconLogout, IconSettings } from "@tabler/icons-solidjs";
+import { IconChevronRight, IconLogout, IconSettings } from "@tabler/icons-solidjs";
 import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { APP_NAME } from "../constants";
 import { logOut } from "../auth";
 import { account, Account, useAvatarURL } from "../state/account";
 import { guilds, useGuild } from "../state/guilds";

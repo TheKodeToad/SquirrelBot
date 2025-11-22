@@ -1,7 +1,6 @@
-import { A, Route, Router, useMatch, useNavigate, useParams } from "@solidjs/router";
-import { PLUGINS, type Plugin } from "../constants";
-import { Button } from "../component/common/Button";
+import { A, Route, Router, useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, JSX } from "solid-js";
+import { PLUGINS, type Plugin } from "../constants";
 
 //export const Guild = () => <LoginGate><GuildComponent /></LoginGate>;
 
@@ -31,17 +30,17 @@ export function GuildRoutes() {
 	);
 }
 
-function GuildLayout(props: { children?: JSX.Element }) {
+function GuildLayout(props: { children?: JSX.Element; }) {
 	return (
 		<>
 			<div class="content">
 				<div id="sidebar" class="vbox">
 					<div class="sidebarHeading">Plugins</div>
 					<For each={PLUGINS}>
-						{plugin => <PluginWidget plugin={plugin} /> }
+						{plugin => <PluginWidget plugin={plugin} />}
 					</For>
 				</div>
-			{props.children}
+				{props.children}
 			</div>
 		</>
 	);

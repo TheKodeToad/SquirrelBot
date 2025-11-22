@@ -29,7 +29,7 @@ export async function logIn(): Promise<void> {
 	window.location.assign(url);
 }
 
-export type CallbackStatus = { state: "working" } | { state: "errored", error: unknown };
+export type CallbackStatus = { state: "working"; } | { state: "errored", error: unknown; };
 
 const [callbackStatus, setCallbackStatus] = createSignal<CallbackStatus | null>(null);
 
@@ -60,7 +60,7 @@ export async function handleLoginCallback() {
 	setCallbackStatus({ state: "working" });
 
 	try {
-		const response = await requestLogIn(code, verifier)
+		const response = await requestLogIn(code, verifier);
 		setAccount({
 			token: response.token,
 			username: response.username,
