@@ -38,7 +38,7 @@ function GuildLayout(props: { children?: JSX.Element; }) {
 				<div id="sidebar" class="vbox">
 					<div class="sidebarHeading">Plugins</div>
 					<For each={PLUGINS}>
-						{plugin => <PluginSidebarWidget plugin={plugin} />}
+						{plugin => <SidebarLinkWidget label={plugin.name} path={getPluginPath(plugin.id)} />}
 					</For>
 				</div>
 				{props.children}
@@ -47,16 +47,16 @@ function GuildLayout(props: { children?: JSX.Element; }) {
 	);
 }
 
-function PluginSidebarWidget(props: { plugin: Plugin; }) {
-	const target = useResolvedPath(() => getPluginPath(props.plugin.id));
+function SidebarLinkWidget(props: { label: string; path: string; }) {
+	const target = useResolvedPath(() => props.path);
 	const loc = useLocation();
-	const active = () => loc.pathname === target() || loc.pathname.startsWith(target() + "/");
+	const active = () => loc.pathname === target();
 
 	return (
-		<A href={getPluginPath(props.plugin.id)}>
+		<A href={props.path}>
 			{/* FIXME: using an inline style to get it to look right */}
 			<Button color={"transparent2"} active={active()} style={{ width: "100%" }}>
-				{props.plugin.name}
+				{props.label}
 			</Button>
 		</A>
 	);
