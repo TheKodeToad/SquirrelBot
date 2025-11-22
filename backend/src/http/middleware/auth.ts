@@ -11,13 +11,15 @@ export type AuthVars = {
 export const authMiddleware = (db: Pool) => createMiddleware<{ Variables: AuthVars; }>(async (ctx, next) => {
 	const authorization = ctx.req.header("Authorization");
 
-	if (authorization === undefined)
+	if (authorization === undefined) {
 		throw new HTTPException(401, { message: "No Authorization header provided" });
+	}
 
 	const user = await validateToken(db, authorization);
 
-	if (user === null)
+	if (user === null) {
 		throw new HTTPException(401, { message: "Invalid or expired token" });
+	}
 
 	ctx.set("discordUserID", user);
 	await next();

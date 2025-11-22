@@ -36,8 +36,9 @@ function initCommandCache(): void {
 		for (const name of command.name) {
 			const nameLower = name.toLowerCase();
 
-			if (byName.has(nameLower))
+			if (byName.has(nameLower)) {
 				throw new Error(`Conflicting commands with name ${name}!`);
+			}
 
 			byName.set(name.toLowerCase(), entry);
 		}
@@ -61,20 +62,25 @@ function makeCacheEntry(command: Command): CommandCacheEntry {
 	const optionsByNegativeName: Map<string, string> = new Map;
 
 	for (const key in command.options) {
-		if (!Object.hasOwn(command.options, key))
+		if (!Object.hasOwn(command.options, key)) {
 			continue;
+		}
 
 		const option = command.options[key]!;
 
-		if (typeof option.position === "number")
+		if (typeof option.position === "number") {
 			optionsByPosition[option.position] = [key, option];
+		}
 
-		for (const name of option.name)
+		for (const name of option.name) {
 			optionsByName.set(name.toLowerCase(), [key, option]);
+		}
 
-		if ("negativeName" in option && option.negativeName !== undefined)
-			for (const negativeName of option.negativeName)
+		if ("negativeName" in option && option.negativeName !== undefined) {
+			for (const negativeName of option.negativeName) {
 				optionsByNegativeName.set(negativeName.toLowerCase(), key);
+			}
+		}
 	}
 
 	return {
@@ -95,41 +101,49 @@ function formatCommandPrefixUsage(options: Command["options"], optionsByPosition
 	for (const [key, option] of optionsByPosition) {
 		result += " ";
 
-		if (!option.required)
+		if (!option.required) {
 			result += "[";
+		}
 
 		result += "<" + option.name[0] + ">";
 
-		if (!option.required)
+		if (!option.required) {
 			result += "]";
+		}
 
 		alreadyDisplayed.add(key);
 	}
 
 	for (const key in options) {
-		if (!Object.hasOwn(options, key))
+		if (!Object.hasOwn(options, key)) {
 			continue;
+		}
 
-		if (alreadyDisplayed.has(key))
+		if (alreadyDisplayed.has(key)) {
 			continue;
+		}
 
 		const option = options[key]!;
 
 		result += " ";
 
-		if (!option.required)
+		if (!option.required) {
 			result += "[";
+		}
 
-		if ("negativeName" in option && option.negativeName !== undefined)
+		if ("negativeName" in option && option.negativeName !== undefined) {
 			result += "(-" + option.name[0] + "|-" + option.negativeName[0] + ")";
-		else
+		} else {
 			result += "-" + option.name[0];
+		}
 
-		if (option.type !== OptionType.Flag)
+		if (option.type !== OptionType.Flag) {
 			result += " <" + formatOptionValue(option) + ">";
+		}
 
-		if (!option.required)
+		if (!option.required) {
 			result += "]";
+		}
 	}
 
 	return result;

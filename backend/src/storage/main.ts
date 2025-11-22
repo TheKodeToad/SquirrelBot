@@ -14,10 +14,11 @@ case "perform": {
 
 	db.end();
 
-	if (count > 0)
+	if (count > 0) {
 		console.log(`Done ${count} migrations!`);
-	else
+	} else {
 		console.log("No migrations needed!");
+	}
 
 	break;
 }
@@ -32,8 +33,9 @@ case "check": {
 	if (count > 0) {
 		console.error(`${count} migrations needed!`);
 		process.exit(1);
-	} else
+	} else {
 		console.log("No migrations needed!");
+	}
 
 	break;
 }

@@ -28,8 +28,9 @@ export function canRunCommand(squirrelCtx: SquirrelDiscordContext, command: Comm
 		async respond() { },
 	});
 
-	if (data == null)
+	if (data == null) {
 		throw new Error("Nullish value returned from preRun");
+	}
 
 	return data !== false;
 }

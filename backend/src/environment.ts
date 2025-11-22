@@ -25,14 +25,17 @@ export const INTERNAL_TYPE_INTEGRITY = parseBoolean(process.env["INTERNAL_TYPE_I
 export const CACHE_PATH = process.env["CACHE_PATH"] ?? "./cache";
 
 function parseBoolean(string: string | undefined): boolean | undefined {
-	if (string === undefined)
+	if (string === undefined) {
 		return undefined;
+	}
 
-	if (string === "0" || string === "false")
+	if (string === "0" || string === "false") {
 		return false;
+	}
 
-	if (string === "1" || string === "true")
+	if (string === "1" || string === "true") {
 		return true;
+	}
 
 	return undefined;
 }

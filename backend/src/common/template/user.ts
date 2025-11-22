@@ -60,16 +60,18 @@ export function makeMemberUserView(member: Member): UserView {
 
 		get guild() { return makeGuildView(member.guild); },
 		get joined_at() {
-			if (member.joinedAt !== null)
+			if (member.joinedAt !== null) {
 				return makeTimestampView(member.joinedAt);
-			else
+			} else {
 				return undefined;
+			}
 		},
 		get membership_duration() {
-			if (member.joinedAt !== null)
+			if (member.joinedAt !== null) {
 				return makeDurationView(Date.now() - member.joinedAt.getTime());
-			else
+			} else {
 				return undefined;
+			}
 		},
 
 		get mention() { return member.mention; },

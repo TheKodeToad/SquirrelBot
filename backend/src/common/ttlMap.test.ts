@@ -31,11 +31,13 @@ function assertConsistentData<V>(map: TTLMap<string, V>, data: Record<string, V>
 
 	const fromForOf: [string, V][] = [];
 
-	for (const [key, value] of map)
+	for (const [key, value] of map) {
 		fromForOf.push([key, value]);
+	}
 
-	for (const key in data)
+	for (const key in data) {
 		assert.ok(map.has(key), `map.has('${key}')`);
+	}
 
 	assert.deepEqual(fromForOf, Object.entries(data), "for of entries == data entries");
 }

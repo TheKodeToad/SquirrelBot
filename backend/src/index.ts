@@ -56,8 +56,9 @@ function preInit() {
 		logger.error?.("Unhandled Promise rejection!", error);
 	});
 
-	if (hasProto())
+	if (hasProto()) {
 		logger.warn?.("The app is tested with --disable-proto=throw. Running without this option is unnecessary and not recommended!");
+	}
 
 	Object.freeze(Object.prototype);
 	Object.freeze(Array.prototype);
@@ -82,28 +83,33 @@ async function loadPlugins(): Promise<Map<string, Plugin>> {
 	entries.sort((a, b) => a.name.localeCompare(b.name, "en-US"));
 
 	for (const entry of entries) {
-		if (!entry.isDirectory())
+		if (!entry.isDirectory()) {
 			continue;
+		}
 
 		const index = path.join(entry.parentPath, entry.name, "index.ts");
 		const { default: plugin } = await import(index) as { default: Plugin; };
 
 		initPlugin(plugin);
 
-		if (result.has(plugin.id))
+		if (result.has(plugin.id)) {
 			throw new Error(`Duplicate plugin #${plugin.id}`);
+		}
 
 		result.set(plugin.id, plugin);
 	}
 
-	if (result.size === 0)
+	if (result.size === 0) {
 		throw new Error("No plugins loaded - something must be wrong!");
+	}
 
 	return result;
 }
 
 function initPlugin(plugin: Plugin): void {
-	if (plugin.contributions !== undefined)
-		for (const contribution of plugin.contributions)
+	if (plugin.contributions !== undefined) {
+		for (const contribution of plugin.contributions) {
 			contribution(plugin);
+		}
+	}
 }

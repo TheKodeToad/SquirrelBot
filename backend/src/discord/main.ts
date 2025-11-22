@@ -49,25 +49,28 @@ bot.on("shardPreReady", id => logger.debug?.(`Shard #${id} received READY packet
 bot.on("shardReady", id => logger.info?.(`Shard #${id} ready`));
 bot.on("shardResume", id => logger.info?.(`Shard #${id} resumed`));
 bot.on("shardDisconnect", (error, id) => {
-	if (error === undefined)
+	if (error === undefined) {
 		logger.info?.(`Shard #${id} disconnected`);
-	else
+	} else {
 		logger.error?.(`Shard #${id} disconnected with error`, error);
+	}
 });
 bot.on("connect", id => logger.info?.(`Shard #${id} connected`));
 
 bot.on("error", (error, shard) => {
-	if (shard !== undefined)
+	if (shard !== undefined) {
 		logger.error?.(`Oceanic error (shard #${shard})`, error);
-	else
+	} else {
 		logger.error?.("Oceanic error", error);
+	}
 });
 
 bot.on("warn", (info, shard) => {
-	if (shard !== undefined)
+	if (shard !== undefined) {
 		logger.warn?.(`Oceanic warning (shard #${shard}): ${info}`);
-	else
+	} else {
 		logger.warn?.(`Oceanic warning: ${info}`);
+	}
 });
 
 logger.info?.("Connecting to Discord");

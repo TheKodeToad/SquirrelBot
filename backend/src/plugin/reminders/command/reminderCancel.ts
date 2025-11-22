@@ -27,7 +27,8 @@ export default defineCommand({
 		if (deleted) {
 			untrackReminder(ctx.guild.id, number);
 			await ctx.respond(`${icons.success} Canceled reminder **#${number}**!`);
-		} else
+		} else {
 			await ctx.respond(`${icons.error} Reminder **#${number}** was not found!`);
+		}
 	}
 });

@@ -22,9 +22,10 @@ export default defineCommand({
 	async run(ctx, { number }) {
 		const deleted = await deleteCase(ctx.squirrelCtx.db, ctx.guild.id, number);
 
-		if (deleted)
+		if (deleted) {
 			await ctx.respond(`${icons.success} Deleted case **#${number}**!`);
-		else
+		} else {
 			await ctx.respond(`${icons.error} Case **#${number}** was not found!`);
+		}
 	}
 });

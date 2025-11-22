@@ -14,8 +14,9 @@ export function wrapListener<E extends keyof ClientEvents>(
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
 
-		if (Object.hasOwn(EVENT_TO_GUILD, event))
+		if (Object.hasOwn(EVENT_TO_GUILD, event)) {
 			guild ??= EVENT_TO_GUILD[event](...args);
+		}
 
 		if (guild !== null && !isGuildAllowed(guild)) {
 			logger.debug?.(`Filtering out event '${event}' from disallowed guild ${guild}`);

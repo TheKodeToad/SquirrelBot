@@ -37,13 +37,15 @@ export default definePluginGuildRoutes((squirrelCtx, app) => {
 	app.get("/cases/:number{\\d+}", async ctx => {
 		const number = Number(ctx.req.param("number"));
 
-		if (!Number.isSafeInteger(number))
+		if (!Number.isSafeInteger(number)) {
 			throw new HTTPException(400, { message: "Bad case number" });
+		}
 
 		const info = await getCase(squirrelCtx.db, ctx.var.discordGuildID, number);
 
-		if (info === null)
+		if (info === null) {
 			throw new HTTPException(404, { message: "Case not found" });
+		}
 
 		return ctx.json(serializeCaseObject(info));
 	});

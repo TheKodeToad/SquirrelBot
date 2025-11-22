@@ -28,9 +28,10 @@ export default defineCommand({
 	async run(ctx, args) {
 		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content);
 
-		if (success)
+		if (success) {
 			await ctx.respond(`${icons.success} Created tag '${escapeMarkdown(args.name)}!'`);
-		else
+		} else {
 			await ctx.respond(`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists! Update it with \`tagedit\`.`);
+		}
 	}
 })

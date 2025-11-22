@@ -18,8 +18,9 @@ export async function getLoggingWebhook(db: Pool, guildID: string, channelID: st
 		[guildID, channelID]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(WebhookAuth, result.rows[0]);
 }

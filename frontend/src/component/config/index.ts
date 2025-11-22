@@ -11,8 +11,9 @@ const toml = LRLanguage.define({
 			indentNodeProp.add({ Array: continuedIndent({ except: /^\s*]/ }) }),
 			foldNodeProp.add({
 				"Table ArrayTable": node => {
-					if (node.firstChild === null || node.lastChild === null)
+					if (node.firstChild === null || node.lastChild === null) {
 						return null;
+					}
 
 					return { from: node.firstChild.to, to: node.lastChild.to };
 				},
@@ -50,8 +51,9 @@ export function baseExtensions(options: {
 			}
 		}),
 		EditorView.updateListener.of(update => {
-			if (update.docChanged)
+			if (update.docChanged) {
 				options.markDirty();
+			}
 		})
 	];
 }

@@ -30,8 +30,9 @@ export function makeMapExtensionPoint<T>(name: string): ((value: T) => Contribut
 	return Object.assign(
 		function (value: T) {
 			return (plugin: Plugin) => {
-				if (contributions.has(plugin))
+				if (contributions.has(plugin)) {
 					throw new Error(`Multiple usages of ${name} for plugin #${plugin.id}`);
+				}
 
 				contributions.set(plugin, value);
 			};
@@ -46,10 +47,11 @@ export function makeMultiMapExtensionPoint<T>(): ((value: T) => Contribution) & 
 	return Object.assign(
 		function (value: T) {
 			return (plugin: Plugin) => {
-				if (contributions.has(plugin))
+				if (contributions.has(plugin)) {
 					contributions.get(plugin)!.push(value);
-				else
+				} else {
 					contributions.set(plugin, [value]);
+				}
 			};
 		},
 		{ contributions }
@@ -69,8 +71,9 @@ export function makeEventExtensionPoint<T extends unknown[]>(): ((listener: Even
 	const firePhase = async (args: T, phase: EventListenerPhase): Promise<void> => {
 		const listeners = contributions.get(phase);
 
-		if (listeners === undefined)
+		if (listeners === undefined) {
 			return;
+		}
 
 		await Promise.all(listeners.map(listener => listener(...args)));
 	};
@@ -78,10 +81,11 @@ export function makeEventExtensionPoint<T extends unknown[]>(): ((listener: Even
 	return Object.assign(
 		function (listener: (...args: T) => void, phase = EventListenerPhase.Default) {
 			return (_: Plugin) => {
-				if (contributions.has(phase))
+				if (contributions.has(phase)) {
 					contributions.get(phase)!.push(listener);
-				else
+				} else {
 					contributions.set(phase, [listener]);
+				}
 			};
 		},
 		{

@@ -1,13 +1,15 @@
 export function buildURI(strings: TemplateStringsArray, ...expressions: string[]): string {
-	if (expressions === undefined)
+	if (expressions === undefined) {
 		return strings[0]!;
+	}
 
 	let result = "";
 
 	for (let i = 0; i < strings.length; ++i) {
 		result += strings[i]!;
-		if (i < expressions.length)
+		if (i < expressions.length) {
 			result += encodeURIComponent(expressions[i]!);
+		}
 	}
 
 	return result;

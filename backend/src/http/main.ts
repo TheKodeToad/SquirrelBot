@@ -25,8 +25,9 @@ app.use(async (ctx, next) => {
 
 	const cspHeader: ResponseHeader = "Content-Security-Policy";
 
-	if (!ctx.res.headers.has(cspHeader))
+	if (!ctx.res.headers.has(cspHeader)) {
 		ctx.res.headers.set(cspHeader, "self-src 'none'");
+	}
 });
 
 const ROBOTS = `User-agent: *
@@ -39,8 +40,9 @@ app.route("/", frontend(ctx));
 
 app.onError((error, ctx) => {
 	if (error instanceof HTTPException) {
-		if (error.res !== undefined)
+		if (error.res !== undefined) {
 			return error.getResponse();
+		}
 
 		return ctx.json({ error: error.message }, error.status);
 	}
@@ -70,10 +72,11 @@ await beginDeleteTokenLoop();
 
 setupShutdownHook(async () => {
 	await new Promise<void>((resolve, reject) => server.close(error => {
-		if (error !== undefined)
+		if (error !== undefined) {
 			reject(error);
-		else
+		} else {
 			resolve();
+		}
 	}));
 
 	squirrelShutdown(ctx);

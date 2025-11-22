@@ -20,28 +20,33 @@ export function resolveGroups(member: Member): GroupsResult {
 	const groups: Set<string> = new Set;
 	let level = 0;
 
-	if (config === undefined)
+	if (config === undefined) {
 		return { groups, level };
+	}
 
 	config.groups.forEach((group, id) => {
-		if (!testGroup(group, member))
+		if (!testGroup(group, member)) {
 			return;
+		}
 
 		groups.add(id);
 
-		if (groupLevel(group) > level)
+		if (groupLevel(group) > level) {
 			level = groupLevel(group);
+		}
 
 		for (const reference of group.inherits) {
 			const referencedGroup = config.groups.get(reference);
 
-			if (referencedGroup === undefined)
+			if (referencedGroup === undefined) {
 				continue;
+			}
 
 			groups.add(reference);
 
-			if (groupLevel(referencedGroup) > level)
+			if (groupLevel(referencedGroup) > level) {
 				level = groupLevel(referencedGroup);
+			}
 		}
 	});
 
@@ -53,11 +58,13 @@ function groupLevel(group: CoreGroup): number {
 }
 
 function testGroup(group: CoreGroup, member: Member): boolean {
-	if (group.users.includes(member.id))
+	if (group.users.includes(member.id)) {
 		return true;
+	}
 
-	if (group.roles.some(role => member.roles.includes(role)))
+	if (group.roles.some(role => member.roles.includes(role))) {
 		return true;
+	}
 
 	return false;
 }
@@ -80,14 +87,16 @@ export function resolvePermissions<P extends Record<string, boolean>>(
 	const debugMatchedOverrides: number[] = [];
 
 	for (const [i, override] of config.permission_overrides.entries()) {
-		if (!testFilter(override, groups, channel))
+		if (!testFilter(override, groups, channel)) {
 			continue;
+		}
 
 		debugMatchedOverrides.push(i);
 
 		for (const key in override) {
-			if (!Object.hasOwn(result, key))
+			if (!Object.hasOwn(result, key)) {
 				continue;
+			}
 
 			result[key as keyof typeof result] = override[key]!;
 		}
@@ -107,25 +116,31 @@ export function resolvePermissions<P extends Record<string, boolean>>(
 function testFilter(filter: PermissionsFilter, groups: GroupsResult, channel: Exclude<AnyGuildChannel, CategoryChannel>): boolean {
 	const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
 
-	if (baseChannel === undefined)
+	if (baseChannel === undefined) {
 		throw new Error("Uncached thread parent channel");
+	}
 
 	const categoryChannel = baseChannel.parent ?? null;
 
-	if (filter.in_group !== undefined && filter.in_group.some(group => groups.groups.has(group)))
+	if (filter.in_group !== undefined && filter.in_group.some(group => groups.groups.has(group))) {
 		return true;
+	}
 
-	if (filter.in_channel && filter.in_channel.includes(baseChannel.id))
+	if (filter.in_channel && filter.in_channel.includes(baseChannel.id)) {
 		return true;
+	}
 
-	if (categoryChannel !== null && filter.in_channel_category && filter.in_channel_category.includes(categoryChannel.id))
+	if (categoryChannel !== null && filter.in_channel_category && filter.in_channel_category.includes(categoryChannel.id)) {
 		return true;
+	}
 
-	if (channel instanceof ThreadChannel && filter.in_thread && filter.in_thread.includes(channel.id))
+	if (channel instanceof ThreadChannel && filter.in_thread && filter.in_thread.includes(channel.id)) {
 		return true;
+	}
 
-	if (filter.level !== undefined && testNumberFilter(filter.level, groups.level))
+	if (filter.level !== undefined && testNumberFilter(filter.level, groups.level)) {
 		return true;
+	}
 
 	return false;
 }

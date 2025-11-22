@@ -44,8 +44,9 @@ function humanizeDurationSegments(duration: number): string[] {
 		remainder %= WEEK;
 	}
 
-	if (duration >= YEAR)
+	if (duration >= YEAR) {
 		return result;
+	}
 
 	if (remainder >= DAY) {
 		const days = Math.floor(remainder / DAY);
@@ -53,8 +54,9 @@ function humanizeDurationSegments(duration: number): string[] {
 		remainder %= DAY;
 	}
 
-	if (duration >= WEEK)
+	if (duration >= WEEK) {
 		return result;
+	}
 
 	if (remainder >= HOUR) {
 		const hours = Math.floor(remainder / HOUR);
@@ -62,8 +64,9 @@ function humanizeDurationSegments(duration: number): string[] {
 		remainder %= HOUR;
 	}
 
-	if (duration >= DAY)
+	if (duration >= DAY) {
 		return result;
+	}
 
 	if (remainder >= MINUTE) {
 		const minutes = Math.floor(remainder / MINUTE);
@@ -71,8 +74,9 @@ function humanizeDurationSegments(duration: number): string[] {
 		remainder %= MINUTE;
 	}
 
-	if (duration >= HOUR)
+	if (duration >= HOUR) {
 		return result;
+	}
 
 	if (remainder >= SECOND) {
 		const seconds = Math.floor(remainder / SECOND);
@@ -80,8 +84,9 @@ function humanizeDurationSegments(duration: number): string[] {
 		remainder %= SECOND;
 	}
 
-	if (result.length === 0)
+	if (result.length === 0) {
 		result.push(remainder + "ms");
+	}
 
 	return result;
 }
@@ -93,10 +98,11 @@ export function humanizeDuration(duration: number): string {
 
 	for (const [i, segment] of segments.entries()) {
 		if (i !== 0) {
-			if (i === segments.length - 1)
+			if (i === segments.length - 1) {
 				result += " and ";
-			else
+			} else {
 				result += ", ";
+			}
 		}
 
 		result += segment;

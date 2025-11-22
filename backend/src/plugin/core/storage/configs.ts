@@ -14,8 +14,9 @@ export async function getGuildConfig(db: Pool, guildID: string, pluginID: string
 		[guildID, pluginID]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(JustValueSchema, result.rows[0]).value;
 }

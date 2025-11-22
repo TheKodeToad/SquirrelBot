@@ -28,13 +28,15 @@ export function renderGroupDMInvite(
 
 	if (iconURL === null || hideImages) {
 		result.components.push(...mainInfo.map(content => Text(content)));
-	} else
+	} else {
 		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
+	}
 
 	result.components.push(Divider());
 
-	if (inviter !== undefined)
+	if (inviter !== undefined) {
 		result.components.push(Text("**Invited By:** " + formatUser(inviter)));
+	}
 
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSecs(expiresAt);

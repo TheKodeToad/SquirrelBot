@@ -49,8 +49,9 @@ export interface ReminderQuery {
 const JustCounter = z.strictObject({ counter: z.number() });
 
 export async function getReminder(db: Pool, guildID: string, number: number): Promise<Reminder | null> {
-	if (number < 0 || number >= 2 ** 32)
+	if (number < 0 || number >= 2 ** 32) {
 		return null;
+	}
 
 	const result = await db.query(
 		`
@@ -60,8 +61,9 @@ export async function getReminder(db: Pool, guildID: string, number: number): Pr
 		[guildID, number]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(Reminder, result.rows[0]);
 }
@@ -157,8 +159,9 @@ export function createReminder(db: Pool, guildID: string, options: CreateReminde
 }
 
 export async function deleteReminder(db: Pool, guildID: string, number: number): Promise<boolean> {
-	if (number < 0 || number >= 2 ** 32)
+	if (number < 0 || number >= 2 ** 32) {
 		return false;
+	}
 
 	const result = await db.query(
 		`
@@ -172,8 +175,9 @@ export async function deleteReminder(db: Pool, guildID: string, number: number):
 }
 
 export async function deleteReminderIfOwnedBy(db: Pool, guildID: string, number: number, ownerID: string): Promise<boolean> {
-	if (number < 0 || number >= 2 ** 32)
+	if (number < 0 || number >= 2 ** 32) {
 		return false;
+	}
 
 	const result = await db.query(
 		`

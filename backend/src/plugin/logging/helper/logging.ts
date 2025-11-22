@@ -18,8 +18,9 @@ export async function logEvent<T extends EventConfig>(
 ): Promise<void> {
 	const config = loggingConfigStore.get(guild.id);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return;
+	}
 
 	let lazyParams: EventConfigView<T> | undefined;
 
@@ -28,23 +29,27 @@ export async function logEvent<T extends EventConfig>(
 	for (const logger of config.loggers) {
 		const event = logger.events[key];
 
-		if (!event)
+		if (!event) {
 			continue;
+		}
 
-		if (logger.channel === channel)
+		if (logger.channel === channel) {
 			continue;
+		}
 
 		if (lazyParams === undefined) {
 			const view = await supply();
 
-			if (view === null)
+			if (view === null) {
 				return;
+			}
 
 			tasks.push(async () => {
 				const channel = await fetchTextableGuildChannelCached(ctx.bot, guild, logger.channel);
 
-				if (channel === null)
+				if (channel === null) {
 					return;
+				}
 
 				await logViaWebhook(ctx, channel, {
 					...event.render(view),

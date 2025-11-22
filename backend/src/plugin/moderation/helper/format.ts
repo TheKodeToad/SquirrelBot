@@ -9,11 +9,13 @@ import type { Client } from "oceanic.js";
 export function formatModActionSuccess(event: ModEvent): string {
 	let result = formatUserBold(event.target);
 
-	if (event.dmDelivered)
+	if (event.dmDelivered) {
 		result += " with direct message";
+	}
 
-	if (event.caseNumber !== undefined)
+	if (event.caseNumber !== undefined) {
 		result += ` (case #${event.caseNumber})`;
+	}
 
 	return result;
 }
@@ -49,29 +51,34 @@ export async function formatCaseDescription(bot: Client, info: CaseInfo, bigTitl
 	let title = "Case #" + info.number;
 
 	if (info.shadowedBy !== null) {
-		if (info.reversed)
+		if (info.reversed) {
 			title = `~~${title}~~ (reversed by #${info.shadowedBy})`;
-		else
+		} else {
 			title = `~~${title}~~ (refined by #${info.shadowedBy})`;
-	} else if (caseExpired(info))
+		}
+	} else if (caseExpired(info)) {
 		title = `~~${title}~~ (expired)`;
+	}
 
-	if (bigTitle)
+	if (bigTitle) {
 		title = "## " + title;
-	else
+	} else {
 		title = "### " + title;
+	}
 
 	const target = await formatUserBoldByID(bot, info.targetID);
 
 	let summary = caseSummaryBase(info.type, target);
 
-	if (info.expiresAt !== null)
+	if (info.expiresAt !== null) {
 		summary += ` for ${humanizeDuration(info.expiresAt.getTime() - info.createdAt.getTime())}`;
+	}
 
-	if (info.reason === null)
+	if (info.reason === null) {
 		summary += ".";
-	else
+	} else {
 		summary += ":\n" + makeMarkdownQuote(info.reason);
+	}
 
 	return title + "\n" + summary;
 }
@@ -99,10 +106,11 @@ export async function formatCompactCaseSummary(bot: Client, info: CaseInfo): Pro
 
 	let result = `<t:${dateToUnixSecs(info.createdAt)}:d> `;
 
-	if (caseExpired(info) || info.shadowedBy !== null)
+	if (caseExpired(info) || info.shadowedBy !== null) {
 		result += `**~~#${info.number}:~~** `;
-	else
+	} else {
 		result += `**#${info.number}:** `;
+	}
 
 	switch (info.type) {
 	case ModEventType.Note:
@@ -128,8 +136,9 @@ export async function formatCompactCaseSummary(bot: Client, info: CaseInfo): Pro
 		break;
 	}
 
-	if (info.reason !== null)
+	if (info.reason !== null) {
 		result += " - " + info.reason;
+	}
 
 	return result;
 }

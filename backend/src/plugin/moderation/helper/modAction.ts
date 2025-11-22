@@ -30,21 +30,25 @@ export async function performModAction(ctx: SquirrelDiscordContext, action: ModA
 	let dmDelivered = false;
 
 	if (action.target instanceof Member) {
-		if (!canModerate(action.ranking, action.actor, action.target))
+		if (!canModerate(action.ranking, action.actor, action.target)) {
 			return { target: action.target, error: "You lack permission to moderate the user" };
+		}
 
-		if (botNeedsPerm(action.type) && !canModerate(MemberRanking.HighestRole, action.guild.clientMember, action.target))
+		if (botNeedsPerm(action.type) && !canModerate(MemberRanking.HighestRole, action.guild.clientMember, action.target)) {
 			return { target: action.target, error: "App lacks permission to moderate the user" };
+		}
 
 		switch (action.type) {
 		case ModEventType.Timeout:
-			if (action.target.permissions.has(Permissions.ADMINISTRATOR))
+			if (action.target.permissions.has(Permissions.ADMINISTRATOR)) {
 				return { target: action.target, error: "Member has admin permissions" };
+		}
 
 			break;
 		case ModEventType.ClearTimeout:
-			if (action.target.communicationDisabledUntil === null || action.target.communicationDisabledUntil.getTime() < Date.now())
+			if (action.target.communicationDisabledUntil === null || action.target.communicationDisabledUntil.getTime() < Date.now()) {
 				return { target: action.target, error: "Member is not timed out" };
+		}
 
 			break;
 		}
@@ -55,8 +59,9 @@ export async function performModAction(ctx: SquirrelDiscordContext, action: ModA
 				await dmChannel.createMessage(action.directMessage);
 				dmDelivered = true;
 			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
+				if (!(error instanceof DiscordRESTError)) {
 					throw error;
+				}
 			}
 		}
 	} else {
@@ -102,8 +107,9 @@ export async function performModAction(ctx: SquirrelDiscordContext, action: ModA
 			break;
 		}
 	} catch (error) {
-		if (!(error instanceof DiscordRESTError))
+		if (!(error instanceof DiscordRESTError)) {
 			throw error;
+		}
 
 		return { target: action.target, error: formatRESTError(error) };
 	}
@@ -126,8 +132,9 @@ export async function performModAction(ctx: SquirrelDiscordContext, action: ModA
 
 			await upsertTempBan(ctx.db, action.guild.id, tempBan);
 			trackNewTempBan(tempBan);
-		} else
+		} else {
 			await deleteTempBan(ctx.db, action.guild.id, action.target.id);
+		}
 	}
 
 	onModAction.fire(ctx, result).catch(error => logger.error?.("Error in onModAction", error));
@@ -152,8 +159,9 @@ function canModerate(ranking: MemberRanking, actor: Member, target: Member): boo
 	case MemberRanking.None:
 		return true;
 	case MemberRanking.HighestRole:
-		if (guild.id !== target.guild.id)
+		if (guild.id !== target.guild.id) {
 			throw new Error("Comparing across guilds");
+	}
 
 		return target.id !== guild.ownerID
 			&& (actor.id === guild.ownerID || getHighestRole(actor).position > getHighestRole(target).position);
@@ -186,14 +194,15 @@ export async function performModActions(
 
 		const member = members.get(id);
 
-		if (member !== undefined)
+		if (member !== undefined) {
 			target = member;
-		else {
+		} else {
 			try {
 				target = await fetchUserCached(ctx.bot, id);
 			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
+				if (!(error instanceof DiscordRESTError)) {
 					throw error;
+				}
 
 				result.unsuccessful.push({
 					target: { id },
@@ -208,10 +217,11 @@ export async function performModActions(
 		// TODO: parallelism
 		const event = await performModAction(ctx, action);
 
-		if ("error" in event)
+		if ("error" in event) {
 			result.unsuccessful.push(event);
-		else
+		} else {
 			result.successful.push(event);
+		}
 	}
 
 	return result;

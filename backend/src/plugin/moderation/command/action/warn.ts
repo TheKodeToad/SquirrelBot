@@ -60,10 +60,11 @@ export default defineCommand({
 		}));
 
 		if (args.user.length === 1) {
-			if (successful.length === 1)
+			if (successful.length === 1) {
 				await ctx.respond(`${icons.success} Warned ${formatModActionSuccess(successful[0]!)}!`);
-			else if (unsuccessful.length === 1)
+			} else if (unsuccessful.length === 1) {
 				await ctx.respond(`${icons.error} Could not warn ${formatModActionFailure(unsuccessful[0]!)}!`);
+			}
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");

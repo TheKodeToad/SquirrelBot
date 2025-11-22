@@ -10,11 +10,13 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 	const output = new SafeArgs(commandEntry.command.options ?? {});
 
 	for (const interactionOption of interactionOptions) {
-		if (!("value" in interactionOption))
+		if (!("value" in interactionOption)) {
 			continue;
+		}
 
-		if (!commandEntry.optionsByName.has(interactionOption.name))
+		if (!commandEntry.optionsByName.has(interactionOption.name)) {
 			continue;
+		}
 
 		const [key, option] = commandEntry.optionsByName.get(interactionOption.name)!;
 
@@ -22,15 +24,17 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 
 		switch (typeof interactionOption.value) {
 		case "string":
-			if (option.type === OptionType.Snowflake)
+			if (option.type === OptionType.Snowflake) {
 				value = readValue(interactionOption.value, readSnowflake);
-			else if (option.type === OptionType.Duration)
+		} else if (option.type === OptionType.Duration) {
 				value = readValue(interactionOption.value, readDuration);
+			}
 
 			break;
 		case "number":
-			if (option.type === OptionType.Flag)
+			if (option.type === OptionType.Flag) {
 				value = interactionOption.value !== 0;
+		}
 
 			break;
 		}
@@ -42,10 +46,11 @@ export function readSlashArgs(interactionOptions: InteractionOptions[], commandE
 			};
 		}
 
-		if (option.array ?? false)
+		if (option.array ?? false) {
 			output.pushTo(key, value);
-		else
+		} else {
 			output.set(key, value);
+		}
 	}
 
 	return {
@@ -61,8 +66,9 @@ export function readValue<T>(value: string, valueReader: (reader: StringReader) 
 	const result = valueReader(reader);
 	reader.skipWhitespace();
 
-	if (reader.canRead() || result === null)
+	if (reader.canRead() || result === null) {
 		return null;
+	}
 
 	return result;
 }

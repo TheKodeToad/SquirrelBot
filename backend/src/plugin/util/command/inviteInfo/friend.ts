@@ -11,10 +11,11 @@ export function renderFriendInvite(inviter: User, expiresAt: Date | undefined, h
 	mainInfo.push("## " + formatUserTagRich(inviter) + "\n**Friend Invite**");
 	mainInfo.push(`<@${inviter.id}>`);
 
-	if (hideImages)
+	if (hideImages) {
 		result.components.push(...mainInfo.map(content => Text(content)));
-	else
+	} else {
 		result.components.push(Section(mainInfo, Thumbnail(inviter.avatarURL())));
+	}
 
 	result.components.push(Divider());
 

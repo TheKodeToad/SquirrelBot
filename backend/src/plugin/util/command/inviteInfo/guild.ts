@@ -36,20 +36,23 @@ export function renderGuildInvite(
 		mainInfo.push(`${icons.boost} Level ${level} (${guild.premiumSubscriptionCount} Boosts)`);
 	}
 
-	if (iconURL === null || hideImages)
+	if (iconURL === null || hideImages) {
 		result.components.push(...mainInfo.map(content => Text(content)));
-	else
+	} else {
 		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
+	}
 
 	result.components.push(Divider());
 
 	let fields = "";
 
-	if (inviter !== undefined)
+	if (inviter !== undefined) {
 		fields += `**Invited By:** ${formatUser(inviter)}\n`;
+	}
 
-	if (channel !== null)
+	if (channel !== null) {
 		fields += `**Channel:** #${escapeMarkdown(channel.name ?? "<unknown>")} (${channel.id})\n`;
+	}
 
 	result.components.push(Text(fields));
 
@@ -60,22 +63,27 @@ export function renderGuildInvite(
 
 	const actions = ActionRow<MessageActionRowComponent>();
 
-	if (iconURL !== null)
+	if (iconURL !== null) {
 		actions.components.push(URLButton("Icon", iconURL));
+	}
 
-	if (bannerURL !== null)
+	if (bannerURL !== null) {
 		actions.components.push(URLButton("Banner", bannerURL));
+	}
 
-	if (splashURL !== null)
+	if (splashURL !== null) {
 		actions.components.push(URLButton("Splash", splashURL));
+	}
 
-	if (actions.components.length !== 0)
+	if (actions.components.length !== 0) {
 		result.components.push(actions);
+	}
 
 	let footer = "-# ";
 
-	if (guild.vanityURLCode !== null)
+	if (guild.vanityURLCode !== null) {
 		footer += escapeMarkdown("discord.gg/" + guild?.vanityURLCode) + " • ";
+	}
 
 	footer += "Server ID: " + guild.id;
 
@@ -85,12 +93,13 @@ export function renderGuildInvite(
 }
 
 export function calculateLevel(boosts: number): number {
-	if (boosts < 2)
+	if (boosts < 2) {
 		return 0;
-	else if (boosts < 7)
+	} else if (boosts < 7) {
 		return 1;
-	else if (boosts < 14)
+	} else if (boosts < 14) {
 		return 2;
-	else
+	} else {
 		return 3;
+	}
 }

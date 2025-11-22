@@ -13,19 +13,23 @@ export const guildAuthMiddleware = (db: Pool) => createMiddleware<{ Variables: G
 	const { discordUserID } = ctx.var;
 	const guildID = ctx.req.param("guildID");
 
-	if (typeof discordUserID !== "string")
+	if (typeof discordUserID !== "string") {
 		throw new Error("Missing auth middleware");
+	}
 
-	if (typeof guildID !== "string")
+	if (typeof guildID !== "string") {
 		throw new Error("Missing guildID path parameter");
+	}
 
-	if (!isSnowflake(guildID))
+	if (!isSnowflake(guildID)) {
 		throw new HTTPException(400, { message: "Malformed guild id" });
+	}
 
 	const owner = await getGuildOwnerID(db, guildID);
 
-	if (owner === null || owner !== discordUserID)
+	if (owner === null || owner !== discordUserID) {
 		throw new HTTPException(403, { message: "Missing permission" });
+	}
 
 	ctx.set("discordGuildID", guildID);
 	await next();

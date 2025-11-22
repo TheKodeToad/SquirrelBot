@@ -55,8 +55,9 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 	let hasIssues = false;
 
 	for (const key in input) {
-		if (!Object.hasOwn(input, key))
+		if (!Object.hasOwn(input, key)) {
 			continue;
+		}
 
 		const value = input[key]!;
 
@@ -71,14 +72,16 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 		});
 	}
 
-	if (hasIssues)
+	if (hasIssues) {
 		return z.NEVER;
+	}
 
 	const result: Map<string, CoreGroup> = new Map;
 
 	for (const key in input) {
-		if (!Object.hasOwn(input, key))
+		if (!Object.hasOwn(input, key)) {
 			continue;
+		}
 
 		const value = input[key]!;
 
@@ -101,29 +104,34 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 function flattenInheritence(input: CoreGroup, key: string, groups: Record<string, CoreGroup>): string[] | null {
 	const output: string[] = [];
 
-	if (!_flattenInheritence(input, output, key, groups, 0))
+	if (!_flattenInheritence(input, output, key, groups, 0)) {
 		return null;
+	}
 
 	return output;
 }
 
 function _flattenInheritence(input: CoreGroup, output: string[], root: string, groups: Record<string, CoreGroup>, depth: number): boolean {
-	if (depth > MAX_INHERITANCE_DEPTH)
+	if (depth > MAX_INHERITANCE_DEPTH) {
 		return false;
+	}
 
 	for (const reference of input.inherits) {
-		if (reference === root || output.includes(reference))
+		if (reference === root || output.includes(reference)) {
 			continue;
+		}
 
-		if (!Object.hasOwn(groups, reference))
+		if (!Object.hasOwn(groups, reference)) {
 			throw new Error("Bad group reference: " + reference);
+		}
 
 		output.push(reference);
 
 		const referencedGroup = groups[reference]!;
 
-		if (!_flattenInheritence(referencedGroup, output, root, groups, depth + 1))
+		if (!_flattenInheritence(referencedGroup, output, root, groups, depth + 1)) {
 			return false;
+		}
 	}
 
 	return true;

@@ -36,23 +36,27 @@ async function init(ctx: SquirrelDiscordContext): Promise<void> {
 		if (missingIndex !== -1) {
 			missing.splice(missingIndex, 1);
 
-			if (guildInfo.deleteAt !== null)
+			if (guildInfo.deleteAt !== null) {
 				await cancelGuildInfoDeletion(ctx.db, guildInfo.id);
+			}
 		} else if (!guildInfo.allowed) {
 			// was removed from env var
-			if (guildInfo.deleteAt === null)
+			if (guildInfo.deleteAt === null) {
 				await scheduleGuildInfoDeletion(ctx.db, guildInfo.id);
+			}
 
 			continue;
 		}
 
-		if (guildInfo.allowed)
+		if (guildInfo.allowed) {
 			allowedGuilds.add(guildInfo.id);
+		}
 
 		const realGuild = ctx.bot.guilds.get(guildInfo.id);
 
-		if (realGuild === undefined)
+		if (realGuild === undefined) {
 			continue;
+		}
 
 		if (guildInfo.name === realGuild.name
 			&& guildInfo.iconHash === realGuild.icon
@@ -81,16 +85,19 @@ async function init(ctx: SquirrelDiscordContext): Promise<void> {
 }
 
 async function handleCreate(db: Pool, guild: Guild): Promise<void> {
-	if (isGuildAllowed(guild.id))
+	if (isGuildAllowed(guild.id)) {
 		await updateGuildInfo(db, guild.id, guild.name, guild.icon, guild.ownerID);
+	}
 }
 
 async function handleUpdate(db: Pool, guild: Guild, oldGuild: JSONGuild | null): Promise<void> {
-	if (oldGuild === null)
+	if (oldGuild === null) {
 		return;
+	}
 
-	if (!isGuildAllowed(guild.id))
+	if (!isGuildAllowed(guild.id)) {
 		return;
+	}
 
 	if (oldGuild.name === guild.name
 		&& oldGuild.icon === guild.icon
@@ -107,17 +114,21 @@ export function isGuildAllowed(id: string): boolean {
 }
 
 export function* getAllowedGuilds(): Generator<string> {
-	for (const id of BOT_ALLOWED_GUILDS)
-		if (!allowedGuilds.has(id))
+	for (const id of BOT_ALLOWED_GUILDS) {
+		if (!allowedGuilds.has(id)) {
 			yield id;
+		}
+	}
 
-	for (const id of allowedGuilds)
+	for (const id of allowedGuilds) {
 		yield id;
+	}
 }
 
 export async function grantAccess(ctx: SquirrelDiscordContext, id: string): Promise<boolean> {
-	if (allowedGuilds.has(id))
+	if (allowedGuilds.has(id)) {
 		return false;
+	}
 
 	const realGuild = ctx.bot.guilds.get(id);
 
@@ -129,20 +140,23 @@ export async function grantAccess(ctx: SquirrelDiscordContext, id: string): Prom
 			realGuild?.icon ?? null,
 			realGuild?.ownerID ?? null,
 		);
-	} else
+	} else {
 		await markUnknownGuildAllowed(ctx.db, id);
+	}
 
 	allowedGuilds.add(id);
 
-	if (!BOT_ALLOWED_GUILDS.includes(id))
+	if (!BOT_ALLOWED_GUILDS.includes(id)) {
 		await onGuildAccessGranted.fire(ctx, id);
+	}
 
 	return true;
 }
 
 export async function revokeAccess(ctx: SquirrelDiscordContext, id: string): Promise<false | true | Date> {
-	if (!allowedGuilds.has(id))
+	if (!allowedGuilds.has(id)) {
 		return false;
+	}
 
 	if (BOT_ALLOWED_GUILDS.includes(id)) {
 		await markGuildNotAllowed(ctx.db, id);

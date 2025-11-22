@@ -70,6 +70,7 @@ export default definePlugin({
 function postInit(ctx: SquirrelDiscordContext): void {
 	logger.debug?.("Installing onBotEvent listeners");
 
-	for (const listener of onBotEvent.contributions)
+	for (const listener of onBotEvent.contributions) {
 		installWrappedListener(ctx, listener.type, listener.listener.bind(listener));
+	}
 }

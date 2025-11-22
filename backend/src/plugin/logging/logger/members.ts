@@ -17,13 +17,15 @@ async function handleAdd(ctx: SquirrelDiscordContext, member: Member): Promise<v
 }
 
 async function handleRemove(ctx: SquirrelDiscordContext, user: Member | User, guild: Guild | Uncached): Promise<void> {
-	if (!(guild instanceof Guild))
+	if (!(guild instanceof Guild)) {
 		return;
+	}
 
 	const config = loggingConfigStore.get(guild.id);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return;
+	}
 
 	await logEvent(ctx, guild, null, "member_leave", () => ({
 		user: "guildID" in user ? makeMemberUserView(user) : makeUserView(user)

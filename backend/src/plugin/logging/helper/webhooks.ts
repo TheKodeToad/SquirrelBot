@@ -8,8 +8,9 @@ import { DiscordRESTError, JSONErrorCodes, Permissions, type AnyTextableGuildCha
 
 export async function logViaWebhook(ctx: SquirrelDiscordContext, channel: AnyTextableGuildChannel, message: ExecuteWebhookOptions): Promise<void> {
 	return acquireWebhook(ctx, channel, async ({ webhookID, token }) => {
-		if (isThreadChannel(channel))
+		if (isThreadChannel(channel)) {
 			message.threadID = channel.id;
+		}
 
 		await channel.client.rest.webhooks.execute(webhookID, token, message);
 	});
@@ -28,29 +29,34 @@ async function acquireWebhook(ctx: SquirrelDiscordContext, channel: AnyTextableG
 				await action(existingWebhook);
 				return;
 			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
+				if (!(error instanceof DiscordRESTError)) {
 					throw error;
+				}
 
-				if (error.code !== JSONErrorCodes.UNKNOWN_WEBHOOK)
+				if (error.code !== JSONErrorCodes.UNKNOWN_WEBHOOK) {
 					throw error;
+				}
 
 				// try to create it again
 			}
 		}
 
-		if (baseChannel === undefined)
+		if (baseChannel === undefined) {
 			throw new Error("Uncached thread parent channel");
+		}
 
-		if (!baseChannel.permissionsOf(channel.guild.clientMember).has(Permissions.MANAGE_WEBHOOKS))
+		if (!baseChannel.permissionsOf(channel.guild.clientMember).has(Permissions.MANAGE_WEBHOOKS)) {
 			return;
+		}
 
 		const webhook = await baseChannel.createWebhook({ name: APP_NAME + " Logging Webhook" });
 		const auth: WebhookAuth = { webhookID: webhook.id, token: webhook.token! };
 
-		if (existingWebhook !== null)
+		if (existingWebhook !== null) {
 			await updateLoggingWebhook(ctx.db, channel.guildID, channel.id, auth);
-		else
+		} else {
 			await insertLoggingWebhook(ctx.db, channel.guildID, channel.id, auth);
+		}
 
 		await action(auth);
 	});

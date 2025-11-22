@@ -35,9 +35,10 @@ export default defineCommand({
 			return;
 		}
 
-		if (ctx.ephemeral ?? false)
+		if (ctx.ephemeral ?? false) {
 			await ctx.respond(renderCommandListPage(ctx, { page: 0, plugin: "core" }));
-		else
+		} else {
 			await ctx.respond(renderCommandListPageMinimal(ctx.squirrelCtx, ctx.guild.id));
+		}
 	},
 });
