@@ -1,14 +1,13 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSecs } from "#common/time.ts";
-import { BOT_ALLOWED_GUILDS } from "#environment.ts";
+import { BOT_ALLOWED_GUILDS, BOT_STAFF } from "#environment.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/guildInfoSync.ts";
 import { OptionType, type CommandContext } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 
-// for now
-function checkForMe(ctx: CommandContext): boolean {
-	return ctx.user.id === "706152404072267788";
+function checkBotStaff(ctx: CommandContext): boolean {
+	return BOT_STAFF.includes(ctx.user.id);
 }
 
 const grantAccessCommand = defineCommand({
@@ -25,7 +24,7 @@ const grantAccessCommand = defineCommand({
 		},
 	},
 
-	preRun: checkForMe,
+	preRun: checkBotStaff,
 	async run(ctx, args) {
 		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
 
@@ -50,7 +49,7 @@ const revokeAccessCommand = defineCommand({
 		},
 	},
 
-	preRun: checkForMe,
+	preRun: checkBotStaff,
 	async run(ctx, args) {
 		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown>";
 

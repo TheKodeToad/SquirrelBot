@@ -6,6 +6,7 @@ export const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";
 export const REDIRECT_URI = process.env["REDIRECT_URI"] || "";
 export const BOT_TOKEN = process.env["BOT_DISCORD_TOKEN"] || "";
 export const BOT_ALLOWED_GUILDS = process.env["BOT_ALLOWED_GUILDS"]?.split(",") ?? [];
+export const BOT_STAFF = process.env["BOT_STAFF"]?.split("?") ?? [];
 export const HTTP_PORT = Number(process.env["PORT"]) || 8080;
 export const LOG_LEVEL = logLevelByName(process.env["LOG_LEVEL"] || "info") ?? LogLevel.Info;
 
