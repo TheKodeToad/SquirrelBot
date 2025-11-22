@@ -1,29 +1,30 @@
-import { A, Route, Router, useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, JSX } from "solid-js";
+import { A, Route, useLocation, useNavigate, useParams, useResolvedPath } from "@solidjs/router";
+import { For, JSX } from "solid-js";
+import { Button } from "../component/common/Button";
+import { ConfigEditor } from "../component/config/ConfigEditor";
 import { PLUGINS, type Plugin } from "../constants";
 
-//export const Guild = () => <LoginGate><GuildComponent /></LoginGate>;
-
-//function testComponent() {
-//	return <>hello</>;
-//}
-
-function getPluginPath(plugin: Plugin) {
-	return "/" + encodeURIComponent(plugin.id);
+function getPluginPath(id: string) {
+	return "plugins/" + encodeURIComponent(id);
 }
 
 export function GuildRoutes() {
+	const guildID = () => useParams().guildID!;
+
 	return (
 		<Route component={GuildLayout}>
 			<Route
 				component={() => {
-					useNavigate()("./core");
+					useNavigate()(getPluginPath("core"));
 					return undefined;
 				}}
 			/>
 			<For each={PLUGINS}>
 				{plugin => (
-					<Route path={getPluginPath(plugin)} component={() => plugin.name} />
+					<Route
+						path={"/" + getPluginPath(plugin.id)}
+						component={() => <ConfigEditor guildID={guildID()} plugin={plugin.id} />}
+					/>
 				)}
 			</For>
 		</Route>
@@ -37,7 +38,7 @@ function GuildLayout(props: { children?: JSX.Element; }) {
 				<div id="sidebar" class="vbox">
 					<div class="sidebarHeading">Plugins</div>
 					<For each={PLUGINS}>
-						{plugin => <PluginWidget plugin={plugin} />}
+						{plugin => <PluginSidebarWidget plugin={plugin} />}
 					</For>
 				</div>
 				{props.children}
@@ -45,24 +46,18 @@ function GuildLayout(props: { children?: JSX.Element; }) {
 		</>
 	);
 }
-function PluginWidget(props: { plugin: Plugin; }) {
+
+function PluginSidebarWidget(props: { plugin: Plugin; }) {
+	const target = useResolvedPath(() => getPluginPath(props.plugin.id));
+	const loc = useLocation();
+	const active = () => loc.pathname === target() || loc.pathname.startsWith(target() + "/");
+
 	return (
-		<A href={"." + getPluginPath(props.plugin)}>
-			{props.plugin.name}
+		<A href={getPluginPath(props.plugin.id)}>
+			{/* FIXME: using an inline style to get it to look right */}
+			<Button color={"transparent2"} active={active()} style={{ width: "100%" }}>
+				{props.plugin.name}
+			</Button>
 		</A>
 	);
 }
-
-function GuildComponent() {
-	const guildID = () => useParams().guildID!;
-
-	const [activeID, setActiveID] = createSignal("core");
-
-	return (
-		<Router>
-			<Route path="/test" component={() => "test page"} />
-			<Route path="/" component={() => "main page"} />
-		</Router>
-	);
-}
-
