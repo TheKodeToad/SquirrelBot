@@ -6,7 +6,7 @@ import { MemberJoinEvent, MemberLeaveEvent } from "#plugin/logging/config/member
 import { MessageDeleteEvent, MessageEditEvent } from "#plugin/logging/config/messages.ts";
 import { UserBanEvent, UserKickEvent, UserUnbanEvent, UserWarnEvent } from "#plugin/logging/config/modEvents.ts";
 import { RoleCreateEvent, RoleDeleteEvent, RoleUpdateEvent } from "#plugin/logging/config/roles.ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export function eventConfig<T extends z.ZodType>(object: T, defaultObject: z.input<T>) {
 	const defaultTransformed = object.parse(defaultObject);

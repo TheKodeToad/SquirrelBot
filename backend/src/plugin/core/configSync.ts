@@ -10,7 +10,7 @@ import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.
 import AsyncLock from "async-lock";
 import type { Client } from "oceanic.js";
 import { parse as parseToml, TomlError } from "smol-toml";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const logger = moduleLogger();
 

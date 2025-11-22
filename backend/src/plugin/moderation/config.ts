@@ -6,7 +6,7 @@ import { GuildView } from "#common/template/guild.ts";
 import { UserView } from "#common/template/user.ts";
 import { DAY } from "#common/time.ts";
 import { m } from "mousetache";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const PresetReason = z.strictObject({
 	name: z.string(),

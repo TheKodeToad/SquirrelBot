@@ -1,6 +1,6 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { NumberFilter } from "#common/schema/numberFilter.ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const PermissionsFilter = z.strictObject({
 	in_group: z.string().array().optional(),

@@ -1,5 +1,5 @@
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import z from "zod/v4";
+import z from "zod";
 
 export const TagsConfig = z.object({
 	default_permissions: z.strictObject({

@@ -4,7 +4,7 @@ import { validate } from "#http/middleware/zod.ts";
 import { generateToken } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 interface TokenResponse {
 	token_type: string;

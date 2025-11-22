@@ -1,6 +1,6 @@
 import { dbParse } from "#storage/index.ts";
 import type { Pool } from "pg";
-import z from "zod/v4";
+import z from "zod";
 
 const MessageCacheEntry = z.strictObject({
 	guildID: z.string(),

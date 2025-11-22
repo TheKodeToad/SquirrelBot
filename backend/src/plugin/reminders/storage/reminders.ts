@@ -2,7 +2,7 @@ import { poolTransaction } from "#common/pg/transaction.ts";
 import { dbParse } from "#storage/index.ts";
 import { ChannelTypes } from "oceanic.js";
 import type { Pool } from "pg";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const Reminder = z.strictObject({
 	guildID: z.string(),

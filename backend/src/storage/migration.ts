@@ -6,7 +6,7 @@ import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import type { ClientBase } from "pg";
-import { z } from "zod/v4";
+import { z } from "zod";
 import "../environment.ts";
 
 export async function migrate(db: ClientBase, ignoreChanges: boolean): Promise<number> {

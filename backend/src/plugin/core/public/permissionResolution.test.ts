@@ -7,7 +7,7 @@ import { resolveGroups } from "#plugin/core/public/permissionResolution.ts";
 import assert from "assert";
 import { suite, test } from "node:test";
 import { parse as parseTOML } from "smol-toml";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 function mockCoreConfig<T>(value: string, callback: (config: CoreConfig) => T): T {
 	const parsed = coreConfigStore.schema.parse(parseTOML(value));

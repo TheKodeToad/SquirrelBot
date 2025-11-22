@@ -4,7 +4,7 @@ import { validate } from "#http/middleware/zod.ts";
 import { ModEventType } from "#plugin/moderation/public/modEvent.ts";
 import { getCase, getCases, type CaseInfo, type CaseQuery } from "#plugin/moderation/storage/cases.ts";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const querySchema = z.strictObject({
 	before: z.coerce.number().optional(),

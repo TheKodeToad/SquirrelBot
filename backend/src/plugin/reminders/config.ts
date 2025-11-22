@@ -1,5 +1,5 @@
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const RemindersConfig = z.strictObject({
 	default_permissions: z.strictObject({

@@ -1,7 +1,7 @@
 import type { CommandContext } from "#plugin/core/public/command.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { resolvePermissions, type ConfigWithPermissions } from "#plugin/core/public/permissionResolution.ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(
 	ctx: CommandContext,

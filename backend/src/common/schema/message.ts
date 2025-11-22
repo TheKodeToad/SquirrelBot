@@ -4,7 +4,7 @@ import { zTemplate, type ZTemplate } from "#common/schema/template.ts";
 import type { InferView, m, Shape } from "mousetache";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type Message<T extends z.ZodType> = z.output<ReturnType<typeof message<T>>>;
 

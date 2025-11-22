@@ -2,7 +2,7 @@
 
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { compileTemplate, TemplateCompileError, TemplateParseError, type Shape } from "mousetache";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export type ZTemplate<T extends Shape> = ReturnType<typeof zTemplate<T>>;
 
@@ -17,7 +17,7 @@ export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 			if (!(error instanceof TemplateCompileError || error instanceof TemplateParseError))
 				throw error;
 
-			ctx.addIssue({ message: error.message });
+			ctx.addIssue({ message: error.message, code: "custom" });
 			return z.NEVER;
 		}
 	});

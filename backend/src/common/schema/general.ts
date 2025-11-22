@@ -1,6 +1,6 @@
 import { colors } from "#common/discord/colors.ts";
 import { isSnowflake } from "#common/snowflake.ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { $ZodEnumParams } from "zod/v4/core";
 
 export const Snowflake = z.string().refine(isSnowflake, { error: "Invalid Discord ID (AKA snowflake)" });

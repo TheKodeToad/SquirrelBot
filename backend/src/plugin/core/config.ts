@@ -1,6 +1,6 @@
 import { Snowflake } from "#common/schema/general.ts";
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const CoreGroup = z.strictObject({
 	users: Snowflake.array().default([]),
@@ -64,7 +64,8 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 			if (!Object.hasOwn(input, reference)) {
 				ctx.addIssue({
 					message: `Invalid group reference: Received ${reference}`,
-					path: [key, "inherits", index]
+					path: [key, "inherits", index],
+					code: "custom",
 				});
 				hasIssues = true;
 			}
@@ -87,7 +88,8 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 		if (inherits === null) {
 			ctx.addIssue({
 				message: `Maximum inheritance depth reached: no more than ${MAX_INHERITANCE_DEPTH} levels of inheritance are allowed`,
-				path: [key, "inherits"]
+				path: [key, "inherits"],
+				code: "custom",
 			});
 			return z.NEVER;
 		}
