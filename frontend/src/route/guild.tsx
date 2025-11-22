@@ -1,8 +1,8 @@
 import { A, Route, useLocation, useNavigate, useParams, useResolvedPath } from "@solidjs/router";
 import { For, JSX } from "solid-js";
 import { Button } from "../component/common/Button";
-import { ConfigEditor } from "../component/config/ConfigEditor";
-import { PLUGINS, type Plugin } from "../constants";
+import { ConfigEditor } from "../component/ConfigEditor";
+import { PLUGINS } from "../constants";
 
 function getPluginPath(id: string) {
 	return "plugins/" + encodeURIComponent(id);

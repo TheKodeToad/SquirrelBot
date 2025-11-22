@@ -1,14 +1,48 @@
-import { syntaxTree } from "@codemirror/language";
+import { indentLess, insertTab } from "@codemirror/commands";
+import { indentUnit, syntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
+import { Command, keymap } from "@codemirror/view";
+import { gruvboxDark } from "@fsegurai/codemirror-theme-gruvbox-dark";
 import { IconDeviceFloppy } from "@tabler/icons-solidjs";
-import { EditorView } from "codemirror";
+import { basicSetup, EditorView } from "codemirror";
 import { createEffect, createResource, createSignal, getOwner, on, runWithOwner } from "solid-js";
-import { baseExtensions } from ".";
-import { getGuildConfig, writeGuildConfig } from "../../client";
-import { account } from "../../state/account";
-import { useGuild } from "../../state/guilds";
-import { Button } from "../common/Button";
-import { StatusFallback } from "../common/StatusFallback";
+import { getGuildConfig, writeGuildConfig } from "../client";
+import { toml } from "../codemirror/toml";
+import { account } from "../state/account";
+import { useGuild } from "../state/guilds";
+import { Button } from "./common/Button";
+import { StatusFallback } from "./common/StatusFallback";
+
+function baseExtensions(options: {
+	save: Command,
+	markDirty: () => void,
+}) {
+	return [
+		basicSetup,
+		toml(),
+		keymap.of([{
+			key: "Tab",
+			run: insertTab,
+			shift: indentLess,
+		}]),
+		keymap.of([{
+			key: "Mod-s",
+			run: options.save,
+		}]),
+		indentUnit.of("\t"),
+		gruvboxDark,
+		EditorView.theme({
+			"&.cm-focused": {
+				outline: "none",
+				"box-shadow": "none !important", // HACK
+			}
+		}),
+		EditorView.updateListener.of(update => {
+			if (update.docChanged)
+				options.markDirty();
+		}),
+	];
+}
 
 export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
@@ -63,18 +97,20 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 				markDirty: () => setDirty(true)
 			})
 		}));
-		const tree = syntaxTree(view.state);
-		tree.iterate({
-			enter: node => {
-				console.group(node.type.name);
-				console.log(view.state.doc.slice(node.from, node.to).toString());
-				return true;
-			},
-			leave: node => {
-				console.groupEnd();
-				return false;
-			}
-		});
+		(window as any).dumpTree = () => {
+			const tree = syntaxTree(view.state);
+			tree.iterate({
+				enter: node => {
+					console.group(node.type.name);
+					console.log(view.state.doc.slice(node.from, node.to).toString());
+					return true;
+				},
+				leave: () => {
+					console.groupEnd();
+					return false;
+				}
+			});
+		};
 	}, { defer: true }));
 
 	return (
