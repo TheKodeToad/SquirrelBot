@@ -18,7 +18,10 @@ import guildInfoSync from "#plugin/core/guildInfoSync.ts";
 import configRoutes from "#plugin/core/http/configRoutes.ts";
 import iconSync from "#plugin/core/iconSync.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
-import { defineConfig, onBotEvent } from "#plugin/core/public/extensionPoints.ts";
+import {
+	defineConfig,
+	onBotEvent,
+} from "#plugin/core/public/extensionPoints.ts";
 
 const logger = moduleLogger();
 
@@ -61,7 +64,10 @@ export default definePlugin({
 
 		onBotInit(postInit, EventListenerPhase.Post),
 
-		help, about, ...access, groups,
+		help,
+		about,
+		...access,
+		groups,
 
 		configRoutes,
 	],
@@ -71,6 +77,10 @@ function postInit(ctx: SquirrelDiscordContext): void {
 	logger.debug?.("Installing onBotEvent listeners");
 
 	for (const listener of onBotEvent.contributions) {
-		installWrappedListener(ctx, listener.type, listener.listener.bind(listener));
+		installWrappedListener(
+			ctx,
+			listener.type,
+			listener.listener.bind(listener),
+		);
 	}
 }

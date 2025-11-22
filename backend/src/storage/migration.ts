@@ -9,7 +9,10 @@ import "../environment.ts";
 import type { ClientBase } from "pg";
 import { transaction } from "#common/pg/transaction.ts";
 
-export async function migrate(db: ClientBase, ignoreChanges: boolean): Promise<number> {
+export async function migrate(
+	db: ClientBase,
+	ignoreChanges: boolean,
+): Promise<number> {
 	return await processMigrations(db, false, ignoreChanges);
 }
 
@@ -27,7 +30,9 @@ export async function checkMigrationsOrExit(db: ClientBase): Promise<void> {
 	if (migrationsNeeded > 0) {
 		console.error(`${migrationsNeeded} migrations needed!`);
 		console.error("Run pnpm migrate!");
-		console.error("Note: this cannot be reversed! Backups are *your* responsibility!");
+		console.error(
+			"Note: this cannot be reversed! Backups are *your* responsibility!",
+		);
 		process.exit(1);
 	}
 }
@@ -41,7 +46,11 @@ class MigrationError extends Error {
 
 const JustChecksumBuffer = z.strictObject({ checksum: z.instanceof(Buffer) });
 
-async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreChanges: boolean): Promise<number> {
+async function processMigrations(
+	client: ClientBase,
+	checkOnly: boolean,
+	ignoreChanges: boolean,
+): Promise<number> {
 	await client.query(`
 		CREATE TABLE IF NOT EXISTS "migration_files" (
 			"number" INT NOT NULL PRIMARY KEY,
@@ -79,7 +88,9 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 
 	for (const [number, file] of files.entries()) {
 		if (file === undefined) {
-			throw new MigrationError(`Migration files are missing or numbers were skipped`);
+			throw new MigrationError(
+				`Migration files are missing or numbers were skipped`,
+			);
 		}
 
 		const { rows } = await client.query(
@@ -88,7 +99,7 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 				FROM "migration_files"
 				WHERE "number" = $1
 			`,
-			[number]
+			[number],
 		);
 
 		const content = await fs.readFile(file, "utf-8");
@@ -109,11 +120,14 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 							SET "checksum" = $2
 							WHERE "number" = $1
 						`,
-						[number, contentChecksum]
+						[number, contentChecksum],
 					);
 					continue;
 				} else {
-					throw new MigrationError(message + " - you may bypass this with pnpm migration perform --ignore-changes");
+					throw new MigrationError(
+						message +
+							" - you may bypass this with pnpm migration perform --ignore-changes",
+					);
 				}
 			}
 
@@ -140,7 +154,7 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 					INSERT INTO "migration_files" ("number", "checksum")
 					VALUES ($1, $2)
 				`,
-				[number, contentChecksum]
+				[number, contentChecksum],
 			);
 		});
 	}

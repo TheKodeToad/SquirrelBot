@@ -3,7 +3,7 @@
 import { todo } from "#common/general.ts";
 import { Permission, type Member } from "oceanic.js";
 
-export type MockMemberProps = Partial<Member> & { id: string; };
+export type MockMemberProps = Partial<Member> & { id: string };
 
 export function mockMember(props: MockMemberProps): Member {
 	// @ts-expect-error No way to properly create a type which can fit
@@ -35,7 +35,12 @@ class MockMember implements Member {
 	}
 
 	get displayName() {
-		return this._props.displayName ?? this._props.user?.globalName ?? this.nick ?? this.username;
+		return (
+			this._props.displayName ??
+			this._props.user?.globalName ??
+			this.nick ??
+			this.username
+		);
 	}
 
 	get tag(): string {
@@ -54,29 +59,75 @@ class MockMember implements Member {
 		}
 	}
 
-	get avatar() { return this._props.avatar ?? null; }
-	get avatarDecorationData() { return this._props.avatarDecorationData ?? null; }
-	get banner() { return this._props.banner ?? null; }
-	get communicationDisabledUntil() { return this._props.communicationDisabledUntil ?? null; }
-	get deaf() { return this._props.deaf ?? false; }
-	get flags() { return this._props.flags ?? 0; }
-	get isPending() { return this._props.isPending ?? false; }
-	get joinedAt() { return this._props.joinedAt ?? null; }
-	get mute() { return this._props.mute ?? false; }
-	get nick() { return this._props.nick ?? null; }
-	get pending() { return this._props.pending ?? false; }
-	get premiumSince() { return this._props.premiumSince ?? null; }
-	get presence() { return this._props.presence; }
-	get roles() { return this._props.roles ?? []; }
-	get user() { return this._props.user ?? todo(); }
-	get bot() { return this._props.bot ?? false; }
-	get discriminator() { return this._props.discriminator ?? "0"; }
-	get guild() { return this._props.guild ?? todo(); }
-	get mention(): string { return this._props.mention ?? `<@${this._props.id}>`; }
-	get permissions() { return this._props.permissions ?? new Permission(0n); }
-	get publicFlags() { return this._props.publicFlags ?? 0; }
-	get system() { return this._props.system ?? false; }
-	get voiceState() { return this._props.voiceState ?? null; }
+	get avatar() {
+		return this._props.avatar ?? null;
+	}
+	get avatarDecorationData() {
+		return this._props.avatarDecorationData ?? null;
+	}
+	get banner() {
+		return this._props.banner ?? null;
+	}
+	get communicationDisabledUntil() {
+		return this._props.communicationDisabledUntil ?? null;
+	}
+	get deaf() {
+		return this._props.deaf ?? false;
+	}
+	get flags() {
+		return this._props.flags ?? 0;
+	}
+	get isPending() {
+		return this._props.isPending ?? false;
+	}
+	get joinedAt() {
+		return this._props.joinedAt ?? null;
+	}
+	get mute() {
+		return this._props.mute ?? false;
+	}
+	get nick() {
+		return this._props.nick ?? null;
+	}
+	get pending() {
+		return this._props.pending ?? false;
+	}
+	get premiumSince() {
+		return this._props.premiumSince ?? null;
+	}
+	get presence() {
+		return this._props.presence;
+	}
+	get roles() {
+		return this._props.roles ?? [];
+	}
+	get user() {
+		return this._props.user ?? todo();
+	}
+	get bot() {
+		return this._props.bot ?? false;
+	}
+	get discriminator() {
+		return this._props.discriminator ?? "0";
+	}
+	get guild() {
+		return this._props.guild ?? todo();
+	}
+	get mention(): string {
+		return this._props.mention ?? `<@${this._props.id}>`;
+	}
+	get permissions() {
+		return this._props.permissions ?? new Permission(0n);
+	}
+	get publicFlags() {
+		return this._props.publicFlags ?? 0;
+	}
+	get system() {
+		return this._props.system ?? false;
+	}
+	get voiceState() {
+		return this._props.voiceState ?? null;
+	}
 
 	addRole = todo;
 	avatarDecorationURL = todo;

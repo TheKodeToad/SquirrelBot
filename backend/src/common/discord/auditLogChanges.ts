@@ -21,7 +21,7 @@ export function parseUpdates(changes: AuditLogChange[]): AuditLogUpdates {
 	for (const change of changes) {
 		result[change.key] = {
 			old: "old_value" in change ? change.old_value : undefined,
-			new: change.new_value
+			new: change.new_value,
 		};
 	}
 

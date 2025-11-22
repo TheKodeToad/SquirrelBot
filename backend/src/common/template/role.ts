@@ -37,7 +37,9 @@ export function makeRoleView(role: RoleViewable): RoleView {
 		hoisted: role.hoist,
 		mentionable: role.mentionable,
 
-		get mention() { return `<@&${role.id}>`; },
+		get mention() {
+			return `<@&${role.id}>`;
+		},
 		get name_mention() {
 			if (role.name === undefined) {
 				return this.mention;
@@ -56,4 +58,3 @@ export function makeRoleView(role: RoleViewable): RoleView {
 
 	return result;
 }
-

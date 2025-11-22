@@ -1,10 +1,21 @@
-import { OptionType, type BaseCommandContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import {
+	OptionType,
+	type BaseCommandContext,
+	type ReplyObject,
+} from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
-import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
+import {
+	respondWithPaginator,
+	type PaginatorQuery,
+} from "#plugin/core/public/helper/paginator.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
-import { formatCaseDescription, formatCaseFields, formatCompactCaseSummary } from "#plugin/moderation/helper/format.ts";
+import {
+	formatCaseDescription,
+	formatCaseFields,
+	formatCompactCaseSummary,
+} from "#plugin/moderation/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { getCases, type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
@@ -31,17 +42,20 @@ export default defineCommand({
 	},
 	trackUpdates: true,
 
-	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_read),
-	async run(ctx, args) {
-		await respondWithPaginator<CaseInfo, number>(
+	preRun: (ctx) =>
+		permissionsGuard(
 			ctx,
-			{
-				pageSize: args.compact ? 16 : 3,
-				getKey: entry => entry.number,
-				lookUp: (ctx, query) => lookUpCases(ctx, query, args.actorID, args.targetID),
-				render: cases => renderCases(ctx.bot, cases, args.compact ?? false),
-			}
-		);
+			moderationConfigStore,
+			(permissions) => permissions.case_read,
+		),
+	async run(ctx, args) {
+		await respondWithPaginator<CaseInfo, number>(ctx, {
+			pageSize: args.compact ? 16 : 3,
+			getKey: (entry) => entry.number,
+			lookUp: (ctx, query) =>
+				lookUpCases(ctx, query, args.actorID, args.targetID),
+			render: (cases) => renderCases(ctx.bot, cases, args.compact ?? false),
+		});
 	},
 });
 
@@ -49,7 +63,7 @@ async function lookUpCases(
 	ctx: BaseCommandContext,
 	query: PaginatorQuery<number>,
 	actorID: string | null,
-	targetID: string | null
+	targetID: string | null,
 ): Promise<CaseInfo[]> {
 	const config = moderationConfigStore.get(ctx.guild.id);
 
@@ -74,7 +88,11 @@ async function lookUpCases(
 	});
 }
 
-async function renderCases(bot: Client, cases: CaseInfo[], compact: boolean): Promise<ReplyObject> {
+async function renderCases(
+	bot: Client,
+	cases: CaseInfo[],
+	compact: boolean,
+): Promise<ReplyObject> {
 	const container = Container([Text("## Cases")]);
 
 	if (cases.length === 0) {
@@ -86,14 +104,16 @@ async function renderCases(bot: Client, cases: CaseInfo[], compact: boolean): Pr
 		let content = "";
 
 		for (const info of cases) {
-			content += await formatCompactCaseSummary(bot, info) + "\n";
+			content += (await formatCompactCaseSummary(bot, info)) + "\n";
 		}
 
 		container.components.push(Text(content));
 	} else {
 		for (const info of cases) {
 			container.components.push(Divider());
-			container.components.push(Text(await formatCaseDescription(bot, info, false)));
+			container.components.push(
+				Text(await formatCaseDescription(bot, info, false)),
+			);
 			container.components.push(Text(await formatCaseFields(bot, info)));
 		}
 	}

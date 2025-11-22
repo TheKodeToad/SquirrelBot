@@ -2,7 +2,10 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { formatCaseDescription, formatCaseFields } from "#plugin/moderation/helper/format.ts";
+import {
+	formatCaseDescription,
+	formatCaseFields,
+} from "#plugin/moderation/helper/format.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { getCase } from "#plugin/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
@@ -21,7 +24,12 @@ export default defineCommand({
 	},
 	trackUpdates: true,
 
-	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_read),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			moderationConfigStore,
+			(permissions) => permissions.case_read,
+		),
 	async run(ctx, { number }) {
 		const info = await getCase(ctx.squirrelCtx.db, ctx.guild.id, number);
 
@@ -31,11 +39,13 @@ export default defineCommand({
 		}
 
 		await ctx.respond({
-			components: [Container([
-				Text(await formatCaseDescription(ctx.bot, info, true)),
-				Divider(),
-				Text(await formatCaseFields(ctx.bot, info)),
-			])]
+			components: [
+				Container([
+					Text(await formatCaseDescription(ctx.bot, info, true)),
+					Divider(),
+					Text(await formatCaseFields(ctx.bot, info)),
+				]),
+			],
 		});
 	},
 });

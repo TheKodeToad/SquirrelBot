@@ -5,23 +5,52 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
-import { listenForInteractions, unlistenForInteractions } from "#plugin/core/commandEngine/handler/componentHandler.ts";
-import { STATE_CLEANUP_INTERVAL, STATE_EXPIRE_AFTER } from "#plugin/core/commandEngine/index.ts";
+import {
+	listenForInteractions,
+	unlistenForInteractions,
+} from "#plugin/core/commandEngine/handler/componentHandler.ts";
+import {
+	STATE_CLEANUP_INTERVAL,
+	STATE_EXPIRE_AFTER,
+} from "#plugin/core/commandEngine/index.ts";
 import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.ts";
-import { readPrefixArgs, readPrefixName } from "#plugin/core/commandEngine/parsing/prefixParser.ts";
+import {
+	readPrefixArgs,
+	readPrefixName,
+} from "#plugin/core/commandEngine/parsing/prefixParser.ts";
 import { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import type { Command, CommandContext, Reply } from "#plugin/core/public/command.ts";
+import type {
+	Command,
+	CommandContext,
+	Reply,
+} from "#plugin/core/public/command.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
-import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User, Client } from "oceanic.js";
+import {
+	type AnyTextableGuildChannel,
+	Guild,
+	GuildChannel,
+	Member,
+	Message,
+	MessageFlags,
+	MessageTypes,
+	Permissions,
+	type PossiblyUncachedMessage,
+	Shard,
+	User,
+	Client,
+} from "oceanic.js";
 
 const logger = moduleLogger();
 
 export default [
-	onBotEvent({ type: "messageCreate", listener: async (ctx, message) => void await handle(ctx, message) }),
+	onBotEvent({
+		type: "messageCreate",
+		listener: async (ctx, message) => void (await handle(ctx, message)),
+	}),
 	onBotEvent({ type: "messageUpdate", listener: handleEdit }),
 	onBotEvent({ type: "messageDelete", listener: handleDelete }),
 ];
@@ -32,13 +61,21 @@ const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
-async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, prevResponse?: Message): Promise<boolean> {
+async function handle(
+	squirrelCtx: SquirrelDiscordContext,
+	message: Message,
+	prevResponse?: Message,
+): Promise<boolean> {
 	if (!message.inCachedGuildChannel()) {
 		return false;
 	}
 
 	// yes, non-bot webhook is/has been possible
-	if (message.author.bot || message.author.system || message.webhookID !== undefined) {
+	if (
+		message.author.bot ||
+		message.author.system ||
+		message.webhookID !== undefined
+	) {
 		return false;
 	}
 
@@ -46,7 +83,13 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 		return false;
 	}
 
-	if (!canWriteInChannel(squirrelCtx.bot, message.channel, message.channel.guild.clientMember)) {
+	if (
+		!canWriteInChannel(
+			squirrelCtx.bot,
+			message.channel,
+			message.channel.guild.clientMember,
+		)
+	) {
 		return false;
 	}
 
@@ -79,12 +122,19 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 		return false;
 	}
 
-	const ctx = new PrefixContext(squirrelCtx, commandEntry.command, message, prevResponse);
+	const ctx = new PrefixContext(
+		squirrelCtx,
+		commandEntry.command,
+		message,
+		prevResponse,
+	);
 
 	const data = commandEntry.command.preRun(ctx);
 
 	if (data === false) {
-		logger.debug?.(`Command '${name}' rejected context - ${debugFormatPermissionContext(ctx.member, ctx.channel)}`);
+		logger.debug?.(
+			`Command '${name}' rejected context - ${debugFormatPermissionContext(ctx.member, ctx.channel)}`,
+		);
 		return false;
 	}
 
@@ -96,9 +146,9 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 
 	if (args.error !== null) {
 		await ctx.respond(
-			`${icons.error} ${formatArgsParseError(args)}\n`
-			+ `${icons.tip} Edit your original message to fix the error!\n`
-			+ `${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`
+			`${icons.error} ${formatArgsParseError(args)}\n` +
+				`${icons.tip} Edit your original message to fix the error!\n` +
+				`${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`,
 		);
 
 		if (ctx._response !== null) {
@@ -120,7 +170,10 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 		try {
 			await ctx.respond(`:boom: Failed to execute command`);
 		} catch (error) {
-			logger.error?.("Error responding with error message for prefix command", error);
+			logger.error?.(
+				"Error responding with error message for prefix command",
+				error,
+			);
 		}
 		throw error;
 	}
@@ -128,7 +181,10 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 	return true;
 }
 
-async function handleEdit(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
+async function handleEdit(
+	ctx: SquirrelDiscordContext,
+	message: Message,
+): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response) {
@@ -141,12 +197,15 @@ async function handleEdit(ctx: SquirrelDiscordContext, message: Message): Promis
 
 	trackedMessages.delete(message.id);
 
-	if (!await handle(ctx, message, response)) {
+	if (!(await handle(ctx, message, response))) {
 		await response.delete();
 	}
 }
 
-async function handleDelete(_: SquirrelDiscordContext, message: PossiblyUncachedMessage): Promise<void> {
+async function handleDelete(
+	_: SquirrelDiscordContext,
+	message: PossiblyUncachedMessage,
+): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
 	if (!response) {
@@ -163,16 +222,33 @@ class PrefixContext implements CommandContext {
 	message: Message<AnyTextableGuildChannel>;
 
 	squirrelCtx: SquirrelDiscordContext;
-	get bot(): Client { return this.squirrelCtx.bot; }
-	get shard(): Shard { return this.message.guild.shard; }
-	get guild(): Guild { return this.message.guild; }
-	get user(): User { return this.message.author; }
-	get member(): Member { return this.message.member; }
-	get channel(): AnyTextableGuildChannel { return this.message.channel; }
+	get bot(): Client {
+		return this.squirrelCtx.bot;
+	}
+	get shard(): Shard {
+		return this.message.guild.shard;
+	}
+	get guild(): Guild {
+		return this.message.guild;
+	}
+	get user(): User {
+		return this.message.author;
+	}
+	get member(): Member {
+		return this.message.member;
+	}
+	get channel(): AnyTextableGuildChannel {
+		return this.message.channel;
+	}
 
 	_response: Message | null;
 
-	constructor(squirrelCtx: SquirrelDiscordContext, command: Command, message: Message<AnyTextableGuildChannel>, response?: Message) {
+	constructor(
+		squirrelCtx: SquirrelDiscordContext,
+		command: Command,
+		message: Message<AnyTextableGuildChannel>,
+		response?: Message,
+	) {
 		this.squirrelCtx = squirrelCtx;
 		this.command = command;
 		this.message = message;
@@ -187,8 +263,14 @@ class PrefixContext implements CommandContext {
 			messageOptions.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
 		}
 
-		if (this.message.channel instanceof GuildChannel
-			&& !canWriteInChannel(this.bot, this.message.channel, this.message.channel.guild.clientMember)) {
+		if (
+			this.message.channel instanceof GuildChannel &&
+			!canWriteInChannel(
+				this.bot,
+				this.message.channel,
+				this.message.channel.guild.clientMember,
+			)
+		) {
 			return;
 		}
 
@@ -200,8 +282,10 @@ class PrefixContext implements CommandContext {
 			}
 
 			if (
-				config.prefix_commands.reply
-				&& this.message.channel.permissionsOf(this.message.channel.guild.clientMember).has(Permissions.READ_MESSAGE_HISTORY)
+				config.prefix_commands.reply &&
+				this.message.channel
+					.permissionsOf(this.message.channel.guild.clientMember)
+					.has(Permissions.READ_MESSAGE_HISTORY)
 			) {
 				this._response = await this.channel.createMessage({
 					messageReference: {
@@ -210,7 +294,7 @@ class PrefixContext implements CommandContext {
 						messageID: this.message.id,
 						failIfNotExists: false,
 					},
-					...messageOptions
+					...messageOptions,
 				});
 			} else {
 				this._response = await this.channel.createMessage(messageOptions);
@@ -221,7 +305,11 @@ class PrefixContext implements CommandContext {
 		}
 
 		if (typeof reply !== "string" && reply.componentHandler !== undefined) {
-			listenForInteractions(this._response.id, this.message.author.id, reply.componentHandler);
+			listenForInteractions(
+				this._response.id,
+				this.message.author.id,
+				reply.componentHandler,
+			);
 		}
 	}
 

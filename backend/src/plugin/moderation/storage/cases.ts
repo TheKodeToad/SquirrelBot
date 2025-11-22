@@ -1,6 +1,10 @@
 import { dbParse } from "#storage/index.ts";
 import { z } from "zod/v4";
-import { ModEventType, reverseModEventType, type ModEvent } from "../public/modEvent.ts";
+import {
+	ModEventType,
+	reverseModEventType,
+	type ModEvent,
+} from "../public/modEvent.ts";
 import type { Pool } from "pg";
 import { poolTransaction } from "#common/pg/transaction.ts";
 
@@ -24,7 +28,7 @@ const CaseInfo = z.strictObject({
 });
 const CaseInfoArray = CaseInfo.array();
 
-export interface CaseInfo extends z.output<typeof CaseInfo> { }
+export interface CaseInfo extends z.output<typeof CaseInfo> {}
 
 export interface CaseQuery {
 	numberLessThan?: number;
@@ -49,7 +53,11 @@ export interface CaseQuery {
 
 const JustCounter = z.strictObject({ counter: z.number() });
 
-export async function getCase(db: Pool, guildID: string, number: number): Promise<CaseInfo | null> {
+export async function getCase(
+	db: Pool,
+	guildID: string,
+	number: number,
+): Promise<CaseInfo | null> {
 	if (number < 0 || number >= 2 ** 32) {
 		return null;
 	}
@@ -61,7 +69,7 @@ export async function getCase(db: Pool, guildID: string, number: number): Promis
 			WHERE "guildID" = $1
 			AND "number" = $2
 		`,
-		[guildID, number]
+		[guildID, number],
 	);
 
 	if (result.rowCount !== 1) {
@@ -71,7 +79,11 @@ export async function getCase(db: Pool, guildID: string, number: number): Promis
 	return dbParse(CaseInfo, result.rows[0]);
 }
 
-export async function getCases(db: Pool, guildID: string, query: CaseQuery): Promise<CaseInfo[]> {
+export async function getCases(
+	db: Pool,
+	guildID: string,
+	query: CaseQuery,
+): Promise<CaseInfo[]> {
 	query.reversed ??= false;
 
 	const result = await db.query(
@@ -112,14 +124,18 @@ export async function getCases(db: Pool, guildID: string, query: CaseQuery): Pro
 			query.dmDelivered,
 			query.reversed,
 			query.limit,
-		]
+		],
 	);
 
 	return dbParse(CaseInfoArray, result.rows);
 }
 
-export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<number> {
-	return poolTransaction(db, async client => {
+export function createCase(
+	db: Pool,
+	guildID: string,
+	event: ModEvent,
+): Promise<number> {
+	return poolTransaction(db, async (client) => {
 		// TODO: might have edge cases but it's pretty darn unlikely for them to occur
 		const result = await client.query(
 			`
@@ -129,7 +145,7 @@ export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<
 				DO UPDATE SET "counter" = "moderation_caseNumberCounter"."counter" + 1
 				RETURNING "counter"
 			`,
-			[guildID]
+			[guildID],
 		);
 		const newNumber = dbParse(JustCounter, result.rows[0]).counter;
 
@@ -160,7 +176,7 @@ export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<
 				event.reason ?? null,
 				event.deleteMessageSeconds ?? null,
 				event.dmDelivered ?? null,
-			]
+			],
 		);
 
 		const reverseType = reverseModEventType(event.type);
@@ -188,7 +204,7 @@ export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<
 						"moderation_cases"."guildID" = "shadowed"."guildID"
 						AND "moderation_cases"."number" = "shadowed"."number"
 				`,
-				[newNumber, event.target.id, event.type, reverseType, new Date]
+				[newNumber, event.target.id, event.type, reverseType, new Date()],
 			);
 		}
 
@@ -196,7 +212,11 @@ export function createCase(db: Pool, guildID: string, event: ModEvent): Promise<
 	});
 }
 
-export async function deleteCase(db: Pool, guildID: string, number: number): Promise<boolean> {
+export async function deleteCase(
+	db: Pool,
+	guildID: string,
+	number: number,
+): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32) {
 		return false;
 	}
@@ -206,7 +226,7 @@ export async function deleteCase(db: Pool, guildID: string, number: number): Pro
 			DELETE FROM "moderation_cases"
 			WHERE "guildID" = $1 AND "number" = $2
 		`,
-		[guildID, number]
+		[guildID, number],
 	);
 
 	return result.rowCount === 1;

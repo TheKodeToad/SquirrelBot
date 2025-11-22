@@ -3,14 +3,17 @@ import type { ValidationTargets } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { z } from "zod/v4";
 
-export function validate<TSchema extends z.ZodType, TTarget extends keyof ValidationTargets>(target: TTarget, schema: TSchema) {
+export function validate<
+	TSchema extends z.ZodType,
+	TTarget extends keyof ValidationTargets,
+>(target: TTarget, schema: TSchema) {
 	return zValidator(target, schema, (result, ctx) => {
 		if (!result.success) {
 			throw new HTTPException(400, {
 				res: ctx.json({
 					error: "Schema validation failed",
-					issues: result.error.issues
-				})
+					issues: result.error.issues,
+				}),
 			});
 		}
 	});

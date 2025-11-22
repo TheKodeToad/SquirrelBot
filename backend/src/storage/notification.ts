@@ -8,25 +8,27 @@ export interface NotifDispatcher {
 	disconnect(): void;
 }
 
-export async function connectNotifDispatcher(pool: Pool): Promise<NotifDispatcher> {
+export async function connectNotifDispatcher(
+	pool: Pool,
+): Promise<NotifDispatcher> {
 	const client = await pool.connect();
-	const listenersLookup: Map<string, Listener[]> = new Map;
+	const listenersLookup: Map<string, Listener[]> = new Map();
 
 	await client.query(
 		`
 			CREATE FUNCTION pg_temp.listen(channel TEXT) RETURNS VOID
 			AS $$ BEGIN EXECUTE format('LISTEN %I', channel); END $$
 			LANGUAGE plpgsql
-		`
+		`,
 	);
-	client.on("notification", notification => {
+	client.on("notification", (notification) => {
 		const listeners = listenersLookup.get(notification.channel);
 
 		if (listeners === undefined) {
 			return;
 		}
 
-		listeners.forEach(listener => listener(notification.payload));
+		listeners.forEach((listener) => listener(notification.payload));
 	});
 
 	return {
@@ -40,10 +42,14 @@ export async function connectNotifDispatcher(pool: Pool): Promise<NotifDispatche
 				listeners.push(listener);
 			}
 		},
-		disconnect: client.release
+		disconnect: client.release,
 	};
 }
 
-export async function notifyChannel(pool: Pool, channel: string, payload: string): Promise<void> {
+export async function notifyChannel(
+	pool: Pool,
+	channel: string,
+	payload: string,
+): Promise<void> {
 	await pool.query("SELECT pg_notify($1, $2)", [channel, payload]);
 }

@@ -1,4 +1,7 @@
-import { renderCommandListPage, renderCommandListPageMinimal } from "#plugin/core/command/help/list.ts";
+import {
+	renderCommandListPage,
+	renderCommandListPageMinimal,
+} from "#plugin/core/command/help/list.ts";
 import { renderCommandPage } from "#plugin/core/command/help/show.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
@@ -18,10 +21,15 @@ export default defineCommand({
 			type: OptionType.String,
 			name: ["command", "c"],
 			position: 0,
-		}
+		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, coreConfigStore, permissions => permissions.help_command),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			coreConfigStore,
+			(permissions) => permissions.help_command,
+		),
 	async run(ctx, args) {
 		if (args.command !== null) {
 			const command = getCommandByName(args.command);
@@ -36,9 +44,13 @@ export default defineCommand({
 		}
 
 		if (ctx.ephemeral ?? false) {
-			await ctx.respond(renderCommandListPage(ctx, { page: 0, plugin: "core" }));
+			await ctx.respond(
+				renderCommandListPage(ctx, { page: 0, plugin: "core" }),
+			);
 		} else {
-			await ctx.respond(renderCommandListPageMinimal(ctx.squirrelCtx, ctx.guild.id));
+			await ctx.respond(
+				renderCommandListPageMinimal(ctx.squirrelCtx, ctx.guild.id),
+			);
 		}
 	},
 });

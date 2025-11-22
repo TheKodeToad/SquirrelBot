@@ -7,14 +7,16 @@ import type { Plugin } from "#plugin.ts";
  *
  * @returns Basic extension point which stores passed values in contributedValues and ignores the plugin
  */
-export function makeArrayExtensionPoint<T>(): ((value: T) => Contribution) & { contributions: T[]; } {
+export function makeArrayExtensionPoint<T>(): ((value: T) => Contribution) & {
+	contributions: T[];
+} {
 	const contributions: T[] = [];
 
 	return Object.assign(
 		function (value: T) {
 			return (_: Plugin) => contributions.push(value);
 		},
-		{ contributions }
+		{ contributions },
 	);
 }
 
@@ -24,25 +26,31 @@ export function makeArrayExtensionPoint<T>(): ((value: T) => Contribution) & { c
  * @param name Name of exported symbol for debugging (e.g. contributeThing -> "Multiple usages of contributeThing for plugin #starboard")
  * @returns Map-backed extension point which stores a single value for each plugin or throws
  */
-export function makeMapExtensionPoint<T>(name: string): ((value: T) => Contribution) & { contributions: Map<Plugin, T>; } {
-	const contributions: Map<Plugin, T> = new Map;
+export function makeMapExtensionPoint<T>(
+	name: string,
+): ((value: T) => Contribution) & { contributions: Map<Plugin, T> } {
+	const contributions: Map<Plugin, T> = new Map();
 
 	return Object.assign(
 		function (value: T) {
 			return (plugin: Plugin) => {
 				if (contributions.has(plugin)) {
-					throw new Error(`Multiple usages of ${name} for plugin #${plugin.id}`);
+					throw new Error(
+						`Multiple usages of ${name} for plugin #${plugin.id}`,
+					);
 				}
 
 				contributions.set(plugin, value);
 			};
 		},
-		{ contributions }
+		{ contributions },
 	);
 }
 
-export function makeMultiMapExtensionPoint<T>(): ((value: T) => Contribution) & { contributions: Map<Plugin, T[]>; } {
-	const contributions: Map<Plugin, T[]> = new Map;
+export function makeMultiMapExtensionPoint<T>(): ((
+	value: T,
+) => Contribution) & { contributions: Map<Plugin, T[]> } {
+	const contributions: Map<Plugin, T[]> = new Map();
 
 	return Object.assign(
 		function (value: T) {
@@ -54,7 +62,7 @@ export function makeMultiMapExtensionPoint<T>(): ((value: T) => Contribution) & 
 				}
 			};
 		},
-		{ contributions }
+		{ contributions },
 	);
 }
 
@@ -66,20 +74,29 @@ export const enum EventListenerPhase {
 
 type EventListener<T extends unknown[]> = (...args: T) => Awaitable<void>;
 
-export function makeEventExtensionPoint<T extends unknown[]>(): ((listener: EventListener<T>, phase?: EventListenerPhase) => Contribution) & { fire(...args: T): Promise<void>; } {
-	const contributions: Map<EventListenerPhase, EventListener<T>[]> = new Map;
-	const firePhase = async (args: T, phase: EventListenerPhase): Promise<void> => {
+export function makeEventExtensionPoint<T extends unknown[]>(): ((
+	listener: EventListener<T>,
+	phase?: EventListenerPhase,
+) => Contribution) & { fire(...args: T): Promise<void> } {
+	const contributions: Map<EventListenerPhase, EventListener<T>[]> = new Map();
+	const firePhase = async (
+		args: T,
+		phase: EventListenerPhase,
+	): Promise<void> => {
 		const listeners = contributions.get(phase);
 
 		if (listeners === undefined) {
 			return;
 		}
 
-		await Promise.all(listeners.map(listener => listener(...args)));
+		await Promise.all(listeners.map((listener) => listener(...args)));
 	};
 
 	return Object.assign(
-		function (listener: (...args: T) => void, phase = EventListenerPhase.Default) {
+		function (
+			listener: (...args: T) => void,
+			phase = EventListenerPhase.Default,
+		) {
 			return (_: Plugin) => {
 				if (contributions.has(phase)) {
 					contributions.get(phase)!.push(listener);
@@ -93,7 +110,7 @@ export function makeEventExtensionPoint<T extends unknown[]>(): ((listener: Even
 				await firePhase(args, EventListenerPhase.Pre);
 				await firePhase(args, EventListenerPhase.Default);
 				await firePhase(args, EventListenerPhase.Post);
-			}
-		}
+			},
+		},
 	);
 }

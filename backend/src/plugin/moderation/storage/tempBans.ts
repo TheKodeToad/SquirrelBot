@@ -20,20 +20,28 @@ export interface CreateTimerOptions {
 	caseNumber?: number;
 }
 
-export async function getTempBansByEndsAt(db: Pool, startInclusive: Date, endExclusive: Date): Promise<TempBan[]> {
+export async function getTempBansByEndsAt(
+	db: Pool,
+	startInclusive: Date,
+	endExclusive: Date,
+): Promise<TempBan[]> {
 	const result = await db.query(
 		`
 			SELECT *
 			FROM "moderation_tempBans"
 			WHERE "endsAt" >= $1 AND "endsAt" < $2
 		`,
-		[startInclusive, endExclusive]
+		[startInclusive, endExclusive],
 	);
 
 	return dbParse(TempBanArray, result.rows);
 }
 
-export async function upsertTempBan(db: Pool, guildID: string, options: CreateTimerOptions): Promise<void> {
+export async function upsertTempBan(
+	db: Pool,
+	guildID: string,
+	options: CreateTimerOptions,
+): Promise<void> {
 	await db.query(
 		`
 			INSERT INTO "moderation_tempBans" (
@@ -47,11 +55,15 @@ export async function upsertTempBan(db: Pool, guildID: string, options: CreateTi
 			DO UPDATE SET "endsAt" = $3, "caseNumber" = $4
 
 		`,
-		[guildID, options.targetID, options.endsAt, options.caseNumber]
-	)
+		[guildID, options.targetID, options.endsAt, options.caseNumber],
+	);
 }
 
-export async function deleteTempBan(db: Pool, guildID: string, targetID: string): Promise<boolean> {
+export async function deleteTempBan(
+	db: Pool,
+	guildID: string,
+	targetID: string,
+): Promise<boolean> {
 	const result = await db.query(
 		`
 			DELETE FROM "moderation_tempBans"
@@ -59,8 +71,8 @@ export async function deleteTempBan(db: Pool, guildID: string, targetID: string)
 				"guildID" = $1
 				AND "targetID" = $2
 		`,
-		[guildID, targetID]
-	)
+		[guildID, targetID],
+	);
 
 	return result.rowCount === 1;
 }

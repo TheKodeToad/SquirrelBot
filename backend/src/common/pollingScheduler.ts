@@ -30,11 +30,13 @@ interface State<T> {
  * Start polling for tasks.
  * @return A handle to the scheduler, after the first poll is done
  */
-export async function startPollingScheduler<T>(options: PollingSchedulerOptions<T>): Promise<PollingSchedulerHandle<T>> {
+export async function startPollingScheduler<T>(
+	options: PollingSchedulerOptions<T>,
+): Promise<PollingSchedulerHandle<T>> {
 	const state: State<T> = {
 		options,
 		nextStartTimestamp: new Date(0),
-		timeouts: new Map,
+		timeouts: new Map(),
 	};
 
 	await poll(state);
@@ -49,8 +51,8 @@ export async function startPollingScheduler<T>(options: PollingSchedulerOptions<
 			setRunTimeout(state, task);
 		},
 		untrack(key) {
-			clearTimeout(state.timeouts.get(key))
-		}
+			clearTimeout(state.timeouts.get(key));
+		},
 	};
 }
 
@@ -62,9 +64,9 @@ async function poll<T>(state: State<T>): Promise<void> {
 	logger.debug?.(
 		end.getTime() === 0
 			? `Setting initial timeouts for #${state.options.discriminator} tasks`
-			: `Setting timeouts for #${state.options.discriminator} tasks`
-				+ ` from ${dateToHMSString(state.nextStartTimestamp)}`
-				+ ` to ${dateToHMSString(end)}`
+			: `Setting timeouts for #${state.options.discriminator} tasks` +
+					` from ${dateToHMSString(state.nextStartTimestamp)}` +
+					` to ${dateToHMSString(end)}`,
 	);
 
 	const tasks = await state.options.poll(state.nextStartTimestamp, end);
@@ -76,9 +78,14 @@ async function poll<T>(state: State<T>): Promise<void> {
 }
 
 function setRunTimeout<T>(state: State<T>, task: T): void {
-	const delay = Math.max(0, state.options.getTimestamp(task).getTime() - Date.now());
+	const delay = Math.max(
+		0,
+		state.options.getTimestamp(task).getTime() - Date.now(),
+	);
 
-	logger.debug?.(`Setting up timeout for #${state.options.discriminator} task ${state.options.debugFormat(task)} with delay ${delay}`);
+	logger.debug?.(
+		`Setting up timeout for #${state.options.discriminator} task ${state.options.debugFormat(task)} with delay ${delay}`,
+	);
 
 	const timeout = setTimeout(() => state.options.run(task), delay).unref();
 	state.timeouts.set(state.options.getKey(task), timeout);

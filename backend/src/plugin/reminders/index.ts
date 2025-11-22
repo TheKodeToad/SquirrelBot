@@ -35,7 +35,9 @@ export default definePlugin({
 		}),
 		...scheduler,
 
-		remind, reminderList, reminderCancel,
+		remind,
+		reminderList,
+		reminderCancel,
 	],
 });
 

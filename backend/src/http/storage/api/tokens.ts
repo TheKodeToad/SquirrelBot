@@ -10,10 +10,13 @@ const TOKEN_REFRESH_THRESHOLD = 7 * DAY;
 
 const TokenInfo = z.strictObject({
 	userID: z.string(),
-	expiresAt: z.date()
+	expiresAt: z.date(),
 });
 
-export async function generateToken(db: Pool, userID: string): Promise<[token: string, expiry: Date]> {
+export async function generateToken(
+	db: Pool,
+	userID: string,
+): Promise<[token: string, expiry: Date]> {
 	const secret = crypto.randomBytes(16);
 	const expiresAt = new Date(Date.now() + TOKEN_LIFETIME);
 
@@ -28,10 +31,13 @@ export async function generateToken(db: Pool, userID: string): Promise<[token: s
 			)
 			VALUES ($1, $2, $3)
 		`,
-		[userID, hash, expiresAt]
+		[userID, hash, expiresAt],
 	);
 
-	return [BigInt(userID).toString(16) + "." + secret.toString("hex"), expiresAt];
+	return [
+		BigInt(userID).toString(16) + "." + secret.toString("hex"),
+		expiresAt,
+	];
 }
 
 async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
@@ -67,7 +73,10 @@ async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
 /**
  * @returns user ID if valid
  */
-export async function validateToken(db: Pool, token: string): Promise<string | null> {
+export async function validateToken(
+	db: Pool,
+	token: string,
+): Promise<string | null> {
 	const key: [bigint, Buffer] | null = await tokenKey(token);
 
 	if (key === null) {
@@ -80,7 +89,7 @@ export async function validateToken(db: Pool, token: string): Promise<string | n
 			FROM "api_tokens"
 			WHERE "userID" = $1 AND "hash" = $2
 		`,
-		key
+		key,
 	);
 
 	if (result.rowCount !== 1) {
@@ -95,7 +104,7 @@ export async function validateToken(db: Pool, token: string): Promise<string | n
 				DELETE FROM "api_tokens"
 				WHERE "userID" = $1 AND "hash" = $2
 			`,
-			key
+			key,
 		);
 		return null;
 	}
@@ -107,7 +116,7 @@ export async function validateToken(db: Pool, token: string): Promise<string | n
 				SET "expiresAt" = $1
 				WHERE "userID" = $2 AND "hash" = $3
 			`,
-			[new Date(Date.now() + TOKEN_LIFETIME), userID, key[1]]
+			[new Date(Date.now() + TOKEN_LIFETIME), userID, key[1]],
 		);
 	}
 
@@ -126,7 +135,7 @@ export async function deleteToken(db: Pool, token: string): Promise<boolean> {
 			DELETE FROM "api_tokens"
 			WHERE "userID" = $1 AND "hash" = $2
 		`,
-		key
+		key,
 	);
 
 	return result.rowCount === 1;
@@ -138,7 +147,7 @@ export async function deleteExpiredTokens(db: Pool): Promise<number> {
 			DELETE FROM "api_tokens"
 			WHERE "expiresAt" <= $1
 		`,
-		[new Date]
+		[new Date()],
 	);
 
 	return result.rowCount ?? 0;

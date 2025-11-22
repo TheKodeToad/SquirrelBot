@@ -21,7 +21,7 @@ const Reminder = z.strictObject({
 
 const ReminderArray = Reminder.array();
 
-export interface Reminder extends z.output<typeof Reminder> { }
+export interface Reminder extends z.output<typeof Reminder> {}
 
 export interface CreateReminderOptions {
 	ownerID: string;
@@ -48,7 +48,11 @@ export interface ReminderQuery {
 
 const JustCounter = z.strictObject({ counter: z.number() });
 
-export async function getReminder(db: Pool, guildID: string, number: number): Promise<Reminder | null> {
+export async function getReminder(
+	db: Pool,
+	guildID: string,
+	number: number,
+): Promise<Reminder | null> {
 	if (number < 0 || number >= 2 ** 32) {
 		return null;
 	}
@@ -58,7 +62,7 @@ export async function getReminder(db: Pool, guildID: string, number: number): Pr
 			SELECT * FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2
 		`,
-		[guildID, number]
+		[guildID, number],
 	);
 
 	if (result.rowCount !== 1) {
@@ -68,7 +72,11 @@ export async function getReminder(db: Pool, guildID: string, number: number): Pr
 	return dbParse(Reminder, result.rows[0]);
 }
 
-export async function getReminders(db: Pool, guildID: string, query: ReminderQuery): Promise<Reminder[]> {
+export async function getReminders(
+	db: Pool,
+	guildID: string,
+	query: ReminderQuery,
+): Promise<Reminder[]> {
 	const result = await db.query(
 		`
 			SELECT * FROM "reminders_reminders"
@@ -91,29 +99,37 @@ export async function getReminders(db: Pool, guildID: string, query: ReminderQue
 			query.firesAfter,
 			query.reversed,
 			query.limit,
-		]
+		],
 	);
 
 	return dbParse(ReminderArray, result.rows);
 }
 
-export async function getRemindersByFiresAt(db: Pool, startInclusive: Date, endExclusive: Date): Promise<Reminder[]> {
+export async function getRemindersByFiresAt(
+	db: Pool,
+	startInclusive: Date,
+	endExclusive: Date,
+): Promise<Reminder[]> {
 	const result = await db.query(
 		`
 			SELECT *
 			FROM "reminders_reminders"
 			WHERE "firesAt" >= $1 AND "firesAt" < $2
 		`,
-		[startInclusive, endExclusive]
+		[startInclusive, endExclusive],
 	);
 
 	return dbParse(ReminderArray, result.rows);
 }
 
-export function createReminder(db: Pool, guildID: string, options: CreateReminderOptions): Promise<number> {
-	options.createdAt ??= new Date;
+export function createReminder(
+	db: Pool,
+	guildID: string,
+	options: CreateReminderOptions,
+): Promise<number> {
+	options.createdAt ??= new Date();
 
-	return poolTransaction(db, async client => {
+	return poolTransaction(db, async (client) => {
 		const result = await client.query(
 			`
 				INSERT INTO "reminders_reminderNumberCounter" ("guildID", "counter")
@@ -122,7 +138,7 @@ export function createReminder(db: Pool, guildID: string, options: CreateReminde
 				DO UPDATE SET "counter" = "reminders_reminderNumberCounter"."counter" + 1
 				RETURNING "counter"
 			`,
-			[guildID]
+			[guildID],
 		);
 		const newNumber = dbParse(JustCounter, result.rows[0]).counter;
 
@@ -151,14 +167,18 @@ export function createReminder(db: Pool, guildID: string, options: CreateReminde
 				options.firesAt,
 				options.message ?? null,
 				options.silent,
-			]
+			],
 		);
 
 		return newNumber;
 	});
 }
 
-export async function deleteReminder(db: Pool, guildID: string, number: number): Promise<boolean> {
+export async function deleteReminder(
+	db: Pool,
+	guildID: string,
+	number: number,
+): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32) {
 		return false;
 	}
@@ -168,13 +188,18 @@ export async function deleteReminder(db: Pool, guildID: string, number: number):
 			DELETE FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2
 		`,
-		[guildID, number]
+		[guildID, number],
 	);
 
 	return result.rowCount === 1;
 }
 
-export async function deleteReminderIfOwnedBy(db: Pool, guildID: string, number: number, ownerID: string): Promise<boolean> {
+export async function deleteReminderIfOwnedBy(
+	db: Pool,
+	guildID: string,
+	number: number,
+	ownerID: string,
+): Promise<boolean> {
 	if (number < 0 || number >= 2 ** 32) {
 		return false;
 	}
@@ -184,8 +209,8 @@ export async function deleteReminderIfOwnedBy(db: Pool, guildID: string, number:
 			DELETE FROM "reminders_reminders"
 			WHERE "guildID" = $1 AND "number" = $2 AND "ownerID" = $3
 		`,
-		[guildID, number, ownerID]
+		[guildID, number, ownerID],
 	);
 
 	return result.rowCount === 1;
-};
+}

@@ -17,7 +17,7 @@ const ctx: SquirrelHTTPContext = await squirrelInit();
 
 const logger = moduleLogger();
 
-const app = new Hono;
+const app = new Hono();
 
 app.use(nortonAntivirusPlus());
 app.use(async (ctx, next) => {
@@ -33,7 +33,7 @@ app.use(async (ctx, next) => {
 const ROBOTS = `User-agent: *
 Disallow: /api/`;
 
-app.get("/robots.txt", ctx => ctx.text(ROBOTS));
+app.get("/robots.txt", (ctx) => ctx.text(ROBOTS));
 
 app.route("/api", api(ctx));
 app.route("/", frontend(ctx));
@@ -51,9 +51,8 @@ app.onError((error, ctx) => {
 	return ctx.json({ message: "Internal server error" }, 500);
 });
 
-const server = serve(
-	{ fetch: app.fetch, port: HTTP_PORT },
-	info => logger.info?.(`Listening on ${info.port}`)
+const server = serve({ fetch: app.fetch, port: HTTP_PORT }, (info) =>
+	logger.info?.(`Listening on ${info.port}`),
 );
 
 async function beginDeleteTokenLoop(): Promise<void> {
@@ -71,13 +70,15 @@ async function beginDeleteTokenLoop(): Promise<void> {
 await beginDeleteTokenLoop();
 
 setupShutdownHook(async () => {
-	await new Promise<void>((resolve, reject) => server.close(error => {
-		if (error !== undefined) {
-			reject(error);
-		} else {
-			resolve();
-		}
-	}));
+	await new Promise<void>((resolve, reject) =>
+		server.close((error) => {
+			if (error !== undefined) {
+				reject(error);
+			} else {
+				resolve();
+			}
+		}),
+	);
 
 	squirrelShutdown(ctx);
 });

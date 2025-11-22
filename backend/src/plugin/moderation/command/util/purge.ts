@@ -8,7 +8,8 @@ import { moderationConfigStore } from "#plugin/moderation/index.ts";
 
 export default defineCommand({
 	name: ["purge", "sweep", "clear"],
-	description: "Delete the specified number of messages in chat starting from the most recent.",
+	description:
+		"Delete the specified number of messages in chat starting from the most recent.",
 
 	options: {
 		count: {
@@ -35,10 +36,15 @@ export default defineCommand({
 			type: OptionType.User,
 			name: ["author", "a", "by", "from"],
 			array: true,
-		}
+		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.purge),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			moderationConfigStore,
+			(permissions) => permissions.purge,
+		),
 	async run(ctx, args) {
 		let purged = 0;
 
@@ -51,7 +57,7 @@ export default defineCommand({
 			let stop = false;
 
 			const toDelete: string[] = [];
-			const twoWeeksAgo = Date.now() - (2 * WEEK);
+			const twoWeeksAgo = Date.now() - 2 * WEEK;
 
 			for (const message of messages) {
 				if (message.createdAt.getTime() < twoWeeksAgo) {
@@ -73,7 +79,10 @@ export default defineCommand({
 					continue;
 				}
 
-				if (args.author.length !== 0 && !args.author.includes(message.author.id)) {
+				if (
+					args.author.length !== 0 &&
+					!args.author.includes(message.author.id)
+				) {
 					continue;
 				}
 

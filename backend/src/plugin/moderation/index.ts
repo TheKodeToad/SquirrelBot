@@ -44,8 +44,17 @@ export default definePlugin({
 		}),
 		...tempBanScheduler,
 
-		ban, unban, kick, timeout, removeTimeout, warn, purge, caseShow, caseDelete, caseList,
+		ban,
+		unban,
+		kick,
+		timeout,
+		removeTimeout,
+		warn,
+		purge,
+		caseShow,
+		caseDelete,
+		caseList,
 
 		casesRoutes,
-	]
+	],
 });

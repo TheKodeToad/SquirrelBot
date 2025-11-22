@@ -5,9 +5,11 @@ export const CLIENT_ID = process.env["CLIENT_ID"] || "";
 export const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";
 export const REDIRECT_URI = process.env["REDIRECT_URI"] || "";
 export const BOT_TOKEN = process.env["BOT_DISCORD_TOKEN"] || "";
-export const BOT_ALLOWED_GUILDS = process.env["BOT_ALLOWED_GUILDS"]?.split(",") ?? [];
+export const BOT_ALLOWED_GUILDS =
+	process.env["BOT_ALLOWED_GUILDS"]?.split(",") ?? [];
 export const HTTP_PORT = Number(process.env["PORT"]) || 8080;
-export const LOG_LEVEL = logLevelByName(process.env["LOG_LEVEL"] || "info") ?? LogLevel.Info;
+export const LOG_LEVEL =
+	logLevelByName(process.env["LOG_LEVEL"] || "info") ?? LogLevel.Info;
 
 // advanced
 
@@ -20,7 +22,8 @@ export const LOG_LEVEL = logLevelByName(process.env["LOG_LEVEL"] || "info") ?? L
  * You do not get much by disabling this - some redundant and potentially more expensive checks are simply skipped.
  * User facing validation is not skipped nor are many trivial checks.
  */
-export const INTERNAL_TYPE_INTEGRITY = parseBoolean(process.env["INTERNAL_TYPE_INTEGRITY"]) ?? true;
+export const INTERNAL_TYPE_INTEGRITY =
+	parseBoolean(process.env["INTERNAL_TYPE_INTEGRITY"]) ?? true;
 
 export const CACHE_PATH = process.env["CACHE_PATH"] ?? "./cache";
 

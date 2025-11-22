@@ -18,7 +18,12 @@ export default defineCommand({
 		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.case_delete),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			moderationConfigStore,
+			(permissions) => permissions.case_delete,
+		),
 	async run(ctx, { number }) {
 		const deleted = await deleteCase(ctx.squirrelCtx.db, ctx.guild.id, number);
 
@@ -27,5 +32,5 @@ export default defineCommand({
 		} else {
 			await ctx.respond(`${icons.error} Case **#${number}** was not found!`);
 		}
-	}
+	},
 });

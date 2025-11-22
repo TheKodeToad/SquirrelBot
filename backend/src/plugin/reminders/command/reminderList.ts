@@ -1,12 +1,21 @@
 import { dateToUnixSecs } from "#common/time.ts";
-import { type BaseCommandContext, type ReplyObject } from "#plugin/core/public/command.ts";
+import {
+	type BaseCommandContext,
+	type ReplyObject,
+} from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
-import { respondWithPaginator, type PaginatorQuery } from "#plugin/core/public/helper/paginator.ts";
+import {
+	respondWithPaginator,
+	type PaginatorQuery,
+} from "#plugin/core/public/helper/paginator.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
-import { getReminders, type Reminder } from "#plugin/reminders/storage/reminders.ts";
+import {
+	getReminders,
+	type Reminder,
+} from "#plugin/reminders/storage/reminders.ts";
 import { Container, Text } from "oceanic-component-helper";
 
 export default defineCommand({
@@ -15,21 +24,26 @@ export default defineCommand({
 
 	trackUpdates: true,
 
-	preRun: ctx => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
-	async run(ctx) {
-		await respondWithPaginator<Reminder, Date>(
+	preRun: (ctx) =>
+		permissionsGuard(
 			ctx,
-			{
-				pageSize: 10,
-				getKey: entry => entry.firesAt,
-				lookUp: (ctx, query) => lookUpReminders(ctx, query),
-				render: renderReminders,
-			}
-		);
+			remindersConfigStore,
+			(permissions) => permissions.personal_reminders,
+		),
+	async run(ctx) {
+		await respondWithPaginator<Reminder, Date>(ctx, {
+			pageSize: 10,
+			getKey: (entry) => entry.firesAt,
+			lookUp: (ctx, query) => lookUpReminders(ctx, query),
+			render: renderReminders,
+		});
 	},
 });
 
-async function lookUpReminders(ctx: BaseCommandContext, query: PaginatorQuery<Date>): Promise<Reminder[]> {
+async function lookUpReminders(
+	ctx: BaseCommandContext,
+	query: PaginatorQuery<Date>,
+): Promise<Reminder[]> {
 	const config = remindersConfigStore.get(ctx.guild.id);
 
 	if (config === undefined) {
@@ -47,7 +61,7 @@ async function lookUpReminders(ctx: BaseCommandContext, query: PaginatorQuery<Da
 		limit: query.limit,
 		firesBefore: query.before,
 		firesAfter: query.after,
-		reversed: query.reversed
+		reversed: query.reversed,
 	});
 }
 
@@ -63,6 +77,6 @@ function renderReminders(reminders: Reminder[]): ReplyObject {
 	}
 
 	return {
-		components: [Container([Text("## Reminders"), Text(content)])]
+		components: [Container([Text("## Reminders"), Text(content)])],
 	};
 }

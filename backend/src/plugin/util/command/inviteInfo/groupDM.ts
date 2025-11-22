@@ -2,8 +2,21 @@ import { formatUser } from "#common/discord/format.ts";
 import { getChannelIconURL } from "#common/discord/urls.ts";
 import { dateToUnixSecs } from "#common/time.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
-import { Client, type ContainerComponent, type PartialInviteChannel, type User } from "oceanic.js";
+import {
+	ActionRow,
+	Container,
+	Divider,
+	Section,
+	Text,
+	Thumbnail,
+	URLButton,
+} from "oceanic-component-helper";
+import {
+	Client,
+	type ContainerComponent,
+	type PartialInviteChannel,
+	type User,
+} from "oceanic.js";
 
 export function renderGroupDMInvite(
 	bot: Client,
@@ -11,7 +24,7 @@ export function renderGroupDMInvite(
 	inviter: User | undefined,
 	totalMembers: number | undefined,
 	expiresAt: Date | undefined,
-	hideImages: boolean
+	hideImages: boolean,
 ): ContainerComponent {
 	const result = Container();
 
@@ -27,7 +40,7 @@ export function renderGroupDMInvite(
 	const iconURL: string | null = getChannelIconURL(bot, channel);
 
 	if (iconURL === null || hideImages) {
-		result.components.push(...mainInfo.map(content => Text(content)));
+		result.components.push(...mainInfo.map((content) => Text(content)));
 	} else {
 		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
 	}
@@ -41,7 +54,9 @@ export function renderGroupDMInvite(
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSecs(expiresAt);
 
-		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
+		result.components.push(
+			Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`),
+		);
 	}
 
 	if (iconURL !== null) {

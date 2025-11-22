@@ -1,5 +1,8 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { OptionType, type CommandContext } from "#plugin/core/public/command.ts";
+import {
+	OptionType,
+	type CommandContext,
+} from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -15,18 +18,25 @@ export default defineCommand({
 			name: ["name", "n"],
 			required: true,
 			position: 0,
-		}
+		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, tagsConfigStore, permissions => permissions.tag_send),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			tagsConfigStore,
+			(permissions) => permissions.tag_send,
+		),
 	async run(ctx, { name }) {
 		const tag = await getTag(ctx.squirrelCtx.db, ctx.guild.id, name);
 
 		if (tag === null) {
-			await ctx.respond(`${icons.error} Tag '${escapeMarkdown(name)}' could not be found!`);
+			await ctx.respond(
+				`${icons.error} Tag '${escapeMarkdown(name)}' could not be found!`,
+			);
 			return;
 		}
 
 		await ctx.respond(tag.content);
-	}
+	},
 });

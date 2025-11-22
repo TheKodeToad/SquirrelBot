@@ -21,17 +21,31 @@ export default defineCommand({
 			name: ["content", "c"],
 			required: true,
 			position: 1,
-		}
+		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, tagsConfigStore, permissions => permissions.tag_create),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			tagsConfigStore,
+			(permissions) => permissions.tag_create,
+		),
 	async run(ctx, args) {
-		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content);
+		const success = await createTag(
+			ctx.squirrelCtx.db,
+			ctx.guild.id,
+			args.name,
+			args.content,
+		);
 
 		if (success) {
-			await ctx.respond(`${icons.success} Created tag '${escapeMarkdown(args.name)}!'`);
+			await ctx.respond(
+				`${icons.success} Created tag '${escapeMarkdown(args.name)}!'`,
+			);
 		} else {
-			await ctx.respond(`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists! Update it with \`tagedit\`.`);
+			await ctx.respond(
+				`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists! Update it with \`tagedit\`.`,
+			);
 		}
-	}
-})
+	},
+});

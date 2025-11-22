@@ -2,25 +2,46 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
-import { EventListenerPhase, makeEventExtensionPoint } from "#extensionPoint.ts";
+import {
+	EventListenerPhase,
+	makeEventExtensionPoint,
+} from "#extensionPoint.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
-import { cancelGuildInfoDeletion, getAllGuildInfo, insertGuildInfo, markGuildAllowed, markGuildNotAllowed, markUnknownGuildAllowed, scheduleGuildInfoDeletion, updateGuildInfo } from "#plugin/core/storage/guildInfo.ts";
+import {
+	cancelGuildInfoDeletion,
+	getAllGuildInfo,
+	insertGuildInfo,
+	markGuildAllowed,
+	markGuildNotAllowed,
+	markUnknownGuildAllowed,
+	scheduleGuildInfoDeletion,
+	updateGuildInfo,
+} from "#plugin/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";
 import type { Pool } from "pg";
 
 const logger = moduleLogger();
 
-const allowedGuilds: Set<string> = new Set;
+const allowedGuilds: Set<string> = new Set();
 
 export type GuildAccessListener = (guildID: string) => void;
-export const onGuildAccessGranted = makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
-export const onGuildAccessRevoked = makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
-export const onGuildInfoReady = makeEventExtensionPoint<[ctx: SquirrelDiscordContext]>();
+export const onGuildAccessGranted =
+	makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
+export const onGuildAccessRevoked =
+	makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
+export const onGuildInfoReady =
+	makeEventExtensionPoint<[ctx: SquirrelDiscordContext]>();
 
 export default [
 	onBotInit(init, EventListenerPhase.Pre),
-	onBotEvent({ type: "guildCreate", listener: (ctx, guild) => handleCreate(ctx.db, guild) }),
-	onBotEvent({ type: "guildUpdate", listener: (ctx, guild, oldGuild) => handleUpdate(ctx.db, guild, oldGuild) }),
+	onBotEvent({
+		type: "guildCreate",
+		listener: (ctx, guild) => handleCreate(ctx.db, guild),
+	}),
+	onBotEvent({
+		type: "guildUpdate",
+		listener: (ctx, guild, oldGuild) => handleUpdate(ctx.db, guild, oldGuild),
+	}),
 ];
 
 async function init(ctx: SquirrelDiscordContext): Promise<void> {
@@ -58,13 +79,21 @@ async function init(ctx: SquirrelDiscordContext): Promise<void> {
 			continue;
 		}
 
-		if (guildInfo.name === realGuild.name
-			&& guildInfo.iconHash === realGuild.icon
-			&& guildInfo.ownerID === realGuild.ownerID) {
+		if (
+			guildInfo.name === realGuild.name &&
+			guildInfo.iconHash === realGuild.icon &&
+			guildInfo.ownerID === realGuild.ownerID
+		) {
 			continue;
 		}
 
-		await updateGuildInfo(ctx.db, guildInfo.id, realGuild.name, realGuild.icon, realGuild.ownerID);
+		await updateGuildInfo(
+			ctx.db,
+			guildInfo.id,
+			realGuild.name,
+			realGuild.icon,
+			realGuild.ownerID,
+		);
 	}
 
 	for (const missingGuildID of missing) {
@@ -90,7 +119,11 @@ async function handleCreate(db: Pool, guild: Guild): Promise<void> {
 	}
 }
 
-async function handleUpdate(db: Pool, guild: Guild, oldGuild: JSONGuild | null): Promise<void> {
+async function handleUpdate(
+	db: Pool,
+	guild: Guild,
+	oldGuild: JSONGuild | null,
+): Promise<void> {
 	if (oldGuild === null) {
 		return;
 	}
@@ -99,15 +132,16 @@ async function handleUpdate(db: Pool, guild: Guild, oldGuild: JSONGuild | null):
 		return;
 	}
 
-	if (oldGuild.name === guild.name
-		&& oldGuild.icon === guild.icon
-		&& oldGuild.ownerID === guild.ownerID) {
+	if (
+		oldGuild.name === guild.name &&
+		oldGuild.icon === guild.icon &&
+		oldGuild.ownerID === guild.ownerID
+	) {
 		return;
 	}
 
 	await updateGuildInfo(db, guild.id, guild.name, guild.icon, guild.ownerID);
 }
-
 
 export function isGuildAllowed(id: string): boolean {
 	return allowedGuilds.has(id) || BOT_ALLOWED_GUILDS.includes(id);
@@ -125,7 +159,10 @@ export function* getAllowedGuilds(): Generator<string> {
 	}
 }
 
-export async function grantAccess(ctx: SquirrelDiscordContext, id: string): Promise<boolean> {
+export async function grantAccess(
+	ctx: SquirrelDiscordContext,
+	id: string,
+): Promise<boolean> {
 	if (allowedGuilds.has(id)) {
 		return false;
 	}
@@ -153,7 +190,10 @@ export async function grantAccess(ctx: SquirrelDiscordContext, id: string): Prom
 	return true;
 }
 
-export async function revokeAccess(ctx: SquirrelDiscordContext, id: string): Promise<false | true | Date> {
+export async function revokeAccess(
+	ctx: SquirrelDiscordContext,
+	id: string,
+): Promise<false | true | Date> {
 	if (!allowedGuilds.has(id)) {
 		return false;
 	}
@@ -171,4 +211,3 @@ export async function revokeAccess(ctx: SquirrelDiscordContext, id: string): Pro
 		return date ?? false;
 	}
 }
-

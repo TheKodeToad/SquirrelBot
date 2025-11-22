@@ -1,4 +1,11 @@
-import type { AnyChannel, Client, Guild, Member, Uncached, User } from "oceanic.js";
+import type {
+	AnyChannel,
+	Client,
+	Guild,
+	Member,
+	Uncached,
+	User,
+} from "oceanic.js";
 
 export function debugFormatUser(user: User): string {
 	return `@${user.tag}[${user.id}]`;
@@ -28,6 +35,9 @@ export function debugFormatGuild(guild: Guild | Uncached): string {
 	return `*${name}[${guild.id}]`;
 }
 
-export function debugFormatPermissionContext(member: Member, channel: AnyChannel): string {
+export function debugFormatPermissionContext(
+	member: Member,
+	channel: AnyChannel,
+): string {
 	return `${debugFormatUser(member.user)} in ${debugFormatChannel(channel)}, ${debugFormatGuild(member.guild)}`;
 }

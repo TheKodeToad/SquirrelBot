@@ -10,17 +10,25 @@ import type { ClientEvents } from "oceanic.js";
 
 export interface BotEventListener<T extends keyof ClientEvents = any> {
 	type: T;
-	listener: (ctx: SquirrelDiscordContext, ...args: ClientEvents[T]) => Awaitable<void>;
+	listener: (
+		ctx: SquirrelDiscordContext,
+		...args: ClientEvents[T]
+	) => Awaitable<void>;
 }
 
-export function onBotEvent<T extends keyof ClientEvents>(listener: BotEventListener<T>): Contribution {
-	return _ => onBotEvent.contributions.push(listener);
+export function onBotEvent<T extends keyof ClientEvents>(
+	listener: BotEventListener<T>,
+): Contribution {
+	return (_) => onBotEvent.contributions.push(listener);
 }
 
 onBotEvent.contributions = [] as BotEventListener[];
 
-export function defineCommand<O extends Record<string, Option> = Record<string, Option>, D extends {} = {}>(command: Command<O, D>): Contribution {
-	return plugin => defineCommand.contributions.push([plugin, command]);
+export function defineCommand<
+	O extends Record<string, Option> = Record<string, Option>,
+	D extends {} = {},
+>(command: Command<O, D>): Contribution {
+	return (plugin) => defineCommand.contributions.push([plugin, command]);
 }
 
 defineCommand.contributions = [] as [Plugin, Command][];

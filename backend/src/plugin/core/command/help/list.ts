@@ -3,11 +3,26 @@ import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { getCommandsByPlugin } from "#plugin/core/commandEngine/commandCache.ts";
 import { canRunCommand } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import type { BaseCommandContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
+import type {
+	BaseCommandContext,
+	Reply,
+	ReplyObject,
+} from "#plugin/core/public/command.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { ActionRow, Container, Divider, StringSelect, Text, TextButton } from "oceanic-component-helper";
-import { MessageFlags, type ContainerComponent, type StringSelectMenu } from "oceanic.js";
+import {
+	ActionRow,
+	Container,
+	Divider,
+	StringSelect,
+	Text,
+	TextButton,
+} from "oceanic-component-helper";
+import {
+	MessageFlags,
+	type ContainerComponent,
+	type StringSelectMenu,
+} from "oceanic.js";
 
 interface CommandListState {
 	plugin: string;
@@ -15,12 +30,17 @@ interface CommandListState {
 	entries?: ContainerComponent["components"][];
 }
 
-export function renderCommandListPageMinimal(ctx: SquirrelDiscordContext, guildID: string): Reply {
+export function renderCommandListPageMinimal(
+	ctx: SquirrelDiscordContext,
+	guildID: string,
+): Reply {
 	return {
 		components: [
 			Text("**Select a plugin to view commands**"),
 			ActionRow([renderPluginSelection(ctx, null, guildID)]),
-			Text(`${icons.tip} You can also pass in the name of a command to view it directly.`)
+			Text(
+				`${icons.tip} You can also pass in the name of a command to view it directly.`,
+			),
 		],
 		async componentHandler(ctx, customID, values) {
 			if (customID !== "plugin") {
@@ -38,7 +58,11 @@ export function renderCommandListPageMinimal(ctx: SquirrelDiscordContext, guildI
 	};
 }
 
-function renderPluginSelection(ctx: SquirrelDiscordContext, selected: string | null, guildID: string): StringSelectMenu {
+function renderPluginSelection(
+	ctx: SquirrelDiscordContext,
+	selected: string | null,
+	guildID: string,
+): StringSelectMenu {
 	const select = StringSelect("plugin");
 
 	for (const plugin of ctx.plugins.values()) {
@@ -59,30 +83,40 @@ function renderPluginSelection(ctx: SquirrelDiscordContext, selected: string | n
 	return select;
 }
 
-export function renderCommandListPage(ctx: BaseCommandContext, state: CommandListState): ReplyObject {
+export function renderCommandListPage(
+	ctx: BaseCommandContext,
+	state: CommandListState,
+): ReplyObject {
 	const plugin = ctx.squirrelCtx.plugins.get(state.plugin);
 
 	if (plugin === undefined) {
 		return {
-			components: [Text(`${icons.error} No such plugin - '${state.plugin}'!`)]
+			components: [Text(`${icons.error} No such plugin - '${state.plugin}'!`)],
 		};
 	}
 
 	const container = Container([Text("## Help")]);
 
-	container.components.push(ActionRow([renderPluginSelection(ctx.squirrelCtx, state.plugin, ctx.guild.id)]));
+	container.components.push(
+		ActionRow([
+			renderPluginSelection(ctx.squirrelCtx, state.plugin, ctx.guild.id),
+		]),
+	);
 
 	let entries = state.entries;
 
 	if (entries === undefined) {
 		entries = [];
 
-		const prefix = coreConfigStore.get(ctx.guild.id)?.prefix_commands.prefix ?? "";
+		const prefix =
+			coreConfigStore.get(ctx.guild.id)?.prefix_commands.prefix ?? "";
 
 		for (const entry of getCommandsByPlugin(plugin.name) ?? []) {
 			const { command } = entry;
 
-			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true))) {
+			if (
+				!((command.supportPrefix ?? true) || (command.supportSlash ?? true))
+			) {
 				continue;
 			}
 
@@ -99,7 +133,12 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 			if (command.supportPrefix ?? true) {
 				entries.push([
 					summaryComponent,
-					Text("**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage)),
+					Text(
+						"**Usage:** " +
+							makeMarkdownInlineCodeblock(
+								prefix + command.name[0] + entry.usage,
+							),
+					),
 				]);
 			} else {
 				entries.push([summaryComponent]);
@@ -118,7 +157,11 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 	}
 
 	if (entries.length === 0) {
-		container.components.push(Text(`**${icons.info} You do not have access to any commands for this plugin!**`));
+		container.components.push(
+			Text(
+				`**${icons.info} You do not have access to any commands for this plugin!**`,
+			),
+		);
 	} else {
 		const prevDisabled = sliceStart === 0;
 		const nextDisabled = sliceEnd >= entries.length;
@@ -126,13 +169,17 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 		container.components.push(Divider());
 
 		if (!prevDisabled || !nextDisabled) {
-			container.components.push(ActionRow([
-				TextButton("←", "prev", { disabled: prevDisabled }),
-				TextButton("→", "next", { disabled: nextDisabled }),
-			]));
+			container.components.push(
+				ActionRow([
+					TextButton("←", "prev", { disabled: prevDisabled }),
+					TextButton("→", "next", { disabled: nextDisabled }),
+				]),
+			);
 		}
 
-		container.components.push(Text("-# Optional options are surrounded with []."));
+		container.components.push(
+			Text("-# Optional options are surrounded with []."),
+		);
 	}
 
 	return {
@@ -143,26 +190,32 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 			}
 
 			if (customID === "prev") {
-				await ctx.edit(renderCommandListPage(ctx, {
-					plugin: state.plugin,
-					entries,
-					page: state.page - 1,
-				}));
+				await ctx.edit(
+					renderCommandListPage(ctx, {
+						plugin: state.plugin,
+						entries,
+						page: state.page - 1,
+					}),
+				);
 			} else if (customID === "next") {
-				await ctx.edit(renderCommandListPage(ctx, {
-					plugin: state.plugin,
-					entries,
-					page: state.page + 1,
-				}));
+				await ctx.edit(
+					renderCommandListPage(ctx, {
+						plugin: state.plugin,
+						entries,
+						page: state.page + 1,
+					}),
+				);
 			} else if (customID === "plugin") {
 				if (values?.length !== 1) {
 					throw new Error("Selected plugin not present");
 				}
 
-				await ctx.edit(renderCommandListPage(ctx, {
-					plugin: values[0]!,
-					page: 0,
-				}));
+				await ctx.edit(
+					renderCommandListPage(ctx, {
+						plugin: values[0]!,
+						page: 0,
+					}),
+				);
 			}
 		},
 	};
