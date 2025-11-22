@@ -61,28 +61,28 @@ async function handleUpdate(ctx: SquirrelDiscordContext, message: Message): Prom
 		return;
 
 	await logEvent(ctx, message.guild, message.channelID, "message_edit", async () => {
-			const entry = await getMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
+		const entry = await getMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
 
-			if (entry?.content === message.content)
-				return null;
+		if (entry?.content === message.content)
+			return null;
 
-			// discord really loves to spam edit events when viewing old messages
-			if (message.content.length === 0)
-				return null;
+		// discord really loves to spam edit events when viewing old messages
+		if (message.content.length === 0)
+			return null;
 
-			await upsertMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id, {
-				authorID: message.author.id,
-				authorName: message.author.tag,
-				authorAvatarHash: message.author.avatar,
-				content: message.content,
-			});
+		await upsertMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id, {
+			authorID: message.author.id,
+			authorName: message.author.tag,
+			authorAvatarHash: message.author.avatar,
+			content: message.content,
+		});
 
-			return {
-				author: message.member !== undefined ? makeMemberUserView(message.member) : makeUserView(message.author),
-				old_message: { content: entry?.content },
-				new_message: { content: message.content }
-			};
-		}
+		return {
+			author: message.member !== undefined ? makeMemberUserView(message.member) : makeUserView(message.author),
+			old_message: { content: entry?.content },
+			new_message: { content: message.content }
+		};
+	}
 	);
 }
 
@@ -91,24 +91,24 @@ async function handleDelete(ctx: SquirrelDiscordContext, message: PossiblyUncach
 		return;
 
 	await logEvent(ctx, message.guild, message.channelID, "message_delete", async () => {
-			const entry = await takeMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
+		const entry = await takeMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
 
-			if (entry === null)
-				return null;
+		if (entry === null)
+			return null;
 
-			const avatarURL = entry.authorAvatarHash !== null
-				? ctx.bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
-				: getDefaultAvatarURL(ctx.bot, BigInt(entry.authorID));
+		const avatarURL = entry.authorAvatarHash !== null
+			? ctx.bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
+			: getDefaultAvatarURL(ctx.bot, BigInt(entry.authorID));
 
-			return {
-				author: {
-					id: entry.authorID,
-					tag: entry.authorName,
-					avatar: avatarURL
-				},
-				message: { content: entry.content }
-			};
-		}
+		return {
+			author: {
+				id: entry.authorID,
+				tag: entry.authorName,
+				avatar: avatarURL
+			},
+			message: { content: entry.content }
+		};
+	}
 	);
 
 }

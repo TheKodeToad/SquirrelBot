@@ -33,4 +33,4 @@ export default defineCommand({
 		else
 			await ctx.respond(`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists! Update it with \`tagedit\`.`);
 	}
-})
+});

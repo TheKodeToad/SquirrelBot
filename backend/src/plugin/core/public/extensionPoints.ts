@@ -1,7 +1,7 @@
 import type { Awaitable } from "#common/general.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { makeMapExtensionPoint } from "#extensionPoint.ts";
-import type { Plugin, Contribution } from "#plugin.ts";
+import type { Contribution, Plugin } from "#plugin.ts";
 import type { Command, Option } from "#plugin/core/public/command.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import type { ClientEvents } from "oceanic.js";

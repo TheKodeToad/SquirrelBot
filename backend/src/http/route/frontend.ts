@@ -30,7 +30,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 		id: plugin.id,
 		name: plugin.name,
 		description: plugin.description,
-	}))
+	}));
 
 	const constants = JSON.stringify({ env, plugins })
 		.replaceAll("<", "\\u003c")

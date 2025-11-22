@@ -18,7 +18,7 @@ let scheduler: PollingSchedulerHandle<Reminder> | null = null;
 export default [onBotInit(beginPollingReminders)];
 
 function debugFormatReminder(bot: Client, reminder: Reminder): string {
-    return `reminder #${reminder.number} in ${debugFormatGuildByID(bot, reminder.guildID)}`;
+	return `reminder #${reminder.number} in ${debugFormatGuildByID(bot, reminder.guildID)}`;
 }
 
 function getReminderKey(guildID: string, number: number): string {

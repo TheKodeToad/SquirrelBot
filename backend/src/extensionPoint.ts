@@ -1,6 +1,5 @@
 import type { Awaitable } from "#common/general.ts";
-import type { Contribution } from "#plugin.ts";
-import type { Plugin } from "#plugin.ts";
+import type { Contribution, Plugin } from "#plugin.ts";
 
 /**
  * Create an extension point collecting values into an array.

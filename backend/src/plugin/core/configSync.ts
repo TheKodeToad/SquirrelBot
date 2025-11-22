@@ -96,14 +96,14 @@ async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise
 
 async function createAndLoadConfigs(ctx: SquirrelDiscordContext, guildID: string): Promise<void> {
 	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
-			await acquireConfig(guildID, plugin.id, async () => {
-				const inserted = await insertGuildConfig(ctx.db, guildID, plugin.id, config.defaultValue);
+		await acquireConfig(guildID, plugin.id, async () => {
+			const inserted = await insertGuildConfig(ctx.db, guildID, plugin.id, config.defaultValue);
 
-				if (inserted)
-					logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(ctx.bot, guildID)}`);
+			if (inserted)
+				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(ctx.bot, guildID)}`);
 
-				await loadConfig(ctx, guildID, plugin.id, config.store);
-			});
+			await loadConfig(ctx, guildID, plugin.id, config.store);
+		});
 	}));
 }
 

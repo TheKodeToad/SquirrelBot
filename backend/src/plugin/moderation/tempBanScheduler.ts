@@ -31,7 +31,7 @@ async function beginPollingTempBans(ctx: SquirrelDiscordContext): Promise<void> 
 		getKey: ban => getTempBanKey(ban.guildID, ban.targetID),
 		getTimestamp: ban => ban.endsAt,
 		debugFormat: ban => debugFormatTempBan(ctx.bot, ban),
-	})
+	});
 }
 
 export function trackNewTempBan(tempBan: TempBan): void {
@@ -51,7 +51,7 @@ async function trigger(ctx: SquirrelDiscordContext, ban: TempBan): Promise<void>
 	}
 
 	try {
-		logger.debug?.(`Lifting expired ban of ${ban.targetID} in ${debugFormatGuild(guild)}`)
+		logger.debug?.(`Lifting expired ban of ${ban.targetID} in ${debugFormatGuild(guild)}`);
 		await guild.removeBan(ban.targetID, "Ban expired");
 	} catch (error) {
 		if (!(error instanceof DiscordRESTError))

@@ -1,8 +1,11 @@
+import eslint from "@eslint/js";
+import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-export default tseslint.config([
+export default defineConfig(
 	{ ignores: ["*.js"] },
-	tseslint.configs.recommendedTypeChecked,
+	eslint.configs.recommended,
+	tseslint.configs.recommended,
 	{
 		languageOptions: {
 			parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
@@ -16,6 +19,9 @@ export default tseslint.config([
 			"@typescript-eslint/restrict-template-expressions": ["error", { allow: [], allowNullish: false }],
 			"@typescript-eslint/no-misused-promises": "off", // "let me abuse promises in peace"
 			"@typescript-eslint/no-unsafe-enum-comparison": "off",
+			"@typescript-eslint/no-unsafe-assignment": "error",
+			"@typescript-eslint/no-unsafe-return": "error",
+			"@typescript-eslint/no-unsafe-argument": "error",
 			"@typescript-eslint/no-floating-promises": ["error", {
 				"allowForKnownSafeCalls": [
 					{ from: "package", name: ["test", "suite"], package: "node:test" }
@@ -26,4 +32,4 @@ export default tseslint.config([
 			"prefer-const": "warn"
 		}
 	}
-]);
+);

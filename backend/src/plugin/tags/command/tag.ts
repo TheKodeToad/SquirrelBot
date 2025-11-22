@@ -1,5 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { OptionType, type CommandContext } from "#plugin/core/public/command.ts";
+import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";

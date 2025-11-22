@@ -45,12 +45,12 @@ export async function squirrelInit(): Promise<SquirrelContext> {
 	};
 }
 
-export async function squirrelShutdown(ctx: SquirrelContext) {
-	ctx.db.end();
+export async function squirrelShutdown(ctx: SquirrelContext): Promise<void> {
+	await ctx.db.end();
 	ctx.dbNotifs.disconnect();
 }
 
-function preInit() {
+function preInit(): void {
 	// not sure if this is good practice but we certainly don't want a crash because we forgot await
 	process.on("unhandledRejection", error => {
 		logger.error?.("Unhandled Promise rejection!", error);

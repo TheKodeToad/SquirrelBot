@@ -1,5 +1,5 @@
 import { isTextableGuildChannel, isThreadChannel } from "#common/discord/general.ts";
-import { type AnyTextableGuildChannel, type AnyThreadChannel, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User, Client } from "oceanic.js";
+import { type AnyTextableGuildChannel, type AnyThreadChannel, Client, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User } from "oceanic.js";
 
 export async function fetchUserCached(bot: Client, userID: string): Promise<User> {
 	return bot.users.get(userID) ?? await bot.rest.users.get(userID);

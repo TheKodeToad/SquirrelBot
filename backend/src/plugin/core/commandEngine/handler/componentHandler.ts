@@ -6,7 +6,7 @@ import { transformReply } from "#plugin/core/helper/commands.ts";
 import type { ComponentContext, Reply, ReplyObject } from "#plugin/core/public/command.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { Text } from "oceanic-component-helper";
-import { ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyInteractionGateway, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
+import { Client, ComponentInteraction, Guild, Member, MessageFlags, Shard, User, type AnyInteractionGateway, type AnyTextableGuildChannel, type MessageComponentTypes } from "oceanic.js";
 
 interface ComponentHandler {
 	callback: NonNullable<ReplyObject["componentHandler"]>;
@@ -67,7 +67,7 @@ class ComponentContextImpl implements ComponentContext {
 	originalUserID: string;
 
 	squirrelCtx: SquirrelDiscordContext;
-	get bot() { return this.squirrelCtx.bot; }
+	get bot(): Client { return this.squirrelCtx.bot; }
 	get shard(): Shard { return this._interaction.guild.shard; }
 	get guild(): Guild { return this._interaction.guild; }
 	get user(): User { return this._interaction.user; };

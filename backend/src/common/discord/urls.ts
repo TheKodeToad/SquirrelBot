@@ -8,6 +8,6 @@ export function getChannelIconURL(bot: Client, channel: { id: string; icon?: str
 }
 
 // based on User.defaultAvatar and defaultAvatarURL
-export function getDefaultAvatarURL(bot: Client, id: bigint) {
+export function getDefaultAvatarURL(bot: Client, id: bigint): string {
 	return bot.util.formatImage(Routes.EMBED_AVATAR(Number(id >> 22n) % 6));
 }

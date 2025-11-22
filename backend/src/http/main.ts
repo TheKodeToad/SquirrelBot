@@ -76,5 +76,5 @@ setupShutdownHook(async () => {
 			resolve();
 	}));
 
-	squirrelShutdown(ctx);
+	await squirrelShutdown(ctx);
 });

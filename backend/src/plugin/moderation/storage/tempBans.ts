@@ -48,7 +48,7 @@ export async function upsertTempBan(db: Pool, guildID: string, options: CreateTi
 
 		`,
 		[guildID, options.targetID, options.endsAt, options.caseNumber]
-	)
+	);
 }
 
 export async function deleteTempBan(db: Pool, guildID: string, targetID: string): Promise<boolean> {
@@ -60,7 +60,7 @@ export async function deleteTempBan(db: Pool, guildID: string, targetID: string)
 				AND "targetID" = $2
 		`,
 		[guildID, targetID]
-	)
+	);
 
 	return result.rowCount === 1;
 }

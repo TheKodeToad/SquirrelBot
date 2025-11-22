@@ -1,5 +1,5 @@
 import type { SquirrelDiscordContext } from "#discord/index.ts";
-import { type AnyTextableGuildChannel, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User, Client } from "oceanic.js";
+import { type AnyTextableGuildChannel, Client, type CreateMessageOptions, Guild, Member, Message, type MessageComponent, Shard, User } from "oceanic.js";
 
 type NameList = [string, ...string[]];
 

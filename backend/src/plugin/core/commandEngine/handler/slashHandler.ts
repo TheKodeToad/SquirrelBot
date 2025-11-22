@@ -16,7 +16,7 @@ import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
 import { readFile, writeFile } from "fs/promises";
-import { type AnyInteractionGateway, type AnyTextableGuildChannel, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, type ApplicationCommandOptions as SlashOptions, ApplicationCommandOptionTypes as SlashOptionTypes, ApplicationCommandTypes as SlashTypes, User, Client } from "oceanic.js";
+import { type AnyInteractionGateway, type AnyTextableGuildChannel, Client, CommandInteraction, type CreateApplicationCommandOptions, Guild, Member, MessageFlags, Shard, type ApplicationCommandOptions as SlashOptions, ApplicationCommandOptionTypes as SlashOptionTypes, ApplicationCommandTypes as SlashTypes, User } from "oceanic.js";
 import path from "path";
 
 const logger = moduleLogger();

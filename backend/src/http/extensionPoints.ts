@@ -1,6 +1,6 @@
+import { makeArrayExtensionPoint, makeMultiMapExtensionPoint } from "#extensionPoint.ts";
 import type { SquirrelHTTPContext } from "#http/index.ts";
 import type { GuildAuthVars } from "#http/middleware/guildAuth.ts";
-import { makeArrayExtensionPoint, makeMultiMapExtensionPoint } from "#extensionPoint.ts";
 import type { Plugin } from "#plugin.ts";
 import type { Hono } from "hono";
 

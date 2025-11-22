@@ -1,4 +1,4 @@
-import { type AnyGuildChannel, ChannelTypes, GuildMemberFlags, Member, Permissions, Role, Client } from "oceanic.js";
+import { type AnyGuildChannel, ChannelTypes, Client, GuildMemberFlags, Member, Permissions, Role } from "oceanic.js";
 
 /**
  * Resolve member roles from cached guild.

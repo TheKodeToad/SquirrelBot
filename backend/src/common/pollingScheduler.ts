@@ -48,7 +48,7 @@ export async function startPollingScheduler<T>(options: PollingSchedulerOptions<
 			setRunTimeout(state, task);
 		},
 		untrack(key) {
-			clearTimeout(state.timeouts.get(key))
+			clearTimeout(state.timeouts.get(key));
 		}
 	};
 }
@@ -62,8 +62,8 @@ async function poll<T>(state: State<T>): Promise<void> {
 		end.getTime() === 0
 			? `Setting initial timeouts for #${state.options.discriminator} tasks`
 			: `Setting timeouts for #${state.options.discriminator} tasks`
-				+ ` from ${dateToHMSString(state.nextStartTimestamp)}`
-				+ ` to ${dateToHMSString(end)}`
+			+ ` from ${dateToHMSString(state.nextStartTimestamp)}`
+			+ ` to ${dateToHMSString(end)}`
 	);
 
 	const tasks = await state.options.poll(state.nextStartTimestamp, end);

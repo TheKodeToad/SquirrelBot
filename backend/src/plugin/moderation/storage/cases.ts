@@ -1,8 +1,8 @@
+import { poolTransaction } from "#common/pg/transaction.ts";
 import { dbParse } from "#storage/index.ts";
+import type { Pool } from "pg";
 import { z } from "zod/v4";
 import { ModEventType, reverseModEventType, type ModEvent } from "../public/modEvent.ts";
-import type { Pool } from "pg";
-import { poolTransaction } from "#common/pg/transaction.ts";
 
 const CaseInfo = z.strictObject({
 	guildID: z.string(),

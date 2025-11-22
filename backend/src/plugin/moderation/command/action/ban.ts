@@ -57,8 +57,8 @@ export default defineCommand({
 			: undefined;
 
 		const deleteMessageSeconds = args.purge !== null
-				? args.purge / 1000
-				: config.ban.purge_messages;
+			? args.purge / 1000
+			: config.ban.purge_messages;
 
 		const { successful, unsuccessful } = await performModActions(ctx.squirrelCtx, ctx.guild, args.user, target => ({
 			guild: ctx.guild,

@@ -1,8 +1,8 @@
-import { squirrelInit, squirrelShutdown } from "#index.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { setupShutdownHook } from "#common/shutdownHook.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { BOT_TOKEN, CACHE_PATH } from "#environment.ts";
+import { squirrelInit, squirrelShutdown } from "#index.ts";
 import { mkdir } from "node:fs/promises";
 import { Client, Constants } from "oceanic.js";
 
@@ -30,9 +30,9 @@ bot.once("ready", async () => {
 	try {
 		logger.debug?.("Ready event received");
 
-		setupShutdownHook(() => {
+		setupShutdownHook(async () => {
 			bot.disconnect(false);
-			squirrelShutdown(ctx);
+			await squirrelShutdown(ctx);
 		});
 
 		logger.debug?.("Firing onBotInit");

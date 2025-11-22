@@ -16,7 +16,7 @@ import type { Command, CommandContext, Reply } from "#plugin/core/public/command
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { resolvePermissions } from "#plugin/core/public/permissionResolution.ts";
-import { type AnyTextableGuildChannel, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User, Client } from "oceanic.js";
+import { type AnyTextableGuildChannel, Client, Guild, GuildChannel, Member, Message, MessageFlags, MessageTypes, Permissions, type PossiblyUncachedMessage, Shard, User } from "oceanic.js";
 
 const logger = moduleLogger();
 

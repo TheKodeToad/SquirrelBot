@@ -1,4 +1,3 @@
-import { makeDurationView } from "#common/template/duration.ts";
 import { makeGuildView } from "#common/template/guild.ts";
 import { makeUserView } from "#common/template/user.ts";
 import { OptionType } from "#plugin/core/public/command.ts";

@@ -8,7 +8,7 @@ import { MemberRanking } from "#plugin/moderation/config.ts";
 import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
 import { performModAction, type ModAction, type ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
-import { ModEventType, type ModEvent} from "#plugin/moderation/public/modEvent.ts";
+import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
 
 export default defineCommand({

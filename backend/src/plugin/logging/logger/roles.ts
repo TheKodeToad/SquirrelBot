@@ -36,20 +36,20 @@ async function handleCreate(ctx: SquirrelDiscordContext, guild: Guild | Uncached
 		return;
 
 	await logEvent(ctx, guild, null, "role_create", async () => {
-			const changes = parseRoleUpdates(entry.changes ?? []);
-			const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
+		const changes = parseRoleUpdates(entry.changes ?? []);
+		const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
 
-			return {
-				actor: makeMemberUserView(actor),
-				role: makeRoleView({
-					id: entry.targetID!,
-					name: changes.name!.new!,
-					color: changes.color?.new,
-					hoist: changes.hoist?.new,
-					mentionable: changes.mentionable?.new,
-				})
-			};
-		}
+		return {
+			actor: makeMemberUserView(actor),
+			role: makeRoleView({
+				id: entry.targetID!,
+				name: changes.name!.new!,
+				color: changes.color?.new,
+				hoist: changes.hoist?.new,
+				mentionable: changes.mentionable?.new,
+			})
+		};
+	}
 	);
 }
 
@@ -61,36 +61,36 @@ async function handleUpdate(ctx: SquirrelDiscordContext, guild: Guild | Uncached
 		return;
 
 	await logEvent(ctx, guild, null, "role_update", async () => {
-			const changes = parseRoleUpdates(entry.changes ?? []);
-			const name = changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
+		const changes = parseRoleUpdates(entry.changes ?? []);
+		const name = changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
 
-			if (name === undefined)
-				return null;
+		if (name === undefined)
+			return null;
 
-			const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
+		const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
 
-			return {
-				actor: makeMemberUserView(actor),
-				name_changed: changes.name?.new !== undefined,
-				color_changed: changes.color?.new !== undefined,
-				hoisted_changed: changes.hoist?.new !== undefined,
-				mentionable_changed: changes.mentionable?.new !== undefined,
-				old_role: makeRoleView({
-					id: entry.targetID!,
-					name: changes.name?.old,
-					color: changes.color?.old,
-					hoist: changes.hoist?.old,
-					mentionable: changes.mentionable?.old,
-				}),
-				new_role: makeRoleView({
-					id: entry.targetID!,
-					name: changes.name!.new!,
-					color: changes.color?.new,
-					hoist: changes.hoist?.new,
-					mentionable: changes.mentionable?.new,
-				})
-			};
-		}
+		return {
+			actor: makeMemberUserView(actor),
+			name_changed: changes.name?.new !== undefined,
+			color_changed: changes.color?.new !== undefined,
+			hoisted_changed: changes.hoist?.new !== undefined,
+			mentionable_changed: changes.mentionable?.new !== undefined,
+			old_role: makeRoleView({
+				id: entry.targetID!,
+				name: changes.name?.old,
+				color: changes.color?.old,
+				hoist: changes.hoist?.old,
+				mentionable: changes.mentionable?.old,
+			}),
+			new_role: makeRoleView({
+				id: entry.targetID!,
+				name: changes.name!.new!,
+				color: changes.color?.new,
+				hoist: changes.hoist?.new,
+				mentionable: changes.mentionable?.new,
+			})
+		};
+	}
 	);
 }
 
@@ -102,19 +102,19 @@ async function handleDelete(ctx: SquirrelDiscordContext, guild: Guild | Uncached
 		return;
 
 	await logEvent(ctx, guild, null, "role_delete", async () => {
-			const changes = parseRoleUpdates(entry.changes ?? []);
-			const actor = await fetchUserCached(ctx.bot, entry.userID!);
+		const changes = parseRoleUpdates(entry.changes ?? []);
+		const actor = await fetchUserCached(ctx.bot, entry.userID!);
 
-			return {
-				moderator: makeUserView(actor),
-				role: makeRoleView({
-					id: entry.targetID!,
-					name: changes.name!.new!,
-					color: changes.color?.new,
-					hoist: changes.hoist?.new,
-					mentionable: changes.mentionable?.new,
-				})
-			};
-		}
+		return {
+			moderator: makeUserView(actor),
+			role: makeRoleView({
+				id: entry.targetID!,
+				name: changes.name!.new!,
+				color: changes.color?.new,
+				hoist: changes.hoist?.new,
+				mentionable: changes.mentionable?.new,
+			})
+		};
+	}
 	);
 }

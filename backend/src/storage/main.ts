@@ -12,7 +12,7 @@ case "perform": {
 
 	const count = await migrate(db, args.includes("--ignore-changes"));
 
-	db.end();
+	await db.end();
 
 	if (count > 0)
 		console.log(`Done ${count} migrations!`);
@@ -27,7 +27,7 @@ case "check": {
 
 	const count = await checkMigrations(db);
 
-	db.end();
+	await db.end();
 
 	if (count > 0) {
 		console.error(`${count} migrations needed!`);
