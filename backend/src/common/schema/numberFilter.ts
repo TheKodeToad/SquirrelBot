@@ -14,9 +14,9 @@ export const NumberFilter = z.string()
 		let numberString = input;
 		let mode = NumberFilterMode.Equals;
 
-		if (numberString.startsWith("="))
+		if (numberString.startsWith("=")) {
 			numberString = numberString.substring(1);
-		else if (numberString.startsWith("!=")) {
+		} else if (numberString.startsWith("!=")) {
 			mode = NumberFilterMode.NotEquals;
 			numberString = numberString.substring(2);
 		} else if (numberString.startsWith("<=")) {

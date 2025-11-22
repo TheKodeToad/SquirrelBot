@@ -20,8 +20,9 @@ export async function checkMigrations(db: ClientBase): Promise<number> {
 export async function checkMigrationsOrExit(db: ClientBase): Promise<void> {
 	const migrationsNeeded = await checkMigrations(db);
 
-	if (migrationsNeeded === null)
+	if (migrationsNeeded === null) {
 		process.exit(1);
+	}
 
 	if (migrationsNeeded > 0) {
 		console.error(`${migrationsNeeded} migrations needed!`);
@@ -56,26 +57,30 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 	for (const name of await fs.readdir(base)) {
 		const itemPath = path.join(base, name);
 
-		if (!(await fs.stat(itemPath)).isFile())
+		if (!(await fs.stat(itemPath)).isFile()) {
 			continue;
+		}
 
 		const pattern = /^([0-9]+)-.+\.sql$/;
 		const matches = pattern.exec(name);
 
-		if (!matches)
+		if (!matches) {
 			continue;
+		}
 
 		const number = Number(matches[1]);
 
-		if (Number.isNaN(number))
+		if (Number.isNaN(number)) {
 			continue;
+		}
 
 		files[number] = itemPath;
 	}
 
 	for (const [number, file] of files.entries()) {
-		if (file === undefined)
+		if (file === undefined) {
 			throw new MigrationError(`Migration files are missing or numbers were skipped`);
+		}
 
 		const { rows } = await client.query(
 			`
@@ -107,12 +112,14 @@ async function processMigrations(client: ClientBase, checkOnly: boolean, ignoreC
 						[number, contentChecksum]
 					);
 					continue;
-				} else
+				} else {
 					throw new MigrationError(message + " - you may bypass this with pnpm migration perform --ignore-changes");
+				}
 			}
 
-			if (!checkOnly)
+			if (!checkOnly) {
 				console.log(`Skipping "${file}" as it has already been run`);
+			}
 
 			continue;
 		}

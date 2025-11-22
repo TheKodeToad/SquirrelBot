@@ -28,10 +28,11 @@ const grantAccessCommand = defineCommand({
 	async run(ctx, args) {
 		const guildName = ctx.bot.guilds.get(args.guild)?.name ?? "<unknown server name>";
 
-		if (await grantAccess(ctx.squirrelCtx, args.guild))
+		if (await grantAccess(ctx.squirrelCtx, args.guild)) {
 			await ctx.respond(`${icons.success} Granted access to **${escapeMarkdown(guildName)}**!`);
-		else
+		} else {
 			await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** already has access to the app!`);
+		}
 	},
 });
 
@@ -56,22 +57,23 @@ const revokeAccessCommand = defineCommand({
 		const result = await revokeAccess(ctx.squirrelCtx, args.guild);
 
 		if (result !== false) {
-			if (result instanceof Date)
+			if (result instanceof Date) {
 				await ctx.respond(
 					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
 					+ `Plugin data will be purged on <t:${dateToUnixSecs(result)}:d>.`
 				);
-			else
+			} else {
 				await ctx.respond(
 					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
 					+ "The server might still have access if it is configured in the environment."
 				);
-
+			}
 		} else {
-			if (BOT_ALLOWED_GUILDS.includes(args.guild))
+			if (BOT_ALLOWED_GUILDS.includes(args.guild)) {
 				await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** cannot be removed as it is configured in the app's environment!`);
-			else
+			} else {
 				await ctx.respond(`${icons.error} Server **${escapeMarkdown(guildName)}** does not have access to the app!`);
+			}
 		}
 	},
 });

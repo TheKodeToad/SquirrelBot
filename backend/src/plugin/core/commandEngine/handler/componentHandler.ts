@@ -23,16 +23,19 @@ export default [
 ];
 
 async function handle(squirrelCtx: SquirrelDiscordContext, interaction: AnyInteractionGateway): Promise<void> {
-	if (!interaction.inCachedGuildChannel())
+	if (!interaction.inCachedGuildChannel()) {
 		return;
+	}
 
-	if (!interaction.isComponentInteraction())
+	if (!interaction.isComponentInteraction()) {
 		return;
+	}
 
 	const handler = activeHandlers.get(interaction.message.id);
 
-	if (handler === undefined)
+	if (handler === undefined) {
 		return;
+	}
 
 	const ctx = new ComponentContextImpl(squirrelCtx, interaction, handler.originalUserID);
 
@@ -104,14 +107,15 @@ class ComponentContextImpl implements ComponentContext {
 
 			await this._interaction.editFollowup(this._responseID, messageOptions).then(message => this._responseID ??= message?.id ?? null);
 		} else {
-			if (this._acked)
+			if (this._acked) {
 				await this._ackPromise;
-			else
+			} else {
 				this._clearTimeout();
+			}
 
-			if (this._edited)
+			if (this._edited) {
 				await this._interaction.createFollowup(messageOptions).then(response => this._responseID = response.message.id);
-			else {
+			} else {
 				await this._interaction.createMessage(messageOptions).then(
 					({ callback }) => this._responseID ??= callback.resource?.message?.id ?? null
 				);
@@ -120,8 +124,9 @@ class ComponentContextImpl implements ComponentContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.componentHandler !== undefined && this._responseID !== null)
+		if (typeof reply !== "string" && reply.componentHandler !== undefined && this._responseID !== null) {
 			listenForInteractions(this._responseID, this.originalUserID, reply.componentHandler);
+		}
 	}
 
 	async edit(reply: Reply): Promise<void> {
@@ -139,8 +144,9 @@ class ComponentContextImpl implements ComponentContext {
 			this._acked = true;
 		}
 
-		if (typeof reply !== "string" && reply.componentHandler !== undefined)
+		if (typeof reply !== "string" && reply.componentHandler !== undefined) {
 			listenForInteractions(this._interaction.message.id, this.originalUserID, reply.componentHandler);
+		}
 	}
 
 	_clearTimeout(): void {
@@ -153,7 +159,8 @@ class ComponentContextImpl implements ComponentContext {
 	async _abandon(): Promise<void> {
 		this._clearTimeout();
 
-		if (!this._acked)
+		if (!this._acked) {
 			await this._interaction.deferUpdate();
+		}
 	}
 }

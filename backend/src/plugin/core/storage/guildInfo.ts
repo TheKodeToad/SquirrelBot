@@ -44,8 +44,9 @@ export async function getGuildInfo(db: Pool, id: string): Promise<GuildInfo | nu
 		[id]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(GuildInfo, result.rows[0]);
 }
@@ -80,8 +81,9 @@ export async function getGuildOwnerID(db: Pool, id: string): Promise<string | nu
 		[id]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(JustOwnerID, result.rows[0]).ownerID;
 }
@@ -209,10 +211,11 @@ export async function scheduleGuildInfoDeletion(db: Pool, id: string): Promise<D
 		[id, date]
 	);
 
-	if (result.rowCount !== 0)
+	if (result.rowCount !== 0) {
 		return date;
-	else
+	} else {
 		return null;
+	}
 }
 
 export async function cancelGuildInfoDeletion(db: Pool, id: string): Promise<void> {

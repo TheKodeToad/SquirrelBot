@@ -10,13 +10,15 @@ export function permissionsGuard<C extends ConfigWithPermissions>(
 ): false | PermissionsGuardData<C> {
 	const config = configCache.get(ctx.guild.id);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return false;
+	}
 
 	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (requirement !== undefined && !requirement(permissions, config))
+	if (requirement !== undefined && !requirement(permissions, config)) {
 		return false;
+	}
 
 	return { config, permissions };
 }

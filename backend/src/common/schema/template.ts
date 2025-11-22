@@ -14,8 +14,9 @@ export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 				escape: allowEscape ? value => escapeMarkdown(String(value)) : undefined,
 			});
 		} catch (error) {
-			if (!(error instanceof TemplateCompileError || error instanceof TemplateParseError))
+			if (!(error instanceof TemplateCompileError || error instanceof TemplateParseError)) {
 				throw error;
+			}
 
 			ctx.addIssue({ message: error.message, code: "custom" });
 			return z.NEVER;

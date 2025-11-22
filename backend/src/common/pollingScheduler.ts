@@ -42,8 +42,9 @@ export async function startPollingScheduler<T>(options: PollingSchedulerOptions<
 
 	return {
 		track(task) {
-			if (state.options.getTimestamp(task) >= state.nextStartTimestamp)
+			if (state.options.getTimestamp(task) >= state.nextStartTimestamp) {
 				return;
+			}
 
 			setRunTimeout(state, task);
 		},
@@ -69,8 +70,9 @@ async function poll<T>(state: State<T>): Promise<void> {
 	const tasks = await state.options.poll(state.nextStartTimestamp, end);
 	state.nextStartTimestamp = end;
 
-	for (const task of tasks)
+	for (const task of tasks) {
 		setRunTimeout(state, task);
+	}
 }
 
 function setRunTimeout<T>(state: State<T>, task: T): void {

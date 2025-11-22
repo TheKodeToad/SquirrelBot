@@ -49,11 +49,13 @@ export function untrackReminder(guildID: string, number: number): void {
 
 async function fire(ctx: SquirrelDiscordContext, reminder: Reminder): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!
-	if (!await deleteReminder(ctx.db, reminder.guildID, reminder.number))
+	if (!await deleteReminder(ctx.db, reminder.guildID, reminder.number)) {
 		return;
+	}
 
-	if (!remindersConfigStore.has(reminder.guildID))
+	if (!remindersConfigStore.has(reminder.guildID)) {
 		return;
+	}
 
 	const guild = ctx.bot.guilds.get(reminder.guildID);
 
@@ -71,15 +73,17 @@ async function fire(ctx: SquirrelDiscordContext, reminder: Reminder): Promise<vo
 		try {
 			var potentialThread = await fetchThreadCached(ctx.bot, guild, reminder.channelID);
 		} catch (error) {
-			if (!(error instanceof DiscordRESTError))
+			if (!(error instanceof DiscordRESTError)) {
 				throw error;
+			}
 
 			logger.debug?.(`Thread was deleted; not sending ${debugFormatReminder(ctx.bot, reminder)}`);
 			return;
 		}
 
-		if (potentialThread === null)
+		if (potentialThread === null) {
 			throw new Error("Inconsistent channel type - channel stopped being a thread?");
+		}
 
 		channel = potentialThread;
 	} else {
@@ -90,8 +94,9 @@ async function fire(ctx: SquirrelDiscordContext, reminder: Reminder): Promise<vo
 			return;
 		}
 
-		if (!isTextableChannel(potentialChannel))
+		if (!isTextableChannel(potentialChannel)) {
 			throw new Error("Inconsistent channel type - channel stopped being textable?");
+		}
 
 		channel = potentialChannel;
 	}
@@ -104,8 +109,9 @@ async function fire(ctx: SquirrelDiscordContext, reminder: Reminder): Promise<vo
 	try {
 		var reminderOwner = await fetchMemberCached(ctx.bot, guild, reminder.ownerID);
 	} catch (error) {
-		if (!(error instanceof DiscordRESTError))
+		if (!(error instanceof DiscordRESTError)) {
 			throw error;
+		}
 
 		return;
 	}
@@ -119,21 +125,25 @@ async function fire(ctx: SquirrelDiscordContext, reminder: Reminder): Promise<vo
 
 	let content = `${icons.bell} **Reminder for <@${reminder.ownerID}> set at <t:${dateToUnixSecs(reminder.createdAt)}>!**`;
 
-	if ((Date.now() - reminder.firesAt.getTime()) >= 10 * 60 * 1000)
+	if ((Date.now() - reminder.firesAt.getTime()) >= 10 * 60 * 1000) {
 		content += `\n${icons.warning} Reminder running late! This is likely due to downtime.`;
+	}
 
-	if (reminder.message !== null)
+	if (reminder.message !== null) {
 		content += "\n>>> " + reminder.message;
+	}
 
 	let flags = 0;
 
-	if (reminder.silent)
+	if (reminder.silent) {
 		flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
+	}
 
 	const reminderOwnerPerms = channel.permissionsOf(reminderOwner);
 
-	if (!reminderOwnerPerms.has(Permissions.EMBED_LINKS))
+	if (!reminderOwnerPerms.has(Permissions.EMBED_LINKS)) {
 		flags |= MessageFlags.SUPPRESS_EMBEDS;
+	}
 
 	await channel.createMessage({
 		content,

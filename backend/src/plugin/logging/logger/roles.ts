@@ -12,8 +12,9 @@ export default [
 ];
 
 async function handleAuditLog(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
-	if (!(guild instanceof Guild))
+	if (!(guild instanceof Guild)) {
 		return;
+	}
 
 	switch (entry.actionType) {
 	case AuditLogActionTypes.ROLE_CREATE:
@@ -29,11 +30,13 @@ async function handleAuditLog(ctx: SquirrelDiscordContext, guild: Guild | Uncach
 }
 
 async function handleCreate(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
-	if (!(guild instanceof Guild))
+	if (!(guild instanceof Guild)) {
 		return;
+	}
 
-	if (entry.targetID === null || entry.userID === null)
+	if (entry.targetID === null || entry.userID === null) {
 		return;
+	}
 
 	await logEvent(ctx, guild, null, "role_create", async () => {
 		const changes = parseRoleUpdates(entry.changes ?? []);
@@ -54,18 +57,21 @@ async function handleCreate(ctx: SquirrelDiscordContext, guild: Guild | Uncached
 }
 
 async function handleUpdate(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
-	if (!(guild instanceof Guild))
+	if (!(guild instanceof Guild)) {
 		return;
+	}
 
-	if (entry.targetID === null || entry.userID === null)
+	if (entry.targetID === null || entry.userID === null) {
 		return;
+	}
 
 	await logEvent(ctx, guild, null, "role_update", async () => {
 		const changes = parseRoleUpdates(entry.changes ?? []);
 		const name = changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
 
-		if (name === undefined)
+		if (name === undefined) {
 			return null;
+		}
 
 		const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
 
@@ -95,11 +101,13 @@ async function handleUpdate(ctx: SquirrelDiscordContext, guild: Guild | Uncached
 }
 
 async function handleDelete(ctx: SquirrelDiscordContext, guild: Guild | Uncached, entry: AuditLogEntry): Promise<void> {
-	if (!(guild instanceof Guild))
+	if (!(guild instanceof Guild)) {
 		return;
+	}
 
-	if (entry.targetID === null || entry.userID === null)
+	if (entry.targetID === null || entry.userID === null) {
 		return;
+	}
 
 	await logEvent(ctx, guild, null, "role_delete", async () => {
 		const changes = parseRoleUpdates(entry.changes ?? []);

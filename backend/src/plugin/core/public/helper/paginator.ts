@@ -37,11 +37,13 @@ async function renderPaginator<E, K>(
 
 	const hasMore = queryResult.length > paginator.pageSize;
 
-	if (hasMore)
+	if (hasMore) {
 		queryResult.splice(queryResult.length - 1, 1);
+	}
 
-	if (reversed)
+	if (reversed) {
 		queryResult.reverse();
+	}
 
 	const reply = await paginator.render(queryResult);
 

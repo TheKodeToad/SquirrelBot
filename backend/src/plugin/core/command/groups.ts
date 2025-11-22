@@ -26,8 +26,9 @@ export default defineCommand({
 	async run(ctx, args) {
 		const coreConfig = coreConfigCache.get(ctx.guild.id);
 
-		if (coreConfig === undefined)
+		if (coreConfig === undefined) {
 			return;
+		}
 
 		let member = ctx.member;
 
@@ -35,8 +36,9 @@ export default defineCommand({
 			try {
 				member = await fetchMemberCached(ctx.bot, ctx.guild, args.user);
 			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
+				if (!(error instanceof DiscordRESTError)) {
 					throw error;
+				}
 
 				if (error.code === JSONErrorCodes.UNKNOWN_MEMBER) {
 					await ctx.respond(`${icons.error} The specified user is not a member of the server!`);
@@ -53,7 +55,8 @@ export default defineCommand({
 		if (result.groups.size !== 0) {
 			const groups = Array.from(result.groups).toSorted().map(makeMarkdownInlineCodeblock);
 			await ctx.respond(`${icons.info} Groups for ${formatUserBold(ctx.user)}: ${groups.join(", ")} (permission level ${result.level})`);
-		} else
+		} else {
 			await ctx.respond(`${icons.info} ${formatUserBold(ctx.user)} is not in any groups!`);
+		}
 	},
 });

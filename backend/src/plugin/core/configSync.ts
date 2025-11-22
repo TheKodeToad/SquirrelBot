@@ -37,14 +37,16 @@ function formatGuildPlugin(bot: Client, guildID: string, pluginID: string): stri
 
 async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise<void> {
 	await ctx.dbNotifs.addListener("core_configUpdate", async payload => {
-		if (payload === undefined)
+		if (payload === undefined) {
 			return;
+		}
 
 		try {
 			var payloadObject: unknown = JSON.parse(payload);
 		} catch (error) {
-			if (!(error instanceof SyntaxError))
+			if (!(error instanceof SyntaxError)) {
 				throw error;
+			}
 
 			logger.warn?.("Malformed JSON in configUpdate payload", error);
 			return;
@@ -99,8 +101,9 @@ async function createAndLoadConfigs(ctx: SquirrelDiscordContext, guildID: string
 		await acquireConfig(guildID, plugin.id, async () => {
 			const inserted = await insertGuildConfig(ctx.db, guildID, plugin.id, config.defaultValue);
 
-			if (inserted)
+			if (inserted) {
 				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(ctx.bot, guildID)}`);
+			}
 
 			await loadConfig(ctx, guildID, plugin.id, config.store);
 		});
@@ -118,29 +121,32 @@ const coreConfigDefault = CoreConfig.parse({} satisfies z.input<typeof CoreConfi
 async function loadConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
 	const value = await parseConfig(ctx, guildID, pluginID, configStore);
 
-	if (value !== null)
+	if (value !== null) {
 		configStore.set(guildID, value);
-	else {
-		if (pluginID === "core")
+	} else {
+		if (pluginID === "core") {
 			configStore.set(guildID, coreConfigDefault);
-		else
+		} else {
 			configStore.delete(guildID);
+		}
 	}
 }
 
 async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
 	const rawValue = await getGuildConfig(ctx.db, guildID, pluginID);
 
-	if (rawValue === null)
+	if (rawValue === null) {
 		return null;
+	}
 
 	try {
 		var table = parseToml(rawValue);
 	} catch (error) {
-		if (!(error instanceof TomlError))
+		if (!(error instanceof TomlError)) {
 			logger.error?.("Unexpected error parsing TOML (bug)", error);
-		else
+		} else {
 			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`, error);
+		}
 
 		return null;
 	}
@@ -151,8 +157,9 @@ async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginI
 			return null;
 		}
 
-		if (table.enabled !== true)
+		if (table.enabled !== true) {
 			return null;
+		}
 	}
 
 	delete table.enabled;

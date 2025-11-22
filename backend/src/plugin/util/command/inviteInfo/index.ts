@@ -49,13 +49,15 @@ export default defineCommand({
 		try {
 			var invite = await stealthyGetInvite(ctx.bot, code);
 		} catch (error) {
-			if (!(error instanceof DiscordRESTError))
+			if (!(error instanceof DiscordRESTError)) {
 				throw error;
+			}
 
-			if (error.code === JSONErrorCodes.UNKNOWN_INVITE)
+			if (error.code === JSONErrorCodes.UNKNOWN_INVITE) {
 				await ctx.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! It might not be visible to apps.`);
-			else
+			} else {
 				await ctx.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
+			}
 
 			return;
 		}
@@ -74,11 +76,11 @@ export default defineCommand({
 				invite.expiresAt,
 				args.hideImages ?? false
 			);
-		} else if (invite.type === InviteTypes.FRIEND && invite.inviter !== undefined)
+		} else if (invite.type === InviteTypes.FRIEND && invite.inviter !== undefined) {
 			container = renderFriendInvite(invite.inviter, invite.expiresAt, args.hideImages ?? false);
-		else if (invite.type === InviteTypes.GROUP_DM && invite.channel !== null)
+		} else if (invite.type === InviteTypes.GROUP_DM && invite.channel !== null) {
 			container = renderGroupDMInvite(ctx.bot, invite.channel, invite.inviter, invite.approximateMemberCount, invite.expiresAt, args.hideImages ?? false);
-		else {
+		} else {
 			await ctx.respond(`${icons.error} Unknown invite type!`);
 			return;
 		}
@@ -99,8 +101,9 @@ function stealthyGetInvite(bot: Client, code: string) {
 	const oldValue = bot.options.auth;
 
 	try {
-		if (trivialDesc && bot.options.auth?.startsWith(prefix))
+		if (trivialDesc && bot.options.auth?.startsWith(prefix)) {
 			bot.options.auth = bot.options.auth.substring(prefix.length);
+		}
 
 		var result = bot.rest.channels.getInvite(code, {
 			withCounts: true,

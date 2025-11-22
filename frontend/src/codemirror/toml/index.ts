@@ -9,8 +9,9 @@ export const tomlLanguage = LRLanguage.define({
 			}),
 			foldNodeProp.add({
 				"Table ArrayTable": node => {
-					if (node.firstChild === null || node.lastChild === null)
+					if (node.firstChild === null || node.lastChild === null) {
 						return null;
+					}
 
 					return { from: node.firstChild.to, to: node.lastChild.to };
 				},

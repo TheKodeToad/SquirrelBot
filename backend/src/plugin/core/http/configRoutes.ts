@@ -7,21 +7,24 @@ export default defineGlobalPluginGuildRoutes((squirrelCtx, plugin, app) => {
 	app.get("/config", async ctx => {
 		const config = await getGuildConfig(squirrelCtx.db, ctx.var.discordGuildID, plugin.id);
 
-		if (config === null)
+		if (config === null) {
 			throw new HTTPException(404, { message: "Config does not exist" });
+		}
 
 		return ctx.body(config, 200, { "Content-Type": "application/toml" });
 	});
 
 	app.put("/config", async ctx => {
-		if (ctx.req.header("Content-Type") !== "application/toml")
+		if (ctx.req.header("Content-Type") !== "application/toml") {
 			throw new HTTPException(400, { message: "Content-Type is not application/toml" });
+		}
 
 		const body = await ctx.req.text();
 		const exists = await updateGuildConfig(squirrelCtx.db, ctx.var.discordGuildID, plugin.id, body);
 
-		if (!exists)
+		if (!exists) {
 			throw new HTTPException(404, { message: "Config does not exist" });
+		}
 
 		await notifyChannel(
 			squirrelCtx.db,

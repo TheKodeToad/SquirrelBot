@@ -59,19 +59,23 @@ export default defineCommand({
 					break;
 				}
 
-				if (isUndeletableMessageType(message.type))
+				if (isUndeletableMessageType(message.type)) {
 					continue;
+				}
 
-				if (args.match !== null && !message.content.includes(args.match))
+				if (args.match !== null && !message.content.includes(args.match)) {
 					continue;
+				}
 
 				const byBot = message.author.bot || message.webhookID !== undefined; // TODO: maybe slightly annoying with PluralKit/Tupperbox?
 
-				if (args.apps !== null && args.apps !== byBot)
+				if (args.apps !== null && args.apps !== byBot) {
 					continue;
+				}
 
-				if (args.author.length !== 0 && !args.author.includes(message.author.id))
+				if (args.author.length !== 0 && !args.author.includes(message.author.id)) {
 					continue;
+				}
 
 				toDelete.push(message.id);
 			}
@@ -79,13 +83,15 @@ export default defineCommand({
 			await ctx.channel.deleteMessages(toDelete);
 			purged += toDelete.length;
 
-			if (stop)
+			if (stop) {
 				break;
+			}
 		}
 
-		if (purged === 0)
+		if (purged === 0) {
 			await ctx.respond(`${icons.error} No messages were purged!`);
-		else
+		} else {
 			await ctx.respond(`${icons.success} Purged **${purged} messages**!`);
+		}
 	},
 });

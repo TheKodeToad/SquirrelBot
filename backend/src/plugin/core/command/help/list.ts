@@ -23,11 +23,13 @@ export function renderCommandListPageMinimal(ctx: SquirrelDiscordContext, guildI
 			Text(`${icons.tip} You can also pass in the name of a command to view it directly.`)
 		],
 		async componentHandler(ctx, customID, values) {
-			if (customID !== "plugin")
+			if (customID !== "plugin") {
 				return;
+			}
 
-			if (values?.length !== 1)
+			if (values?.length !== 1) {
 				throw new Error("Selected plugin not present");
+			}
 
 			const page = renderCommandListPage(ctx, { plugin: values[0]!, page: 0 });
 			page.flags ??= MessageFlags.EPHEMERAL;
@@ -42,8 +44,9 @@ function renderPluginSelection(ctx: SquirrelDiscordContext, selected: string | n
 	for (const plugin of ctx.plugins.values()) {
 		const config = defineConfig.contributions.get(plugin);
 
-		if (config !== undefined && !config.store.has(guildID))
+		if (config !== undefined && !config.store.has(guildID)) {
 			continue;
+		}
 
 		select.options.push({
 			label: plugin.name,
@@ -79,25 +82,28 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 		for (const entry of getCommandsByPlugin(plugin.name) ?? []) {
 			const { command } = entry;
 
-			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true)))
+			if (!((command.supportPrefix ?? true) || (command.supportSlash ?? true))) {
 				continue;
+			}
 
-			if (!canRunCommand(ctx.squirrelCtx, command, ctx.member, ctx.channel))
+			if (!canRunCommand(ctx.squirrelCtx, command, ctx.member, ctx.channel)) {
 				continue;
+			}
 
 			const summaryComponent = Text("### " + command.name[0] + "\n");
 
-			if (command.description !== undefined)
+			if (command.description !== undefined) {
 				summaryComponent.content += command.description + "\n";
+			}
 
 			if (command.supportPrefix ?? true) {
 				entries.push([
 					summaryComponent,
 					Text("**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage)),
 				]);
-			}
-			else
+			} else {
 				entries.push([summaryComponent]);
+			}
 		}
 	}
 
@@ -111,9 +117,9 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 		container.components.push(...entry);
 	}
 
-	if (entries.length === 0)
+	if (entries.length === 0) {
 		container.components.push(Text(`**${icons.info} You do not have access to any commands for this plugin!**`));
-	else {
+	} else {
 		const prevDisabled = sliceStart === 0;
 		const nextDisabled = sliceEnd >= entries.length;
 
@@ -132,8 +138,9 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 	return {
 		components: [container],
 		async componentHandler(ctx, customID, values) {
-			if (ctx.originalUserID !== ctx.user.id)
+			if (ctx.originalUserID !== ctx.user.id) {
 				return;
+			}
 
 			if (customID === "prev") {
 				await ctx.edit(renderCommandListPage(ctx, {
@@ -148,8 +155,9 @@ export function renderCommandListPage(ctx: BaseCommandContext, state: CommandLis
 					page: state.page + 1,
 				}));
 			} else if (customID === "plugin") {
-				if (values?.length !== 1)
+				if (values?.length !== 1) {
 					throw new Error("Selected plugin not present");
+				}
 
 				await ctx.edit(renderCommandListPage(ctx, {
 					plugin: values[0]!,

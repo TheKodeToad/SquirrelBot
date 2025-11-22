@@ -62,8 +62,9 @@ export async function getMessageCacheEntry(db: Pool, guildID: string, channelID:
 		[guildID, channelID, id]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(MessageCacheEntry, result.rows[0]);
 }
@@ -78,8 +79,9 @@ export async function takeMessageCacheEntry(db: Pool, guildID: string, channelID
 		[guildID, channelID, id]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(MessageCacheEntry, result.rows[0]);
 }

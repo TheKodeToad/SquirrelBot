@@ -38,8 +38,9 @@ function baseExtensions(options: {
 			}
 		}),
 		EditorView.updateListener.of(update => {
-			if (update.docChanged)
+			if (update.docChanged) {
 				options.markDirty();
+			}
 		}),
 	];
 }
@@ -48,10 +49,11 @@ export function ConfigEditor(props: { guildID: string; plugin: string; }) {
 	const guild = () => useGuild(props.guildID);
 
 	const [resource] = createResource(() => [guild(), props.plugin], () => {
-		if (guild() !== undefined)
+		if (guild() !== undefined) {
 			return getGuildConfig(account()!.token, guild()!.id, props.plugin);
-		else
+		} else {
 			return undefined;
+		}
 	});
 
 	const [saving, setSaving] = createSignal(false);

@@ -14,10 +14,11 @@ export function setupShutdownHook(callback: () => Awaitable<void>): void {
 
 		logger.info?.(`Received ${signal}; attempting graceful shutdown`);
 
-		if (signal === "SIGTERM")
+		if (signal === "SIGTERM") {
 			exitingAfter = 30;
-		else
+		} else {
 			exitingAfter = 5;
+		}
 
 		setTimeout(() => {
 			logger.warn?.(`Forced exit after waiting for ${exitingAfter} seconds`);

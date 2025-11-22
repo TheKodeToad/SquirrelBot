@@ -20,8 +20,9 @@ export async function getTag(db: Pool, guildID: string, name: string): Promise<T
 		[guildID, name]
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	return dbParse(Tag, result.rows[0]);
 }

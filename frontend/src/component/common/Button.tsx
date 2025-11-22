@@ -17,11 +17,13 @@ export function Button(props: ButtonProps) {
 	const classes = () => {
 		let result = `button button-${props.color ?? "secondary"}`;
 
-		if (props.small)
+		if (props.small) {
 			result += " button-small";
+		}
 
-		if (props.active)
+		if (props.active) {
 			result += " button-active";
+		}
 
 		return result;
 	};

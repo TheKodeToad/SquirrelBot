@@ -34,29 +34,34 @@ export function formatUserBold(user: UserLike): string {
 }
 
 export function formatUserTag(user: UserLike): string {
-	if ("tag" in user)
+	if ("tag" in user) {
 		return escapeMarkdown(user.tag);
-	else
+	}
+	else {
 		return "\\<unknown\\>";
+	}
 }
 
 /** This should be used in user lookup commands to nicely present information next to the name which otherwise would be displayed elsewhere. */
 export function formatUserTagRich(user: User | Member): string {
-	if ("user" in user)
+	if ("user" in user) {
 		user = user.user;
+	}
 
 	let result = escapeMarkdown(user.tag || user.globalName || "<unknown>");
 
-	if (user.clan !== null)
+	if (user.clan !== null) {
 		result += " \\[" + escapeMarkdown(user.clan.tag) + "\\]";
+	}
 
-	if (user.system)
+	if (user.system) {
 		result += " \\[SYSTEM\\]";
-	else if (user.bot) {
-		if (user.publicFlags & UserFlags.VERIFIED_BOT)
+	} else if (user.bot) {
+		if (user.publicFlags & UserFlags.VERIFIED_BOT) {
 			result += " \\[✔\u8201APP]\\";
-		else
+		} else {
 			result += " \\[APP\\]";
+		}
 	}
 
 	return result;

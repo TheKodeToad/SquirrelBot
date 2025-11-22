@@ -9,8 +9,9 @@ suite("duration parsing", () => {
 		const reader = new StringReader(input);
 		const result = readDuration(reader);
 
-		if (result === null || reader.canRead())
+		if (result === null || reader.canRead()) {
 			throw new Error(`Invalid input: '${input}'`);
+		}
 
 		assert.equal(result, expected, `'${humanizeDuration(result)}' == '${humanizeDuration(expected)}' (input: '${input}')`);
 	};

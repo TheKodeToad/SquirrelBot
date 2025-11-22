@@ -29,8 +29,9 @@ export default defineCommand({
 
 	preRun: (ctx) => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
 	async run(ctx, args) {
-		if (ctx.guild === null)
+		if (ctx.guild === null) {
 			return;
+		}
 
 		const now = Date.now();
 		const firesAt = now + args.delay;

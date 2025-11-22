@@ -14,8 +14,9 @@ export function moduleLogger(): Logger {
 	const scriptName = fileURLToPath(getCallSites()[1]!.scriptName);
 	let discriminator = path.relative("src", scriptName);
 
-	if (discriminator.endsWith(".ts"))
+	if (discriminator.endsWith(".ts")) {
 		discriminator = discriminator.substring(0, discriminator.lastIndexOf("."));
+	}
 
 	return new Logger(discriminator);
 }
@@ -92,8 +93,9 @@ export class Logger {
 	get fatal(): LoggerFunction | undefined { return this.log(LogLevel.Fatal); }
 
 	log(level: LogLevel): LoggerFunction | undefined {
-		if (LOG_LEVEL > level)
+		if (LOG_LEVEL > level) {
 			return undefined;
+		}
 
 		return (message, data) => {
 			// you mean you DON'T know ansi escape codes off by heart

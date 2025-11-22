@@ -54,11 +54,13 @@ async function trigger(ctx: SquirrelDiscordContext, ban: TempBan): Promise<void>
 		logger.debug?.(`Lifting expired ban of ${ban.targetID} in ${debugFormatGuild(guild)}`);
 		await guild.removeBan(ban.targetID, "Ban expired");
 	} catch (error) {
-		if (!(error instanceof DiscordRESTError))
+		if (!(error instanceof DiscordRESTError)) {
 			throw error;
+		}
 
-		if (error.code !== Constants.JSONErrorCodes.UNKNOWN_BAN)
+		if (error.code !== Constants.JSONErrorCodes.UNKNOWN_BAN) {
 			logger.debug?.(`Failed to lift expired ban of ${ban.targetID} in ${debugFormatGuild(guild)}`);
+		}
 	} finally {
 		// TODO: does this always run, even if the catch throws
 		await deleteTempBan(ctx.db, ban.guildID, ban.targetID);

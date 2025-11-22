@@ -48,8 +48,9 @@ export default defineCommand({
 			try {
 				var ban = await ctx.guild.getBan(target);
 			} catch (error) {
-				if (!(error instanceof DiscordRESTError))
+				if (!(error instanceof DiscordRESTError)) {
 					throw error;
+				}
 
 				if (error.code === JSONErrorCodes.UNKNOWN_BAN) {
 					unsuccessful.push({
@@ -84,17 +85,19 @@ export default defineCommand({
 
 			const actionResult = await performModAction(ctx.squirrelCtx, action);
 
-			if ("error" in actionResult)
+			if ("error" in actionResult) {
 				unsuccessful.push(actionResult);
-			else
+			} else {
 				successful.push(actionResult);
+			}
 		}
 
 		if (args.user.length === 1) {
-			if (successful.length === 1)
+			if (successful.length === 1) {
 				await ctx.respond(`${icons.success} Unbanned ${formatModActionSuccess(successful[0]!)}!`);
-			else if (unsuccessful.length === 1)
+			} else if (unsuccessful.length === 1) {
 				await ctx.respond(`${icons.error} Could not unban ${formatModActionFailure(unsuccessful[0]!)}!`);
+			}
 		} else {
 			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
 			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");

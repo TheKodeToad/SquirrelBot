@@ -35,18 +35,21 @@ async function beginMessageCleanupLoop(ctx: SquirrelDiscordContext): Promise<voi
 }
 
 async function handleCreate(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
-	if (message.guildID === null)
+	if (message.guildID === null) {
 		return;
+	}
 
 	const config = loggingConfigStore.get(message.guildID);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return;
+	}
 
 	const shouldTrack = config.loggers.some(logger => logger.events.message_edit || logger.events.message_delete);
 
-	if (!shouldTrack)
+	if (!shouldTrack) {
 		return;
+	}
 
 	await upsertMessageCacheEntry(ctx.db, message.guildID, message.channelID, message.id, {
 		authorID: message.author.id,
@@ -57,18 +60,21 @@ async function handleCreate(ctx: SquirrelDiscordContext, message: Message): Prom
 }
 
 async function handleUpdate(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
-	if (message.guild === null)
+	if (message.guild === null) {
 		return;
+	}
 
 	await logEvent(ctx, message.guild, message.channelID, "message_edit", async () => {
 		const entry = await getMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
 
-		if (entry?.content === message.content)
+		if (entry?.content === message.content) {
 			return null;
+		}
 
 		// discord really loves to spam edit events when viewing old messages
-		if (message.content.length === 0)
+		if (message.content.length === 0) {
 			return null;
+		}
 
 		await upsertMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id, {
 			authorID: message.author.id,
@@ -87,14 +93,16 @@ async function handleUpdate(ctx: SquirrelDiscordContext, message: Message): Prom
 }
 
 async function handleDelete(ctx: SquirrelDiscordContext, message: PossiblyUncachedMessage): Promise<void> {
-	if (message.guild == null)
+	if (message.guild == null) {
 		return;
+	}
 
 	await logEvent(ctx, message.guild, message.channelID, "message_delete", async () => {
 		const entry = await takeMessageCacheEntry(ctx.db, message.guild!.id, message.channelID, message.id);
 
-		if (entry === null)
+		if (entry === null) {
 			return null;
+		}
 
 		const avatarURL = entry.authorAvatarHash !== null
 			? ctx.bot.util.formatImage(Routes.USER_AVATAR(entry.authorID, entry.authorAvatarHash))
@@ -108,7 +116,5 @@ async function handleDelete(ctx: SquirrelDiscordContext, message: PossiblyUncach
 			},
 			message: { content: entry.content }
 		};
-	}
-	);
-
+	});
 }

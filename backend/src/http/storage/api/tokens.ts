@@ -37,20 +37,23 @@ export async function generateToken(db: Pool, userID: string): Promise<[token: s
 async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
 	const splitIndex = token.indexOf(".");
 
-	if (splitIndex === -1)
+	if (splitIndex === -1) {
 		return null;
+	}
 
 	const userIDPart = token.slice(0, splitIndex);
 	const secretPart = token.slice(splitIndex + 1);
 
-	if (userIDPart.length === 0 || secretPart.length === 0)
+	if (userIDPart.length === 0 || secretPart.length === 0) {
 		return null;
+	}
 
 	try {
 		var userID = BigInt("0x" + userIDPart);
 	} catch (error) {
-		if (!(error instanceof SyntaxError))
+		if (!(error instanceof SyntaxError)) {
 			throw error;
+		}
 
 		return null;
 	}
@@ -67,8 +70,9 @@ async function tokenKey(token: string): Promise<[bigint, Buffer] | null> {
 export async function validateToken(db: Pool, token: string): Promise<string | null> {
 	const key: [bigint, Buffer] | null = await tokenKey(token);
 
-	if (key === null)
+	if (key === null) {
 		return null;
+	}
 
 	const result = await db.query(
 		`
@@ -79,8 +83,9 @@ export async function validateToken(db: Pool, token: string): Promise<string | n
 		key
 	);
 
-	if (result.rowCount !== 1)
+	if (result.rowCount !== 1) {
 		return null;
+	}
 
 	const { expiresAt, userID } = dbParse(TokenInfo, result.rows[0]);
 
@@ -112,8 +117,9 @@ export async function validateToken(db: Pool, token: string): Promise<string | n
 export async function deleteToken(db: Pool, token: string): Promise<boolean> {
 	const key = await tokenKey(token);
 
-	if (key === null)
+	if (key === null) {
 		return false;
+	}
 
 	const result = await db.query(
 		`

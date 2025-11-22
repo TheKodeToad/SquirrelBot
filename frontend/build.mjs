@@ -18,9 +18,9 @@ const context = await esbuild.context({
 	logLevel: "info",
 });
 
-if (watch)
+if (watch) {
 	await context.watch();
-else {
+} else {
 	await context.rebuild();
 	await context.dispose();
 }

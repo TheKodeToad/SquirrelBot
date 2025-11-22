@@ -5,10 +5,11 @@ import type { StringReader } from "#plugin/core/commandEngine/parsing/stringRead
 export function readBoolean(reader: StringReader): boolean | null {
 	const result = reader.readWord().toLowerCase();
 
-	if (result === "false" || result === "f" || result === "0")
+	if (result === "false" || result === "f" || result === "0") {
 		return false;
-	else if (result === "true" || result === "t" || result === "1")
+	} else if (result === "true" || result === "t" || result === "1") {
 		return true;
+	}
 
 	return null;
 }
@@ -16,8 +17,9 @@ export function readBoolean(reader: StringReader): boolean | null {
 export function readInteger(reader: StringReader): number | null {
 	const result = parseInt(reader.readWord());
 
-	if (!Number.isSafeInteger(result))
+	if (!Number.isSafeInteger(result)) {
 		return null;
+	}
 
 	return result;
 }
@@ -25,8 +27,9 @@ export function readInteger(reader: StringReader): number | null {
 export function readNumber(reader: StringReader): number | null {
 	const result = parseFloat(reader.readWord());
 
-	if (!Number.isFinite(result))
+	if (!Number.isFinite(result)) {
 		return null;
+	}
 
 	return result;
 }
@@ -38,10 +41,11 @@ export function readNumber(reader: StringReader): number | null {
  */
 export function readString(reader: StringReader, terminator?: RegExp): string | null {
 	if (!(reader.peek() === "'" || reader.peek() === '"') || reader.peek() === "`") {
-		if (terminator !== undefined)
+		if (terminator !== undefined) {
 			return reader.readUntil(terminator);
-		else
+		} else {
 			return reader.readWord();
+		}
 	}
 
 	// potentially slow :(
@@ -54,13 +58,15 @@ export function readString(reader: StringReader, terminator?: RegExp): string | 
 	const escapedQuote = endQuote + endQuote;
 
 	while (reader.read() !== endQuote) {
-		if (!reader.canRead())
+		if (!reader.canRead()) {
 			return null;
+		}
 
 		result += reader.peek(0);
 
-		if (reader.skipOver(escapedQuote))
+		if (reader.skipOver(escapedQuote)) {
 			result += endQuote;
+		}
 	}
 
 	return result;
@@ -69,8 +75,9 @@ export function readString(reader: StringReader, terminator?: RegExp): string | 
 export function readSnowflake(reader: StringReader): string | null {
 	const id = reader.readWord();
 
-	if (!isSnowflake(id))
+	if (!isSnowflake(id)) {
 		return null;
+	}
 
 	return id;
 }
@@ -88,17 +95,20 @@ export function readChannel(reader: StringReader): string | null {
 }
 
 function readMention(reader: StringReader, prefix: "@" | "&" | "#"): string | null {
-	if (!reader.skipOver("<" + prefix))
+	if (!reader.skipOver("<" + prefix)) {
 		return readSnowflake(reader);
+	}
 
-	if (prefix === "@")
+	if (prefix === "@") {
 		reader.skipOver("!");
+	}
 
 	const id = reader.readUntil(">");
 	reader.read(); // skip trailing >
 
-	if (!isSnowflake(id))
+	if (!isSnowflake(id)) {
 		return null;
+	}
 
 	return id;
 }
@@ -144,8 +154,9 @@ export function readDuration(reader: StringReader): number | null {
 		reader.skipOver(DURATION_SEPARATOR);
 	}
 
-	if (!Number.isSafeInteger(total))
+	if (!Number.isSafeInteger(total)) {
 		return null;
+	}
 
 	return total;
 }

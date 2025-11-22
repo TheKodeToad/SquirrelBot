@@ -19,11 +19,13 @@ class MockMember implements Member {
 	}
 
 	get guildID() {
-		if (this._props.guildID !== undefined)
+		if (this._props.guildID !== undefined) {
 			return this._props.guildID;
+		}
 
-		if (this._props.guild !== undefined)
+		if (this._props.guild !== undefined) {
 			return this._props.guild.id;
+		}
 
 		return todo();
 	}
@@ -37,16 +39,19 @@ class MockMember implements Member {
 	}
 
 	get tag(): string {
-		if (this._props.tag !== undefined)
+		if (this._props.tag !== undefined) {
 			return this._props.tag;
+		}
 
-		if (this.user !== null)
+		if (this.user !== null) {
 			return this.user.tag;
+		}
 
-		if (this.discriminator === "0")
+		if (this.discriminator === "0") {
 			return this.username;
-		else
+		} else {
 			return this.username + "#" + this.discriminator;
+		}
 	}
 
 	get avatar() { return this._props.avatar ?? null; }

@@ -33,8 +33,9 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 	app.post("/", validate("json", LogInPayload), async ctx => {
 		const { code, codeVerifier } = ctx.req.valid("json");
 
-		if (typeof code !== "string")
+		if (typeof code !== "string") {
 			throw new HTTPException(400, { message: "Missing code" });
+		}
 
 		const tokenResponse = await fetch("https://discord.com/api/v10/oauth2/token", {
 			method: "POST",
@@ -52,8 +53,9 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 			}),
 		});
 
-		if (!tokenResponse.ok)
+		if (!tokenResponse.ok) {
 			throw new HTTPException(500, { message: "Failed fetching OAuth token" });
+		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const tokenJSON: TokenResponse = await tokenResponse.json();
@@ -61,11 +63,13 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 
 		const userResponse = await fetch("https://discord.com/api/v10/users/@me", { headers: { "Authorization": auth } });
 
-		if (userResponse.status === 401)
+		if (userResponse.status === 401) {
 			throw new HTTPException(500, { message: "Application deauthorized" });
+		}
 
-		if (!userResponse.ok)
+		if (!userResponse.ok) {
 			throw new HTTPException(500, { message: "Failed fetching Discord user" });
+		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const userJSON: UserResponse = await userResponse.json();

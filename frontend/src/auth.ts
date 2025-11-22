@@ -36,26 +36,30 @@ const [callbackStatus, setCallbackStatus] = createSignal<CallbackStatus | null>(
 export const loginCallbackStatus = callbackStatus;
 
 export async function handleLoginCallback() {
-	if (window.location.pathname !== "/log-in")
+	if (window.location.pathname !== "/log-in") {
 		return;
+	}
 
 	const params = new URLSearchParams(window.location.search);
 
 	const code = params.get("code");
 
-	if (code === null)
+	if (code === null) {
 		throw new Error("Missing code in URL");
+	}
 
 	const state = params.get("state");
 
-	if (state !== null)
+	if (state !== null) {
 		history.replaceState(null, "", state);
+	}
 
 	const verifier = sessionStorage.getItem("authVerifier");
 	sessionStorage.removeItem("authVerifier");
 
-	if (verifier === null)
+	if (verifier === null) {
 		throw new Error("Login was not initiated in the same session");
+	}
 
 	setCallbackStatus({ state: "working" });
 

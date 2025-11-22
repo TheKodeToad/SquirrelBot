@@ -6,9 +6,9 @@ export const DUMMY_GUILD = mockSnowflake();
 export function mockSnowflake(): string {
 	const now = Date.now();
 
-	if (lastTime === now)
+	if (lastTime === now) {
 		++increment;
-	else {
+	} else {
 		lastTime = now;
 		increment = 0n;
 	}

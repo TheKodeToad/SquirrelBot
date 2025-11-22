@@ -33,23 +33,28 @@ const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
 setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL).unref();
 
 async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, prevResponse?: Message): Promise<boolean> {
-	if (!message.inCachedGuildChannel())
+	if (!message.inCachedGuildChannel()) {
 		return false;
+	}
 
 	// yes, non-bot webhook is/has been possible
-	if (message.author.bot || message.author.system || message.webhookID !== undefined)
+	if (message.author.bot || message.author.system || message.webhookID !== undefined) {
 		return false;
+	}
 
-	if (!ALLOWED_MESSAGE_TYPES.includes(message.type))
+	if (!ALLOWED_MESSAGE_TYPES.includes(message.type)) {
 		return false;
+	}
 
-	if (!canWriteInChannel(squirrelCtx.bot, message.channel, message.channel.guild.clientMember))
+	if (!canWriteInChannel(squirrelCtx.bot, message.channel, message.channel.guild.clientMember)) {
 		return false;
+	}
 
 	const config = coreConfigStore.get(message.guildID);
 
-	if (config === undefined)
+	if (config === undefined) {
 		return false;
+	}
 
 	const { prefix } = config.prefix_commands;
 
@@ -57,13 +62,15 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 
 	const name = readPrefixName(reader, prefix);
 
-	if (name === null)
+	if (name === null) {
 		return false;
+	}
 
 	const perms = resolvePermissions(config, message.member, message.channel);
 
-	if (!perms.prefix_commands)
+	if (!perms.prefix_commands) {
 		return false;
+	}
 
 	const commandEntry = getCommandByName(name);
 
@@ -81,8 +88,9 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 		return false;
 	}
 
-	if (data == null)
+	if (data == null) {
 		throw new Error("Nullish value returned from preRun!");
+	}
 
 	const args = readPrefixArgs(reader, commandEntry);
 
@@ -93,8 +101,9 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 			+ `${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`
 		);
 
-		if (ctx._response !== null)
+		if (ctx._response !== null) {
 			trackedMessages.set(message.id, ctx._response);
+		}
 
 		return true;
 	}
@@ -105,8 +114,9 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		await commandEntry.command.run(ctx, args.result as any, data);
 
-		if (commandEntry.command.trackUpdates && ctx._response !== null)
+		if (commandEntry.command.trackUpdates && ctx._response !== null) {
 			trackedMessages.set(message.id, ctx._response);
+		}
 	} catch (error) {
 		try {
 			await ctx.respond(`:boom: Failed to execute command`);
@@ -122,23 +132,27 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 async function handleEdit(ctx: SquirrelDiscordContext, message: Message): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
-	if (!response)
+	if (!response) {
 		return;
+	}
 
-	if (response !== null)
+	if (response !== null) {
 		unlistenForInteractions(response.id);
+	}
 
 	trackedMessages.delete(message.id);
 
-	if (!await handle(ctx, message, response))
+	if (!await handle(ctx, message, response)) {
 		await response.delete();
+	}
 }
 
 async function handleDelete(_: SquirrelDiscordContext, message: PossiblyUncachedMessage): Promise<void> {
 	const response = trackedMessages.get(message.id);
 
-	if (!response)
+	if (!response) {
 		return;
+	}
 
 	trackedMessages.delete(message.id);
 	unlistenForInteractions(response.id);
@@ -175,14 +189,16 @@ class PrefixContext implements CommandContext {
 		}
 
 		if (this.message.channel instanceof GuildChannel
-			&& !canWriteInChannel(this.bot, this.message.channel, this.message.channel.guild.clientMember))
+			&& !canWriteInChannel(this.bot, this.message.channel, this.message.channel.guild.clientMember)) {
 			return;
+		}
 
 		if (this._response === null) {
 			const config = coreConfigStore.get(this.guild.id);
 
-			if (config === undefined)
+			if (config === undefined) {
 				return;
+			}
 
 			if (
 				config.prefix_commands.reply
@@ -197,15 +213,17 @@ class PrefixContext implements CommandContext {
 					},
 					...messageOptions
 				});
-			} else
+			} else {
 				this._response = await this.channel.createMessage(messageOptions);
+			}
 		} else {
 			unlistenForInteractions(this._response.id);
 			await this._response.edit(messageOptions);
 		}
 
-		if (typeof reply !== "string" && reply.componentHandler !== undefined)
+		if (typeof reply !== "string" && reply.componentHandler !== undefined) {
 			listenForInteractions(this._response.id, this.message.author.id, reply.componentHandler);
+		}
 	}
 
 	async _delete(): Promise<void> {

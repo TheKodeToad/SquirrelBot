@@ -28,24 +28,27 @@ export function makeRoleView(role: RoleViewable): RoleView {
 		id: role.id,
 		name: role.name,
 		get color() {
-			if (role.color !== undefined)
+			if (role.color !== undefined) {
 				return paddedHex(role.color, 3);
-			else
+			} else {
 				return undefined;
+			}
 		},
 		hoisted: role.hoist,
 		mentionable: role.mentionable,
 
 		get mention() { return `<@&${role.id}>`; },
 		get name_mention() {
-			if (role.name === undefined)
+			if (role.name === undefined) {
 				return this.mention;
+			}
 
 			return `${escapeMarkdown(role.name)} ${this.mention}`;
 		},
 		get name_bold_mention() {
-			if (role.name === undefined)
+			if (role.name === undefined) {
 				return this.mention;
+			}
 
 			return `**${escapeMarkdown(role.name)}** ${this.mention}`;
 		},
