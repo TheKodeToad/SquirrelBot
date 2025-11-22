@@ -89,7 +89,6 @@ export default defineCommand({
 	},
 });
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function stealthyGetInvite(bot: Client, code: string) {
 	// HACK: I am very sorry
 	// remove Bot prefix because Discord API lets you resolve more invites for some reason (??)

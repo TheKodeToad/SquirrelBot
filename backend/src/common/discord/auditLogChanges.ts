@@ -16,7 +16,6 @@ export interface RoleUpdates {
 }
 
 export function parseUpdates(changes: AuditLogChange[]): AuditLogUpdates {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const result: AuditLogUpdates = Object.create(null);
 
 	for (const change of changes) {

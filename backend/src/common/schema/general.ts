@@ -28,7 +28,6 @@ export const NamedColor = z.enum(Object.keys(colors))
 
 export const Color = z.union([HexColor, NamedColor]);
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function mappedEnum<I extends string, O>(map: Readonly<Record<I, O>>, params?: string | $ZodEnumParams) {
 	return z.enum(Object.keys(map) as I[], params).transform(input => map[input]);
 }

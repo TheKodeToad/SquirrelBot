@@ -111,7 +111,6 @@ async function handle(squirrelCtx: SquirrelDiscordContext, message: Message, pre
 	logger.debug?.(`Parsed arguments; running '${name}'`, args);
 
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		await commandEntry.command.run(ctx, args.result as any, data);
 
 		if (commandEntry.command.trackUpdates && ctx._response !== null) {

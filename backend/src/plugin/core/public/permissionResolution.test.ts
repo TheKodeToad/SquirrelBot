@@ -26,7 +26,6 @@ const Permissions = z.strictObject({
 	permission_overrides: z.object(PermissionsFilter.shape).array(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function mockCustomConfig(value: string): z.output<typeof Permissions> {
 	return Permissions.parse(parseTOML(value));
 }

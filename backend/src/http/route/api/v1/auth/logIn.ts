@@ -57,7 +57,6 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 			throw new HTTPException(500, { message: "Failed fetching OAuth token" });
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const tokenJSON: TokenResponse = await tokenResponse.json();
 		const auth = tokenJSON.token_type + " " + tokenJSON.access_token;
 
@@ -71,7 +70,6 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 			throw new HTTPException(500, { message: "Failed fetching Discord user" });
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const userJSON: UserResponse = await userResponse.json();
 
 		await fetch("https://discord.com/api/v10/oauth2/token/revoke", {

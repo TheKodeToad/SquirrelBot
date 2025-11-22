@@ -177,6 +177,5 @@ async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginI
 		return null;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 	return result.data as any;
 }

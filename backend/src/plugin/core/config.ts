@@ -49,7 +49,6 @@ export type CoreConfig = z.output<typeof CoreConfig>;
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.RefinementCtx<Record<string, CoreGroup>>) {
 	// show all errors for invalid inherits references at once
 	let hasIssues = false;
