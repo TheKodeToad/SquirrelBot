@@ -46,8 +46,8 @@ export async function squirrelInit(): Promise<SquirrelContext> {
 }
 
 export async function squirrelShutdown(ctx: SquirrelContext): Promise<void> {
-	await ctx.db.end();
 	ctx.dbNotifs.disconnect();
+	await ctx.db.end();
 }
 
 function preInit(): void {
