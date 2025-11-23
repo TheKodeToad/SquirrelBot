@@ -11,7 +11,7 @@
 		"typecheck": "tsc",
 		"lint": "eslint",
 		"reformat": "pnpm run formatting --write",
-		"formatting": "prettier src/**/*.ts",
+		"formatting": "prettier eslint.config.js src/**/*.ts",
 		"test": "pnpm run _node --test src/**/*.test.ts",
 		"_node": "node --import=@swc-node/register/esm-register --env-file=.env --disable-proto=throw --enable-source-maps"
 	},
