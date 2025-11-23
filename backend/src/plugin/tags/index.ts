@@ -2,7 +2,7 @@ import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
 import tag from "#plugin/tags/command/tag.ts";
-import tagCreate from "#plugin/tags/command/tagCreate.ts";
+import tagSet from "#plugin/tags/command/tagSet.ts";
 import { TagsConfig } from "#plugin/tags/config.ts";
 
 export const tagsConfigStore = new ConfigStore(TagsConfig);
@@ -27,6 +27,6 @@ export default definePlugin({
 			defaultValue: defaultConfig,
 		}),
 		tag,
-		tagCreate,
+		tagSet,
 	]
 });

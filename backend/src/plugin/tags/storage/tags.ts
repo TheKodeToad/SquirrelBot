@@ -39,3 +39,29 @@ export async function createTag(db: Pool, guildID: string, name: string, content
 
 	return result.rowCount === 1;
 }
+
+export async function updateTag(db: Pool, guildID: string, name: string, content: string): Promise<boolean> {
+	const result = await db.query(
+		`
+			UPDATE "tags_tags"
+			SET "content" = $3
+			WHERE "guildID" = $1 AND "name" = $2
+		`,
+		[guildID, name, content]
+	);
+
+	return result.rowCount === 1;
+}
+
+export async function upsertTag(db: Pool, guildID: string, name: string, content: string): Promise<boolean> {
+	const result = await db.query(
+		`
+			INSERT INTO "tags_tags" ("guildID", "name", "content")
+			VALUES ($1, $2, $3)
+			ON CONFLICT ("guildID", "name") DO UPDATE SET "content" = $3
+		`,
+		[guildID, name, content]
+	);
+
+	return result.rowCount === 1;
+}
