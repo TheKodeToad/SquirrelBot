@@ -11,7 +11,7 @@ const Tag = z.object({
 
 export type Tag = z.output<typeof Tag>;
 
-const JustDidInsert = z.object({ didInsert: z.boolean() });
+const JustInserted = z.object({ inserted: z.boolean() });
 
 export async function getTag(
 	db: Pool,
@@ -74,16 +74,16 @@ export async function upsertTag(
 	guildID: string,
 	name: string,
 	content: string,
-): Promise<{ didInsert: boolean }> {
+): Promise<{ inserted: boolean }> {
 	const result = await db.query(
 		`
 			INSERT INTO "tags_tags" ("guildID", "name", "content")
 			VALUES ($1, $2, $3)
 			ON CONFLICT ("guildID", "name") DO UPDATE SET "content" = $3
-			RETURNING (xmax = 0) AS "didInsert"
+			RETURNING (xmax = 0) AS "inserted"
 		`,
 		[guildID, name, content],
 	);
 
-	return dbParse(JustDidInsert, result.rows[0]);
+	return dbParse(JustInserted, result.rows[0]);
 }

@@ -46,14 +46,14 @@ export default defineCommand({
 		),
 	async run(ctx, args) {
 		if (args.existing) {
-			if (
-				await updateTag(
-					ctx.squirrelCtx.db,
-					ctx.guild.id,
-					args.name,
-					args.content,
-				)
-			) {
+			const success = await updateTag(
+				ctx.squirrelCtx.db,
+				ctx.guild.id,
+				args.name,
+				args.content,
+			);
+
+			if (success) {
 				await ctx.respond(
 					`${icons.success} Edited tag '${escapeMarkdown(args.name)}'!`,
 				);
@@ -63,14 +63,14 @@ export default defineCommand({
 				);
 			}
 		} else if (args.new) {
-			if (
-				await createTag(
-					ctx.squirrelCtx.db,
-					ctx.guild.id,
-					args.name,
-					args.content,
-				)
-			) {
+			const success = await createTag(
+				ctx.squirrelCtx.db,
+				ctx.guild.id,
+				args.name,
+				args.content,
+			);
+
+			if (success) {
 				await ctx.respond(
 					`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`,
 				);
@@ -80,16 +80,14 @@ export default defineCommand({
 				);
 			}
 		} else {
-			if (
-				(
-					await upsertTag(
-						ctx.squirrelCtx.db,
-						ctx.guild.id,
-						args.name,
-						args.content,
-					)
-				).didInsert
-			) {
+			const { inserted } = await upsertTag(
+				ctx.squirrelCtx.db,
+				ctx.guild.id,
+				args.name,
+				args.content,
+			);
+
+			if (inserted) {
 				await ctx.respond(
 					`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`,
 				);
