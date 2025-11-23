@@ -111,7 +111,12 @@ interface FlagOption extends BaseOption {
 	position?: undefined;
 }
 
-interface StringOption extends BaseOption { type: OptionType.String; }
+interface StringOption extends BaseOption {
+	type: OptionType.String;
+	/** For prefix commands - set to false to only parse one word unless quoted. */
+	greedy?: boolean;
+}
+
 interface IntegerOption extends BaseOption { type: OptionType.Integer; }
 interface NumberOption extends BaseOption { type: OptionType.Number; }
 interface UserOption extends BaseOption { type: OptionType.User; }
