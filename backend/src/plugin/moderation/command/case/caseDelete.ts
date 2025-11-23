@@ -8,10 +8,10 @@ import { deleteCase } from "#plugin/moderation/storage/cases.ts";
 export default defineCommand({
 	name: [
 		"casedelete",
-		"casedel",
-		"caserm",
 		"deletecase",
+		"casedel",
 		"delcase",
+		"caserm",
 		"rmcase",
 	],
 	description: "Delete a recorded moderation case.",

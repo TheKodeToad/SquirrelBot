@@ -87,3 +87,19 @@ export async function upsertTag(
 
 	return dbParse(JustInserted, result.rows[0]);
 }
+
+export async function deleteTag(
+	db: Pool,
+	guildID: string,
+	name: string,
+): Promise<boolean> {
+	const result = await db.query(
+		`
+			DELETE FROM "tags_tags"
+			WHERE "guildID" = $1 AND "name" = $2
+		`,
+		[guildID, name],
+	);
+
+	return result.rowCount !== 0;
+}
