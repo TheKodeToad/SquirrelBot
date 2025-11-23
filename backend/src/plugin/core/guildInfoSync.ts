@@ -1,4 +1,5 @@
 import { moduleLogger } from "#common/logger/index.ts";
+import { HOUR } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
@@ -9,6 +10,7 @@ import {
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
 import {
 	cancelGuildInfoDeletion,
+	deleteExpiredGuildInfo,
 	getAllGuildInfo,
 	insertGuildInfo,
 	markGuildAllowed,
@@ -112,6 +114,20 @@ async function init(ctx: SquirrelDiscordContext): Promise<void> {
 
 	// we do await these as we do want errors to interrupt startup
 	await onGuildInfoReady.fire(ctx);
+
+	await beginDeleteGuildInfoLoop(ctx.db);
+}
+
+export async function beginDeleteGuildInfoLoop(db: Pool): Promise<void> {
+	try {
+		logger.debug?.("Deleting expired guild info");
+
+		const deletedCount = await deleteExpiredGuildInfo(db);
+
+		logger.debug?.(`Deleted ${deletedCount} guilds`);
+	} finally {
+		setTimeout(() => beginDeleteGuildInfoLoop(db), 6 * HOUR).unref();
+	}
 }
 
 async function handleCreate(db: Pool, guild: Guild): Promise<void> {

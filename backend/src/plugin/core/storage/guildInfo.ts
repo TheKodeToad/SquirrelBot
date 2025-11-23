@@ -267,12 +267,14 @@ export async function cancelGuildInfoDeletion(
 }
 
 // TODO: use this darn thing!
-export async function deleteExpiredGuildInfo(db: Pool): Promise<void> {
-	await db.query(
+export async function deleteExpiredGuildInfo(db: Pool): Promise<number> {
+	const result = await db.query(
 		`
 			DELETE FROM "core_guildInfo"
 			WHERE "deleteAt" <= $1
 		`,
 		[new Date()],
 	);
+
+	return result.rowCount ?? 0;
 }
