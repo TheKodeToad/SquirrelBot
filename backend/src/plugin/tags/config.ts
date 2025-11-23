@@ -1,7 +1,7 @@
 import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import z from "zod";
 
-export const TagsConfig = z.object({
+export const TagsConfig = z.strictObject({
 	default_permissions: z
 		.strictObject({
 			tag_send: z.boolean().default(true),

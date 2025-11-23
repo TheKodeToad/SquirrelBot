@@ -2,7 +2,7 @@ import { dbParse } from "#storage/index.ts";
 import type { Pool } from "pg";
 import z from "zod";
 
-const Tag = z.object({
+const Tag = z.strictObject({
 	guildID: z.string(),
 	name: z.string(),
 
@@ -11,7 +11,7 @@ const Tag = z.object({
 
 export type Tag = z.output<typeof Tag>;
 
-const JustInserted = z.object({ inserted: z.boolean() });
+const JustInserted = z.strictObject({ inserted: z.boolean() });
 
 export async function getTag(
 	db: Pool,

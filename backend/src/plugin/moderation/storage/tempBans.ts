@@ -2,7 +2,7 @@ import { dbParse } from "#storage/index.ts";
 import type { Pool } from "pg";
 import z from "zod";
 
-const TempBan = z.object({
+const TempBan = z.strictObject({
 	guildID: z.string(),
 	targetID: z.string(),
 
