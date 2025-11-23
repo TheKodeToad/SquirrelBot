@@ -4,7 +4,7 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
-import { createTag, updateTag } from "#plugin/tags/storage/tags.ts";
+import { createTag, updateTag, upsertTag } from "#plugin/tags/storage/tags.ts";
 
 export default defineCommand({
 	name: ["tagset", "settag"],
@@ -51,11 +51,10 @@ export default defineCommand({
 				await ctx.respond(`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists!`);
 			}
 		} else {
-			if (await createTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content)) {
+			if ((await upsertTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content)).didInsert) {
 				await ctx.respond(`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`);
 			} else {
-				await ctx.respond(`${icons.success} Edited tag '${escapeMarkdown(args.name)}'!`);
-				await updateTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content);
+				await ctx.respond(`${icons.success} Edited tag '${escapeMarkdown(args.name)}!'`);
 			}
 		}
 	}
