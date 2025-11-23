@@ -16,6 +16,7 @@ export default defineCommand({
 			name: ["name", "n"],
 			required: true,
 			position: 0,
+			greedy: false,
 		},
 		content: {
 			type: OptionType.String,
