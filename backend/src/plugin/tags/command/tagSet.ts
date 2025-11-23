@@ -93,7 +93,7 @@ export default defineCommand({
 				);
 			} else {
 				await ctx.respond(
-					`${icons.success} Edited tag '${escapeMarkdown(args.name)}!'`,
+					`${icons.success} Edited tag '${escapeMarkdown(args.name)}'!`,
 				);
 			}
 		}
