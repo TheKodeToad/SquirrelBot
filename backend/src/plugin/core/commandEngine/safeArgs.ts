@@ -1,5 +1,10 @@
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/command.ts";
+import {
+	OptionType,
+	type AnyArgsValue,
+	type AnyArgsValueItem,
+	type Option,
+} from "#plugin/core/public/command.ts";
 
 export class SafeArgs {
 	private _schema: Record<string, Option>;
@@ -11,7 +16,7 @@ export class SafeArgs {
 		this._schema = schema;
 		// TODO: this is... safe... right?
 		this._result = { __proto__: null };
-		this._missing = new Set;
+		this._missing = new Set();
 		this._frozen = false;
 
 		for (const key in schema) {
@@ -84,7 +89,9 @@ export class SafeArgs {
 		const array = this._result[key];
 
 		if (!Array.isArray(array)) {
-			throw new Error(`Array.isArray(result['${key}']) is false; expected true`);
+			throw new Error(
+				`Array.isArray(result['${key}']) is false; expected true`,
+			);
 		}
 
 		if (value.length === 0) {
@@ -125,7 +132,9 @@ export class SafeArgs {
 		}
 
 		if (this._missing.size !== 0) {
-			throw new Error(`Missing keys: ${[...this._missing].map(value => "'" + value + "'").join(",")}`);
+			throw new Error(
+				`Missing keys: ${[...this._missing].map((value) => "'" + value + "'").join(",")}`,
+			);
 		}
 
 		return this._result;
@@ -138,48 +147,55 @@ function validateType(type: OptionType, value: unknown): void {
 	}
 
 	switch (type) {
-	case OptionType.Flag:
-		if (typeof value !== "boolean") {
-			throw new Error(`typeof value is '${typeof value}'; expected 'boolean'`);
-		}
+		case OptionType.Flag:
+			if (typeof value !== "boolean") {
+				throw new Error(
+					`typeof value is '${typeof value}'; expected 'boolean'`,
+				);
+			}
 
-		break;
-	case OptionType.Integer:
-		if (!Number.isSafeInteger(value)) {
-			throw new Error(`Number.isSafeInteger(value) is false`);
-		}
+			break;
+		case OptionType.Integer:
+			if (!Number.isSafeInteger(value)) {
+				throw new Error(`Number.isSafeInteger(value) is false`);
+			}
 
-		break;
-	case OptionType.Number:
-		if (!Number.isFinite(value)) {
-			throw new Error(`Number.isFinite(value) is false`);
-		}
+			break;
+		case OptionType.Number:
+			if (!Number.isFinite(value)) {
+				throw new Error(`Number.isFinite(value) is false`);
+			}
 
-		break;
-	case OptionType.String:
-		if (typeof value !== "string") {
-			throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
-		}
+			break;
+		case OptionType.String:
+			if (typeof value !== "string") {
+				throw new Error(
+					`typeof value is '${typeof value}'; expected 'string'`,
+				);
+			}
 
-		break;
-	case OptionType.Snowflake:
-	case OptionType.User:
-	case OptionType.Role:
-	case OptionType.Channel:
-		if (typeof value !== "string") {
-			throw new Error(`typeof value is '${typeof value}'; expected 'string'`);
-		}
+			break;
+		case OptionType.Snowflake:
+		case OptionType.User:
+		case OptionType.Role:
+		case OptionType.Channel:
+			if (typeof value !== "string") {
+				throw new Error(
+					`typeof value is '${typeof value}'; expected 'string'`,
+				);
+			}
 
-		break;
-	case OptionType.Duration:
-		if (typeof value !== "number") {
-			throw new Error(`typeof value is '${typeof value}'; expected 'number'`);
-		}
+			break;
+		case OptionType.Duration:
+			if (typeof value !== "number") {
+				throw new Error(
+					`typeof value is '${typeof value}'; expected 'number'`,
+				);
+			}
 
-		break;
-	default:
-		(type satisfies never);
-		break;
+			break;
+		default:
+			(type) satisfies never;
+			break;
 	}
 }
-

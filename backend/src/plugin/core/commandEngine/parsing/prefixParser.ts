@@ -1,13 +1,33 @@
 import type { CommandCacheEntry } from "#plugin/core/commandEngine/commandCache.ts";
-import { ArgsParseError, type ArgsParseResult } from "#plugin/core/commandEngine/parsing/index.ts";
-import { readChannel, readDuration, readInteger, readNumber, readRole, readSnowflake, readString, readUser } from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
+import {
+	ArgsParseError,
+	type ArgsParseResult,
+} from "#plugin/core/commandEngine/parsing/index.ts";
+import {
+	readChannel,
+	readDuration,
+	readInteger,
+	readNumber,
+	readRole,
+	readSnowflake,
+	readString,
+	readUser,
+} from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
 import type { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import { SafeArgs } from "#plugin/core/commandEngine/safeArgs.ts";
-import { OptionType, type AnyArgsValue, type AnyArgsValueItem, type Option } from "#plugin/core/public/command.ts";
+import {
+	OptionType,
+	type AnyArgsValue,
+	type AnyArgsValueItem,
+	type Option,
+} from "#plugin/core/public/command.ts";
 
 const LIMITED_WHITESPACE_EATER_PATTERN = /\s{0,3}/y;
 
-export function readPrefixName(reader: StringReader, prefix: string): string | null {
+export function readPrefixName(
+	reader: StringReader,
+	prefix: string,
+): string | null {
 	if (!reader.skipOver(prefix)) {
 		return null;
 	}
@@ -24,7 +44,10 @@ export function readPrefixName(reader: StringReader, prefix: string): string | n
 const GREEDY_VALUE_TERMINATOR = /\s+--?[\w-]/g;
 const ARRAY_TERMINATOR = /--?[\w-]/y;
 
-export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheEntry): ArgsParseResult {
+export function readPrefixArgs(
+	reader: StringReader,
+	commandEntry: CommandCacheEntry,
+): ArgsParseResult {
 	const output = new SafeArgs(commandEntry.command.options ?? {});
 
 	let positionalIndex = 0;
@@ -82,17 +105,21 @@ export function readPrefixArgs(reader: StringReader, commandEntry: CommandCacheE
 	if (output.getMissing().size !== 0) {
 		return {
 			error: ArgsParseError.MissingOptions,
-			options: output.getMissing()
+			options: output.getMissing(),
 		};
 	}
 
 	return {
 		error: null,
-		result: output.getFrozenResult()
+		result: output.getFrozenResult(),
 	};
 }
 
-function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, output: SafeArgs): ArgsParseResult | boolean {
+function readNamedArg(
+	reader: StringReader,
+	commandEntry: CommandCacheEntry,
+	output: SafeArgs,
+): ArgsParseResult | boolean {
 	if (!reader.skipOver("-")) {
 		return false;
 	}
@@ -121,7 +148,7 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 		if (value === null) {
 			return {
 				error: ArgsParseError.BadNamedValue,
-				name: optionName
+				name: optionName,
 			};
 		}
 
@@ -135,7 +162,8 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 		return true;
 	}
 
-	const foundByNegativeName = commandEntry.optionsByNegativeName.get(optionName);
+	const foundByNegativeName =
+		commandEntry.optionsByNegativeName.get(optionName);
 
 	if (foundByNegativeName !== undefined) {
 		const key = foundByNegativeName;
@@ -145,12 +173,16 @@ function readNamedArg(reader: StringReader, commandEntry: CommandCacheEntry, out
 
 	return {
 		error: ArgsParseError.BadNamedKey,
-		name: optionName
+		name: optionName,
 	};
 }
 
 // null explicitly indicates error
-function readCommandArg(reader: StringReader, option: Option, propagateArrayError: boolean): AnyArgsValue | null {
+function readCommandArg(
+	reader: StringReader,
+	option: Option,
+	propagateArrayError: boolean,
+): AnyArgsValue | null {
 	if (option.type === OptionType.Flag) {
 		return true;
 	}
@@ -193,25 +225,29 @@ function readCommandArg(reader: StringReader, option: Option, propagateArrayErro
 	return result;
 }
 
-function readCommandArgValue(reader: StringReader, type: Exclude<OptionType, OptionType.Flag>, greedy: boolean): AnyArgsValueItem | null {
+function readCommandArgValue(
+	reader: StringReader,
+	type: Exclude<OptionType, OptionType.Flag>,
+	greedy: boolean,
+): AnyArgsValueItem | null {
 	const terminator = greedy ? GREEDY_VALUE_TERMINATOR : undefined;
 
 	switch (type) {
-	case OptionType.Integer:
-		return readInteger(reader);
-	case OptionType.Number:
-		return readNumber(reader);
-	case OptionType.String:
-		return readString(reader, terminator);
-	case OptionType.Snowflake:
-		return readSnowflake(reader);
-	case OptionType.User:
-		return readUser(reader);
-	case OptionType.Role:
-		return readRole(reader);
-	case OptionType.Channel:
-		return readChannel(reader);
-	case OptionType.Duration:
-		return readDuration(reader);
+		case OptionType.Integer:
+			return readInteger(reader);
+		case OptionType.Number:
+			return readNumber(reader);
+		case OptionType.String:
+			return readString(reader, terminator);
+		case OptionType.Snowflake:
+			return readSnowflake(reader);
+		case OptionType.User:
+			return readUser(reader);
+		case OptionType.Role:
+			return readRole(reader);
+		case OptionType.Channel:
+			return readChannel(reader);
+		case OptionType.Duration:
+			return readDuration(reader);
 	}
 }

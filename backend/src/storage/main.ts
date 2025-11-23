@@ -6,40 +6,42 @@ import { Client } from "pg";
 const [_runtime, _script, command, ...args] = process.argv;
 
 switch (command) {
-case "perform": {
-	const db = new Client;
-	await db.connect();
+	case "perform": {
+		const db = new Client();
+		await db.connect();
 
-	const count = await migrate(db, args.includes("--ignore-changes"));
+		const count = await migrate(db, args.includes("--ignore-changes"));
 
-	await db.end();
+		await db.end();
 
-	if (count > 0) {
-		console.log(`Done ${count} migrations!`);
-	} else {
-		console.log("No migrations needed!");
+		if (count > 0) {
+			console.log(`Done ${count} migrations!`);
+		} else {
+			console.log("No migrations needed!");
+		}
+
+		break;
 	}
+	case "check": {
+		const db = new Client();
+		await db.connect();
 
-	break;
-}
-case "check": {
-	const db = new Client;
-	await db.connect();
+		const count = await checkMigrations(db);
 
-	const count = await checkMigrations(db);
+		await db.end();
 
-	await db.end();
+		if (count > 0) {
+			console.error(`${count} migrations needed!`);
+			process.exit(1);
+		} else {
+			console.log("No migrations needed!");
+		}
 
-	if (count > 0) {
-		console.error(`${count} migrations needed!`);
-		process.exit(1);
-	} else {
-		console.log("No migrations needed!");
+		break;
 	}
-
-	break;
-}
-default:
-	console.error(`Usage: pnpm migration (perform|check) [--ignore-changes]`);
-	break;
+	default:
+		console.error(
+			`Usage: pnpm migration (perform|check) [--ignore-changes]`,
+		);
+		break;
 }

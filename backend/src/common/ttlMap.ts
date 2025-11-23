@@ -7,7 +7,7 @@ export class TTLMap<K, V> {
 	private readonly _ttl: number;
 
 	constructor(ttl: number) {
-		this._map = new Map;
+		this._map = new Map();
 		this._ttl = ttl;
 	}
 
@@ -24,7 +24,7 @@ export class TTLMap<K, V> {
 	}
 
 	private _isExpired(now: number, date: number): boolean {
-		return (now - date) >= this._ttl;
+		return now - date >= this._ttl;
 	}
 
 	get size(): number {
@@ -50,7 +50,10 @@ export class TTLMap<K, V> {
 		return had;
 	}
 
-	forEach(callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void, thisArg?: any): void {
+	forEach(
+		callbackfn: (value: V, key: K, map: TTLMap<K, V>) => void,
+		thisArg?: any,
+	): void {
 		if (thisArg != null) {
 			callbackfn = callbackfn.bind(thisArg);
 		}

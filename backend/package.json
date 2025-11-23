@@ -10,6 +10,8 @@
 		"migration": "pnpm run _node src/storage/main.ts",
 		"typecheck": "tsc",
 		"lint": "eslint",
+		"reformat": "pnpm run formatting --write",
+		"formatting": "prettier src/**/*.ts",
 		"test": "pnpm run _node --test src/**/*.test.ts",
 		"_node": "node --import=@swc-node/register/esm-register --env-file=.env --disable-proto=throw --enable-source-maps"
 	},
@@ -31,7 +33,7 @@
 		"@types/async-lock": "^1.4.2",
 		"@types/node": "^24.10.1",
 		"@types/pg": "^8.15.6",
-		"eslint": "^9.39.1",
+		"eslint": "9.39.1",
 		"globals": "^16.5.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.47.0"

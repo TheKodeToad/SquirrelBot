@@ -1,4 +1,11 @@
-import { A, Route, useLocation, useNavigate, useParams, useResolvedPath } from "@solidjs/router";
+import {
+	A,
+	Route,
+	useLocation,
+	useNavigate,
+	useParams,
+	useResolvedPath,
+} from "@solidjs/router";
 import { For, JSX } from "solid-js";
 import { Button } from "../component/common/Button";
 import { ConfigEditor } from "../component/ConfigEditor";
@@ -20,10 +27,15 @@ export function GuildRoutes() {
 				}}
 			/>
 			<For each={PLUGINS}>
-				{plugin => (
+				{(plugin) => (
 					<Route
 						path={"/" + getPluginPath(plugin.id)}
-						component={() => <ConfigEditor guildID={guildID()} plugin={plugin.id} />}
+						component={() => (
+							<ConfigEditor
+								guildID={guildID()}
+								plugin={plugin.id}
+							/>
+						)}
 					/>
 				)}
 			</For>
@@ -31,14 +43,19 @@ export function GuildRoutes() {
 	);
 }
 
-function GuildLayout(props: { children?: JSX.Element; }) {
+function GuildLayout(props: { children?: JSX.Element }) {
 	return (
 		<>
 			<div class="content">
 				<div id="sidebar" class="vbox">
 					<div class="sidebarHeading">Plugins</div>
 					<For each={PLUGINS}>
-						{plugin => <SidebarLinkWidget label={plugin.name} path={getPluginPath(plugin.id)} />}
+						{(plugin) => (
+							<SidebarLinkWidget
+								label={plugin.name}
+								path={getPluginPath(plugin.id)}
+							/>
+						)}
 					</For>
 				</div>
 				{props.children}
@@ -47,7 +64,7 @@ function GuildLayout(props: { children?: JSX.Element; }) {
 	);
 }
 
-function SidebarLinkWidget(props: { label: string; path: string; }) {
+function SidebarLinkWidget(props: { label: string; path: string }) {
 	const target = useResolvedPath(() => props.path);
 	const loc = useLocation();
 	const active = () => loc.pathname === target();
@@ -55,7 +72,11 @@ function SidebarLinkWidget(props: { label: string; path: string; }) {
 	return (
 		<A href={props.path}>
 			{/* FIXME: using an inline style to get it to look right */}
-			<Button color={"transparent2"} active={active()} style={{ width: "100%" }}>
+			<Button
+				color={"transparent2"}
+				active={active()}
+				style={{ width: "100%" }}
+			>
 				{props.label}
 			</Button>
 		</A>

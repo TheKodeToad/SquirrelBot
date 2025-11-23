@@ -4,7 +4,7 @@ import guilds from "#http/route/api/v1/guilds.ts";
 import { Hono } from "hono";
 
 export default (squirrelCtx: SquirrelHTTPContext): Hono => {
-	const app = new Hono;
+	const app = new Hono();
 
 	app.route("/auth", auth(squirrelCtx));
 	app.route("/guilds", guilds(squirrelCtx));

@@ -27,35 +27,77 @@ export default defineCommand({
 		existing: {
 			type: OptionType.Flag,
 			name: ["existing"],
-			description: "Only set the tag if it already exists; don't create a new one.",
+			description:
+				"Only set the tag if it already exists; don't create a new one.",
 		},
 		new: {
 			type: OptionType.Flag,
 			name: ["new"],
-			description: "Only set the tag if it doesn't already exist; fail unless creating a new one."
+			description:
+				"Only set the tag if it doesn't already exist; fail unless creating a new one.",
 		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, tagsConfigStore, permissions => permissions.tag_create),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			tagsConfigStore,
+			(permissions) => permissions.tag_create,
+		),
 	async run(ctx, args) {
 		if (args.existing) {
-			if (await updateTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content)) {
-				await ctx.respond(`${icons.success} Edited tag '${escapeMarkdown(args.name)}'!`);
+			if (
+				await updateTag(
+					ctx.squirrelCtx.db,
+					ctx.guild.id,
+					args.name,
+					args.content,
+				)
+			) {
+				await ctx.respond(
+					`${icons.success} Edited tag '${escapeMarkdown(args.name)}'!`,
+				);
 			} else {
-				await ctx.respond(`${icons.error} Tag '${escapeMarkdown(args.name)}' does not exist!`);
+				await ctx.respond(
+					`${icons.error} Tag '${escapeMarkdown(args.name)}' does not exist!`,
+				);
 			}
 		} else if (args.new) {
-			if (await createTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content)) {
-				await ctx.respond(`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`);
+			if (
+				await createTag(
+					ctx.squirrelCtx.db,
+					ctx.guild.id,
+					args.name,
+					args.content,
+				)
+			) {
+				await ctx.respond(
+					`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`,
+				);
 			} else {
-				await ctx.respond(`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists!`);
+				await ctx.respond(
+					`${icons.error} Tag '${escapeMarkdown(args.name)}' already exists!`,
+				);
 			}
 		} else {
-			if ((await upsertTag(ctx.squirrelCtx.db, ctx.guild.id, args.name, args.content)).didInsert) {
-				await ctx.respond(`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`);
+			if (
+				(
+					await upsertTag(
+						ctx.squirrelCtx.db,
+						ctx.guild.id,
+						args.name,
+						args.content,
+					)
+				).didInsert
+			) {
+				await ctx.respond(
+					`${icons.success} Created tag '${escapeMarkdown(args.name)}'!`,
+				);
 			} else {
-				await ctx.respond(`${icons.success} Edited tag '${escapeMarkdown(args.name)}!'`);
+				await ctx.respond(
+					`${icons.success} Edited tag '${escapeMarkdown(args.name)}!'`,
+				);
 			}
 		}
-	}
+	},
 });

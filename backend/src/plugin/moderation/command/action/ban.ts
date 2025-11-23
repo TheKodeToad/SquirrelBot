@@ -4,7 +4,10 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { formatModActionFailure, formatModActionSuccess } from "#plugin/moderation/helper/format.ts";
+import {
+	formatModActionFailure,
+	formatModActionSuccess,
+} from "#plugin/moderation/helper/format.ts";
 import { performModActions } from "#plugin/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugin/moderation/index.ts";
 import { ModEventType } from "#plugin/moderation/public/modEvent.ts";
@@ -34,71 +37,93 @@ export default defineCommand({
 		},
 		dm: {
 			type: OptionType.Flag,
-			description: "Choose whether to notify the banned user with a DM (overrides the configured default).",
+			description:
+				"Choose whether to notify the banned user with a DM (overrides the configured default).",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},
 		purge: {
 			type: OptionType.Duration,
-			description: "Request to delete messages within the specified duration of being sent.",
+			description:
+				"Request to delete messages within the specified duration of being sent.",
 			name: ["purge", "p", "delete"],
 		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, moderationConfigStore, permissions => permissions.ban),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			moderationConfigStore,
+			(permissions) => permissions.ban,
+		),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
 		const directMessage = sendDirectMessage
 			? config.ban.direct_message.render({
-				server: makeGuildView(ctx.guild),
-				moderator: makeUserView(ctx.user),
-				reason: args.reason ?? undefined,
-			})
+					server: makeGuildView(ctx.guild),
+					moderator: makeUserView(ctx.user),
+					reason: args.reason ?? undefined,
+				})
 			: undefined;
 
-		const deleteMessageSeconds = args.purge !== null
-			? args.purge / 1000
-			: config.ban.purge_messages;
+		const deleteMessageSeconds =
+			args.purge !== null ? args.purge / 1000 : config.ban.purge_messages;
 
-		const { successful, unsuccessful } = await performModActions(ctx.squirrelCtx, ctx.guild, args.user, target => ({
-			guild: ctx.guild,
+		const { successful, unsuccessful } = await performModActions(
+			ctx.squirrelCtx,
+			ctx.guild,
+			args.user,
+			(target) => ({
+				guild: ctx.guild,
 
-			type: ModEventType.Ban,
-			expiresAt: args.duration !== null ? new Date(Date.now() + args.duration) : undefined,
+				type: ModEventType.Ban,
+				expiresAt:
+					args.duration !== null
+						? new Date(Date.now() + args.duration)
+						: undefined,
 
-			actor: ctx.member,
-			target: target,
-			ranking: config.member_ranking,
+				actor: ctx.member,
+				target: target,
+				ranking: config.member_ranking,
 
-			reason: args.reason ?? undefined,
+				reason: args.reason ?? undefined,
 
-			deleteMessageSeconds,
-			directMessage,
-		}));
+				deleteMessageSeconds,
+				directMessage,
+			}),
+		);
 
 		if (args.user.length === 1) {
 			if (successful.length === 1) {
-				await ctx.respond(`${icons.success} Banned ${formatModActionSuccess(successful[0]!)}!`);
+				await ctx.respond(
+					`${icons.success} Banned ${formatModActionSuccess(successful[0]!)}!`,
+				);
 			} else if (unsuccessful.length === 1) {
-				await ctx.respond(`${icons.error} Could not ban ${formatModActionFailure(unsuccessful[0]!)}!`);
+				await ctx.respond(
+					`${icons.error} Could not ban ${formatModActionFailure(unsuccessful[0]!)}!`,
+				);
 			}
 		} else {
-			const successfulMessage = successful.map(item => `- ${formatModActionSuccess(item)}`).join("\n");
-			const unsuccessfulMessage = unsuccessful.map(item => `- ${formatModActionFailure(item)}`).join("\n");
+			const successfulMessage = successful
+				.map((item) => `- ${formatModActionSuccess(item)}`)
+				.join("\n");
+			const unsuccessfulMessage = unsuccessful
+				.map((item) => `- ${formatModActionFailure(item)}`)
+				.join("\n");
 
 			if (unsuccessful.length === 0) {
 				await ctx.respond(
-					`${icons.success} Banned all **${args.user.length} users**:\n${successfulMessage}`
+					`${icons.success} Banned all **${args.user.length} users**:\n${successfulMessage}`,
 				);
 			} else if (successful.length === 0) {
 				await ctx.respond(
-					`${icons.error} None of **${args.user.length} users** were banned:\n${unsuccessfulMessage}`
+					`${icons.error} None of **${args.user.length} users** were banned:\n${unsuccessfulMessage}`,
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n`
-					+ `Successful:\n${successfulMessage}\n`
-					+ `Unsuccessful:\n${unsuccessfulMessage}`
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n` +
+						`Successful:\n${successfulMessage}\n` +
+						`Unsuccessful:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

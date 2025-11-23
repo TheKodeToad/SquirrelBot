@@ -4,11 +4,13 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 
 export default (squirrelCtx: SquirrelHTTPContext): Hono => {
-	const app = new Hono;
+	const app = new Hono();
 
 	app.route("/v1", v1(squirrelCtx));
-	app.get("/hello", ctx => ctx.json("hello world"));
-	app.all("/*", () => { throw new HTTPException(404, { message: "API route does not exist" }); });
+	app.get("/hello", (ctx) => ctx.json("hello world"));
+	app.all("/*", () => {
+		throw new HTTPException(404, { message: "API route does not exist" });
+	});
 
 	return app;
 };

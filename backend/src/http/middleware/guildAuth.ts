@@ -11,7 +11,7 @@ export type GuildAuthVars = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function guildAuthMiddleware(db: Pool) {
-	return createMiddleware<{ Variables: GuildAuthVars; }>(async (ctx, next) => {
+	return createMiddleware<{ Variables: GuildAuthVars }>(async (ctx, next) => {
 		const { discordUserID } = ctx.var;
 		const guildID = ctx.req.param("guildID");
 
@@ -36,4 +36,4 @@ export function guildAuthMiddleware(db: Pool) {
 		ctx.set("discordGuildID", guildID);
 		await next();
 	});
-};
+}

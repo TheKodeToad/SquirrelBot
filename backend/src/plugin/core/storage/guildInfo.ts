@@ -13,7 +13,7 @@ const GuildInfo = z.strictObject({
 
 const GuildInfoArray = GuildInfo.array();
 
-export interface GuildInfo extends z.output<typeof GuildInfo> { }
+export interface GuildInfo extends z.output<typeof GuildInfo> {}
 
 const APIGuildInfo = z.strictObject({
 	id: z.string(),
@@ -24,11 +24,14 @@ const APIGuildInfo = z.strictObject({
 
 const APIGuildInfoArray = APIGuildInfo.array();
 
-export interface APIGuildInfo extends z.output<typeof APIGuildInfo> { }
+export interface APIGuildInfo extends z.output<typeof APIGuildInfo> {}
 
 const JustOwnerID = z.strictObject({ ownerID: z.string() });
 
-export async function getGuildInfo(db: Pool, id: string): Promise<GuildInfo | null> {
+export async function getGuildInfo(
+	db: Pool,
+	id: string,
+): Promise<GuildInfo | null> {
 	const result = await db.query(
 		`
 			SELECT
@@ -41,7 +44,7 @@ export async function getGuildInfo(db: Pool, id: string): Promise<GuildInfo | nu
 			FROM "core_guildInfo"
 			WHERE "id" = $1
 		`,
-		[id]
+		[id],
 	);
 
 	if (result.rowCount !== 1) {
@@ -65,20 +68,23 @@ export async function getAllGuildInfo(db: Pool): Promise<GuildInfo[]> {
 				"allowed",
 				"deleteAt"
 			FROM "core_guildInfo"
-		`
+		`,
 	);
 
 	return dbParse(GuildInfoArray, result.rows);
 }
 
-export async function getGuildOwnerID(db: Pool, id: string): Promise<string | null> {
+export async function getGuildOwnerID(
+	db: Pool,
+	id: string,
+): Promise<string | null> {
 	const result = await db.query(
 		`
 			SELECT "ownerID"
 			FROM "core_guildInfo"
 			WHERE "id" = $1
 		`,
-		[id]
+		[id],
 	);
 
 	if (result.rowCount !== 1) {
@@ -88,7 +94,10 @@ export async function getGuildOwnerID(db: Pool, id: string): Promise<string | nu
 	return dbParse(JustOwnerID, result.rows[0]).ownerID;
 }
 
-export async function getAPIGuildInfoByOwner(db: Pool, ownerID: string): Promise<APIGuildInfo[]> {
+export async function getAPIGuildInfoByOwner(
+	db: Pool,
+	ownerID: string,
+): Promise<APIGuildInfo[]> {
 	const result = await db.query(
 		`
 			SELECT
@@ -100,7 +109,7 @@ export async function getAPIGuildInfoByOwner(db: Pool, ownerID: string): Promise
 			WHERE "ownerID" = $1
 			ORDER BY "name" ASC
 		`,
-		[ownerID]
+		[ownerID],
 	);
 
 	return dbParse(APIGuildInfoArray, result.rows);
@@ -112,11 +121,17 @@ export async function deleteGuildInfo(db: Pool, id: string): Promise<void> {
 			DELETE FROM "core_guildInfo"
 			WHERE "id" = $1
 		`,
-		[id]
+		[id],
 	);
 }
 
-export async function updateGuildInfo(db: Pool, id: string, name: string, iconHash: string | null, ownerID: string | null): Promise<void> {
+export async function updateGuildInfo(
+	db: Pool,
+	id: string,
+	name: string,
+	iconHash: string | null,
+	ownerID: string | null,
+): Promise<void> {
 	await db.query(
 		`
 			UPDATE "core_guildInfo"
@@ -126,11 +141,18 @@ export async function updateGuildInfo(db: Pool, id: string, name: string, iconHa
 				"ownerID" = $4
 			WHERE "id" = $1
 		`,
-		[id, name, iconHash, ownerID]
+		[id, name, iconHash, ownerID],
 	);
 }
 
-export async function insertGuildInfo(db: Pool, id: string, name: string | null, iconHash: string | null, ownerID: string | null, allowed: boolean): Promise<boolean> {
+export async function insertGuildInfo(
+	db: Pool,
+	id: string,
+	name: string | null,
+	iconHash: string | null,
+	ownerID: string | null,
+	allowed: boolean,
+): Promise<boolean> {
 	const result = await db.query(
 		`
 			INSERT INTO "core_guildInfo" (
@@ -142,13 +164,19 @@ export async function insertGuildInfo(db: Pool, id: string, name: string | null,
 			)
 			VALUES ($1, $2, $3, $4, $5)
 		`,
-		[id, name, iconHash, ownerID, allowed]
+		[id, name, iconHash, ownerID, allowed],
 	);
 
 	return result.rowCount === 1;
 }
 
-export async function markGuildAllowed(db: Pool, id: string, name: string | null, iconHash: string | null, ownerID: string | null): Promise<void> {
+export async function markGuildAllowed(
+	db: Pool,
+	id: string,
+	name: string | null,
+	iconHash: string | null,
+	ownerID: string | null,
+): Promise<void> {
 	await db.query(
 		`
 			INSERT INTO "core_guildInfo" (
@@ -166,11 +194,14 @@ export async function markGuildAllowed(db: Pool, id: string, name: string | null
 				"allowed" = TRUE,
 				"deleteAt" = NULL
 		`,
-		[id, name, iconHash, ownerID]
+		[id, name, iconHash, ownerID],
 	);
 }
 
-export async function markUnknownGuildAllowed(db: Pool, id: string): Promise<void> {
+export async function markUnknownGuildAllowed(
+	db: Pool,
+	id: string,
+): Promise<void> {
 	await db.query(
 		`
 			INSERT INTO "core_guildInfo" ("id", "allowed")
@@ -179,7 +210,7 @@ export async function markUnknownGuildAllowed(db: Pool, id: string): Promise<voi
 				"allowed" = TRUE,
 				"deleteAt" = NULL
 		`,
-		[id]
+		[id],
 	);
 }
 
@@ -190,12 +221,15 @@ export async function markGuildNotAllowed(db: Pool, id: string): Promise<void> {
 			SET "allowed" = FALSE
 			WHERE "id" = $1
 		`,
-		[id]
+		[id],
 	);
 }
 
-export async function scheduleGuildInfoDeletion(db: Pool, id: string): Promise<Date | null> {
-	const date = new Date;
+export async function scheduleGuildInfoDeletion(
+	db: Pool,
+	id: string,
+): Promise<Date | null> {
+	const date = new Date();
 	date.setDate(date.getDate() + 30);
 
 	const result = await db.query(
@@ -208,7 +242,7 @@ export async function scheduleGuildInfoDeletion(db: Pool, id: string): Promise<D
 				"id" = $1
 				AND "deleteAt" IS NULL
 		`,
-		[id, date]
+		[id, date],
 	);
 
 	if (result.rowCount !== 0) {
@@ -218,14 +252,17 @@ export async function scheduleGuildInfoDeletion(db: Pool, id: string): Promise<D
 	}
 }
 
-export async function cancelGuildInfoDeletion(db: Pool, id: string): Promise<void> {
+export async function cancelGuildInfoDeletion(
+	db: Pool,
+	id: string,
+): Promise<void> {
 	await db.query(
 		`
 			UPDATE "core_guildInfo"
 			SET "deleteAt" = NULL
 			WHERE "id" = $1
 		`,
-		[id]
+		[id],
 	);
 }
 
@@ -236,6 +273,6 @@ export async function deleteExpiredGuildInfo(db: Pool): Promise<void> {
 			DELETE FROM "core_guildInfo"
 			WHERE "deleteAt" <= $1
 		`,
-		[new Date]
+		[new Date()],
 	);
 }

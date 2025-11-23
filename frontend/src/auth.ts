@@ -8,30 +8,50 @@ export async function logIn(): Promise<void> {
 	const buffer = new Uint8Array(64);
 	crypto.getRandomValues(buffer);
 
-	const verifier = Uint8Array_toBase64(buffer, { alphabet: "base64url", omitPadding: true });
+	const verifier = Uint8Array_toBase64(buffer, {
+		alphabet: "base64url",
+		omitPadding: true,
+	});
 
-	const verifierHash = new Uint8Array(await crypto.subtle.digest("sha-256", new TextEncoder().encode(verifier)));
-	const challenge = Uint8Array_toBase64(verifierHash, { alphabet: "base64url", omitPadding: true });
+	const verifierHash = new Uint8Array(
+		await crypto.subtle.digest(
+			"sha-256",
+			new TextEncoder().encode(verifier),
+		),
+	);
+	const challenge = Uint8Array_toBase64(verifierHash, {
+		alphabet: "base64url",
+		omitPadding: true,
+	});
 
 	sessionStorage.setItem("authVerifier", verifier);
 
-	const url = `https://discord.com/oauth2/authorize?` + new URLSearchParams({
-		client_id: CLIENT_ID,
-		response_type: "code",
-		redirect_uri: REDIRECT_URI,
-		scope: "identify",
-		prompt: "none",
-		code_challenge: challenge,
-		code_challenge_method: "S256",
-		state: window.location.pathname + window.location.search + window.location.hash
-	});
+	const url =
+		`https://discord.com/oauth2/authorize?` +
+		new URLSearchParams({
+			client_id: CLIENT_ID,
+			response_type: "code",
+			redirect_uri: REDIRECT_URI,
+			scope: "identify",
+			prompt: "none",
+			code_challenge: challenge,
+			code_challenge_method: "S256",
+			state:
+				window.location.pathname +
+				window.location.search +
+				window.location.hash,
+		});
 
 	window.location.assign(url);
 }
 
-export type CallbackStatus = { state: "working"; } | { state: "errored", error: unknown; };
+export type CallbackStatus =
+	| { state: "working" }
+	| { state: "errored"; error: unknown };
 
-const [callbackStatus, setCallbackStatus] = createSignal<CallbackStatus | null>(null);
+const [callbackStatus, setCallbackStatus] = createSignal<CallbackStatus | null>(
+	null,
+);
 
 export const loginCallbackStatus = callbackStatus;
 
@@ -68,7 +88,7 @@ export async function handleLoginCallback() {
 		setAccount({
 			token: response.token,
 			username: response.username,
-			avatar: response.avatar
+			avatar: response.avatar,
 		});
 		setCallbackStatus(null);
 	} catch (error) {

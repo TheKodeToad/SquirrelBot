@@ -28,6 +28,8 @@ export default definePlugin({
 			defaultValue: defaultConfig,
 		}),
 
-		inviteInfo, ping, snowflake,
-	]
+		inviteInfo,
+		ping,
+		snowflake,
+	],
 });

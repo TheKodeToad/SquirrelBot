@@ -1,11 +1,31 @@
-import { isTextableGuildChannel, isThreadChannel } from "#common/discord/general.ts";
-import { type AnyTextableGuildChannel, type AnyThreadChannel, Client, DiscordRESTError, Guild, Member, PrivateChannel, type RequestGuildMembersOptions, type Uncached, User } from "oceanic.js";
+import {
+	isTextableGuildChannel,
+	isThreadChannel,
+} from "#common/discord/general.ts";
+import {
+	type AnyTextableGuildChannel,
+	type AnyThreadChannel,
+	Client,
+	DiscordRESTError,
+	Guild,
+	Member,
+	PrivateChannel,
+	type RequestGuildMembersOptions,
+	type Uncached,
+	User,
+} from "oceanic.js";
 
-export async function fetchUserCached(bot: Client, userID: string): Promise<User> {
-	return bot.users.get(userID) ?? await bot.rest.users.get(userID);
+export async function fetchUserCached(
+	bot: Client,
+	userID: string,
+): Promise<User> {
+	return bot.users.get(userID) ?? (await bot.rest.users.get(userID));
 }
 
-export async function fetchUserCachedSupressed(bot: Client, userID: string): Promise<User | Uncached> {
+export async function fetchUserCachedSupressed(
+	bot: Client,
+	userID: string,
+): Promise<User | Uncached> {
 	try {
 		return await fetchUserCached(bot, userID);
 	} catch (error) {
@@ -17,19 +37,37 @@ export async function fetchUserCachedSupressed(bot: Client, userID: string): Pro
 	}
 }
 
-export async function fetchMemberCached(bot: Client, guild: Guild, userID: string): Promise<Member> {
-	return guild.members.get(userID) ?? await bot.rest.guilds.getMember(guild.id, userID);
+export async function fetchMemberCached(
+	bot: Client,
+	guild: Guild,
+	userID: string,
+): Promise<Member> {
+	return (
+		guild.members.get(userID) ??
+		(await bot.rest.guilds.getMember(guild.id, userID))
+	);
 }
 
 export function fetchBotUserCached(bot: Client, guild: Guild): Promise<Member> {
 	return fetchMemberCached(bot, guild, bot.user.id);
 }
 
-export async function createDMCached(bot: Client, userID: string): Promise<PrivateChannel> {
-	return bot.privateChannels.find(channel => channel.recipient.id === userID) ?? await bot.rest.users.createDM(userID);
+export async function createDMCached(
+	bot: Client,
+	userID: string,
+): Promise<PrivateChannel> {
+	return (
+		bot.privateChannels.find(
+			(channel) => channel.recipient.id === userID,
+		) ?? (await bot.rest.users.createDM(userID))
+	);
 }
 
-export async function fetchThreadCached(bot: Client, guild: Guild, threadID: string): Promise<AnyThreadChannel | null> {
+export async function fetchThreadCached(
+	bot: Client,
+	guild: Guild,
+	threadID: string,
+): Promise<AnyThreadChannel | null> {
 	const cached = guild.threads.get(threadID);
 
 	if (cached !== undefined) {
@@ -53,7 +91,11 @@ export async function fetchThreadCached(bot: Client, guild: Guild, threadID: str
 	return fetched;
 }
 
-export async function fetchTextableGuildChannelCached(bot: Client, guild: Guild, channelID: string): Promise<AnyTextableGuildChannel | null> {
+export async function fetchTextableGuildChannelCached(
+	bot: Client,
+	guild: Guild,
+	channelID: string,
+): Promise<AnyTextableGuildChannel | null> {
 	const cachedRegularChannel = guild.channels.get(channelID);
 
 	if (cachedRegularChannel !== undefined) {
@@ -91,18 +133,22 @@ export async function fetchTextableGuildChannelCached(bot: Client, guild: Guild,
 export async function fetchMembersCached(
 	guild: Guild,
 	userIDs: readonly string[],
-	options?: Pick<RequestGuildMembersOptions, "presences" | "timeout">
+	options?: Pick<RequestGuildMembersOptions, "presences" | "timeout">,
 ): Promise<Map<string, Member>> {
-	const result: Map<string, Member> = new Map;
+	const result: Map<string, Member> = new Map();
 	const queue: string[] = [];
 	const promises: Promise<unknown>[] = [];
 
 	const request = (): void => {
 		promises.push(
-			guild.shard.requestGuildMembers(guild.id, {
-				userIDs: queue,
-				...options,
-			}).then(members => members.forEach(member => result.set(member.id, member)))
+			guild.shard
+				.requestGuildMembers(guild.id, {
+					userIDs: queue,
+					...options,
+				})
+				.then((members) =>
+					members.forEach((member) => result.set(member.id, member)),
+				),
 		);
 		queue.length = 0;
 	};
@@ -126,4 +172,3 @@ export async function fetchMembersCached(
 	await Promise.all(promises);
 	return result;
 }
-

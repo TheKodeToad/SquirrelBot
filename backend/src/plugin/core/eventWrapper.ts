@@ -9,7 +9,10 @@ const logger = moduleLogger();
 export function wrapListener<E extends keyof ClientEvents>(
 	ctx: SquirrelDiscordContext,
 	event: E,
-	listener: (ctx: SquirrelDiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
+	listener: (
+		ctx: SquirrelDiscordContext,
+		...args: ClientEvents[E]
+	) => Awaitable<void>,
 ) {
 	return async (...args: ClientEvents[E]) => {
 		let guild: string | null = null;
@@ -19,7 +22,9 @@ export function wrapListener<E extends keyof ClientEvents>(
 		}
 
 		if (guild !== null && !isGuildAllowed(guild)) {
-			logger.debug?.(`Filtering out event '${event}' from disallowed guild ${guild}`);
+			logger.debug?.(
+				`Filtering out event '${event}' from disallowed guild ${guild}`,
+			);
 			return;
 		}
 
@@ -34,7 +39,10 @@ export function wrapListener<E extends keyof ClientEvents>(
 export function installWrappedListener<E extends keyof ClientEvents>(
 	ctx: SquirrelDiscordContext,
 	event: E,
-	listener: (ctx: SquirrelDiscordContext, ...args: ClientEvents[E]) => Awaitable<void>
+	listener: (
+		ctx: SquirrelDiscordContext,
+		...args: ClientEvents[E]
+	) => Awaitable<void>,
 ): void {
 	ctx.bot.on(event, wrapListener(ctx, event, listener));
 }
@@ -42,85 +50,90 @@ export function installWrappedListener<E extends keyof ClientEvents>(
 const EVENT_TO_GUILD: {
 	[E in keyof ClientEvents]: (...args: ClientEvents[E]) => string | null;
 } = {
-	applicationCommandPermissionsUpdate: guild => guild.id,
-	autoModerationActionExecution: guild => guild.id,
-	autoModerationRuleCreate: rule => rule.guildID,
-	autoModerationRuleDelete: rule => rule.guildID,
-	autoModerationRuleUpdate: rule => rule.guildID,
-	channelCreate: channel => "guildID" in channel ? channel.guildID : null,
-	channelDelete: channel => "guildID" in channel ? channel.guildID : null,
-	channelPinsUpdate: channel => "guildID" in channel ? channel.guildID : null,
+	applicationCommandPermissionsUpdate: (guild) => guild.id,
+	autoModerationActionExecution: (guild) => guild.id,
+	autoModerationRuleCreate: (rule) => rule.guildID,
+	autoModerationRuleDelete: (rule) => rule.guildID,
+	autoModerationRuleUpdate: (rule) => rule.guildID,
+	channelCreate: (channel) => ("guildID" in channel ? channel.guildID : null),
+	channelDelete: (channel) => ("guildID" in channel ? channel.guildID : null),
+	channelPinsUpdate: (channel) =>
+		"guildID" in channel ? channel.guildID : null,
 	channelUpdate: (...[channel]) => channel.guildID,
-	entitlementCreate: entitlement => entitlement.guildID,
-	entitlementDelete: entitlement => entitlement.guildID,
-	entitlementUpdate: entitlement => entitlement.guildID,
-	guildAuditLogEntryCreate: guild => guild.id,
-	guildAvailable: guild => guild.id,
-	guildBanAdd: guild => guild.id,
-	guildBanRemove: guild => guild.id,
-	guildCreate: guild => guild.id,
-	guildDelete: guild => guild.id,
-	guildEmojisUpdate: guild => guild.id,
-	guildIntegrationsUpdate: guild => guild.id,
-	guildMemberAdd: member => member.guildID,
-	guildMemberChunk: members => members[0]?.guildID ?? null,
+	entitlementCreate: (entitlement) => entitlement.guildID,
+	entitlementDelete: (entitlement) => entitlement.guildID,
+	entitlementUpdate: (entitlement) => entitlement.guildID,
+	guildAuditLogEntryCreate: (guild) => guild.id,
+	guildAvailable: (guild) => guild.id,
+	guildBanAdd: (guild) => guild.id,
+	guildBanRemove: (guild) => guild.id,
+	guildCreate: (guild) => guild.id,
+	guildDelete: (guild) => guild.id,
+	guildEmojisUpdate: (guild) => guild.id,
+	guildIntegrationsUpdate: (guild) => guild.id,
+	guildMemberAdd: (member) => member.guildID,
+	guildMemberChunk: (members) => members[0]?.guildID ?? null,
 	guildMemberRemove: (_member, guild) => guild.id,
-	guildMemberUpdate: member => member.guildID,
-	guildRoleCreate: role => role.guildID,
+	guildMemberUpdate: (member) => member.guildID,
+	guildRoleCreate: (role) => role.guildID,
 	guildRoleDelete: (_role, guild) => guild.id,
-	guildRoleUpdate: role => role.guildID,
-	guildScheduledEventCreate: event => event.guildID,
-	guildScheduledEventDelete: event => event.guildID,
-	guildScheduledEventUpdate: event => event.guildID,
+	guildRoleUpdate: (role) => role.guildID,
+	guildScheduledEventCreate: (event) => event.guildID,
+	guildScheduledEventDelete: (event) => event.guildID,
+	guildScheduledEventUpdate: (event) => event.guildID,
 	guildScheduledEventUserAdd: () => {
 		throw new Error("Function not implemented.");
 	},
 	guildScheduledEventUserRemove: () => {
 		throw new Error("Function not implemented.");
 	},
-	guildStickersUpdate: guild => guild.id,
-	guildUnavailable: guild => guild.id,
-	guildUpdate: guild => guild.id,
-	integrationCreate: guild => guild.id,
-	integrationDelete: guild => guild.id,
-	integrationUpdate: guild => guild.id,
-	interactionCreate: interaction => interaction.guildID,
-	inviteCreate: invite => invite.guildID,
-	inviteDelete: invite => invite.guild?.id ?? null,
-	messageCreate: message => message.guildID,
-	messageDelete: message => message.guildID ?? null,
-	messageDeleteBulk: messages => messages[0]?.guildID ?? null,
-	messagePollVoteAdd: message => message.guildID ?? null,
-	messagePollVoteRemove: message => message.guildID ?? null,
-	messageReactionAdd: message => message.guildID ?? null,
-	messageReactionRemove: message => message.guildID ?? null,
-	messageReactionRemoveAll: message => message.guildID ?? null,
-	messageReactionRemoveEmoji: message => message.guildID ?? null,
-	messageUpdate: message => message.guildID,
-	presenceUpdate: guild => guild.id,
-	stageInstanceCreate: instance => instance.guildID,
-	stageInstanceDelete: instance => instance.guildID,
-	stageInstanceUpdate: instance => instance.guildID,
-	threadCreate: thread => thread.guildID,
-	threadDelete: thread => thread.guildID ?? null,
-	threadListSync: threads => threads[0]?.guildID ?? null,
-	threadMemberUpdate: thread => thread.guildID,
-	threadMembersUpdate: thread => thread.guildID,
+	guildStickersUpdate: (guild) => guild.id,
+	guildUnavailable: (guild) => guild.id,
+	guildUpdate: (guild) => guild.id,
+	integrationCreate: (guild) => guild.id,
+	integrationDelete: (guild) => guild.id,
+	integrationUpdate: (guild) => guild.id,
+	interactionCreate: (interaction) => interaction.guildID,
+	inviteCreate: (invite) => invite.guildID,
+	inviteDelete: (invite) => invite.guild?.id ?? null,
+	messageCreate: (message) => message.guildID,
+	messageDelete: (message) => message.guildID ?? null,
+	messageDeleteBulk: (messages) => messages[0]?.guildID ?? null,
+	messagePollVoteAdd: (message) => message.guildID ?? null,
+	messagePollVoteRemove: (message) => message.guildID ?? null,
+	messageReactionAdd: (message) => message.guildID ?? null,
+	messageReactionRemove: (message) => message.guildID ?? null,
+	messageReactionRemoveAll: (message) => message.guildID ?? null,
+	messageReactionRemoveEmoji: (message) => message.guildID ?? null,
+	messageUpdate: (message) => message.guildID,
+	presenceUpdate: (guild) => guild.id,
+	stageInstanceCreate: (instance) => instance.guildID,
+	stageInstanceDelete: (instance) => instance.guildID,
+	stageInstanceUpdate: (instance) => instance.guildID,
+	threadCreate: (thread) => thread.guildID,
+	threadDelete: (thread) => thread.guildID ?? null,
+	threadListSync: (threads) => threads[0]?.guildID ?? null,
+	threadMemberUpdate: (thread) => thread.guildID,
+	threadMembersUpdate: (thread) => thread.guildID,
 	threadUpdate: (...[thread]) => thread.guildID,
-	typingStart: (...[channel]) => "guildID" in channel ? channel.guildID : null,
-	unavailableGuildCreate: guild => guild.id,
-	voiceChannelEffectSend: channel => channel.guild.id,
-	voiceChannelJoin: member => member.guildID,
-	voiceChannelLeave: member => member.guildID,
-	voiceChannelStatusUpdate: channel => "guildID" in channel ? channel.guildID : null,
-	voiceChannelSwitch: member => member.guildID,
-	voiceStateUpdate: member => member.guildID,
-	webhooksUpdate: guild => guild.id,
-	guildSoundboardSoundCreate: sound => sound.guildID ?? null,
-	guildSoundboardSoundDelete: sound => "guildID" in sound ? (sound.guildID ?? null) : null,
-	guildSoundboardSoundUpdate: sound => sound.guildID ?? null,
-	guildSoundboardSoundsUpdate: (_sounds, _newSounds, guildID) => guildID ?? null,
-	soundboardSounds: guildID => guildID,
+	typingStart: (...[channel]) =>
+		"guildID" in channel ? channel.guildID : null,
+	unavailableGuildCreate: (guild) => guild.id,
+	voiceChannelEffectSend: (channel) => channel.guild.id,
+	voiceChannelJoin: (member) => member.guildID,
+	voiceChannelLeave: (member) => member.guildID,
+	voiceChannelStatusUpdate: (channel) =>
+		"guildID" in channel ? channel.guildID : null,
+	voiceChannelSwitch: (member) => member.guildID,
+	voiceStateUpdate: (member) => member.guildID,
+	webhooksUpdate: (guild) => guild.id,
+	guildSoundboardSoundCreate: (sound) => sound.guildID ?? null,
+	guildSoundboardSoundDelete: (sound) =>
+		"guildID" in sound ? (sound.guildID ?? null) : null,
+	guildSoundboardSoundUpdate: (sound) => sound.guildID ?? null,
+	guildSoundboardSoundsUpdate: (_sounds, _newSounds, guildID) =>
+		guildID ?? null,
+	soundboardSounds: (guildID) => guildID,
 
 	connect: () => null,
 	debug: () => null,

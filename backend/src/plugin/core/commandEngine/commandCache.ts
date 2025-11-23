@@ -1,6 +1,10 @@
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { EventListenerPhase } from "#extensionPoint.ts";
-import { OptionType, type Command, type Option } from "#plugin/core/public/command.ts";
+import {
+	OptionType,
+	type Command,
+	type Option,
+} from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 
 export interface CommandCacheEntry {
@@ -12,8 +16,8 @@ export interface CommandCacheEntry {
 }
 
 const all: CommandCacheEntry[] = [];
-const byName: Map<string, CommandCacheEntry> = new Map;
-const byPlugin: Map<string, CommandCacheEntry[]> = new Map;
+const byName: Map<string, CommandCacheEntry> = new Map();
+const byPlugin: Map<string, CommandCacheEntry[]> = new Map();
 
 export default [onBotInit(initCommandCache, EventListenerPhase.Pre)];
 
@@ -25,7 +29,9 @@ export function getCommandByName(name: string): CommandCacheEntry | undefined {
 	return byName.get(name);
 }
 
-export function getCommandsByPlugin(name: string): CommandCacheEntry[] | undefined {
+export function getCommandsByPlugin(
+	name: string,
+): CommandCacheEntry[] | undefined {
 	return byPlugin.get(name);
 }
 
@@ -58,8 +64,8 @@ function initCommandCache(): void {
 
 function makeCacheEntry(command: Command): CommandCacheEntry {
 	const optionsByPosition: [string, Option][] = [];
-	const optionsByName: Map<string, [string, Option]> = new Map;
-	const optionsByNegativeName: Map<string, string> = new Map;
+	const optionsByName: Map<string, [string, Option]> = new Map();
+	const optionsByNegativeName: Map<string, string> = new Map();
 
 	for (const key in command.options) {
 		if (!Object.hasOwn(command.options, key)) {
@@ -92,11 +98,13 @@ function makeCacheEntry(command: Command): CommandCacheEntry {
 	};
 }
 
-
-function formatCommandPrefixUsage(options: Command["options"], optionsByPosition: CommandCacheEntry["optionsByPosition"]): string {
+function formatCommandPrefixUsage(
+	options: Command["options"],
+	optionsByPosition: CommandCacheEntry["optionsByPosition"],
+): string {
 	let result = "";
 
-	const alreadyDisplayed = new Set;
+	const alreadyDisplayed = new Set();
 
 	for (const [key, option] of optionsByPosition) {
 		result += " ";
@@ -132,7 +140,8 @@ function formatCommandPrefixUsage(options: Command["options"], optionsByPosition
 		}
 
 		if ("negativeName" in option && option.negativeName !== undefined) {
-			result += "(-" + option.name[0] + "|-" + option.negativeName[0] + ")";
+			result +=
+				"(-" + option.name[0] + "|-" + option.negativeName[0] + ")";
 		} else {
 			result += "-" + option.name[0];
 		}
@@ -151,25 +160,23 @@ function formatCommandPrefixUsage(options: Command["options"], optionsByPosition
 
 function formatOptionValue(option: Option): string {
 	switch (option.type) {
-	case OptionType.Flag:
-		return "";
-	case OptionType.Integer:
-		return option.array ? "integer(s)" : "integer";
-	case OptionType.Number:
-		return option.array ? "number(s)" : "number";
-	case OptionType.String:
-		return option.array ? "text(s)" : "text";
-	case OptionType.Snowflake:
-		return option.array ? "id(s)" : "id";
-	case OptionType.User:
-		return option.array ? "user(s)" : "user";
-	case OptionType.Role:
-		return option.array ? "role(s)" : "role";
-	case OptionType.Channel:
-		return option.array ? "channel(s)" : "channel";
-	case OptionType.Duration:
-		return option.array ? "duration(s)" : "duration";
+		case OptionType.Flag:
+			return "";
+		case OptionType.Integer:
+			return option.array ? "integer(s)" : "integer";
+		case OptionType.Number:
+			return option.array ? "number(s)" : "number";
+		case OptionType.String:
+			return option.array ? "text(s)" : "text";
+		case OptionType.Snowflake:
+			return option.array ? "id(s)" : "id";
+		case OptionType.User:
+			return option.array ? "user(s)" : "user";
+		case OptionType.Role:
+			return option.array ? "role(s)" : "role";
+		case OptionType.Channel:
+			return option.array ? "channel(s)" : "channel";
+		case OptionType.Duration:
+			return option.array ? "duration(s)" : "duration";
 	}
 }
-
-

@@ -15,7 +15,10 @@ export function moduleLogger(): Logger {
 	let discriminator = path.relative("src", scriptName);
 
 	if (discriminator.endsWith(".ts")) {
-		discriminator = discriminator.substring(0, discriminator.lastIndexOf("."));
+		discriminator = discriminator.substring(
+			0,
+			discriminator.lastIndexOf("."),
+		);
 	}
 
 	return new Logger(discriminator);
@@ -23,16 +26,16 @@ export function moduleLogger(): Logger {
 
 function logLevelColor(level: LogLevel): string {
 	switch (level) {
-	case LogLevel.Debug:
-		return "\x1b[32m"; // green
-	case LogLevel.Info:
-		return "\x1b[34m"; // blue
-	case LogLevel.Warn:
-		return "\x1b[33m"; // yellow
-	case LogLevel.Error:
-		return "\x1b[31m"; // red
-	case LogLevel.Fatal:
-		return "\x1b[7m\x1b[31m"; // reversed red
+		case LogLevel.Debug:
+			return "\x1b[32m"; // green
+		case LogLevel.Info:
+			return "\x1b[34m"; // blue
+		case LogLevel.Warn:
+			return "\x1b[33m"; // yellow
+		case LogLevel.Error:
+			return "\x1b[31m"; // red
+		case LogLevel.Fatal:
+			return "\x1b[7m\x1b[31m"; // reversed red
 	}
 }
 
@@ -54,7 +57,9 @@ export class Logger {
 	 * Try to avoid excessive usage.
 	 * If you just want to see a value use a debugger or console.log - the latter is easy to spot and remove if it is accidentally left over.
 	 */
-	get debug(): LoggerFunction | undefined { return this.log(LogLevel.Debug); }
+	get debug(): LoggerFunction | undefined {
+		return this.log(LogLevel.Debug);
+	}
 
 	/**
 	 * Print an info message.
@@ -63,7 +68,9 @@ export class Logger {
 	 *
 	 * This should be used - rarely - for information which is relevent for the whole bot - mainly startup info.
 	 */
-	get info(): LoggerFunction | undefined { return this.log(LogLevel.Info); }
+	get info(): LoggerFunction | undefined {
+		return this.log(LogLevel.Info);
+	}
 
 	/**
 	 * Print a warning message.
@@ -72,7 +79,9 @@ export class Logger {
 	 *
 	 * This should be used for unexpected behavior which does not threaten stability.
 	 */
-	get warn(): LoggerFunction | undefined { return this.log(LogLevel.Warn); }
+	get warn(): LoggerFunction | undefined {
+		return this.log(LogLevel.Warn);
+	}
 
 	/**
 	 * Print an error message.
@@ -81,7 +90,9 @@ export class Logger {
 	 *
 	 * This should be used for unexpected errors which potentially could be more serious.
 	 */
-	get error(): LoggerFunction | undefined { return this.log(LogLevel.Error); }
+	get error(): LoggerFunction | undefined {
+		return this.log(LogLevel.Error);
+	}
 
 	/**
 	 * Print a fatal error message.
@@ -90,7 +101,9 @@ export class Logger {
 	 *
 	 * This should be used very rarely for critical errors.
 	 */
-	get fatal(): LoggerFunction | undefined { return this.log(LogLevel.Fatal); }
+	get fatal(): LoggerFunction | undefined {
+		return this.log(LogLevel.Fatal);
+	}
 
 	log(level: LogLevel): LoggerFunction | undefined {
 		if (LOG_LEVEL > level) {
@@ -100,7 +113,9 @@ export class Logger {
 		return (message, data) => {
 			// you mean you DON'T know ansi escape codes off by heart
 			// too bad!
-			console.error(`\x1b[2m${dateToHMSString()} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`);
+			console.error(
+				`\x1b[2m${dateToHMSString()} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`,
+			);
 
 			if (data !== undefined) {
 				console.group();

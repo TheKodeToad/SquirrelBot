@@ -7,7 +7,9 @@ import { loggingConfigStore } from "#plugin/logging/index.ts";
 import type { Guild } from "oceanic.js";
 
 type EventConfig = ValuesOf<LoggerConfig["events"]>;
-type EventConfigView<T extends EventConfig> = Parameters<Exclude<T, false>["render"]>[0];
+type EventConfigView<T extends EventConfig> = Parameters<
+	Exclude<T, false>["render"]
+>[0];
 
 export async function logEvent<T extends EventConfig>(
 	ctx: SquirrelDiscordContext,
@@ -45,7 +47,11 @@ export async function logEvent<T extends EventConfig>(
 			}
 
 			tasks.push(async () => {
-				const channel = await fetchTextableGuildChannelCached(ctx.bot, guild, logger.channel);
+				const channel = await fetchTextableGuildChannelCached(
+					ctx.bot,
+					guild,
+					logger.channel,
+				);
 
 				if (channel === null) {
 					return;
@@ -60,5 +66,5 @@ export async function logEvent<T extends EventConfig>(
 		}
 	}
 
-	await Promise.all(tasks.map(task => task()));
+	await Promise.all(tasks.map((task) => task()));
 }

@@ -13,7 +13,7 @@ const MessageCacheEntry = z.strictObject({
 	content: z.string(),
 });
 
-export interface MessageCacheEntry extends z.output<typeof MessageCacheEntry> { }
+export interface MessageCacheEntry extends z.output<typeof MessageCacheEntry> {}
 
 interface CreateMessageCacheEntryOptions {
 	authorID: string;
@@ -27,7 +27,7 @@ export async function upsertMessageCacheEntry(
 	guildID: string,
 	channelID: string,
 	id: string,
-	entry: CreateMessageCacheEntryOptions
+	entry: CreateMessageCacheEntryOptions,
 ): Promise<void> {
 	// TODO check whether this works properly
 	await db.query(
@@ -48,18 +48,31 @@ export async function upsertMessageCacheEntry(
 					SET "authorID" = $5, "authorName" = $6, "authorAvatarHash" = $7, "content" = $8
 					WHERE "logging_messageCache"."lastUpdated" <= $4
 		`,
-		[guildID, channelID, id, new Date, entry.authorID, entry.authorName, entry.authorAvatarHash, entry.content]
+		[
+			guildID,
+			channelID,
+			id,
+			new Date(),
+			entry.authorID,
+			entry.authorName,
+			entry.authorAvatarHash,
+			entry.content,
+		],
 	);
 }
 
-export async function getMessageCacheEntry(db: Pool, guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
+export async function getMessageCacheEntry(
+	db: Pool,
+	guildID: string,
+	channelID: string,
+	id: string,
+): Promise<MessageCacheEntry | null> {
 	const result = await db.query(
-
 		`
 			SELECT * FROM "logging_messageCache"
 			WHERE "guildID" = $1 AND "channelID" = $2 AND "id" = $3
 		`,
-		[guildID, channelID, id]
+		[guildID, channelID, id],
 	);
 
 	if (result.rowCount !== 1) {
@@ -69,14 +82,19 @@ export async function getMessageCacheEntry(db: Pool, guildID: string, channelID:
 	return dbParse(MessageCacheEntry, result.rows[0]);
 }
 
-export async function takeMessageCacheEntry(db: Pool, guildID: string, channelID: string, id: string): Promise<MessageCacheEntry | null> {
+export async function takeMessageCacheEntry(
+	db: Pool,
+	guildID: string,
+	channelID: string,
+	id: string,
+): Promise<MessageCacheEntry | null> {
 	const result = await db.query(
 		`
 			DELETE FROM "logging_messageCache"
 			WHERE "guildID" = $1 AND "channelID" = $2 AND "id" = $3
 			RETURNING *
 		`,
-		[guildID, channelID, id]
+		[guildID, channelID, id],
 	);
 
 	if (result.rowCount !== 1) {
@@ -86,13 +104,16 @@ export async function takeMessageCacheEntry(db: Pool, guildID: string, channelID
 	return dbParse(MessageCacheEntry, result.rows[0]);
 }
 
-export async function cleanUpMessageCacheEntries(db: Pool, threshold: Date): Promise<number> {
+export async function cleanUpMessageCacheEntries(
+	db: Pool,
+	threshold: Date,
+): Promise<number> {
 	const result = await db.query(
 		`
 			DELETE FROM "logging_messageCache"
 			WHERE "lastUpdated" <= $1
 		`,
-		[threshold]
+		[threshold],
 	);
 
 	return result.rowCount ?? 0;

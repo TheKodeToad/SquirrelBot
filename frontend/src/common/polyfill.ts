@@ -5,7 +5,10 @@ export interface Base64Options {
 	omitPadding: boolean;
 }
 
-export function Uint8Array_toBase64(array: Uint8Array, options: Base64Options): string {
+export function Uint8Array_toBase64(
+	array: Uint8Array,
+	options: Base64Options,
+): string {
 	if ("toBase64" in array && typeof array.toBase64 === "function") {
 		return array.toBase64(options);
 	} else {

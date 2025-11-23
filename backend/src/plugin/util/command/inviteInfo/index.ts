@@ -9,15 +9,23 @@ import { renderFriendInvite } from "#plugin/util/command/inviteInfo/friend.ts";
 import { renderGroupDMInvite } from "#plugin/util/command/inviteInfo/groupDM.ts";
 import { renderGuildInvite } from "#plugin/util/command/inviteInfo/guild.ts";
 import { utilConfigStore } from "#plugin/util/index.ts";
-import { Client, DiscordRESTError, InviteTypes, JSONErrorCodes, type ContainerComponent } from "oceanic.js";
+import {
+	Client,
+	DiscordRESTError,
+	InviteTypes,
+	JSONErrorCodes,
+	type ContainerComponent,
+} from "oceanic.js";
 
-const REGEX = /^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
+const REGEX =
+	/^\s*(?:(?:https:\/\/)?(?:(?:(?:canary\.|ptb\.)?discord(?:app)?\.com\/invite)|(?:discord\.gg(?:\/invite)?))\/)?([A-Za-z0-9-]+)\s*$/;
 
 const logger = moduleLogger();
 
 export default defineCommand({
 	name: ["inviteinfo", "invite", "invinfo", "inv"],
-	description: "Display information about a Discord invite by passing in the code or link.",
+	description:
+		"Display information about a Discord invite by passing in the code or link.",
 
 	trackUpdates: true,
 
@@ -26,21 +34,28 @@ export default defineCommand({
 			type: OptionType.String,
 			name: ["link", "l"],
 			required: true,
-			position: 0
+			position: 0,
 		},
 		hideImages: {
 			type: OptionType.Flag,
 			name: ["hide-images", "h", "hi", "no-images"],
-			description: "Do not display images in the invite information."
-		}
+			description: "Do not display images in the invite information.",
+		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, utilConfigStore, permissions => permissions.invite_info_command),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			utilConfigStore,
+			(permissions) => permissions.invite_info_command,
+		),
 	async run(ctx, args) {
 		const matches = REGEX.exec(args.link);
 
 		if (matches === null) {
-			await ctx.respond(`${icons.error} Provided link does not contain invite code!`);
+			await ctx.respond(
+				`${icons.error} Provided link does not contain invite code!`,
+			);
 			return;
 		}
 
@@ -54,9 +69,13 @@ export default defineCommand({
 			}
 
 			if (error.code === JSONErrorCodes.UNKNOWN_INVITE) {
-				await ctx.respond(`${icons.error} Invite not found: '${escapeMarkdown(code)}'! It might not be visible to apps.`);
+				await ctx.respond(
+					`${icons.error} Invite not found: '${escapeMarkdown(code)}'! It might not be visible to apps.`,
+				);
 			} else {
-				await ctx.respond(`${icons.error} Invite fetch failed: ${formatRESTError(error)}`);
+				await ctx.respond(
+					`${icons.error} Invite fetch failed: ${formatRESTError(error)}`,
+				);
 			}
 
 			return;
@@ -74,12 +93,29 @@ export default defineCommand({
 				invite.approximatePresenceCount,
 				invite.approximateMemberCount,
 				invite.expiresAt,
-				args.hideImages ?? false
+				args.hideImages ?? false,
 			);
-		} else if (invite.type === InviteTypes.FRIEND && invite.inviter !== undefined) {
-			container = renderFriendInvite(invite.inviter, invite.expiresAt, args.hideImages ?? false);
-		} else if (invite.type === InviteTypes.GROUP_DM && invite.channel !== null) {
-			container = renderGroupDMInvite(ctx.bot, invite.channel, invite.inviter, invite.approximateMemberCount, invite.expiresAt, args.hideImages ?? false);
+		} else if (
+			invite.type === InviteTypes.FRIEND &&
+			invite.inviter !== undefined
+		) {
+			container = renderFriendInvite(
+				invite.inviter,
+				invite.expiresAt,
+				args.hideImages ?? false,
+			);
+		} else if (
+			invite.type === InviteTypes.GROUP_DM &&
+			invite.channel !== null
+		) {
+			container = renderGroupDMInvite(
+				ctx.bot,
+				invite.channel,
+				invite.inviter,
+				invite.approximateMemberCount,
+				invite.expiresAt,
+				args.hideImages ?? false,
+			);
 		} else {
 			await ctx.respond(`${icons.error} Unknown invite type!`);
 			return;
@@ -95,7 +131,11 @@ function stealthyGetInvite(bot: Client, code: string) {
 	// remove Bot prefix because Discord API lets you resolve more invites for some reason (??)
 
 	const desc = Object.getOwnPropertyDescriptor(bot.options, "auth");
-	const trivialDesc = desc !== undefined && desc.writable && desc.get === undefined && desc.set === undefined;
+	const trivialDesc =
+		desc !== undefined &&
+		desc.writable &&
+		desc.get === undefined &&
+		desc.set === undefined;
 
 	const prefix = "Bot ";
 	const oldValue = bot.options.auth;
@@ -115,4 +155,3 @@ function stealthyGetInvite(bot: Client, code: string) {
 
 	return result;
 }
-

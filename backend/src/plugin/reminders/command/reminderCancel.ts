@@ -16,19 +16,32 @@ export default defineCommand({
 			type: OptionType.Integer,
 			required: true,
 			position: 0,
-		}
+		},
 	},
 
-
-	preRun: ctx => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			remindersConfigStore,
+			(permissions) => permissions.personal_reminders,
+		),
 	async run(ctx, { number }) {
-		const deleted = await deleteReminderIfOwnedBy(ctx.squirrelCtx.db, ctx.guild.id, number, ctx.user.id);
+		const deleted = await deleteReminderIfOwnedBy(
+			ctx.squirrelCtx.db,
+			ctx.guild.id,
+			number,
+			ctx.user.id,
+		);
 
 		if (deleted) {
 			untrackReminder(ctx.guild.id, number);
-			await ctx.respond(`${icons.success} Canceled reminder **#${number}**!`);
+			await ctx.respond(
+				`${icons.success} Canceled reminder **#${number}**!`,
+			);
 		} else {
-			await ctx.respond(`${icons.error} Reminder **#${number}** was not found!`);
+			await ctx.respond(
+				`${icons.error} Reminder **#${number}** was not found!`,
+			);
 		}
-	}
+	},
 });

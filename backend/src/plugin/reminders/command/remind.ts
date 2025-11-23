@@ -5,7 +5,10 @@ import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { trackNewReminder } from "#plugin/reminders/scheduler.ts";
-import { createReminder, type CreateReminderOptions } from "#plugin/reminders/storage/reminders.ts";
+import {
+	createReminder,
+	type CreateReminderOptions,
+} from "#plugin/reminders/storage/reminders.ts";
 import { MessageFlags } from "oceanic.js";
 
 export default defineCommand({
@@ -24,10 +27,15 @@ export default defineCommand({
 			name: ["message", "m"],
 			required: true,
 			position: 1,
-		}
+		},
 	},
 
-	preRun: (ctx) => permissionsGuard(ctx, remindersConfigStore, permissions => permissions.personal_reminders),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			remindersConfigStore,
+			(permissions) => permissions.personal_reminders,
+		),
 	async run(ctx, args) {
 		if (ctx.guild === null) {
 			return;
@@ -43,9 +51,16 @@ export default defineCommand({
 			createdAt: new Date(now),
 			firesAt: new Date(firesAt),
 			message: args.message ?? undefined,
-			silent: ((ctx.message?.flags ?? 0) & MessageFlags.SUPPRESS_NOTIFICATIONS) !== 0,
+			silent:
+				((ctx.message?.flags ?? 0) &
+					MessageFlags.SUPPRESS_NOTIFICATIONS) !==
+				0,
 		};
-		const number = await createReminder(ctx.squirrelCtx.db, ctx.guild.id, options);
+		const number = await createReminder(
+			ctx.squirrelCtx.db,
+			ctx.guild.id,
+			options,
+		);
 
 		trackNewReminder({
 			guildID: ctx.guild.id,
@@ -56,8 +71,8 @@ export default defineCommand({
 		const firesAtSecs = dateToUnixSecs(firesAt);
 
 		await ctx.respond(
-			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${number})!\n`
-			+ `${icons.tip} No notification will be sent if you are timed out or not present in the server.`
+			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${number})!\n` +
+				`${icons.tip} No notification will be sent if you are timed out or not present in the server.`,
 		);
-	}
+	},
 });

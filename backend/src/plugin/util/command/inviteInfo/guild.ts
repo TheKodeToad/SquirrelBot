@@ -2,8 +2,22 @@ import { formatUser } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSecs } from "#common/time.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { ActionRow, Container, Divider, Section, Text, Thumbnail, URLButton } from "oceanic-component-helper";
-import { User, type ContainerComponent, type InviteGuild, type MessageActionRowComponent, type PartialInviteChannel } from "oceanic.js";
+import {
+	ActionRow,
+	Container,
+	Divider,
+	Section,
+	Text,
+	Thumbnail,
+	URLButton,
+} from "oceanic-component-helper";
+import {
+	User,
+	type ContainerComponent,
+	type InviteGuild,
+	type MessageActionRowComponent,
+	type PartialInviteChannel,
+} from "oceanic.js";
 
 export function renderGuildInvite(
 	guild: InviteGuild,
@@ -12,7 +26,7 @@ export function renderGuildInvite(
 	onlineMembers: number | undefined,
 	totalMembers: number | undefined,
 	expiresAt: Date | undefined,
-	hideImages: boolean
+	hideImages: boolean,
 ): ContainerComponent {
 	const result = Container();
 
@@ -22,22 +36,31 @@ export function renderGuildInvite(
 
 	const mainInfo: string[] = [];
 
-	mainInfo.push("## " + escapeMarkdown(guild.name) + "\n**Server Invite**\n" + (guild.description || "*No description provided.*"));
+	mainInfo.push(
+		"## " +
+			escapeMarkdown(guild.name) +
+			"\n**Server Invite**\n" +
+			(guild.description || "*No description provided.*"),
+	);
 
 	if (totalMembers !== undefined && onlineMembers !== undefined) {
 		const online = onlineMembers.toLocaleString("en-US");
 		const total = totalMembers.toLocaleString("en-US");
 
-		mainInfo.push(`${icons.online} ${online} Online  ${icons.offline} ${total} Total`);
+		mainInfo.push(
+			`${icons.online} ${online} Online  ${icons.offline} ${total} Total`,
+		);
 	}
 
 	if (guild.premiumSubscriptionCount) {
 		const level = calculateLevel(guild.premiumSubscriptionCount);
-		mainInfo.push(`${icons.boost} Level ${level} (${guild.premiumSubscriptionCount} Boosts)`);
+		mainInfo.push(
+			`${icons.boost} Level ${level} (${guild.premiumSubscriptionCount} Boosts)`,
+		);
 	}
 
 	if (iconURL === null || hideImages) {
-		result.components.push(...mainInfo.map(content => Text(content)));
+		result.components.push(...mainInfo.map((content) => Text(content)));
 	} else {
 		result.components.push(Section(mainInfo, Thumbnail(iconURL)));
 	}
@@ -58,7 +81,11 @@ export function renderGuildInvite(
 
 	if (expiresAt !== undefined) {
 		const expirySeconds = dateToUnixSecs(expiresAt);
-		result.components.push(Text(`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`));
+		result.components.push(
+			Text(
+				`**Expires At:** <t:${expirySeconds}> (<t:${expirySeconds}:R>)`,
+			),
+		);
 	}
 
 	const actions = ActionRow<MessageActionRowComponent>();

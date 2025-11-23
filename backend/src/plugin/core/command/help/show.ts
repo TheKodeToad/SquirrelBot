@@ -1,10 +1,16 @@
-import { escapeMarkdown, makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
+import {
+	escapeMarkdown,
+	makeMarkdownInlineCodeblock,
+} from "#common/discord/markdown.ts";
 import type { CommandCacheEntry } from "#plugin/core/commandEngine/commandCache.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import { type ReplyObject } from "#plugin/core/public/command.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 
-export function renderCommandPage(guildID: string, entry: CommandCacheEntry): ReplyObject {
+export function renderCommandPage(
+	guildID: string,
+	entry: CommandCacheEntry,
+): ReplyObject {
 	const { command } = entry;
 
 	const container = Container([Text("## " + entry.command.name[0])]);
@@ -16,12 +22,20 @@ export function renderCommandPage(guildID: string, entry: CommandCacheEntry): Re
 	if (command.supportPrefix ?? true) {
 		container.components.push(Divider());
 
-		const prefix = coreConfigStore.get(guildID)?.prefix_commands.prefix ?? "";
+		const prefix =
+			coreConfigStore.get(guildID)?.prefix_commands.prefix ?? "";
 
-		let content = "**Usage:** " + makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage);
+		let content =
+			"**Usage:** " +
+			makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage);
 
 		if (command.name.length > 1) {
-			content += "\n**Aliases:** " + command.name.slice(1).map(name => makeMarkdownInlineCodeblock(prefix + name)).join(", ");
+			content +=
+				"\n**Aliases:** " +
+				command.name
+					.slice(1)
+					.map((name) => makeMarkdownInlineCodeblock(prefix + name))
+					.join(", ");
 		}
 
 		container.components.push(Text(content));

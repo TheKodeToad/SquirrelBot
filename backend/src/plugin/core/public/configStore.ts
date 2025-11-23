@@ -1,12 +1,14 @@
 import type { z } from "zod";
 
-export class ConfigStore<T extends z.ZodType = z.ZodType> implements ConfigStore<T> {
+export class ConfigStore<T extends z.ZodType = z.ZodType>
+	implements ConfigStore<T>
+{
 	private _cache: Map<string, z.output<T>>;
 	schema: T;
 
 	constructor(schema: T) {
 		this.schema = schema;
-		this._cache = new Map;
+		this._cache = new Map();
 	}
 
 	/** @returns The guild's config, or undefined if it's not available or disabled.  */

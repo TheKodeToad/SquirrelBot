@@ -1,5 +1,16 @@
 import { isSnowflake } from "#common/snowflake.ts";
-import { CENTURY, DAY, DECADE, HOUR, MILLENIUM, MINUTE, MONTH, SECOND, WEEK, YEAR } from "#common/time.ts";
+import {
+	CENTURY,
+	DAY,
+	DECADE,
+	HOUR,
+	MILLENIUM,
+	MINUTE,
+	MONTH,
+	SECOND,
+	WEEK,
+	YEAR,
+} from "#common/time.ts";
 import type { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 
 export function readBoolean(reader: StringReader): boolean | null {
@@ -39,8 +50,14 @@ export function readNumber(reader: StringReader): number | null {
  * @param reader StringReader instance
  * @param terminator The pattern to terminate the string if unquoted - defaults to space
  */
-export function readString(reader: StringReader, terminator?: RegExp): string | null {
-	if (!(reader.peek() === "'" || reader.peek() === '"') || reader.peek() === "`") {
+export function readString(
+	reader: StringReader,
+	terminator?: RegExp,
+): string | null {
+	if (
+		!(reader.peek() === "'" || reader.peek() === '"') ||
+		reader.peek() === "`"
+	) {
 		if (terminator !== undefined) {
 			return reader.readUntil(terminator);
 		} else {
@@ -94,7 +111,10 @@ export function readChannel(reader: StringReader): string | null {
 	return readMention(reader, "#");
 }
 
-function readMention(reader: StringReader, prefix: "@" | "&" | "#"): string | null {
+function readMention(
+	reader: StringReader,
+	prefix: "@" | "&" | "#",
+): string | null {
 	if (!reader.skipOver("<" + prefix)) {
 		return readSnowflake(reader);
 	}
@@ -115,7 +135,7 @@ function readMention(reader: StringReader, prefix: "@" | "&" | "#"): string | nu
 
 const DURATION_UNIT_BOUNDARY = /[A-Za-z\s]/g;
 const DURATION_LENGTH_BOUNDARY = /[^A-Za-z]/g;
-const DURATION_SEPARATOR = /(,|\s|and)*/yi;
+const DURATION_SEPARATOR = /(,|\s|and)*/iy;
 
 export function readDuration(reader: StringReader): number | null {
 	let total = null;
@@ -163,86 +183,86 @@ export function readDuration(reader: StringReader): number | null {
 
 function durationToMS(length: number, unit: string): number | null {
 	switch (unit) {
-	case "ms":
-	case "millisecond":
-	case "milliseconds":
-		return length;
+		case "ms":
+		case "millisecond":
+		case "milliseconds":
+			return length;
 
-	case "s":
-	case "sec":
-	case "secs":
-	case "second":
-	case "seconds":
-		return length * SECOND;
+		case "s":
+		case "sec":
+		case "secs":
+		case "second":
+		case "seconds":
+			return length * SECOND;
 
-	case "m":
-	case "min":
-	case "mins":
-	case "minute":
-	case "minutes":
-		return length * MINUTE;
+		case "m":
+		case "min":
+		case "mins":
+		case "minute":
+		case "minutes":
+			return length * MINUTE;
 
-	case "h":
-	case "hr":
-	case "hrs":
-	case "hour":
-	case "hours":
-		return length * HOUR;
+		case "h":
+		case "hr":
+		case "hrs":
+		case "hour":
+		case "hours":
+			return length * HOUR;
 
-	case "d":
-	case "dy":
-	case "dys":
-	case "day":
-	case "days":
-		return length * DAY;
+		case "d":
+		case "dy":
+		case "dys":
+		case "day":
+		case "days":
+			return length * DAY;
 
-	case "w":
-	case "wk":
-	case "wks":
-	case "week":
-	case "weeks":
-		return length * WEEK;
+		case "w":
+		case "wk":
+		case "wks":
+		case "week":
+		case "weeks":
+			return length * WEEK;
 
-	case "mo":
-	case "mon":
-	case "month":
-	case "months":
-		return length * MONTH;
+		case "mo":
+		case "mon":
+		case "month":
+		case "months":
+			return length * MONTH;
 
-	case "y":
-	case "yr":
-	case "yrs":
-	case "year":
-	case "years":
-		return length * YEAR;
+		case "y":
+		case "yr":
+		case "yrs":
+		case "year":
+		case "years":
+			return length * YEAR;
 
-	case "dc":
-	case "dcs":
-	case "dec":
-	case "decs":
-	case "decade":
-	case "decades":
-		return length * DECADE;
+		case "dc":
+		case "dcs":
+		case "dec":
+		case "decs":
+		case "decade":
+		case "decades":
+			return length * DECADE;
 
-	case "c":
-	case "cs":
-	case "cent":
-	case "cents":
-	case "century":
-	case "centuries":
-		return length * CENTURY;
+		case "c":
+		case "cs":
+		case "cent":
+		case "cents":
+		case "century":
+		case "centuries":
+			return length * CENTURY;
 
-	case "mi":
-	case "mis":
-	case "mil":
-	case "mils":
-	case "mill":
-	case "mills":
-	case "millenium":
-	case "millenia":
-		return length * MILLENIUM;
+		case "mi":
+		case "mis":
+		case "mil":
+		case "mils":
+		case "mill":
+		case "mills":
+		case "millenium":
+		case "millenia":
+			return length * MILLENIUM;
 
-	default:
-		return null;
+		default:
+			return null;
 	}
 }

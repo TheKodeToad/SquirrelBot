@@ -3,7 +3,10 @@ import { ClientBase, Pool, type PoolClient } from "pg";
 
 const logger = moduleLogger();
 
-export async function transaction<T>(client: ClientBase, action: () => Promise<T>): Promise<T> {
+export async function transaction<T>(
+	client: ClientBase,
+	action: () => Promise<T>,
+): Promise<T> {
 	await client.query("BEGIN");
 
 	try {
@@ -22,7 +25,10 @@ export async function transaction<T>(client: ClientBase, action: () => Promise<T
 	}
 }
 
-export async function poolTransaction<T>(db: Pool, action: (client: PoolClient) => Promise<T>): Promise<T> {
+export async function poolTransaction<T>(
+	db: Pool,
+	action: (client: PoolClient) => Promise<T>,
+): Promise<T> {
 	const client = await db.connect();
 
 	try {

@@ -1,8 +1,16 @@
-import { formatUserBold, formatUserBoldByID, formatUserByID, formatUserTagByID } from "#common/discord/format.ts";
+import {
+	formatUserBold,
+	formatUserBoldByID,
+	formatUserByID,
+	formatUserTagByID,
+} from "#common/discord/format.ts";
 import { escapeMarkdown, makeMarkdownQuote } from "#common/discord/markdown.ts";
 import { dateToUnixSecs, humanizeDuration } from "#common/time.ts";
 import type { ModActionFailure } from "#plugin/moderation/helper/modAction.ts";
-import { ModEventType, type ModEvent } from "#plugin/moderation/public/modEvent.ts";
+import {
+	ModEventType,
+	type ModEvent,
+} from "#plugin/moderation/public/modEvent.ts";
 import { type CaseInfo } from "#plugin/moderation/storage/cases.ts";
 import type { Client } from "oceanic.js";
 
@@ -30,24 +38,28 @@ function caseExpired(info: CaseInfo, date: number = Date.now()): boolean {
 
 function caseSummaryBase(type: ModEventType, target: string): string {
 	switch (type) {
-	case ModEventType.Note:
-		return `Note added for ${target}`;
-	case ModEventType.Warn:
-		return `Warned ${target}`;
-	case ModEventType.Timeout:
-		return `Timed out ${target}`;
-	case ModEventType.ClearTimeout:
-		return `Removed timeout from ${target}`;
-	case ModEventType.Kick:
-		return `Kicked ${target}`;
-	case ModEventType.Ban:
-		return `Banned ${target}`;
-	case ModEventType.Unban:
-		return `Unbanned ${target}`;
+		case ModEventType.Note:
+			return `Note added for ${target}`;
+		case ModEventType.Warn:
+			return `Warned ${target}`;
+		case ModEventType.Timeout:
+			return `Timed out ${target}`;
+		case ModEventType.ClearTimeout:
+			return `Removed timeout from ${target}`;
+		case ModEventType.Kick:
+			return `Kicked ${target}`;
+		case ModEventType.Ban:
+			return `Banned ${target}`;
+		case ModEventType.Unban:
+			return `Unbanned ${target}`;
 	}
 }
 
-export async function formatCaseDescription(bot: Client, info: CaseInfo, bigTitle: boolean): Promise<string> {
+export async function formatCaseDescription(
+	bot: Client,
+	info: CaseInfo,
+	bigTitle: boolean,
+): Promise<string> {
 	let title = "Case #" + info.number;
 
 	if (info.shadowedBy !== null) {
@@ -83,14 +95,16 @@ export async function formatCaseDescription(bot: Client, info: CaseInfo, bigTitl
 	return title + "\n" + summary;
 }
 
-export async function formatCaseFields(bot: Client, info: CaseInfo): Promise<string> {
+export async function formatCaseFields(
+	bot: Client,
+	info: CaseInfo,
+): Promise<string> {
 	let result = "";
 
 	result += `**Moderator:** ${await formatUserByID(bot, info.actorID)}\n`;
 
 	const creationSecs = dateToUnixSecs(info.createdAt);
 	result += `**Performed At:** <t:${creationSecs}> (<t:${creationSecs}:R>)\n`;
-
 
 	if (info.expiresAt !== null) {
 		const expirySecs = dateToUnixSecs(info.expiresAt);
@@ -100,7 +114,10 @@ export async function formatCaseFields(bot: Client, info: CaseInfo): Promise<str
 	return result;
 }
 
-export async function formatCompactCaseSummary(bot: Client, info: CaseInfo): Promise<string> {
+export async function formatCompactCaseSummary(
+	bot: Client,
+	info: CaseInfo,
+): Promise<string> {
 	const actor = await formatUserTagByID(bot, info.actorID);
 	const target = await formatUserTagByID(bot, info.targetID);
 
@@ -113,27 +130,27 @@ export async function formatCompactCaseSummary(bot: Client, info: CaseInfo): Pro
 	}
 
 	switch (info.type) {
-	case ModEventType.Note:
-		result += `Note added for ${target} by ${actor}`;
-		break;
-	case ModEventType.Warn:
-		result += `${target} warned by ${actor}`;
-		break;
-	case ModEventType.Timeout:
-		result += `${target} muted by ${actor}`;
-		break;
-	case ModEventType.ClearTimeout:
-		result += `${target} unmuted by ${actor}`;
-		break;
-	case ModEventType.Kick:
-		result += `${target} kicked by ${actor}`;
-		break;
-	case ModEventType.Ban:
-		result += `${target} banned by ${actor}`;
-		break;
-	case ModEventType.Unban:
-		result += `${target} unbanned by ${actor}`;
-		break;
+		case ModEventType.Note:
+			result += `Note added for ${target} by ${actor}`;
+			break;
+		case ModEventType.Warn:
+			result += `${target} warned by ${actor}`;
+			break;
+		case ModEventType.Timeout:
+			result += `${target} muted by ${actor}`;
+			break;
+		case ModEventType.ClearTimeout:
+			result += `${target} unmuted by ${actor}`;
+			break;
+		case ModEventType.Kick:
+			result += `${target} kicked by ${actor}`;
+			break;
+		case ModEventType.Ban:
+			result += `${target} banned by ${actor}`;
+			break;
+		case ModEventType.Unban:
+			result += `${target} unbanned by ${actor}`;
+			break;
 	}
 
 	if (info.reason !== null) {

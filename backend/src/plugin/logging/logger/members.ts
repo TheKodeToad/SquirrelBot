@@ -10,13 +10,20 @@ export default [
 	onBotEvent({ type: "guildMemberRemove", listener: handleRemove }),
 ];
 
-async function handleAdd(ctx: SquirrelDiscordContext, member: Member): Promise<void> {
+async function handleAdd(
+	ctx: SquirrelDiscordContext,
+	member: Member,
+): Promise<void> {
 	await logEvent(ctx, member.guild, null, "member_join", () => ({
-		user: makeMemberUserView(member)
+		user: makeMemberUserView(member),
 	}));
 }
 
-async function handleRemove(ctx: SquirrelDiscordContext, user: Member | User, guild: Guild | Uncached): Promise<void> {
+async function handleRemove(
+	ctx: SquirrelDiscordContext,
+	user: Member | User,
+	guild: Guild | Uncached,
+): Promise<void> {
 	if (!(guild instanceof Guild)) {
 		return;
 	}
@@ -28,7 +35,6 @@ async function handleRemove(ctx: SquirrelDiscordContext, user: Member | User, gu
 	}
 
 	await logEvent(ctx, guild, null, "member_leave", () => ({
-		user: "guildID" in user ? makeMemberUserView(user) : makeUserView(user)
+		user: "guildID" in user ? makeMemberUserView(user) : makeUserView(user),
 	}));
 }
-

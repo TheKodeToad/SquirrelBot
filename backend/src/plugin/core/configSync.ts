@@ -3,10 +3,19 @@ import { mapIterable, type Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { CoreConfig } from "#plugin/core/config.ts";
-import { getAllowedGuilds, isGuildAllowed, onGuildAccessGranted, onGuildAccessRevoked, onGuildInfoReady } from "#plugin/core/guildInfoSync.ts";
+import {
+	getAllowedGuilds,
+	isGuildAllowed,
+	onGuildAccessGranted,
+	onGuildAccessRevoked,
+	onGuildInfoReady,
+} from "#plugin/core/guildInfoSync.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import { defineConfig } from "#plugin/core/public/extensionPoints.ts";
-import { getGuildConfig, insertGuildConfig } from "#plugin/core/storage/configs.ts";
+import {
+	getGuildConfig,
+	insertGuildConfig,
+} from "#plugin/core/storage/configs.ts";
 import AsyncLock from "async-lock";
 import type { Client } from "oceanic.js";
 import { parse as parseToml, TomlError } from "smol-toml";
@@ -21,22 +30,36 @@ export default [
 ];
 
 async function init(ctx: SquirrelDiscordContext): Promise<void> {
-	await Promise.all(mapIterable(getAllowedGuilds(), guildID => createAndLoadConfigs(ctx, guildID)));
+	await Promise.all(
+		mapIterable(getAllowedGuilds(), (guildID) =>
+			createAndLoadConfigs(ctx, guildID),
+		),
+	);
 	await installConfigChangeListener(ctx);
 }
 
-const configUpdateLock = new AsyncLock;
+const configUpdateLock = new AsyncLock();
 
-function acquireConfig<T>(guildID: string, pluginID: string, action: () => Awaitable<T>): Promise<T> {
+function acquireConfig<T>(
+	guildID: string,
+	pluginID: string,
+	action: () => Awaitable<T>,
+): Promise<T> {
 	return configUpdateLock.acquire(guildID + "::" + pluginID, action);
 }
 
-function formatGuildPlugin(bot: Client, guildID: string, pluginID: string): string {
+function formatGuildPlugin(
+	bot: Client,
+	guildID: string,
+	pluginID: string,
+): string {
 	return `#${pluginID} in ${debugFormatGuildByID(bot, guildID)}`;
 }
 
-async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise<void> {
-	await ctx.dbNotifs.addListener("core_configUpdate", async payload => {
+async function installConfigChangeListener(
+	ctx: SquirrelDiscordContext,
+): Promise<void> {
+	await ctx.dbNotifs.addListener("core_configUpdate", async (payload) => {
 		if (payload === undefined) {
 			return;
 		}
@@ -58,7 +81,9 @@ async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise
 		}
 
 		if (!("pluginID" in payloadObject && "guildID" in payloadObject)) {
-			logger.warn?.("configUpdate payload does not contain pluginID and guildID");
+			logger.warn?.(
+				"configUpdate payload does not contain pluginID and guildID",
+			);
 			return;
 		}
 
@@ -70,7 +95,9 @@ async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise
 		}
 
 		if (!isGuildAllowed(guildID)) {
-			logger.debug?.(`${debugFormatGuildByID(ctx.bot, guildID)} not allowed; not updating config`);
+			logger.debug?.(
+				`${debugFormatGuildByID(ctx.bot, guildID)} not allowed; not updating config`,
+			);
 			return;
 		}
 
@@ -78,47 +105,76 @@ async function installConfigChangeListener(ctx: SquirrelDiscordContext): Promise
 			const plugin = ctx.plugins.get(pluginID);
 
 			if (plugin === undefined) {
-				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not exist`);
+				logger.warn?.(
+					`Received configUpdate for plugin #${pluginID} which does not exist`,
+				);
 				return;
 			}
 
 			const config = defineConfig.contributions.get(plugin);
 
 			if (config === undefined) {
-				logger.warn?.(`Received configUpdate for plugin #${pluginID} which does not have a config`);
+				logger.warn?.(
+					`Received configUpdate for plugin #${pluginID} which does not have a config`,
+				);
 				return;
 			}
 
-			logger.debug?.(`Updating config for plugin ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`);
+			logger.debug?.(
+				`Updating config for plugin ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`,
+			);
 
 			await loadConfig(ctx, guildID, plugin.id, config.store);
 		});
 	});
 }
 
-async function createAndLoadConfigs(ctx: SquirrelDiscordContext, guildID: string): Promise<void> {
-	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
-		await acquireConfig(guildID, plugin.id, async () => {
-			const inserted = await insertGuildConfig(ctx.db, guildID, plugin.id, config.defaultValue);
+async function createAndLoadConfigs(
+	ctx: SquirrelDiscordContext,
+	guildID: string,
+): Promise<void> {
+	await Promise.all(
+		defineConfig.contributions.entries().map(async ([plugin, config]) => {
+			await acquireConfig(guildID, plugin.id, async () => {
+				const inserted = await insertGuildConfig(
+					ctx.db,
+					guildID,
+					plugin.id,
+					config.defaultValue,
+				);
 
-			if (inserted) {
-				logger.debug?.(`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(ctx.bot, guildID)}`);
-			}
+				if (inserted) {
+					logger.debug?.(
+						`Creating config for plugin #${plugin.id} in ${debugFormatGuildByID(ctx.bot, guildID)}`,
+					);
+				}
 
-			await loadConfig(ctx, guildID, plugin.id, config.store);
-		});
-	}));
+				await loadConfig(ctx, guildID, plugin.id, config.store);
+			});
+		}),
+	);
 }
 
 async function unloadConfigs(guildID: string): Promise<void> {
-	await Promise.all(defineConfig.contributions.entries().map(async ([plugin, config]) => {
-		await acquireConfig(guildID, plugin.id, () => config.store.delete(guildID));
-	}));
+	await Promise.all(
+		defineConfig.contributions.entries().map(async ([plugin, config]) => {
+			await acquireConfig(guildID, plugin.id, () =>
+				config.store.delete(guildID),
+			);
+		}),
+	);
 }
 
-const coreConfigDefault = CoreConfig.parse({} satisfies z.input<typeof CoreConfig>);
+const coreConfigDefault = CoreConfig.parse(
+	{} satisfies z.input<typeof CoreConfig>,
+);
 
-async function loadConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID: string, configStore: ConfigStore): Promise<void> {
+async function loadConfig(
+	ctx: SquirrelDiscordContext,
+	guildID: string,
+	pluginID: string,
+	configStore: ConfigStore,
+): Promise<void> {
 	const value = await parseConfig(ctx, guildID, pluginID, configStore);
 
 	if (value !== null) {
@@ -132,7 +188,12 @@ async function loadConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID
 	}
 }
 
-async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginID: string, configCache: ConfigStore): Promise<{} | null> {
+async function parseConfig(
+	ctx: SquirrelDiscordContext,
+	guildID: string,
+	pluginID: string,
+	configCache: ConfigStore,
+): Promise<{} | null> {
 	const rawValue = await getGuildConfig(ctx.db, guildID, pluginID);
 
 	if (rawValue === null) {
@@ -145,7 +206,10 @@ async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginI
 		if (!(error instanceof TomlError)) {
 			logger.error?.("Unexpected error parsing TOML (bug)", error);
 		} else {
-			logger.debug?.(`Invalid TOML syntax in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`, error);
+			logger.debug?.(
+				`Invalid TOML syntax in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`,
+				error,
+			);
 		}
 
 		return null;
@@ -153,7 +217,9 @@ async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginI
 
 	if (pluginID !== "core") {
 		if (typeof table.enabled !== "boolean") {
-			logger.debug?.(`Missing { enabled: boolean; } in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`);
+			logger.debug?.(
+				`Missing { enabled: boolean; } in plugin config of ${formatGuildPlugin(ctx.bot, guildID, pluginID)}`,
+			);
 			return null;
 		}
 
@@ -173,7 +239,10 @@ async function parseConfig(ctx: SquirrelDiscordContext, guildID: string, pluginI
 	}
 
 	if (!result.success) {
-		logger.debug?.(`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(ctx.bot, guildID)}`, z.prettifyError(result.error));
+		logger.debug?.(
+			`Validation failed for plugin config of #${pluginID} in ${debugFormatGuildByID(ctx.bot, guildID)}`,
+			z.prettifyError(result.error),
+		);
 		return null;
 	}
 

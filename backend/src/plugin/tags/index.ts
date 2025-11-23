@@ -28,5 +28,5 @@ export default definePlugin({
 		}),
 		tag,
 		tagSet,
-	]
+	],
 });

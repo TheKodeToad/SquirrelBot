@@ -1,6 +1,15 @@
 import { AUTH_LOG_IN, AUTH_LOG_OUT, GUILDS, PLUGIN_CONFIG } from "./routes";
 
-type HTTPMethod = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE" | "PATCH";
+type HTTPMethod =
+	| "GET"
+	| "HEAD"
+	| "POST"
+	| "PUT"
+	| "DELETE"
+	| "CONNECT"
+	| "OPTIONS"
+	| "TRACE"
+	| "PATCH";
 
 function extractMessage(body: unknown) {
 	if (typeof body === "string") {
@@ -44,17 +53,23 @@ export interface GuildResponse {
 
 export interface RequestOptions {
 	token?: string;
-	body?: {
-		contentType: "application/json";
-		value: unknown;
-	} | {
-		contentType: string;
-		data: string;
-	};
+	body?:
+		| {
+				contentType: "application/json";
+				value: unknown;
+		  }
+		| {
+				contentType: string;
+				data: string;
+		  };
 }
 
-async function request<T>(method: HTTPMethod, route: string, options: RequestOptions = {}): Promise<T> {
-	const headers = new Headers;
+async function request<T>(
+	method: HTTPMethod,
+	route: string,
+	options: RequestOptions = {},
+): Promise<T> {
+	const headers = new Headers();
 
 	let body: string | undefined;
 
@@ -92,7 +107,7 @@ export function logIn(code: string, codeVerifier: string) {
 		body: {
 			contentType: "application/json",
 			value: { code, codeVerifier },
-		}
+		},
 	});
 }
 
@@ -108,7 +123,12 @@ export function getGuildConfig(token: string, guildID: string, plugin: string) {
 	return request<string>("GET", PLUGIN_CONFIG(guildID, plugin), { token });
 }
 
-export async function writeGuildConfig(token: string, guildID: string, plugin: string, text: string) {
+export async function writeGuildConfig(
+	token: string,
+	guildID: string,
+	plugin: string,
+	text: string,
+) {
 	await request<null>("PUT", PLUGIN_CONFIG(guildID, plugin), {
 		token,
 		body: {

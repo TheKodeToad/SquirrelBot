@@ -12,20 +12,20 @@ export enum ModEventType {
 
 export function reverseModEventType(type: ModEventType): ModEventType | null {
 	switch (type) {
-	case ModEventType.Note:
-		return null;
-	case ModEventType.Warn:
-		return null;
-	case ModEventType.Timeout:
-		return ModEventType.ClearTimeout;
-	case ModEventType.ClearTimeout:
-		return ModEventType.Timeout;
-	case ModEventType.Kick:
-		return null;
-	case ModEventType.Ban:
-		return ModEventType.Unban;
-	case ModEventType.Unban:
-		return ModEventType.Ban;
+		case ModEventType.Note:
+			return null;
+		case ModEventType.Warn:
+			return null;
+		case ModEventType.Timeout:
+			return ModEventType.ClearTimeout;
+		case ModEventType.ClearTimeout:
+			return ModEventType.Timeout;
+		case ModEventType.Kick:
+			return null;
+		case ModEventType.Ban:
+			return ModEventType.Unban;
+		case ModEventType.Unban:
+			return ModEventType.Ban;
 	}
 }
 

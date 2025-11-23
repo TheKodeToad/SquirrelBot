@@ -16,12 +16,20 @@ export function makeGuildView(guild: Guild): GuildView {
 	const result = {
 		id: guild.id,
 		name: guild.name,
-		get icon() { return guild.iconURL(); },
+		get icon() {
+			return guild.iconURL();
+		},
 
-		get link() { return BASE_URL + Routes.CHANNEL(guild.id); },
-		get maskedLink() { return `[${escapeMarkdown(guild.name)}](${this.link})`; },
+		get link() {
+			return BASE_URL + Routes.CHANNEL(guild.id);
+		},
+		get maskedLink() {
+			return `[${escapeMarkdown(guild.name)}](${this.link})`;
+		},
 
-		toString() { return this.name; }
+		toString() {
+			return this.name;
+		},
 	};
 
 	return result;

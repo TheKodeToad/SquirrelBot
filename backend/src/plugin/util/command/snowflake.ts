@@ -8,7 +8,8 @@ const DISCORD_EPOCH = BigInt(new Date(2015, 0, 1).getTime());
 
 export default defineCommand({
 	name: ["snowflake", "snowflakeinfo", "creation"],
-	description: "Calculate the creation date of something on Discord based on its ID.",
+	description:
+		"Calculate the creation date of something on Discord based on its ID.",
 
 	trackUpdates: true,
 	options: {
@@ -21,10 +22,17 @@ export default defineCommand({
 		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, utilConfigStore, permissions => permissions.snowflake_command),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			utilConfigStore,
+			(permissions) => permissions.snowflake_command,
+		),
 	async run(ctx, args) {
 		const snowflake = BigInt(args.input);
 		const timestamp = DISCORD_EPOCH + (snowflake >> 22n);
-		await ctx.respond(`${icons.info} **<t:${timestamp / 1000n}>** (${timestamp} unix time)`);
+		await ctx.respond(
+			`${icons.info} **<t:${timestamp / 1000n}>** (${timestamp} unix time)`,
+		);
 	},
 });

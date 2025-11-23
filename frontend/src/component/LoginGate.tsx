@@ -4,14 +4,14 @@ import { logIn, loginCallbackStatus } from "../auth";
 import { account } from "../state/account";
 import { Button } from "./common/Button";
 
-export function LoginGate(props: { children: JSX.Element; }) {
-	const Status = (props: { children: JSX.Element; }) => <div class="vbox loginGate">{props.children}</div>;
+export function LoginGate(props: { children: JSX.Element }) {
+	const Status = (props: { children: JSX.Element }) => (
+		<div class="vbox loginGate">{props.children}</div>
+	);
 
 	return (
 		<Switch>
-			<Match when={account() !== null}>
-				{props.children}
-			</Match>
+			<Match when={account() !== null}>{props.children}</Match>
 			<Match when={loginCallbackStatus() === null}>
 				<Status>
 					<h1 style={{ margin: 0 }}>Login Required</h1>
@@ -31,7 +31,11 @@ export function LoginGate(props: { children: JSX.Element; }) {
 				<Status>
 					<h1 style={{ margin: 0 }}>Login Failed</h1>
 					<p>{String((loginCallbackStatus() as any).error)}</p>
-					<Button onClick={logIn} color="primary" icon={IconArrowBackUp}>
+					<Button
+						onClick={logIn}
+						color="primary"
+						icon={IconArrowBackUp}
+					>
 						Try Again
 					</Button>
 				</Status>

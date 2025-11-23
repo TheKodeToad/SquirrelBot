@@ -1,4 +1,15 @@
-import { CENTURY, DAY, DECADE, HOUR, humanizeDuration, MINUTE, MONTH, SECOND, WEEK, YEAR } from "#common/time.ts";
+import {
+	CENTURY,
+	DAY,
+	DECADE,
+	HOUR,
+	humanizeDuration,
+	MINUTE,
+	MONTH,
+	SECOND,
+	WEEK,
+	YEAR,
+} from "#common/time.ts";
 import { readDuration } from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
 import { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import assert from "node:assert";
@@ -13,7 +24,11 @@ suite("duration parsing", () => {
 			throw new Error(`Invalid input: '${input}'`);
 		}
 
-		assert.equal(result, expected, `'${humanizeDuration(result)}' == '${humanizeDuration(expected)}' (input: '${input}')`);
+		assert.equal(
+			result,
+			expected,
+			`'${humanizeDuration(result)}' == '${humanizeDuration(expected)}' (input: '${input}')`,
+		);
 	};
 
 	// mundane stuff which users will expect to work
@@ -77,7 +92,10 @@ suite("duration parsing", () => {
 
 		check("1y,,,,, AND 6 MO", YEAR + 6 * MONTH);
 		check("1y,,,,, AND,,,, 6 MO", YEAR + 6 * MONTH);
-		check("1 yr ,,, , , , ,,, ,, 6 mo ,,,, 6 minute", YEAR + 6 * MONTH + 6 * MINUTE);
+		check(
+			"1 yr ,,, , , , ,,, ,, 6 mo ,,,, 6 minute",
+			YEAR + 6 * MONTH + 6 * MINUTE,
+		);
 
 		check("1 century", CENTURY);
 		check("1 decade", DECADE);

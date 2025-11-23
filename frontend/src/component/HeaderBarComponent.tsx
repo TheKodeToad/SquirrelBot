@@ -1,5 +1,9 @@
 import { A, useMatch } from "@solidjs/router";
-import { IconChevronRight, IconLogout, IconSettings } from "@tabler/icons-solidjs";
+import {
+	IconChevronRight,
+	IconLogout,
+	IconSettings,
+} from "@tabler/icons-solidjs";
 import { Match, Show, Switch } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { logOut } from "../auth";
@@ -8,7 +12,7 @@ import { guilds, useGuild } from "../state/guilds";
 import { Button } from "./common/Button";
 import { GuildIcon } from "./common/GuildIcon";
 
-export function HeaderBarComponent(props: { children?: JSX.Element; }) {
+export function HeaderBarComponent(props: { children?: JSX.Element }) {
 	const guildMatch = useMatch(() => "/guilds/:guildID/*?");
 
 	const breadcrumbChildren = () => {
@@ -20,18 +24,18 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 			return (
 				<>
 					<IconChevronRight size="1em" />
-					<GuildIcon id={guildID} iconHash={guild?.iconHash ?? null} size={24} />
+					<GuildIcon
+						id={guildID}
+						iconHash={guild?.iconHash ?? null}
+						size={24}
+					/>
 					<A href={`/guilds/${guildID}`}>
 						<Switch>
 							<Match when={guild !== undefined}>
 								{guild!.name}
 							</Match>
-							<Match when={guilds.loading}>
-								Loading
-							</Match>
-							<Match when={true}>
-								Unknown
-							</Match>
+							<Match when={guilds.loading}>Loading</Match>
+							<Match when={true}>Unknown</Match>
 						</Switch>
 					</A>
 				</>
@@ -44,7 +48,12 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 	return (
 		<>
 			<nav id="headerBar" class="hbox">
-				<span id="headerBar-breadcrumb"><A href="/" end={true}>Dashboard</A>{breadcrumbChildren()}</span>
+				<span id="headerBar-breadcrumb">
+					<A href="/" end={true}>
+						Dashboard
+					</A>
+					{breadcrumbChildren()}
+				</span>
 				<span style={{ "margin-left": "auto" }} />
 				<Show when={account() !== null}>
 					<AccountButton account={account()!} />
@@ -57,12 +66,12 @@ export function HeaderBarComponent(props: { children?: JSX.Element; }) {
 			{props.children}
 		</>
 	);
-};
-function AccountButton(props: { account: Account; }) {
+}
+function AccountButton(props: { account: Account }) {
 	return (
 		<Button onClick={() => logOut()} color="transparent3">
-			<img src={useAvatarURL()} class="avatar" /> {props.account!.username} <IconLogout size="1em" />
+			<img src={useAvatarURL()} class="avatar" />{" "}
+			{props.account!.username} <IconLogout size="1em" />
 		</Button>
 	);
 }
-

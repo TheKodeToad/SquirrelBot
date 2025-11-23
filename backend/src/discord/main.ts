@@ -15,9 +15,9 @@ const bot = new Client({
 	auth: `Bot ${BOT_TOKEN}`,
 	gateway: {
 		intents:
-			Constants.AllNonPrivilegedIntents
-			| Constants.Intents.MESSAGE_CONTENT
-			| Constants.Intents.GUILD_MEMBERS,
+			Constants.AllNonPrivilegedIntents |
+			Constants.Intents.MESSAGE_CONTENT |
+			Constants.Intents.GUILD_MEMBERS,
 		lookupDisallowedIntents: true,
 	},
 
@@ -45,9 +45,11 @@ bot.once("ready", async () => {
 	}
 });
 
-bot.on("shardPreReady", id => logger.debug?.(`Shard #${id} received READY packet`));
-bot.on("shardReady", id => logger.info?.(`Shard #${id} ready`));
-bot.on("shardResume", id => logger.info?.(`Shard #${id} resumed`));
+bot.on("shardPreReady", (id) =>
+	logger.debug?.(`Shard #${id} received READY packet`),
+);
+bot.on("shardReady", (id) => logger.info?.(`Shard #${id} ready`));
+bot.on("shardResume", (id) => logger.info?.(`Shard #${id} resumed`));
 bot.on("shardDisconnect", (error, id) => {
 	if (error === undefined) {
 		logger.info?.(`Shard #${id} disconnected`);
@@ -55,7 +57,7 @@ bot.on("shardDisconnect", (error, id) => {
 		logger.error?.(`Shard #${id} disconnected with error`, error);
 	}
 });
-bot.on("connect", id => logger.info?.(`Shard #${id} connected`));
+bot.on("connect", (id) => logger.info?.(`Shard #${id} connected`));
 
 bot.on("error", (error, shard) => {
 	if (shard !== undefined) {

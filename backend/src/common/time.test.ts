@@ -1,4 +1,13 @@
-import { DAY, HOUR, humanizeDuration, MINUTE, MONTH, SECOND, WEEK, YEAR } from "#common/time.ts";
+import {
+	DAY,
+	HOUR,
+	humanizeDuration,
+	MINUTE,
+	MONTH,
+	SECOND,
+	WEEK,
+	YEAR,
+} from "#common/time.ts";
 import assert from "node:assert";
 import test, { suite } from "node:test";
 

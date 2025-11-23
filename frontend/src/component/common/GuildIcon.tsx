@@ -1,6 +1,10 @@
 import { buildURI } from "../../common/uris";
 
-export function GuildIcon(props: { id: string; iconHash: string | null; size: number; }) {
+export function GuildIcon(props: {
+	id: string;
+	iconHash: string | null;
+	size: number;
+}) {
 	const icon =
 		props.iconHash !== null
 			? buildURI`https://cdn.discordapp.com/icons/${props.id}/${props.iconHash}.png?size=${(props.size * 4).toString()}`
@@ -20,5 +24,4 @@ export function GuildIcon(props: { id: string; iconHash: string | null; size: nu
 			src={icon}
 		/>
 	);
-
 }

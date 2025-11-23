@@ -1,4 +1,6 @@
-const constants: Constants = JSON.parse(document.getElementById("constants")!.textContent!);
+const constants: Constants = JSON.parse(
+	document.getElementById("constants")!.textContent!,
+);
 
 interface Constants {
 	env: {
@@ -20,5 +22,12 @@ export interface Plugin {
 	description?: string;
 }
 
-export const { CLIENT_ID, REDIRECT_URI, APP_NAME, APP_DESCRIPTION, APP_SOURCE_CODE, APP_INVITE_PERMISSIONS } = constants.env;
+export const {
+	CLIENT_ID,
+	REDIRECT_URI,
+	APP_NAME,
+	APP_DESCRIPTION,
+	APP_SOURCE_CODE,
+	APP_INVITE_PERMISSIONS,
+} = constants.env;
 export const PLUGINS = constants.plugins;

@@ -15,18 +15,25 @@ export default defineCommand({
 			name: ["name", "n"],
 			required: true,
 			position: 0,
-		}
+		},
 	},
 
-	preRun: ctx => permissionsGuard(ctx, tagsConfigStore, permissions => permissions.tag_send),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			tagsConfigStore,
+			(permissions) => permissions.tag_send,
+		),
 	async run(ctx, { name }) {
 		const tag = await getTag(ctx.squirrelCtx.db, ctx.guild.id, name);
 
 		if (tag === null) {
-			await ctx.respond(`${icons.error} Tag '${escapeMarkdown(name)}' could not be found!`);
+			await ctx.respond(
+				`${icons.error} Tag '${escapeMarkdown(name)}' could not be found!`,
+			);
 			return;
 		}
 
 		await ctx.respond(tag.content);
-	}
+	},
 });

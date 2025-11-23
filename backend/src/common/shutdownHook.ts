@@ -8,7 +8,9 @@ export function setupShutdownHook(callback: () => Awaitable<void>): void {
 
 	const shutDown = async (signal: NodeJS.Signals): Promise<void> => {
 		if (exitingAfter !== 0) {
-			logger.warn?.(`Already attempting shutdown - exit will be forced after ${exitingAfter} seconds`);
+			logger.warn?.(
+				`Already attempting shutdown - exit will be forced after ${exitingAfter} seconds`,
+			);
 			return;
 		}
 
@@ -21,14 +23,19 @@ export function setupShutdownHook(callback: () => Awaitable<void>): void {
 		}
 
 		setTimeout(() => {
-			logger.warn?.(`Forced exit after waiting for ${exitingAfter} seconds`);
+			logger.warn?.(
+				`Forced exit after waiting for ${exitingAfter} seconds`,
+			);
 			process.exit(1);
 		}, exitingAfter * 1000).unref();
 
 		try {
 			await callback();
 		} catch (error) {
-			logger.error?.(`Unhandled error during cleanup; exit will be forced after ${exitingAfter} seconds`, error);
+			logger.error?.(
+				`Unhandled error during cleanup; exit will be forced after ${exitingAfter} seconds`,
+				error,
+			);
 		}
 	};
 

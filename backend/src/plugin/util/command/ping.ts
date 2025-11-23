@@ -9,11 +9,18 @@ export default defineCommand({
 
 	trackUpdates: true, // allow deleting
 
-	preRun: ctx => permissionsGuard(ctx, utilConfigStore, permissions => permissions.ping_command),
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			utilConfigStore,
+			(permissions) => permissions.ping_command,
+		),
 	async run(ctx) {
 		const baseResponse = `${icons.info} **Gateway:** ${ctx.shard.latency}ms`;
 		const preRespond = Date.now();
 		await ctx.respond(baseResponse);
-		await ctx.respond(baseResponse + `; **REST:** ${Date.now() - preRespond}ms`);
+		await ctx.respond(
+			baseResponse + `; **REST:** ${Date.now() - preRespond}ms`,
+		);
 	},
 });

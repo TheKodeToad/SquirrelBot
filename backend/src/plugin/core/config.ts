@@ -8,49 +8,65 @@ const CoreGroup = z.strictObject({
 	inherits: Snowflake.array().default([]),
 	level: z.int().optional(),
 });
-export interface CoreGroup extends z.output<typeof CoreGroup> { }
+export interface CoreGroup extends z.output<typeof CoreGroup> {}
 
-const CoreGroups = z.record(z.string(), CoreGroup).transform(transformCoreGroups);
+const CoreGroups = z
+	.record(z.string(), CoreGroup)
+	.transform(transformCoreGroups);
 export type CoreGroups = z.output<typeof CoreGroups>;
 
 export const CoreConfig = z.strictObject({
 	groups: CoreGroups.prefault({}).describe(
 		"Declare permission groups. " +
-		"Permission groups are used to assign permissions to users — " +
-		"for example, you can create a permission group for admins called 'admin' " +
-		"and assign it using a permission override which matches it."
+			"Permission groups are used to assign permissions to users — " +
+			"for example, you can create a permission group for admins called 'admin' " +
+			"and assign it using a permission override which matches it.",
 	),
 
-	prefix_commands: z.strictObject({
-		prefix: z.string().default("?"),
-		reply: z.boolean().default(true)
-			.describe("Reply to messages invoking commands. The bot must have 'Read Message History' permissions.")
-	}).prefault({}),
+	prefix_commands: z
+		.strictObject({
+			prefix: z.string().default("?"),
+			reply: z
+				.boolean()
+				.default(true)
+				.describe(
+					"Reply to messages invoking commands. The bot must have 'Read Message History' permissions.",
+				),
+		})
+		.prefault({}),
 
-	default_permissions: z.strictObject({
-		prefix_commands: z.boolean().default(true),
-		slash_commands: z.boolean().default(true),
-		ephemeral_response: z.boolean().default(true),
-		about_command: z.boolean().default(true),
-		help_command: z.boolean().default(true),
-		groups_command: z.boolean().default(false),
-	}).prefault({}),
-	permission_overrides: z.strictObject({
-		prefix_commands: z.boolean().optional(),
-		slash_commands: z.boolean().optional(),
-		ephemeral_response: z.boolean().optional(),
-		about_command: z.boolean().optional(),
-		help_command: z.boolean().optional(),
-		groups_command: z.boolean().optional(),
-		...PermissionsFilter.shape
-	}).array().default([]),
+	default_permissions: z
+		.strictObject({
+			prefix_commands: z.boolean().default(true),
+			slash_commands: z.boolean().default(true),
+			ephemeral_response: z.boolean().default(true),
+			about_command: z.boolean().default(true),
+			help_command: z.boolean().default(true),
+			groups_command: z.boolean().default(false),
+		})
+		.prefault({}),
+	permission_overrides: z
+		.strictObject({
+			prefix_commands: z.boolean().optional(),
+			slash_commands: z.boolean().optional(),
+			ephemeral_response: z.boolean().optional(),
+			about_command: z.boolean().optional(),
+			help_command: z.boolean().optional(),
+			groups_command: z.boolean().optional(),
+			...PermissionsFilter.shape,
+		})
+		.array()
+		.default([]),
 });
 export type CoreConfig = z.output<typeof CoreConfig>;
 
 const MAX_INHERITANCE_DEPTH = 1000;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.RefinementCtx<Record<string, CoreGroup>>) {
+function transformCoreGroups(
+	input: Record<string, CoreGroup>,
+	ctx: z.RefinementCtx<Record<string, CoreGroup>>,
+) {
 	// show all errors for invalid inherits references at once
 	let hasIssues = false;
 
@@ -77,7 +93,7 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 		return z.NEVER;
 	}
 
-	const result: Map<string, CoreGroup> = new Map;
+	const result: Map<string, CoreGroup> = new Map();
 
 	for (const key in input) {
 		if (!Object.hasOwn(input, key)) {
@@ -103,7 +119,11 @@ function transformCoreGroups(input: Record<string, CoreGroup>, ctx: z.Refinement
 	return result;
 }
 
-function flattenInheritence(input: CoreGroup, key: string, groups: Record<string, CoreGroup>): string[] | null {
+function flattenInheritence(
+	input: CoreGroup,
+	key: string,
+	groups: Record<string, CoreGroup>,
+): string[] | null {
 	const output: string[] = [];
 
 	if (!_flattenInheritence(input, output, key, groups, 0)) {
@@ -113,7 +133,13 @@ function flattenInheritence(input: CoreGroup, key: string, groups: Record<string
 	return output;
 }
 
-function _flattenInheritence(input: CoreGroup, output: string[], root: string, groups: Record<string, CoreGroup>, depth: number): boolean {
+function _flattenInheritence(
+	input: CoreGroup,
+	output: string[],
+	root: string,
+	groups: Record<string, CoreGroup>,
+	depth: number,
+): boolean {
 	if (depth > MAX_INHERITANCE_DEPTH) {
 		return false;
 	}
@@ -131,7 +157,15 @@ function _flattenInheritence(input: CoreGroup, output: string[], root: string, g
 
 		const referencedGroup = groups[reference]!;
 
-		if (!_flattenInheritence(referencedGroup, output, root, groups, depth + 1)) {
+		if (
+			!_flattenInheritence(
+				referencedGroup,
+				output,
+				root,
+				groups,
+				depth + 1,
+			)
+		) {
 			return false;
 		}
 	}

@@ -1,11 +1,15 @@
 import type { SquirrelDiscordContext } from "#discord/index.ts";
-import { type Command, type Reply, type ReplyObject } from "#plugin/core/public/command.ts";
+import {
+	type Command,
+	type Reply,
+	type ReplyObject,
+} from "#plugin/core/public/command.ts";
 import { Text } from "oceanic-component-helper";
 import { Member, MessageFlags, type AnyTextableGuildChannel } from "oceanic.js";
 
-export function transformReply(reply: Reply): ReplyObject & { flags: number; } {
+export function transformReply(reply: Reply): ReplyObject & { flags: number } {
 	if (typeof reply === "string") {
-		reply = { components: [Text(reply)], };
+		reply = { components: [Text(reply)] };
 	}
 
 	reply.flags ??= 0;
@@ -15,7 +19,12 @@ export function transformReply(reply: Reply): ReplyObject & { flags: number; } {
 	return { ...reply, flags: reply.flags };
 }
 
-export function canRunCommand(squirrelCtx: SquirrelDiscordContext, command: Command, member: Member, channel: AnyTextableGuildChannel): boolean {
+export function canRunCommand(
+	squirrelCtx: SquirrelDiscordContext,
+	command: Command,
+	member: Member,
+	channel: AnyTextableGuildChannel,
+): boolean {
 	const data = command.preRun({
 		squirrelCtx,
 		bot: squirrelCtx.bot,
@@ -25,7 +34,7 @@ export function canRunCommand(squirrelCtx: SquirrelDiscordContext, command: Comm
 		user: member.user,
 		guild: member.guild,
 		shard: member.guild.shard,
-		async respond() { },
+		async respond() {},
 	});
 
 	if (data == null) {

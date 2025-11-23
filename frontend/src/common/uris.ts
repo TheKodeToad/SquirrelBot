@@ -1,4 +1,7 @@
-export function buildURI(strings: TemplateStringsArray, ...expressions: string[]): string {
+export function buildURI(
+	strings: TemplateStringsArray,
+	...expressions: string[]
+): string {
 	if (expressions === undefined) {
 		return strings[0]!;
 	}

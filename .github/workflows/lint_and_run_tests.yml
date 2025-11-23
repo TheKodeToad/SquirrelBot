@@ -25,5 +25,7 @@ jobs:
         run: pnpm typecheck
       - name: Run linter
         run: pnpm lint
+      - name: Check formatting
+        run: pnpm formatting --check
       - name: Run tests
         run: pnpm test

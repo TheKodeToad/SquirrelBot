@@ -3,7 +3,12 @@ import { JSX } from "solid-js/jsx-runtime";
 import { Dynamic } from "solid-js/web";
 
 export interface ButtonProps {
-	color?: `transparent${"2" | "3"}` | "primary" | "secondary" | "danger" | "success";
+	color?:
+		| `transparent${"2" | "3"}`
+		| "primary"
+		| "secondary"
+		| "danger"
+		| "success";
 	small?: boolean;
 	icon?: typeof IconCube;
 	onClick?: JSX.HTMLElementTags["button"]["onClick"];
@@ -29,7 +34,12 @@ export function Button(props: ButtonProps) {
 	};
 
 	return (
-		<button class={classes()} style={props.style} onClick={props.onClick} disabled={props.disabled}>
+		<button
+			class={classes()}
+			style={props.style}
+			onClick={props.onClick}
+			disabled={props.disabled}
+		>
 			<span class={"button-inner"}>
 				{props.icon && <Dynamic component={props.icon} size={"1em"} />}
 				{props.children}

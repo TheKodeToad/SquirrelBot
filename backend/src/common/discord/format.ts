@@ -1,17 +1,29 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { Client, DiscordRESTError, Member, User, UserFlags, type Uncached } from "oceanic.js";
+import {
+	Client,
+	DiscordRESTError,
+	Member,
+	User,
+	UserFlags,
+	type Uncached,
+} from "oceanic.js";
 
 export function formatRESTError(restError: DiscordRESTError): string {
-	if (restError.resBody !== null
-		&& typeof restError.resBody.message === "string") {
+	if (
+		restError.resBody !== null &&
+		typeof restError.resBody.message === "string"
+	) {
 		return `API Error ${restError.code}: ${escapeMarkdown(restError.resBody.message)}`;
 	}
 
 	return `HTTP Error ${restError.status}: ${escapeMarkdown(restError.statusText)}`;
 }
 
-export async function formatUserTagByID(bot: Client, id: string): Promise<string> {
+export async function formatUserTagByID(
+	bot: Client,
+	id: string,
+): Promise<string> {
 	return formatUserTag(await fetchUserCachedSupressed(bot, id));
 }
 
@@ -19,11 +31,14 @@ export async function formatUserByID(bot: Client, id: string): Promise<string> {
 	return formatUser(await fetchUserCachedSupressed(bot, id));
 }
 
-export async function formatUserBoldByID(bot: Client, id: string): Promise<string> {
+export async function formatUserBoldByID(
+	bot: Client,
+	id: string,
+): Promise<string> {
 	return formatUserBold(await fetchUserCachedSupressed(bot, id));
 }
 
-type UserLike = { id: string; tag: string; } | Uncached;
+type UserLike = { id: string; tag: string } | Uncached;
 
 export function formatUser(user: UserLike): string {
 	return `${formatUserTag(user)} (<@${user.id}>)`;
@@ -36,8 +51,7 @@ export function formatUserBold(user: UserLike): string {
 export function formatUserTag(user: UserLike): string {
 	if ("tag" in user) {
 		return escapeMarkdown(user.tag);
-	}
-	else {
+	} else {
 		return "\\<unknown\\>";
 	}
 }
