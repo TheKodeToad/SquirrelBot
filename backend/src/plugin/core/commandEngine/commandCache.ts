@@ -9,8 +9,8 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 
 export interface CommandCacheEntry {
 	command: Command;
-	optionsByPosition: [string, Option][];
-	optionsByName: Map<string, [string, Option]>;
+	optionsByPosition: [key: string, Option][];
+	optionsByName: Map<string, [key: string, Option]>;
 	optionsByNegativeName: Map<string, string>;
 	usage: string;
 }

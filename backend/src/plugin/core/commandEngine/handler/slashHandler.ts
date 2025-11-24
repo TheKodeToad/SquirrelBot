@@ -84,7 +84,7 @@ async function handle(
 
 	if (commandEntry === undefined) {
 		logger.warn?.(
-			`Received event for unknown slash command - '${interaction.data.name}' is not internally known`,
+			`Received command interaction for unknown slash command - '${interaction.data.name}' is not internally known`,
 		);
 		return;
 	}
@@ -132,10 +132,10 @@ async function handle(
 	} catch (error) {
 		try {
 			await ctx.respond(`:boom: Failed to execute command`);
-		} catch (error) {
+		} catch (error2) {
 			logger.error?.(
 				"Error responding with error message for slash command",
-				error,
+				error2,
 			);
 		}
 		throw error;
@@ -225,7 +225,11 @@ function mapCommand({
 				});
 				break;
 			case OptionType.String:
-				options.push({ type: SlashOptionTypes.STRING, ...base });
+				options.push({
+					type: SlashOptionTypes.STRING,
+					autocomplete: option.autocomplete !== undefined,
+					...base,
+				});
 				break;
 			case OptionType.Integer:
 				options.push({ type: SlashOptionTypes.INTEGER, ...base });

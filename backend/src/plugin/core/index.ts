@@ -8,6 +8,7 @@ import access from "#plugin/core/command/access.ts";
 import groups from "#plugin/core/command/groups.ts";
 import help from "#plugin/core/command/help/index.ts";
 import commandCache from "#plugin/core/commandEngine/commandCache.ts";
+import autoCompleteHandler from "#plugin/core/commandEngine/handler/autocompleteHandler.ts";
 import componentHandler from "#plugin/core/commandEngine/handler/componentHandler.ts";
 import prefixHandler from "#plugin/core/commandEngine/handler/prefixHandler.ts";
 import slashHandler from "#plugin/core/commandEngine/handler/slashHandler.ts";
@@ -60,6 +61,7 @@ export default definePlugin({
 		...commandCache,
 		...prefixHandler,
 		...slashHandler,
+		...autoCompleteHandler,
 		...componentHandler,
 
 		onBotInit(postInit, EventListenerPhase.Post),

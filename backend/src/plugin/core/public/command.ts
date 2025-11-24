@@ -57,7 +57,7 @@ export interface ActionContext {
 	channel: AnyTextableGuildChannel;
 }
 
-export interface AutoCompleteContext extends ActionContext {
+export interface AutocompleteContext extends ActionContext {
 	command: Command;
 }
 
@@ -145,7 +145,10 @@ interface StringOption extends BaseOption {
 	/** For prefix commands - set to false to only parse one word unless quoted. */
 	greedy?: boolean;
 	/** For slash commands - provide autocompletion */
-	autocomplete?: (ctx: CommandContext, value: string) => Awaitable<string[]>;
+	autocomplete?: (
+		ctx: AutocompleteContext,
+		value: string,
+	) => Awaitable<string[]>;
 }
 
 interface IntegerOption extends BaseOption {
