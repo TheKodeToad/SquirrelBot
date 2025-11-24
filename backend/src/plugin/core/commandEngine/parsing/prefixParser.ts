@@ -227,8 +227,6 @@ function readCommandArgValue(
 	reader: StringReader,
 	option: Option,
 ): AnyArgsValueItem | null {
-	const greedy = !("greedy" in option && option.greedy === false);
-
 	switch (option.type) {
 		case OptionType.Flag:
 			return true;
