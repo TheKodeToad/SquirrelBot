@@ -26,7 +26,7 @@ export function readBoolean(reader: StringReader): boolean | null {
 }
 
 export function readInteger(reader: StringReader): number | null {
-	const result = parseInt(reader.readWord());
+	const result = Number(reader.readWord());
 
 	if (!Number.isSafeInteger(result)) {
 		return null;
@@ -36,7 +36,7 @@ export function readInteger(reader: StringReader): number | null {
 }
 
 export function readNumber(reader: StringReader): number | null {
-	const result = parseFloat(reader.readWord());
+	const result = Number(reader.readWord());
 
 	if (!Number.isFinite(result)) {
 		return null;
@@ -72,21 +72,21 @@ export function readString(
 	let result = "";
 
 	const endQuote = reader.read();
-	const escapedQuote = endQuote + endQuote;
 
-	while (reader.read() !== endQuote) {
-		if (!reader.canRead()) {
-			return null;
+	while (reader.canRead()) {
+		if (reader.skipOver(endQuote)) {
+			if (!reader.skipOver(endQuote)) {
+				return result;
+			} else {
+				result += endQuote;
+				continue;
+			}
 		}
 
-		result += reader.peek(0);
-
-		if (reader.skipOver(escapedQuote)) {
-			result += endQuote;
-		}
+		result += reader.read();
 	}
 
-	return result;
+	return null;
 }
 
 export function readSnowflake(reader: StringReader): string | null {
