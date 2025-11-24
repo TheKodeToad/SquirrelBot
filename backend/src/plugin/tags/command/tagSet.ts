@@ -7,13 +7,9 @@ import {
 	MAX_TAG_CONTENT_LENGTH,
 	MAX_TAG_NAME_LENGTH,
 } from "#plugin/tags/constants.ts";
+import { autocompleteTags } from "#plugin/tags/helper/command.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
-import {
-	createTag,
-	searchTags,
-	updateTag,
-	upsertTag,
-} from "#plugin/tags/storage/tags.ts";
+import { createTag, updateTag, upsertTag } from "#plugin/tags/storage/tags.ts";
 
 export default defineCommand({
 	name: ["tagset", "settag"],
@@ -30,8 +26,22 @@ export default defineCommand({
 			maxLength: MAX_TAG_NAME_LENGTH,
 			greedy: false,
 
-			autocomplete: (ctx, value) =>
-				searchTags(ctx.squirrelCtx.db, ctx.guild.id, value),
+			async autocomplete(ctx, value) {
+				const names = await autocompleteTags(ctx, value);
+
+				// add the current value so pressing tab won't rudely correct it to something else
+				if (value.length !== 0) {
+					const valueIndex = names.indexOf(value);
+
+					if (valueIndex !== -1) {
+						names.splice(names.indexOf(value), 1);
+					}
+
+					names.unshift(value);
+				}
+
+				return names;
+			},
 		},
 		content: {
 			type: OptionType.String,

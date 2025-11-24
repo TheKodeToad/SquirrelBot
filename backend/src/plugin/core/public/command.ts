@@ -140,6 +140,8 @@ interface FlagOption extends BaseOption {
 	position?: undefined;
 }
 
+export const MAX_AUTOCOMPLETE_CHOICES = 25;
+
 interface StringOption extends BaseOption {
 	type: OptionType.String;
 	minLength?: number;

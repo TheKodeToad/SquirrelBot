@@ -4,8 +4,9 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugin/tags/constants.ts";
+import { autocompleteTags } from "#plugin/tags/helper/command.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
-import { getTag, searchTags } from "#plugin/tags/storage/tags.ts";
+import { getTag } from "#plugin/tags/storage/tags.ts";
 
 export default defineCommand({
 	name: ["tag", "tagsend", "sendtag"],
@@ -18,8 +19,7 @@ export default defineCommand({
 			position: 0,
 			maxLength: MAX_TAG_NAME_LENGTH,
 
-			autocomplete: (ctx, value) =>
-				searchTags(ctx.squirrelCtx.db, ctx.guild.id, value),
+			autocomplete: (ctx, value) => autocompleteTags(ctx, value),
 		},
 	},
 

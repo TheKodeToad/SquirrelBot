@@ -14,6 +14,12 @@ export type Tag = z.output<typeof Tag>;
 const JustInserted = z.strictObject({ inserted: z.boolean() });
 const JustNameArray = z.strictObject({ name: z.string() }).array();
 
+export interface TagQuery {
+	name: string;
+
+	limit: number;
+}
+
 export async function getTag(
 	db: Pool,
 	guildID: string,
@@ -34,17 +40,20 @@ export async function getTag(
 	return dbParse(Tag, result.rows[0]);
 }
 
-export async function searchTags(
+export async function searchTagNames(
 	db: Pool,
 	guildID: string,
-	name: string,
+	query: TagQuery,
 ): Promise<string[]> {
+	// FIXME: use casefold
 	const result = await db.query(
 		`
 			SELECT "name" FROM "tags_tags"
-			WHERE "guildID" = $1 AND position($2 in "name") > 0
+			WHERE "guildID" = $1 AND position(lower($2) in lower("name")) > 0
+			ORDER BY position(lower($2) in lower("name")), "name" ASC
+			LIMIT $3
 		`,
-		[guildID, name],
+		[guildID, query.name, query.limit],
 	);
 
 	return dbParse(JustNameArray, result.rows).map(({ name }) => name);
