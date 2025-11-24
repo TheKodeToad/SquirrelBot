@@ -183,11 +183,11 @@ interface DurationOption extends BaseOption {
 	type: OptionType.Duration;
 }
 
-type OptionValue<F extends Option> = F["array"] extends true
-	? ArrayValue<OptionTypeValue<F["type"]>, F["required"]>
-	: F["required"] extends true
-		? NullableValue<OptionTypeValue<F["type"]>, F["required"]>
-		: OptionTypeValue<F["type"]> | null;
+type OptionValue<TOpt extends Option> = TOpt["array"] extends true
+	? ArrayValue<OptionTypeValue<TOpt["type"]>, TOpt["required"]>
+	: TOpt["required"] extends true
+		? NullableValue<OptionTypeValue<TOpt["type"]>, TOpt["required"]>
+		: OptionTypeValue<TOpt["type"]> | null;
 
 type ArrayValue<
 	TOpt,
