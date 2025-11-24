@@ -13,18 +13,6 @@ import {
 } from "#common/time.ts";
 import type { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 
-export function readBoolean(reader: StringReader): boolean | null {
-	const result = reader.readWord().toLowerCase();
-
-	if (result === "false" || result === "f" || result === "0") {
-		return false;
-	} else if (result === "true" || result === "t" || result === "1") {
-		return true;
-	}
-
-	return null;
-}
-
 export function readInteger(reader: StringReader): number | null {
 	const result = Number(reader.readWord());
 

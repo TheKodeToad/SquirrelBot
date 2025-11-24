@@ -11,7 +11,6 @@ import {
 	YEAR,
 } from "#common/time.ts";
 import {
-	readBoolean,
 	readDuration,
 	readInteger,
 	readNumber,
@@ -31,20 +30,6 @@ function parse<T>(input: string, read: (reader: StringReader) => T): T | null {
 
 	return result;
 }
-
-test("boolean parsing", () => {
-	assert.equal(parse("false", readBoolean), false);
-	assert.equal(parse("true", readBoolean), true);
-
-	assert.equal(parse("f", readBoolean), false);
-	assert.equal(parse("t", readBoolean), true);
-
-	assert.equal(parse("0", readBoolean), false);
-	assert.equal(parse("1", readBoolean), true);
-
-	assert.equal(parse("fal", readBoolean), null);
-	assert.equal(parse("falsey", readBoolean), null);
-});
 
 test("integer parsing", () => {
 	assert.equal(parse("1234", readInteger), 1234);
