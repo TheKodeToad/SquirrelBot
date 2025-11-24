@@ -104,8 +104,6 @@ export function unlistenForInteractions(messageID: string): void {
 }
 
 class ComponentContextImpl implements ComponentContext {
-	originalUserID: string;
-
 	squirrelCtx: SquirrelDiscordContext;
 	get bot(): Client {
 		return this.squirrelCtx.bot;
@@ -125,6 +123,8 @@ class ComponentContextImpl implements ComponentContext {
 	get channel(): AnyTextableGuildChannel {
 		return this._interaction.channel;
 	}
+
+	originalUserID: string;
 
 	_interaction: ComponentInteraction<
 		MessageComponentTypes,

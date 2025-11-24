@@ -1,6 +1,6 @@
 import type { Awaitable } from "#common/general.ts";
 import type {
-	BaseCommandContext,
+	ActionContext,
 	CommandContext,
 	ReplyObject,
 } from "#plugin/core/public/command.ts";
@@ -10,10 +10,7 @@ import { ComponentTypes } from "oceanic.js";
 export interface Paginator<E, K> {
 	pageSize: number;
 	getKey: (entry: E) => K;
-	lookUp: (
-		ctx: BaseCommandContext,
-		query: PaginatorQuery<K>,
-	) => Awaitable<E[]>;
+	lookUp: (ctx: ActionContext, query: PaginatorQuery<K>) => Awaitable<E[]>;
 	render: (entries: E[]) => Awaitable<ReplyObject>;
 }
 
@@ -34,7 +31,7 @@ export async function respondWithPaginator<E, K>(
 }
 
 async function renderPaginator<E, K>(
-	ctx: BaseCommandContext,
+	ctx: ActionContext,
 	paginator: Paginator<E, K>,
 	reversed: boolean,
 	before: K | undefined,

@@ -4,7 +4,7 @@ import { getCommandsByPlugin } from "#plugin/core/commandEngine/commandCache.ts"
 import { canRunCommand } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import type {
-	BaseCommandContext,
+	ActionContext,
 	Reply,
 	ReplyObject,
 } from "#plugin/core/public/command.ts";
@@ -87,7 +87,7 @@ function renderPluginSelection(
 }
 
 export function renderCommandListPage(
-	ctx: BaseCommandContext,
+	ctx: ActionContext,
 	state: CommandListState,
 ): ReplyObject {
 	const plugin = ctx.squirrelCtx.plugins.get(state.plugin);

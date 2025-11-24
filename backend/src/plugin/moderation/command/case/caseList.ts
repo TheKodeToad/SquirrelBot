@@ -1,6 +1,6 @@
 import {
 	OptionType,
-	type BaseCommandContext,
+	type ActionContext,
 	type ReplyObject,
 } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
@@ -61,7 +61,7 @@ export default defineCommand({
 });
 
 async function lookUpCases(
-	ctx: BaseCommandContext,
+	ctx: ActionContext,
 	query: PaginatorQuery<number>,
 	actorID: string | null,
 	targetID: string | null,

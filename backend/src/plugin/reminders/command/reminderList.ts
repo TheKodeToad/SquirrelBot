@@ -1,6 +1,6 @@
 import { dateToUnixSecs } from "#common/time.ts";
 import {
-	type BaseCommandContext,
+	type ActionContext,
 	type ReplyObject,
 } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
@@ -41,7 +41,7 @@ export default defineCommand({
 });
 
 async function lookUpReminders(
-	ctx: BaseCommandContext,
+	ctx: ActionContext,
 	query: PaginatorQuery<Date>,
 ): Promise<Reminder[]> {
 	const config = remindersConfigStore.get(ctx.guild.id);

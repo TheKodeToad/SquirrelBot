@@ -1,6 +1,8 @@
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import {
+	type ActionContext,
 	type Command,
+	type Option,
 	type Reply,
 	type ReplyObject,
 } from "#plugin/core/public/command.ts";
@@ -25,21 +27,31 @@ export function canRunCommand(
 	member: Member,
 	channel: AnyTextableGuildChannel,
 ): boolean {
-	const data = command.preRun({
-		squirrelCtx,
-		bot: squirrelCtx.bot,
+	const data = safePreRun(
+		{
+			squirrelCtx,
+			bot: squirrelCtx.bot,
+			member,
+			channel,
+			user: member.user,
+			guild: member.guild,
+			shard: member.guild.shard,
+		},
 		command,
-		member,
-		channel,
-		user: member.user,
-		guild: member.guild,
-		shard: member.guild.shard,
-		async respond() {},
-	});
+	);
+
+	return data !== false;
+}
+
+export function safePreRun<TData extends {}>(
+	ctx: ActionContext,
+	command: Command<Record<string, Option>, TData>,
+): TData | false {
+	const data = command.preRun(ctx);
 
 	if (data == null) {
 		throw new Error("Nullish value returned from preRun");
 	}
 
-	return data !== false;
+	return data;
 }

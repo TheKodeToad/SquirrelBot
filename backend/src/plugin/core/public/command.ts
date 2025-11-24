@@ -1,3 +1,4 @@
+import type { Awaitable } from "#common/general.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import {
 	type AnyTextableGuildChannel,
@@ -14,13 +15,13 @@ import {
 type NameList = [string, ...string[]];
 
 export interface Command<
-	O extends Record<string, Option> = Record<string, Option>,
-	D extends {} = {},
+	TOpts extends Record<string, Option> = Record<string, Option>,
+	TData extends {} = {},
 > {
 	name: NameList;
 	description?: string;
 
-	options?: O;
+	options?: TOpts;
 	supportPrefix?: boolean;
 	supportSlash?: boolean;
 	trackUpdates?: boolean;
@@ -31,7 +32,7 @@ export interface Command<
 	 * Note: to prevent nasty bugs this may not return null or undefined!
 	 * @param ctx Contextual information
 	 */
-	preRun(ctx: CommandContext): D | false;
+	preRun(ctx: ActionContext): TData | false;
 
 	/**
 	 * Invoke the command, and call ctx.respond to display output.
@@ -41,43 +42,48 @@ export interface Command<
 	 */
 	run(
 		ctx: CommandContext,
-		args: { readonly [K in keyof O]: OptionValue<O[K]> },
-		data: D,
+		args: { readonly [K in keyof TOpts]: OptionValue<TOpts[K]> },
+		data: TData,
 	): Promise<void> | void;
 }
 
-export interface BaseCommandContext {
-	bot: Client;
+export interface ActionContext {
 	squirrelCtx: SquirrelDiscordContext;
+	bot: Client;
 	shard: Shard;
 	guild: Guild;
 	user: User;
 	member: Member;
 	channel: AnyTextableGuildChannel;
-	respond: (reply: Reply) => Promise<void>;
 }
 
-export interface CommandContext extends BaseCommandContext {
+export interface AutoCompleteContext extends ActionContext {
+	command: Command;
+}
+
+export interface CommandContext extends ActionContext {
 	command: Command;
 	ephemeral?: boolean;
 	message?: Message<AnyTextableGuildChannel>;
+	respond: (reply: Reply) => Promise<void>;
 }
 
-export interface ComponentContext extends BaseCommandContext {
+export interface ComponentContext extends ActionContext {
 	/** The ID of the user who initially ran the command */
 	originalUserID: string;
+	respond: (reply: Reply) => Promise<void>;
 	edit: (reply: Reply) => Promise<void>;
 }
 
 export interface ReplyObject
 	extends Omit<CreateMessageOptions, "messageReference" | "tts" | "content"> {
 	components: MessageComponent[];
-	componentHandler?(
+	componentHandler?: (
 		this: void,
 		ctx: ComponentContext,
 		customID: string,
 		values?: string[],
-	): Promise<void> | void;
+	) => Promise<void> | void;
 }
 
 export type Reply = ReplyObject | string;
@@ -138,6 +144,8 @@ interface StringOption extends BaseOption {
 	type: OptionType.String;
 	/** For prefix commands - set to false to only parse one word unless quoted. */
 	greedy?: boolean;
+	/** For slash commands - provide autocompletion */
+	autocomplete?: (ctx: CommandContext, value: string) => Awaitable<string[]>;
 }
 
 interface IntegerOption extends BaseOption {
@@ -174,13 +182,14 @@ type OptionValue<F extends Option> = F["array"] extends true
 		? NullableValue<OptionTypeValue<F["type"]>, F["required"]>
 		: OptionTypeValue<F["type"]> | null;
 
-type ArrayValue<O, Required extends boolean | undefined> = Required extends true
-	? readonly [O, ...O[]]
-	: readonly O[];
+type ArrayValue<
+	TOpt,
+	TRequired extends boolean | undefined,
+> = TRequired extends true ? readonly [TOpt, ...TOpt[]] : readonly TOpt[];
 type NullableValue<
-	O,
-	Required extends boolean | undefined,
-> = Required extends true ? O : O | null;
+	TOpt,
+	TRequired extends boolean | undefined,
+> = TRequired extends true ? TOpt : TOpt | null;
 
 type OptionTypeValue<T extends OptionType> = T extends OptionType.Flag
 	? boolean

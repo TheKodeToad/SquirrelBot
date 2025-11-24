@@ -25,9 +25,9 @@ export function onBotEvent<T extends keyof ClientEvents>(
 onBotEvent.contributions = [] as BotEventListener[];
 
 export function defineCommand<
-	O extends Record<string, Option> = Record<string, Option>,
-	D extends {} = {},
->(command: Command<O, D>): Contribution {
+	TOpts extends Record<string, Option> = Record<string, Option>,
+	TData extends {} = {},
+>(command: Command<TOpts, TData>): Contribution {
 	return (plugin) => defineCommand.contributions.push([plugin, command]);
 }
 

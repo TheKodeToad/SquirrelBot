@@ -33,7 +33,6 @@ import {
 	type AnyTextableGuildChannel,
 	Client,
 	Guild,
-	GuildChannel,
 	Member,
 	Message,
 	MessageFlags,
@@ -264,14 +263,13 @@ class PrefixContext implements CommandContext {
 			messageOptions.flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
 		}
 
-		if (
-			this.message.channel instanceof GuildChannel &&
-			!canWriteInChannel(
-				this.bot,
-				this.message.channel,
-				this.message.channel.guild.clientMember,
-			)
-		) {
+		const canWrite = canWriteInChannel(
+			this.bot,
+			this.message.channel,
+			this.message.channel.guild.clientMember,
+		);
+
+		if (!canWrite) {
 			return;
 		}
 
@@ -282,12 +280,13 @@ class PrefixContext implements CommandContext {
 				return;
 			}
 
-			if (
+			const shouldReply =
 				config.prefix_commands.reply &&
 				this.message.channel
 					.permissionsOf(this.message.channel.guild.clientMember)
-					.has(Permissions.READ_MESSAGE_HISTORY)
-			) {
+					.has(Permissions.READ_MESSAGE_HISTORY);
+
+			if (shouldReply) {
 				this._response = await this.channel.createMessage({
 					messageReference: {
 						guildID: this.guild.id,

@@ -1,4 +1,4 @@
-import type { CommandContext } from "#plugin/core/public/command.ts";
+import type { ActionContext } from "#plugin/core/public/command.ts";
 import type { ConfigStore } from "#plugin/core/public/configStore.ts";
 import {
 	resolvePermissions,
@@ -7,7 +7,7 @@ import {
 import { z } from "zod";
 
 export function permissionsGuard<C extends ConfigWithPermissions>(
-	ctx: CommandContext,
+	ctx: ActionContext,
 	configCache: ConfigStore<z.ZodType<C>>,
 	requirement?: (permissions: C["default_permissions"], config: C) => boolean,
 ): false | PermissionsGuardData<C> {

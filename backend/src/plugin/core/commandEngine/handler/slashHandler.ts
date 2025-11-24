@@ -16,7 +16,7 @@ import {
 import { AUTO_DEFER_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.ts";
 import { readSlashArgs } from "#plugin/core/commandEngine/parsing/slashParser.ts";
-import { transformReply } from "#plugin/core/helper/commands.ts";
+import { safePreRun, transformReply } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import {
 	type Command,
@@ -100,27 +100,23 @@ async function handle(
 		ephemeral,
 	);
 
-	const data = commandEntry.command.preRun(ctx);
+	const data = safePreRun(ctx, commandEntry.command);
 
 	if (data === false) {
 		logger.debug?.(
 			`Command '${interaction.data.name}' rejected context - ${debugFormatPermissionContext(ctx.member, ctx.channel)}`,
 		);
-		ctx._ephemeral = true;
+		ctx.ephemeral = true;
 		await ctx.respond(
 			`${icons.error} You lack permission to execute the command in this channel.`,
 		);
 		return;
 	}
 
-	if (data == null) {
-		throw new Error("Nullish value returned from preRun!");
-	}
-
 	const args = readSlashArgs(interaction.data.options.raw, commandEntry);
 
 	if (args.error !== null) {
-		ctx._ephemeral = true;
+		ctx.ephemeral = true;
 		await ctx.respond(`${icons.error} ${formatArgsParseError(args)}`);
 		return;
 	}
@@ -278,11 +274,6 @@ function mapCommand({
 }
 
 class SlashContext implements CommandContext {
-	command: Command;
-	get ephemeral(): boolean {
-		return this._ephemeral;
-	}
-
 	squirrelCtx: SquirrelDiscordContext;
 	get bot(): Client {
 		return this.squirrelCtx.bot;
@@ -303,12 +294,14 @@ class SlashContext implements CommandContext {
 		return this._interaction.channel;
 	}
 
+	command: Command;
+	ephemeral: boolean;
+
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;
 	_responseID: string | null;
 	_acked: boolean;
 	_deferTimeout: NodeJS.Timeout | null;
 	_deferPromise: Promise<void> | null;
-	_ephemeral: boolean;
 
 	constructor(
 		squirrelCtx: SquirrelDiscordContext,
@@ -318,6 +311,7 @@ class SlashContext implements CommandContext {
 	) {
 		this.squirrelCtx = squirrelCtx;
 		this.command = command;
+		this.ephemeral = ephemeral;
 		this._interaction = interaction;
 		this._responseID = null;
 		this._acked = false;
@@ -327,7 +321,7 @@ class SlashContext implements CommandContext {
 				this._deferTimeout = null;
 				this._acked = true;
 				this._deferPromise = interaction
-					.defer(this._ephemeral ? MessageFlags.EPHEMERAL : 0)
+					.defer(this.ephemeral ? MessageFlags.EPHEMERAL : 0)
 					.then();
 			},
 			Math.max(
@@ -336,13 +330,12 @@ class SlashContext implements CommandContext {
 					(Date.now() - interaction.createdAt.getTime()),
 			),
 		).unref();
-		this._ephemeral = ephemeral;
 	}
 
 	async respond(reply: Reply): Promise<void> {
 		const messageOptions = transformReply(reply);
 
-		if (this._ephemeral) {
+		if (this.ephemeral) {
 			messageOptions.flags |= MessageFlags.EPHEMERAL;
 		} else {
 			messageOptions.flags &= ~MessageFlags.EPHEMERAL;
