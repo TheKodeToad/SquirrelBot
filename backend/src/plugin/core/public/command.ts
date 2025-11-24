@@ -142,6 +142,8 @@ interface FlagOption extends BaseOption {
 
 interface StringOption extends BaseOption {
 	type: OptionType.String;
+	minLength?: number;
+	maxLength?: number;
 	/** For prefix commands - set to false to only parse one word unless quoted. */
 	greedy?: boolean;
 	/** For slash commands - provide autocompletion */

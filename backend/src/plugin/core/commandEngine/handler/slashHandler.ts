@@ -228,6 +228,9 @@ function mapCommand({
 				options.push({
 					type: SlashOptionTypes.STRING,
 					autocomplete: option.autocomplete !== undefined,
+					// FIXME: remove this when oceanic fixes this
+					minLength: option.minLength as undefined,
+					maxLength: option.maxLength as undefined,
 					...base,
 				});
 				break;
