@@ -42,10 +42,10 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			tagsConfigStore,
-			(permissions) => permissions.tag_create,
+			(permissions) => permissions.tag_create || permissions.tag_edit,
 		),
-	async run(ctx, args) {
-		if (args.existing) {
+	async run(ctx, args, { permissions }) {
+		if (args.existing || !permissions.tag_create) {
 			const success = await updateTag(
 				ctx.squirrelCtx.db,
 				ctx.guild.id,
@@ -62,7 +62,7 @@ export default defineCommand({
 					`${icons.error} Tag '${escapeMarkdown(args.name)}' does not exist!`,
 				);
 			}
-		} else if (args.new) {
+		} else if (args.new || !permissions.tag_edit) {
 			const success = await createTag(
 				ctx.squirrelCtx.db,
 				ctx.guild.id,
