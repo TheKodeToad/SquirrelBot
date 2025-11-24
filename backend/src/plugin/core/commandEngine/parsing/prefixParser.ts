@@ -237,8 +237,15 @@ function readCommandArgValue(
 			return readInteger(reader);
 		case OptionType.Number:
 			return readNumber(reader);
-		case OptionType.String:
-			return readString(reader, terminator);
+		case OptionType.String: {
+			const result = readString(reader, terminator);
+
+			if (result?.length === 0) {
+				return null;
+			}
+
+			return result;
+		}
 		case OptionType.Snowflake:
 			return readSnowflake(reader);
 		case OptionType.User:
