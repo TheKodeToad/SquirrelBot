@@ -104,13 +104,17 @@ async function handle(
 	}
 
 	try {
-		const result = await commandOption.autocomplete(
+		const choices = await commandOption.autocomplete(
 			ctx,
 			focusedOption.value,
 		);
-		await interaction.result(
-			result.map((choice) => ({ name: choice, value: choice })),
-		);
+		const result = choices
+			.slice(0, 25)
+			.filter((choice) => choice.length !== 0)
+			.map((choice) => choice.slice(0, 100))
+			.map((choice) => ({ name: choice, value: choice }));
+
+		await interaction.result(result);
 	} catch (error) {
 		try {
 			await interaction.result([
@@ -118,7 +122,7 @@ async function handle(
 			]);
 		} catch (error2) {
 			logger.error?.(
-				"Error responding with error message for slash command",
+				"Error responding with error message for autocomplete",
 				error2,
 			);
 		}
