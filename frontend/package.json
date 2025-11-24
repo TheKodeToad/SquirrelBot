@@ -5,7 +5,7 @@
 		"watch": "node build.mjs watch",
 		"typecheck": "tsc --noEmit",
 		"reformat": "pnpm run formatting --write",
-		"formatting": "prettier src/**/*.{ts,tsx}"
+		"formatting": "prettier 'src/**/*.{ts,tsx}'"
 	},
 	"devDependencies": {
 		"esbuild": "^0.25.4",

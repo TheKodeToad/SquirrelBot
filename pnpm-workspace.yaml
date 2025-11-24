@@ -3,6 +3,4 @@ packages:
   - frontend
 
 onlyBuiltDependencies:
-  - '@swc/core'
-
-shellEmulator: true
+  - "@swc/core"
