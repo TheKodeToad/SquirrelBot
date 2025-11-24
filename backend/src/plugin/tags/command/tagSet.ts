@@ -53,14 +53,12 @@ export default defineCommand({
 		existing: {
 			type: OptionType.Flag,
 			name: ["existing"],
-			description:
-				"Only set the tag if it already exists; don't create a new one.",
+			description: "Make sure to edit a tag rather than creating one.",
 		},
 		new: {
 			type: OptionType.Flag,
 			name: ["new"],
-			description:
-				"Only set the tag if it doesn't already exist; fail unless creating a new one.",
+			description: "Make sure to create a tag rather than editing one.",
 		},
 	},
 
