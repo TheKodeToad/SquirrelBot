@@ -3,7 +3,11 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { tagsConfigStore } from "#plugin/tags/index.ts";
+import {
+	MAX_TAG_CONTENT_LENGTH,
+	MAX_TAG_NAME_LENGTH,
+	tagsConfigStore,
+} from "#plugin/tags/index.ts";
 import {
 	createTag,
 	searchTags,
@@ -23,6 +27,7 @@ export default defineCommand({
 				"The name of the tag - a tag with this name will be created if it doesn't currently exist.",
 			required: true,
 			position: 0,
+			maxLength: MAX_TAG_NAME_LENGTH,
 			greedy: false,
 
 			autocomplete: (ctx, value) =>
@@ -33,6 +38,7 @@ export default defineCommand({
 			name: ["content", "c"],
 			required: true,
 			position: 1,
+			maxLength: MAX_TAG_CONTENT_LENGTH,
 		},
 		existing: {
 			type: OptionType.Flag,
