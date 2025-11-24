@@ -187,14 +187,12 @@ function readCommandArg(
 		return true;
 	}
 
-	const greedy = !("greedy" in option && option.greedy === false);
-
 	if (!(option.array ?? false)) {
 		if (!reader.canRead()) {
 			return null;
 		}
 
-		const result = readCommandArgValue(reader, option.type, greedy);
+		const result = readCommandArgValue(reader, option);
 		reader.skipWhitespace();
 
 		return result;
@@ -205,7 +203,7 @@ function readCommandArg(
 	while (reader.canRead() && !reader.match(ARRAY_TERMINATOR)) {
 		const prevCursor = reader.cursor;
 
-		const item = readCommandArgValue(reader, option.type, greedy);
+		const item = readCommandArgValue(reader, option);
 
 		if (item === null) {
 			reader.cursor = prevCursor;
@@ -227,20 +225,37 @@ function readCommandArg(
 
 function readCommandArgValue(
 	reader: StringReader,
-	type: Exclude<OptionType, OptionType.Flag>,
-	greedy: boolean,
+	option: Option,
 ): AnyArgsValueItem | null {
-	const terminator = greedy ? GREEDY_VALUE_TERMINATOR : undefined;
+	const greedy = !("greedy" in option && option.greedy === false);
 
-	switch (type) {
+	switch (option.type) {
+		case OptionType.Flag:
+			return true;
 		case OptionType.Integer:
 			return readInteger(reader);
 		case OptionType.Number:
 			return readNumber(reader);
 		case OptionType.String: {
+			const terminator =
+				(option.greedy ?? true) ? GREEDY_VALUE_TERMINATOR : undefined;
 			const result = readString(reader, terminator);
 
-			if (result?.length === 0) {
+			if (result === null || result.length === 0) {
+				return null;
+			}
+
+			if (
+				option.minLength !== undefined &&
+				result.length < option.minLength
+			) {
+				return null;
+			}
+
+			if (
+				option.maxLength !== undefined &&
+				result.length > option.maxLength
+			) {
 				return null;
 			}
 
