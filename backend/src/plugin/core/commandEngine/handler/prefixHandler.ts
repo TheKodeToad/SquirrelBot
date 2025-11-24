@@ -9,16 +9,16 @@ import {
 	listenForInteractions,
 	unlistenForInteractions,
 } from "#plugin/core/commandEngine/handler/componentHandler.ts";
-import {
-	STATE_CLEANUP_INTERVAL,
-	STATE_EXPIRE_AFTER,
-} from "#plugin/core/commandEngine/index.ts";
 import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.ts";
 import {
 	readPrefixArgs,
 	readPrefixName,
 } from "#plugin/core/commandEngine/parsing/prefixParser.ts";
 import { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
+import {
+	COMMAND_STATE_CLEANUP_INTERVAL,
+	COMMAND_STATE_EXPIRE_AFTER,
+} from "#plugin/core/constants.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import type {
@@ -57,8 +57,13 @@ export default [
 // if anything is added here, make sure the message type can be replied to
 const ALLOWED_MESSAGE_TYPES = [MessageTypes.DEFAULT, MessageTypes.REPLY];
 
-const trackedMessages: TTLMap<string, Message> = new TTLMap(STATE_EXPIRE_AFTER);
-setInterval(() => trackedMessages.cleanup(), STATE_CLEANUP_INTERVAL).unref();
+const trackedMessages: TTLMap<string, Message> = new TTLMap(
+	COMMAND_STATE_EXPIRE_AFTER,
+);
+setInterval(
+	() => trackedMessages.cleanup(),
+	COMMAND_STATE_CLEANUP_INTERVAL,
+).unref();
 
 async function handle(
 	squirrelCtx: SquirrelDiscordContext,

@@ -1,10 +1,13 @@
 import { getDefaultAvatarURL } from "#common/discord/urls.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
-import { HOUR, MINUTE } from "#common/time.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
+import {
+	MESSAGE_CLEANUP_INTERVAL,
+	MESSAGE_CLEANUP_THRESHOLD,
+} from "#plugin/logging/constants.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
 import {
@@ -16,9 +19,6 @@ import {
 import { Message, Routes, type PossiblyUncachedMessage } from "oceanic.js";
 
 const logger = moduleLogger();
-
-const MESSAGE_CLEANUP_INTERVAL = 30 * MINUTE;
-const MESSAGE_CLEANUP_THRESHOLD = 6 * HOUR;
 
 export default [
 	onBotInit(beginMessageCleanupLoop),

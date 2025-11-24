@@ -6,8 +6,8 @@ import { icons } from "#plugin/core/public/icons.ts";
 import {
 	MAX_TAG_CONTENT_LENGTH,
 	MAX_TAG_NAME_LENGTH,
-	tagsConfigStore,
-} from "#plugin/tags/index.ts";
+} from "#plugin/tags/constants.ts";
+import { tagsConfigStore } from "#plugin/tags/index.ts";
 import {
 	createTag,
 	searchTags,

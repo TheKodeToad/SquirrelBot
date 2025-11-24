@@ -13,9 +13,9 @@ import {
 	listenForInteractions,
 	unlistenForInteractions,
 } from "#plugin/core/commandEngine/handler/componentHandler.ts";
-import { AUTO_DEFER_AFTER } from "#plugin/core/commandEngine/index.ts";
 import { formatArgsParseError } from "#plugin/core/commandEngine/parsing/index.ts";
 import { readSlashArgs } from "#plugin/core/commandEngine/parsing/slashParser.ts";
+import { COMMAND_AUTO_DEFER_AFTER } from "#plugin/core/constants.ts";
 import { safePreRun, transformReply } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import {
@@ -333,7 +333,7 @@ class SlashContext implements CommandContext {
 			},
 			Math.max(
 				0,
-				AUTO_DEFER_AFTER -
+				COMMAND_AUTO_DEFER_AFTER -
 					(Date.now() - interaction.createdAt.getTime()),
 			),
 		).unref();

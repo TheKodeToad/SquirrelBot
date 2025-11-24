@@ -2,10 +2,10 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import {
-	AUTO_DEFER_AFTER,
-	STATE_CLEANUP_INTERVAL,
-	STATE_EXPIRE_AFTER,
-} from "#plugin/core/commandEngine/index.ts";
+	COMMAND_AUTO_DEFER_AFTER,
+	COMMAND_STATE_CLEANUP_INTERVAL,
+	COMMAND_STATE_EXPIRE_AFTER,
+} from "#plugin/core/constants.ts";
 import { transformReply } from "#plugin/core/helper/commands.ts";
 import type {
 	ComponentContext,
@@ -35,9 +35,12 @@ interface ComponentHandler {
 const logger = moduleLogger();
 
 const activeHandlers: TTLMap<string, ComponentHandler> = new TTLMap(
-	STATE_EXPIRE_AFTER,
+	COMMAND_STATE_EXPIRE_AFTER,
 );
-setInterval(() => activeHandlers.cleanup(), STATE_CLEANUP_INTERVAL).unref();
+setInterval(
+	() => activeHandlers.cleanup(),
+	COMMAND_STATE_CLEANUP_INTERVAL,
+).unref();
 
 export default [onBotEvent({ type: "interactionCreate", listener: handle })];
 
@@ -158,7 +161,7 @@ class ComponentContextImpl implements ComponentContext {
 			},
 			Math.max(
 				0,
-				AUTO_DEFER_AFTER -
+				COMMAND_AUTO_DEFER_AFTER -
 					(Date.now() - interaction.createdAt.getTime()),
 			),
 		).unref();

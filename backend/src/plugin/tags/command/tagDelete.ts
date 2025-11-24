@@ -3,7 +3,8 @@ import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
-import { MAX_TAG_NAME_LENGTH, tagsConfigStore } from "#plugin/tags/index.ts";
+import { MAX_TAG_NAME_LENGTH } from "#plugin/tags/constants.ts";
+import { tagsConfigStore } from "#plugin/tags/index.ts";
 import { deleteTag, searchTags } from "#plugin/tags/storage/tags.ts";
 
 export default defineCommand({

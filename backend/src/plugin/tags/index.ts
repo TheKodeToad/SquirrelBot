@@ -8,9 +8,6 @@ import { TagsConfig } from "#plugin/tags/config.ts";
 
 export const tagsConfigStore = new ConfigStore(TagsConfig);
 
-export const MAX_TAG_NAME_LENGTH = 30;
-export const MAX_TAG_CONTENT_LENGTH = 4000;
-
 const defaultConfig = `enabled = false
 
 # Example: allow admins to create tags
