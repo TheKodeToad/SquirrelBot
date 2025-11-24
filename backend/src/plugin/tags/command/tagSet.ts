@@ -4,7 +4,12 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
-import { createTag, updateTag, upsertTag } from "#plugin/tags/storage/tags.ts";
+import {
+	createTag,
+	searchTags,
+	updateTag,
+	upsertTag,
+} from "#plugin/tags/storage/tags.ts";
 
 export default defineCommand({
 	name: ["tagset", "settag"],
@@ -14,9 +19,14 @@ export default defineCommand({
 		name: {
 			type: OptionType.String,
 			name: ["name", "n"],
+			description:
+				"The name of the tag - a tag with this name will be created if it doesn't currently exist.",
 			required: true,
 			position: 0,
 			greedy: false,
+
+			autocomplete: (ctx, value) =>
+				searchTags(ctx.squirrelCtx.db, ctx.guild.id, value),
 		},
 		content: {
 			type: OptionType.String,

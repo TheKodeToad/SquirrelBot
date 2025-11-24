@@ -12,6 +12,7 @@ const Tag = z.strictObject({
 export type Tag = z.output<typeof Tag>;
 
 const JustInserted = z.strictObject({ inserted: z.boolean() });
+const JustNameArray = z.strictObject({ name: z.string() }).array();
 
 export async function getTag(
 	db: Pool,
@@ -31,6 +32,22 @@ export async function getTag(
 	}
 
 	return dbParse(Tag, result.rows[0]);
+}
+
+export async function searchTags(
+	db: Pool,
+	guildID: string,
+	name: string,
+): Promise<string[]> {
+	const result = await db.query(
+		`
+			SELECT "name" FROM "tags_tags"
+			WHERE "guildID" = $1 AND position($2 in "name") > 0
+		`,
+		[guildID, name],
+	);
+
+	return dbParse(JustNameArray, result.rows).map(({ name }) => name);
 }
 
 export async function createTag(

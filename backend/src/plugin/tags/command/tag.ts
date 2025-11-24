@@ -4,7 +4,7 @@ import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
-import { getTag } from "#plugin/tags/storage/tags.ts";
+import { getTag, searchTags } from "#plugin/tags/storage/tags.ts";
 
 export default defineCommand({
 	name: ["tag", "tagsend", "sendtag"],
@@ -15,6 +15,9 @@ export default defineCommand({
 			name: ["name", "n"],
 			required: true,
 			position: 0,
+
+			autocomplete: (ctx, value) =>
+				searchTags(ctx.squirrelCtx.db, ctx.guild.id, value),
 		},
 	},
 
