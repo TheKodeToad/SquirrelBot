@@ -22,12 +22,16 @@ async function handleCreate(
 	actor: Member,
 	tag: Tag,
 ): Promise<void> {
-	await logEvent(ctx, guild, null, "tagCreate", () => {
-		return {
-			guild: makeGuildView(guild),
-			actor: makeMemberUserView(actor),
-			tag,
-		};
+	await logEvent(ctx, {
+		guild,
+		key: "tagCreate",
+		supply() {
+			return {
+				guild: makeGuildView(guild),
+				actor: makeMemberUserView(actor),
+				tag,
+			};
+		},
 	});
 }
 
@@ -45,15 +49,19 @@ async function handleEdit(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "tagEdit", () => {
-		return {
-			guild: makeGuildView(guild),
-			actor: makeMemberUserView(actor),
-			oldTag: oldTag,
-			newTag: newTag,
-			nameChanged: nameChanged,
-			contentChanged: contentChanged,
-		};
+	await logEvent(ctx, {
+		guild,
+		key: "tagEdit",
+		supply() {
+			return {
+				guild: makeGuildView(guild),
+				actor: makeMemberUserView(actor),
+				oldTag: oldTag,
+				newTag: newTag,
+				nameChanged: nameChanged,
+				contentChanged: contentChanged,
+			};
+		},
 	});
 }
 
@@ -63,11 +71,15 @@ async function handleDelete(
 	actor: Member,
 	tag: Tag,
 ): Promise<void> {
-	await logEvent(ctx, guild, null, "tagDelete", () => {
-		return {
-			guild: makeGuildView(guild),
-			actor: makeMemberUserView(actor),
-			tag,
-		};
+	await logEvent(ctx, {
+		guild,
+		key: "tagDelete",
+		supply() {
+			return {
+				guild: makeGuildView(guild),
+				actor: makeMemberUserView(actor),
+				tag,
+			};
+		},
 	});
 }

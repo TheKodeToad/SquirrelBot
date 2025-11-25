@@ -54,20 +54,28 @@ async function handleCreate(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "roleCreate", async () => {
-		const changes = parseRoleUpdates(entry.changes ?? []);
-		const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
+	await logEvent(ctx, {
+		guild,
+		key: "roleCreate",
+		async supply() {
+			const changes = parseRoleUpdates(entry.changes ?? []);
+			const actor = await fetchMemberCached(
+				ctx.bot,
+				guild,
+				entry.userID!,
+			);
 
-		return {
-			actor: makeMemberUserView(actor),
-			role: makeRoleView({
-				id: entry.targetID!,
-				name: changes.name!.new!,
-				color: changes.color?.new,
-				hoist: changes.hoist?.new,
-				mentionable: changes.mentionable?.new,
-			}),
-		};
+			return {
+				actor: makeMemberUserView(actor),
+				role: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name!.new!,
+					color: changes.color?.new,
+					hoist: changes.hoist?.new,
+					mentionable: changes.mentionable?.new,
+				}),
+			};
+		},
 	});
 }
 
@@ -84,38 +92,46 @@ async function handleUpdate(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "roleUpdate", async () => {
-		const changes = parseRoleUpdates(entry.changes ?? []);
-		const name =
-			changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
+	await logEvent(ctx, {
+		guild,
+		key: "roleUpdate",
+		async supply() {
+			const changes = parseRoleUpdates(entry.changes ?? []);
+			const name =
+				changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
 
-		if (name === undefined) {
-			return null;
-		}
+			if (name === undefined) {
+				return null;
+			}
 
-		const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
+			const actor = await fetchMemberCached(
+				ctx.bot,
+				guild,
+				entry.userID!,
+			);
 
-		return {
-			actor: makeMemberUserView(actor),
-			nameChanged: changes.name?.new !== undefined,
-			colorChanged: changes.color?.new !== undefined,
-			hoistedChanged: changes.hoist?.new !== undefined,
-			mentionableChanged: changes.mentionable?.new !== undefined,
-			oldRole: makeRoleView({
-				id: entry.targetID!,
-				name: changes.name?.old,
-				color: changes.color?.old,
-				hoist: changes.hoist?.old,
-				mentionable: changes.mentionable?.old,
-			}),
-			newRole: makeRoleView({
-				id: entry.targetID!,
-				name: changes.name!.new!,
-				color: changes.color?.new,
-				hoist: changes.hoist?.new,
-				mentionable: changes.mentionable?.new,
-			}),
-		};
+			return {
+				actor: makeMemberUserView(actor),
+				nameChanged: changes.name?.new !== undefined,
+				colorChanged: changes.color?.new !== undefined,
+				hoistedChanged: changes.hoist?.new !== undefined,
+				mentionableChanged: changes.mentionable?.new !== undefined,
+				oldRole: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name?.old,
+					color: changes.color?.old,
+					hoist: changes.hoist?.old,
+					mentionable: changes.mentionable?.old,
+				}),
+				newRole: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name!.new!,
+					color: changes.color?.new,
+					hoist: changes.hoist?.new,
+					mentionable: changes.mentionable?.new,
+				}),
+			};
+		},
 	});
 }
 
@@ -132,19 +148,23 @@ async function handleDelete(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "roleDelete", async () => {
-		const changes = parseRoleUpdates(entry.changes ?? []);
-		const actor = await fetchUserCached(ctx.bot, entry.userID!);
+	await logEvent(ctx, {
+		guild,
+		key: "roleDelete",
+		async supply() {
+			const changes = parseRoleUpdates(entry.changes ?? []);
+			const actor = await fetchUserCached(ctx.bot, entry.userID!);
 
-		return {
-			moderator: makeUserView(actor),
-			role: makeRoleView({
-				id: entry.targetID!,
-				name: changes.name!.new!,
-				color: changes.color?.new,
-				hoist: changes.hoist?.new,
-				mentionable: changes.mentionable?.new,
-			}),
-		};
+			return {
+				moderator: makeUserView(actor),
+				role: makeRoleView({
+					id: entry.targetID!,
+					name: changes.name!.new!,
+					color: changes.color?.new,
+					hoist: changes.hoist?.new,
+					mentionable: changes.mentionable?.new,
+				}),
+			};
+		},
 	});
 }

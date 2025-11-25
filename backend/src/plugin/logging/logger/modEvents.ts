@@ -33,5 +33,9 @@ async function handleModAction(
 			return;
 	}
 
-	await logEvent(ctx, event.guild, null, key, () => makeModEventView(event));
+	await logEvent(ctx, {
+		guild: event.guild,
+		key,
+		supply: () => makeModEventView(event),
+	});
 }

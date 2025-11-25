@@ -11,14 +11,18 @@ type EventConfigView<T extends ValuesOf<EventConfigs>> = Parameters<
 	Exclude<T, false>["render"]
 >[0];
 
+export interface LogEventOptions<T extends keyof EventConfigs> {
+	guild: Guild;
+	channelID?: string;
+	key: T;
+	supply: () => Awaitable<EventConfigView<EventConfigs[T]> | null>;
+}
+
 export async function logEvent<T extends keyof EventConfigs>(
 	ctx: SquirrelDiscordContext,
-	guild: Guild,
-	channel: string | null,
-	key: T,
-	supply: () => Awaitable<EventConfigView<EventConfigs[T]> | null>,
+	options: LogEventOptions<T>,
 ): Promise<void> {
-	const config = loggingConfigStore.get(guild.id);
+	const config = loggingConfigStore.get(options.guild.id);
 
 	if (config === undefined) {
 		return;
@@ -29,18 +33,18 @@ export async function logEvent<T extends keyof EventConfigs>(
 	const tasks: (() => Promise<void>)[] = [];
 
 	for (const logger of config.loggers) {
-		const event = logger.events[key];
+		const event = logger.events[options.key];
 
 		if (!event) {
 			continue;
 		}
 
-		if (logger.channel === channel) {
+		if (logger.channel === options.channelID) {
 			continue;
 		}
 
 		if (view === null) {
-			view = await supply();
+			view = await options.supply();
 
 			if (view === null) {
 				return;
@@ -50,7 +54,7 @@ export async function logEvent<T extends keyof EventConfigs>(
 		tasks.push(async () => {
 			const channel = await fetchTextableGuildChannelCached(
 				ctx.bot,
-				guild,
+				options.guild,
 				logger.channel,
 			);
 
@@ -61,7 +65,8 @@ export async function logEvent<T extends keyof EventConfigs>(
 			await logViaWebhook(ctx, channel, {
 				...event.render(view!),
 				username: logger.displayName,
-				avatarURL: logger.avatar ?? guild.clientMember.avatarURL(),
+				avatarURL:
+					logger.avatar ?? options.guild.clientMember.avatarURL(),
 			});
 		});
 	}

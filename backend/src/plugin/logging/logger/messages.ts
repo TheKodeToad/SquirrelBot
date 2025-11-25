@@ -91,12 +91,11 @@ async function handleUpdate(
 		return;
 	}
 
-	await logEvent(
-		ctx,
-		message.guild,
-		message.channelID,
-		"messageEdit",
-		async () => {
+	await logEvent(ctx, {
+		guild: message.guild,
+		channel: message.channelID,
+		key: "messageEdit",
+		async supply() {
 			const entry = await getMessageCacheEntry(
 				ctx.db,
 				message.guild!.id,
@@ -135,7 +134,7 @@ async function handleUpdate(
 				newMessage: { content: message.content },
 			};
 		},
-	);
+	});
 }
 
 async function handleDelete(
@@ -146,12 +145,11 @@ async function handleDelete(
 		return;
 	}
 
-	await logEvent(
-		ctx,
-		message.guild,
-		message.channelID,
-		"messageDelete",
-		async () => {
+	await logEvent(ctx, {
+		guild: message.guild,
+		channel: message.channelID,
+		key: "messageDelete",
+		async supply() {
 			const entry = await takeMessageCacheEntry(
 				ctx.db,
 				message.guild!.id,
@@ -182,5 +180,5 @@ async function handleDelete(
 				message: { content: entry.content },
 			};
 		},
-	);
+	});
 }
