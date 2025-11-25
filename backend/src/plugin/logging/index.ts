@@ -6,6 +6,7 @@ import memberLogger from "#plugin/logging/logger/members.ts";
 import messageLogger from "#plugin/logging/logger/messages.ts";
 import modEventLogger from "#plugin/logging/logger/modEvents.ts";
 import roleLogger from "#plugin/logging/logger/roles.ts";
+import tagsLogger from "#plugin/logging/logger/tags.ts";
 
 export const loggingConfigStore = new ConfigStore(LoggingConfig);
 
@@ -31,5 +32,6 @@ export default definePlugin({
 		...roleLogger,
 		...memberLogger,
 		...modEventLogger,
+		...tagsLogger,
 	],
 });

@@ -45,7 +45,7 @@ export const RoleUpdateEvent = eventConfig(
 	{
 		embeds: [
 			{
-				title: "Role Updated",
+				title: "Updated Role",
 				author: { name: "{{actor.tag}}", icon_url: "{{actor.avatar}}" },
 				description: "{{new_role.mention}}",
 				fields: [
@@ -83,7 +83,7 @@ export const RoleDeleteEvent = eventConfig(
 	{
 		embeds: [
 			{
-				title: "Role Deleted",
+				title: "Deleted Role",
 				author: { name: "{{actor.tag}}", icon_url: "{{actor.avatar}}" },
 				fields: [
 					{ name: "Name", value: "{{role.name}}" },

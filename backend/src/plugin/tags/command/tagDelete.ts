@@ -1,12 +1,16 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
+import { moduleLogger } from "#common/logger/index.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugin/tags/constants.ts";
-import { autocompleteTags } from "#plugin/tags/helper/command.ts";
+import { autocompleteTags } from "#plugin/tags/helper/autocompletion.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
+import { onTagDeleted } from "#plugin/tags/public/extensionPoints.ts";
 import { deleteTag } from "#plugin/tags/storage/tags.ts";
+
+const logger = moduleLogger();
 
 export default defineCommand({
 	name: ["tagdelete", "deletetag", "tagdel", "deltag", "tagrm", "rmtag"],
@@ -31,20 +35,25 @@ export default defineCommand({
 			(permissions) => permissions.tag_delete,
 		),
 	async run(ctx, args) {
-		const success = await deleteTag(
+		const tag = await deleteTag(
 			ctx.squirrelCtx.db,
 			ctx.guild.id,
 			args.name,
 		);
 
-		if (success) {
-			await ctx.respond(
-				`${icons.success} Deleted tag '${escapeMarkdown(args.name)}'!`,
-			);
-		} else {
+		if (tag === null) {
 			await ctx.respond(
 				`${icons.error} Tag '${escapeMarkdown(args.name)}' does not exist!`,
 			);
+			return;
 		}
+
+		onTagDeleted
+			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, tag)
+			.catch((error) => logger.error?.("Error in onTagDeleted", error));
+
+		await ctx.respond(
+			`${icons.success} Deleted tag '${escapeMarkdown(args.name)}'!`,
+		);
 	},
 });

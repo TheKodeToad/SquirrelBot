@@ -11,6 +11,7 @@ type EventConfigView<T extends EventConfig> = Parameters<
 	Exclude<T, false>["render"]
 >[0];
 
+// FIXME: the generics are very broken!
 export async function logEvent<T extends EventConfig>(
 	ctx: SquirrelDiscordContext,
 	guild: Guild,

@@ -73,6 +73,7 @@ export const enum EventListenerPhase {
 
 type EventListener<T extends unknown[]> = (...args: T) => Awaitable<void>;
 
+// FIXME: this is overkill for most usages
 export function makeEventExtensionPoint<T extends unknown[]>(): ((
 	listener: EventListener<T>,
 	phase?: EventListenerPhase,

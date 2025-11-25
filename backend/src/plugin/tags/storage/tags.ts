@@ -1,17 +1,13 @@
+import type { Tag } from "#plugin/tags/public/tag.ts";
 import { dbParse } from "#storage/index.ts";
 import type { Pool } from "pg";
 import z from "zod";
 
 const Tag = z.strictObject({
-	guildID: z.string(),
 	name: z.string(),
-
 	content: z.string(),
 });
 
-export type Tag = z.output<typeof Tag>;
-
-const JustInserted = z.strictObject({ inserted: z.boolean() });
 const JustNameArray = z.strictObject({ name: z.string() }).array();
 
 export interface TagQuery {
@@ -27,7 +23,7 @@ export async function getTag(
 ): Promise<Tag | null> {
 	const result = await db.query(
 		`
-			SELECT * FROM "tags_tags"
+			SELECT "name", "content" FROM "tags_tags"
 			WHERE "guildID" = $1 AND "name" = $2
 		`,
 		[guildID, name],
@@ -62,8 +58,7 @@ export async function searchTagNames(
 export async function createTag(
 	db: Pool,
 	guildID: string,
-	name: string,
-	content: string,
+	tag: Tag,
 ): Promise<boolean> {
 	const result = await db.query(
 		`
@@ -71,7 +66,7 @@ export async function createTag(
 			VALUES ($1, $2, $3)
 			ON CONFLICT DO NOTHING
 		`,
-		[guildID, name, content],
+		[guildID, tag.name, tag.content],
 	);
 
 	return result.rowCount === 1;
@@ -82,50 +77,45 @@ export async function updateTag(
 	guildID: string,
 	name: string,
 	content: string,
-): Promise<boolean> {
+): Promise<Tag | null> {
 	const result = await db.query(
 		`
+			WITH "old" AS (
+				SELECT "content" FROM "tags_tags"
+				WHERE "guildID" = $1 AND "name" = $2
+			)
 			UPDATE "tags_tags"
 			SET "content" = $3
 			WHERE "guildID" = $1 AND "name" = $2
+			RETURNING "name", (SELECT "content" FROM "old") AS "content"
 		`,
 		[guildID, name, content],
 	);
 
-	return result.rowCount === 1;
-}
+	if (result.rowCount !== 1) {
+		return null;
+	}
 
-export async function upsertTag(
-	db: Pool,
-	guildID: string,
-	name: string,
-	content: string,
-): Promise<{ inserted: boolean }> {
-	const result = await db.query(
-		`
-			INSERT INTO "tags_tags" ("guildID", "name", "content")
-			VALUES ($1, $2, $3)
-			ON CONFLICT ("guildID", "name") DO UPDATE SET "content" = $3
-			RETURNING (xmax = 0) AS "inserted"
-		`,
-		[guildID, name, content],
-	);
-
-	return dbParse(JustInserted, result.rows[0]);
+	return dbParse(Tag, result.rows[0]);
 }
 
 export async function deleteTag(
 	db: Pool,
 	guildID: string,
 	name: string,
-): Promise<boolean> {
+): Promise<Tag | null> {
 	const result = await db.query(
 		`
 			DELETE FROM "tags_tags"
 			WHERE "guildID" = $1 AND "name" = $2
+			RETURNING "name", "content"
 		`,
 		[guildID, name],
 	);
 
-	return result.rowCount !== 0;
+	if (result.rows.length !== 1) {
+		return null;
+	}
+
+	return dbParse(Tag, result.rows[0]);
 }
