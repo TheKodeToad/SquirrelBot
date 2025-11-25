@@ -97,18 +97,18 @@ async function handleUpdate(
 
 		return {
 			actor: makeMemberUserView(actor),
-			name_changed: changes.name?.new !== undefined,
-			color_changed: changes.color?.new !== undefined,
-			hoisted_changed: changes.hoist?.new !== undefined,
-			mentionable_changed: changes.mentionable?.new !== undefined,
-			old_role: makeRoleView({
+			nameChanged: changes.name?.new !== undefined,
+			colorChanged: changes.color?.new !== undefined,
+			hoistedChanged: changes.hoist?.new !== undefined,
+			mentionableChanged: changes.mentionable?.new !== undefined,
+			oldRole: makeRoleView({
 				id: entry.targetID!,
 				name: changes.name?.old,
 				color: changes.color?.old,
 				hoist: changes.hoist?.old,
 				mentionable: changes.mentionable?.old,
 			}),
-			new_role: makeRoleView({
+			newRole: makeRoleView({
 				id: entry.targetID!,
 				name: changes.name!.new!,
 				color: changes.color?.new,

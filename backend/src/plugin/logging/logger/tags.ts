@@ -49,10 +49,10 @@ async function handleEdit(
 		return {
 			guild: makeGuildView(guild),
 			actor: makeMemberUserView(actor),
-			old_tag: oldTag,
-			new_tag: newTag,
-			name_changed: nameChanged,
-			content_changed: contentChanged,
+			oldTag: oldTag,
+			newTag: newTag,
+			nameChanged: nameChanged,
+			contentChanged: contentChanged,
 		};
 	});
 }

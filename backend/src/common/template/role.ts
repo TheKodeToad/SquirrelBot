@@ -10,8 +10,8 @@ export const RoleView = m.object({
 	mentionable: m.terminal({ noEscape: true }),
 
 	mention: m.terminal({ noEscape: true }),
-	name_mention: m.terminal({ noEscape: true }),
-	name_bold_mention: m.terminal({ noEscape: true }),
+	nameMention: m.terminal({ noEscape: true }),
+	nameBoldMention: m.terminal({ noEscape: true }),
 });
 export type RoleView = InferView<typeof RoleView>;
 
@@ -40,14 +40,14 @@ export function makeRoleView(role: RoleViewable): RoleView {
 		get mention() {
 			return `<@&${role.id}>`;
 		},
-		get name_mention() {
+		get nameMention() {
 			if (role.name === undefined) {
 				return this.mention;
 			}
 
 			return `${escapeMarkdown(role.name)} ${this.mention}`;
 		},
-		get name_bold_mention() {
+		get nameBoldMention() {
 			if (role.name === undefined) {
 				return this.mention;
 			}

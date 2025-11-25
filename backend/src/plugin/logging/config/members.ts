@@ -13,7 +13,7 @@ export const MemberJoinEvent = eventConfig(
 				fields: [
 					{
 						name: "Account Created At",
-						value: "{{#user.created_at}}{{.}} ({{user.age}} old){{/user.created_at}}",
+						value: "{{#user.createdAt}}{{.}} ({{user.age}} old){{/user.createdAt}}",
 					},
 				],
 				color: "green",
@@ -33,7 +33,7 @@ export const MemberLeaveEvent = eventConfig(
 				fields: [
 					{
 						name: "Joined At",
-						value: "{{#user.joined_at}}{{.}} (stayed for {{user.membership_duration}}){{/user.joined_at}}",
+						value: "{{#user.joinedAt}}{{.}} (stayed for {{user.membershipDuration}}){{/user.joinedAt}}",
 					},
 				],
 				color: "red",

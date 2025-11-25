@@ -18,8 +18,8 @@ import { Member } from "oceanic.js";
 export const ModEventView = m.object({
 	guild: GuildView,
 
-	performed_at: TimestampView,
-	expires_at: TimestampView,
+	performedAt: TimestampView,
+	expiresAt: TimestampView,
 	duration: DurationView,
 
 	moderator: UserView,
@@ -27,9 +27,9 @@ export const ModEventView = m.object({
 
 	reason: m.terminal({ noEscape: true }),
 
-	purge_duration: DurationView,
-	dm_delivered: m.terminal({ noEscape: true }),
-	case_number: m.terminal({ noEscape: true }),
+	purgeDuration: DurationView,
+	dmDelivered: m.terminal({ noEscape: true }),
+	caseNumber: m.terminal({ noEscape: true }),
 });
 export type ModEventView = InferView<typeof ModEventView>;
 
@@ -37,8 +37,8 @@ export function makeModEventView(action: ModEvent): ModEventView {
 	const result = {
 		guild: makeGuildView(action.guild),
 
-		performed_at: makeTimestampView(action.performedAt),
-		expires_at:
+		performedAt: makeTimestampView(action.performedAt),
+		expiresAt:
 			action.expiresAt !== undefined
 				? makeTimestampView(action.expiresAt)
 				: undefined,
@@ -58,13 +58,13 @@ export function makeModEventView(action: ModEvent): ModEventView {
 
 		reason: action.reason,
 
-		purge_duration:
+		purgeDuration:
 			action.deleteMessageSeconds !== undefined &&
 			action.deleteMessageSeconds !== 0
 				? makeDurationView(action.deleteMessageSeconds * 1000)
 				: undefined,
-		dm_delivered: action.dmDelivered,
-		case_number: action.caseNumber,
+		dmDelivered: action.dmDelivered,
+		caseNumber: action.caseNumber,
 	};
 
 	return result;
@@ -73,19 +73,19 @@ export function makeModEventView(action: ModEvent): ModEventView {
 export const UserBanEvent = eventConfig(messageTemplate(ModEventView), {
 	embeds: [
 		{
-			title: "User Banned {{#case_number}}(Case #{{.}}){{/case_number}}",
+			title: "User Banned {{#caseNumber}}(Case #{{.}}){{/caseNumber}}",
 			color: "red",
 			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
-				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Moderator", value: "{{moderator.tagMention}}" },
 				{
 					name: "Duration",
-					value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}",
+					value: "{{#duration}}{{.}} (expires at {{expiresAt}}){{/duration}}",
 				},
 				{
 					name: "Deleted Messages",
-					value: "{{#purge_duration}}Last {{.}}{{/purge_duration}}",
+					value: "{{#purgeDuration}}Last {{.}}{{/purgeDuration}}",
 				},
 			],
 			footer: { text: "Target ID: {{target.id}}" },
@@ -96,12 +96,12 @@ export const UserBanEvent = eventConfig(messageTemplate(ModEventView), {
 export const UserUnbanEvent = eventConfig(messageTemplate(ModEventView), {
 	embeds: [
 		{
-			title: "Ban Revoked {{#case_number}}(Case #{{.}}){{/case_number}}",
+			title: "Ban Revoked {{#caseNumber}}(Case #{{.}}){{/caseNumber}}",
 			color: "green",
 			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
-				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Moderator", value: "{{moderator.tagMention}}" },
 			],
 			footer: { text: "Target ID: {{target.id}}" },
 		},
@@ -111,12 +111,12 @@ export const UserUnbanEvent = eventConfig(messageTemplate(ModEventView), {
 export const UserKickEvent = eventConfig(messageTemplate(ModEventView), {
 	embeds: [
 		{
-			title: "User Kicked {{#case_number}}(Case #{{.}}){{/case_number}}",
+			title: "User Kicked {{#caseNumber}}(Case #{{.}}){{/caseNumber}}",
 			color: "red",
 			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
-				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Moderator", value: "{{moderator.tagMention}}" },
 			],
 			footer: { text: "Target ID: {{target.id}}" },
 		},
@@ -126,15 +126,15 @@ export const UserKickEvent = eventConfig(messageTemplate(ModEventView), {
 export const UserTimeoutEvent = eventConfig(messageTemplate(ModEventView), {
 	embeds: [
 		{
-			title: "User Timed Out {{#case_number}}(Case #{{.}}){{/case_number}}",
+			title: "User Timed Out {{#caseNumber}}(Case #{{.}}){{/caseNumber}}",
 			color: "fuchsia",
 			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
-				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Moderator", value: "{{moderator.tagMention}}" },
 				{
 					name: "Duration",
-					value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}",
+					value: "{{#duration}}{{.}} (expires at {{expiresAt}}){{/duration}}",
 				},
 			],
 			footer: { text: "Target ID: {{target.id}}" },
@@ -145,15 +145,15 @@ export const UserTimeoutEvent = eventConfig(messageTemplate(ModEventView), {
 export const UserWarnEvent = eventConfig(messageTemplate(ModEventView), {
 	embeds: [
 		{
-			title: "Warned User {{#case_number}}(Case #{{.}}){{/case_number}}",
+			title: "Warned User {{#caseNumber}}(Case #{{.}}){{/caseNumber}}",
 			color: "yellow",
 			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
-				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
+				{ name: "Moderator", value: "{{moderator.tagMention}}" },
 				{
 					name: "Duration",
-					value: "{{#duration}}{{.}} (expires at {{expires_at}}){{/duration}}",
+					value: "{{#duration}}{{.}} (expires at {{expiresAt}}){{/duration}}",
 				},
 			],
 			footer: { text: "Target ID: {{target.id}}" },

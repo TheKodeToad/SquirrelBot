@@ -12,8 +12,8 @@ export const MessageEditEvent = eventConfig(
 	messageTemplate(
 		m.object({
 			author: UserView,
-			old_message: MessageLogView,
-			new_message: MessageLogView,
+			oldMessage: MessageLogView,
+			newMessage: MessageLogView,
 		}),
 	),
 	{
@@ -27,9 +27,9 @@ export const MessageEditEvent = eventConfig(
 				fields: [
 					{
 						name: "Old Content",
-						value: "{{old_message.content}}{{^old_message.content}}Unknown{{/old_message.content}}",
+						value: "{{oldMessage.content}}{{^oldMessage.content}}Unknown{{/oldMessage.content}}",
 					},
-					{ name: "New Content", value: "{{new_message.content}}" },
+					{ name: "New Content", value: "{{newMessage.content}}" },
 				],
 				color: "yellow",
 				footer: { text: "Author ID: {{author.id}}" },

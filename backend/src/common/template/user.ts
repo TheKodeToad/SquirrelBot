@@ -14,30 +14,30 @@ import { BASE_URL, Member, Routes, type User } from "oceanic.js";
 
 export const UserView = m.object({
 	id: m.terminal({ noEscape: true }),
-	created_at: TimestampView,
+	createdAt: TimestampView,
 	age: DurationView,
 	tag: m.terminal(),
-	display_name: m.terminal(),
+	displayName: m.terminal(),
 	avatar: m.terminal({ noEscape: true }),
-	global_name: m.terminal(),
-	global_avatar: m.terminal({ noEscape: true }),
+	globalName: m.terminal(),
+	globalAvatar: m.terminal({ noEscape: true }),
 
 	guild: GuildView,
-	joined_at: TimestampView,
-	membership_duration: DurationView,
+	joinedAt: TimestampView,
+	membershipDuration: DurationView,
 
 	mention: m.terminal({ noEscape: true }),
-	tag_mention: m.terminal({ noEscape: true }),
-	tag_bold_mention: m.terminal({ noEscape: true }),
+	tagMention: m.terminal({ noEscape: true }),
+	tagBoldMention: m.terminal({ noEscape: true }),
 	link: m.terminal({ noEscape: true }),
-	masked_link: m.terminal({ noEscape: true }),
+	maskedLink: m.terminal({ noEscape: true }),
 });
 export type UserView = InferView<typeof UserView>;
 
 export function makeUserView(user: User): UserView {
 	const result = {
 		id: user.id,
-		get created_at() {
+		get createdAt() {
 			return makeTimestampView(user.createdAt);
 		},
 		get age() {
@@ -46,26 +46,26 @@ export function makeUserView(user: User): UserView {
 		get tag() {
 			return user.tag;
 		},
-		get display_name() {
+		get displayName() {
 			return user.globalName ?? user.tag;
 		},
 		get avatar() {
 			return user.avatarURL();
 		},
-		get global_name() {
-			return this.display_name;
+		get globalName() {
+			return this.displayName;
 		},
-		get global_avatar() {
+		get globalAvatar() {
 			return this.avatar;
 		},
 
 		get mention() {
 			return user.mention;
 		},
-		get tag_mention() {
+		get tagMention() {
 			return formatUserTag(user);
 		},
-		get tag_bold_mention() {
+		get tagBoldMention() {
 			return formatUserBold(user);
 		},
 		get link() {
@@ -83,7 +83,7 @@ export function makeUserView(user: User): UserView {
 export function makeMemberUserView(member: Member): UserView {
 	const result = {
 		id: member.id,
-		get created_at() {
+		get createdAt() {
 			return makeTimestampView(member.createdAt);
 		},
 		get age() {
@@ -92,7 +92,7 @@ export function makeMemberUserView(member: Member): UserView {
 		get tag() {
 			return member.tag;
 		},
-		get display_name() {
+		get displayName() {
 			return member.displayName;
 		},
 		get avatar() {
@@ -102,14 +102,14 @@ export function makeMemberUserView(member: Member): UserView {
 		get guild() {
 			return makeGuildView(member.guild);
 		},
-		get joined_at() {
+		get joinedAt() {
 			if (member.joinedAt !== null) {
 				return makeTimestampView(member.joinedAt);
 			} else {
 				return undefined;
 			}
 		},
-		get membership_duration() {
+		get membershipDuration() {
 			if (member.joinedAt !== null) {
 				return makeDurationView(Date.now() - member.joinedAt.getTime());
 			} else {
@@ -120,19 +120,19 @@ export function makeMemberUserView(member: Member): UserView {
 		get mention() {
 			return member.mention;
 		},
-		get tag_mention() {
+		get tagMention() {
 			return formatUser(member);
 		},
-		get tag_bold_mention() {
+		get tagBoldMention() {
 			return formatUserBold(member);
 		},
 		get link() {
 			return BASE_URL + Routes.USER(member.id);
 		},
-		get global_name() {
+		get globalName() {
 			return member.user.globalName;
 		},
-		get global_avatar() {
+		get globalAvatar() {
 			return member.user.avatarURL();
 		},
 

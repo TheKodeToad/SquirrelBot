@@ -8,7 +8,7 @@ export const GuildView = m.object({
 	icon: m.terminal({ noEscape: true }),
 
 	link: m.terminal({ noEscape: true }),
-	masked_link: m.terminal({ noEscape: true }),
+	maskedLink: m.terminal({ noEscape: true }),
 });
 export type GuildView = InferView<typeof GuildView>;
 

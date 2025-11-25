@@ -131,8 +131,8 @@ async function handleUpdate(
 					message.member !== undefined
 						? makeMemberUserView(message.member)
 						: makeUserView(message.author),
-				old_message: { content: entry?.content },
-				new_message: { content: message.content },
+				oldMessage: { content: entry?.content },
+				newMessage: { content: message.content },
 			};
 		},
 	);

@@ -34,12 +34,12 @@ export const RoleUpdateEvent = eventConfig(
 	messageTemplate(
 		m.object({
 			actor: UserView,
-			old_role: RoleView,
-			new_role: RoleView,
-			name_changed: m.terminal(),
-			color_changed: m.terminal(),
-			hoisted_changed: m.terminal(),
-			mentionable_changed: m.terminal(),
+			oldRole: RoleView,
+			newRole: RoleView,
+			nameChanged: m.terminal(),
+			colorChanged: m.terminal(),
+			hoistedChanged: m.terminal(),
+			mentionableChanged: m.terminal(),
 		}),
 	),
 	{
@@ -47,23 +47,23 @@ export const RoleUpdateEvent = eventConfig(
 			{
 				title: "Updated Role",
 				author: { name: "{{actor.tag}}", iconURL: "{{actor.avatar}}" },
-				description: "{{new_role.mention}}",
+				description: "{{newRole.mention}}",
 				fields: [
 					{
 						name: "Name",
-						value: "{{#name_changed}}{{old_role.name}} → {{new_role.name}}{{/name_changed}}",
+						value: "{{#nameChanged}}{{oldRole.name}} → {{newRole.name}}{{/nameChanged}}",
 					},
 					{
 						name: "Color",
-						value: "{{#color_changed}}{{old_role.color}} → {{new_role.color}}{{/color_changed}}",
+						value: "{{#colorChanged}}{{oldRole.color}} → {{newRole.color}}{{/colorChanged}}",
 					},
 					{
 						name: "Hoisted",
-						value: "{{#hoisted_changed}}{{old_role.hoisted}} → {{new_role.hoisted}}{{/hoisted_changed}}",
+						value: "{{#hoistedChanged}}{{oldRole.hoisted}} → {{newRole.hoisted}}{{/hoistedChanged}}",
 					},
 					{
 						name: "Mentionable",
-						value: "{{#mentionable_changed}}{{old_role.mentionable}} → {{new_role.mentionable}}{{/mentionable_changed}}",
+						value: "{{#mentionableChanged}}{{oldRole.mentionable}} → {{newRole.mentionable}}{{/mentionableChanged}}",
 					},
 				],
 				color: "yellow",

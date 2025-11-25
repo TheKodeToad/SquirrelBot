@@ -48,11 +48,11 @@ export const TagEditEvent = eventConfig(
 			guild: GuildView,
 			actor: UserView,
 
-			old_tag: TagView,
-			new_tag: TagView,
+			oldTag: TagView,
+			newTag: TagView,
 
-			name_changed: m.terminal(),
-			content_changed: m.terminal(),
+			nameChanged: m.terminal(),
+			contentChanged: m.terminal(),
 		}),
 	),
 	{
@@ -66,15 +66,15 @@ export const TagEditEvent = eventConfig(
 				fields: [
 					{
 						name: "Name",
-						value: "{{#name_changed}}{{old_tag.name}} → {{new_tag.name}}{{/name_changed}}{{^name_changed}}{{new_tag.name}}{{/name_changed}}",
+						value: "{{#nameChanged}}{{oldTag.name}} → {{newTag.name}}{{/nameChanged}}{{^nameChanged}}{{newTag.name}}{{/nameChanged}}",
 					},
 					{
 						name: "Old Content",
-						value: "{{#content_changed}}{{old_tag.content}}{{/content_changed}}",
+						value: "{{#contentChanged}}{{oldTag.content}}{{/contentChanged}}",
 					},
 					{
 						name: "New Content",
-						value: "{{#content_changed}}{{new_tag.content}}{{/content_changed}}",
+						value: "{{#contentChanged}}{{newTag.content}}{{/contentChanged}}",
 					},
 				],
 				color: "yellow",

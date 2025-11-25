@@ -3,15 +3,15 @@ import { m, type InferView } from "mousetache";
 
 export const TimestampView = m.object(
 	{
-		date_time: m.terminal({ noEscape: true }),
-		date_time_long: m.terminal({ noEscape: true }),
+		dateTime: m.terminal({ noEscape: true }),
+		dateTimeLong: m.terminal({ noEscape: true }),
 		time: m.terminal({ noEscape: true }),
-		time_long: m.terminal({ noEscape: true }),
+		timeLong: m.terminal({ noEscape: true }),
 		date: m.terminal({ noEscape: true }),
-		date_long: m.terminal({ noEscape: true }),
+		dateLong: m.terminal({ noEscape: true }),
 		relative: m.terminal({ noEscape: true }),
 		unix: m.terminal({ noEscape: true }),
-		unix_secs: m.terminal({ noEscape: true }),
+		unixSecs: m.terminal({ noEscape: true }),
 	},
 	{ noEscape: true },
 );
