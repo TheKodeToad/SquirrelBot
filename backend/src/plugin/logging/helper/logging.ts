@@ -6,18 +6,17 @@ import { logViaWebhook } from "#plugin/logging/helper/webhooks.ts";
 import { loggingConfigStore } from "#plugin/logging/index.ts";
 import type { Guild } from "oceanic.js";
 
-type EventConfig = ValuesOf<LoggerConfig["events"]>;
-type EventConfigView<T extends EventConfig> = Parameters<
+type EventConfigs = LoggerConfig["events"];
+type EventConfigView<T extends ValuesOf<EventConfigs>> = Parameters<
 	Exclude<T, false>["render"]
 >[0];
 
-// FIXME: the generics are very broken!
-export async function logEvent<T extends EventConfig>(
+export async function logEvent<T extends keyof EventConfigs>(
 	ctx: SquirrelDiscordContext,
 	guild: Guild,
 	channel: string | null,
-	key: keyof LoggerConfig["events"],
-	supply: () => Awaitable<EventConfigView<T> | null>,
+	key: T,
+	supply: () => Awaitable<EventConfigView<EventConfigs[T]> | null>,
 ): Promise<void> {
 	const config = loggingConfigStore.get(guild.id);
 
@@ -25,7 +24,7 @@ export async function logEvent<T extends EventConfig>(
 		return;
 	}
 
-	let lazyParams: EventConfigView<T> | undefined;
+	let view: EventConfigView<EventConfigs[T]> | null = null;
 
 	const tasks: (() => Promise<void>)[] = [];
 
@@ -40,31 +39,31 @@ export async function logEvent<T extends EventConfig>(
 			continue;
 		}
 
-		if (lazyParams === undefined) {
-			const view = await supply();
+		if (view === null) {
+			view = await supply();
 
 			if (view === null) {
 				return;
 			}
-
-			tasks.push(async () => {
-				const channel = await fetchTextableGuildChannelCached(
-					ctx.bot,
-					guild,
-					logger.channel,
-				);
-
-				if (channel === null) {
-					return;
-				}
-
-				await logViaWebhook(ctx, channel, {
-					...event.render(view),
-					username: logger.displayName,
-					avatarURL: logger.avatar ?? guild.clientMember.avatarURL(),
-				});
-			});
 		}
+
+		tasks.push(async () => {
+			const channel = await fetchTextableGuildChannelCached(
+				ctx.bot,
+				guild,
+				logger.channel,
+			);
+
+			if (channel === null) {
+				return;
+			}
+
+			await logViaWebhook(ctx, channel, {
+				...event.render(view!),
+				username: logger.displayName,
+				avatarURL: logger.avatar ?? guild.clientMember.avatarURL(),
+			});
+		});
 	}
 
 	await Promise.all(tasks.map((task) => task()));
