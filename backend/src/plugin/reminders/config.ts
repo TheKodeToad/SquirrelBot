@@ -2,16 +2,16 @@ import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { z } from "zod";
 
 export const RemindersConfig = z.strictObject({
-	default_permissions: z
+	defaultPermissions: z
 		.strictObject({
-			personal_reminders: z.boolean().default(false),
-			manage_reminders: z.boolean().default(false),
+			personalReminders: z.boolean().default(false),
+			manageReminders: z.boolean().default(false),
 		})
 		.prefault({}),
-	permission_overrides: z
+	permissionOverrides: z
 		.strictObject({
-			personal_reminders: z.boolean().optional(),
-			manage_reminders: z.boolean().optional(),
+			personalReminders: z.boolean().optional(),
+			manageReminders: z.boolean().optional(),
 			...PermissionsFilter.shape,
 		})
 		.array()

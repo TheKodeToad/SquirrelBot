@@ -9,7 +9,7 @@ import { z } from "zod";
 export function permissionsGuard<C extends ConfigWithPermissions>(
 	ctx: ActionContext,
 	configCache: ConfigStore<z.ZodType<C>>,
-	requirement?: (permissions: C["default_permissions"], config: C) => boolean,
+	requirement?: (permissions: C["defaultPermissions"], config: C) => boolean,
 ): false | PermissionsGuardData<C> {
 	const config = configCache.get(ctx.guild.id);
 
@@ -27,6 +27,6 @@ export function permissionsGuard<C extends ConfigWithPermissions>(
 }
 
 interface PermissionsGuardData<C extends ConfigWithPermissions> {
-	permissions: C["default_permissions"];
+	permissions: C["defaultPermissions"];
 	config: C;
 }

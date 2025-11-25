@@ -15,7 +15,7 @@ export const RoleCreateEvent = eventConfig(
 		embeds: [
 			{
 				title: "Role Created",
-				author: { name: "{{actor.tag}}", icon_url: "{{actor.avatar}}" },
+				author: { name: "{{actor.tag}}", iconURL: "{{actor.avatar}}" },
 				description: "{{role.mention}}",
 				fields: [
 					{ name: "Name", value: "{{role.name}}" },
@@ -46,7 +46,7 @@ export const RoleUpdateEvent = eventConfig(
 		embeds: [
 			{
 				title: "Updated Role",
-				author: { name: "{{actor.tag}}", icon_url: "{{actor.avatar}}" },
+				author: { name: "{{actor.tag}}", iconURL: "{{actor.avatar}}" },
 				description: "{{new_role.mention}}",
 				fields: [
 					{
@@ -84,7 +84,7 @@ export const RoleDeleteEvent = eventConfig(
 		embeds: [
 			{
 				title: "Deleted Role",
-				author: { name: "{{actor.tag}}", icon_url: "{{actor.avatar}}" },
+				author: { name: "{{actor.tag}}", iconURL: "{{actor.avatar}}" },
 				fields: [
 					{ name: "Name", value: "{{role.name}}" },
 					{ name: "Color", value: "{{role.color}}" },

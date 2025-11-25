@@ -22,7 +22,7 @@ async function handleCreate(
 	actor: Member,
 	tag: Tag,
 ): Promise<void> {
-	await logEvent(ctx, guild, null, "tag_create", () => {
+	await logEvent(ctx, guild, null, "tagCreate", () => {
 		return {
 			guild: makeGuildView(guild),
 			actor: makeMemberUserView(actor),
@@ -45,7 +45,7 @@ async function handleEdit(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "tag_edit", () => {
+	await logEvent(ctx, guild, null, "tagEdit", () => {
 		return {
 			guild: makeGuildView(guild),
 			actor: makeMemberUserView(actor),
@@ -63,7 +63,7 @@ async function handleDelete(
 	actor: Member,
 	tag: Tag,
 ): Promise<void> {
-	await logEvent(ctx, guild, null, "tag_delete", () => {
+	await logEvent(ctx, guild, null, "tagDelete", () => {
 		return {
 			guild: makeGuildView(guild),
 			actor: makeMemberUserView(actor),

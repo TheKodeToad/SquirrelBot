@@ -28,7 +28,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			coreConfigStore,
-			(permissions) => permissions.help_command,
+			(permissions) => permissions.helpCommand,
 		),
 	async run(ctx, args) {
 		if (args.command !== null) {

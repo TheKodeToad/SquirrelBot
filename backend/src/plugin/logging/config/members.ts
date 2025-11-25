@@ -9,7 +9,7 @@ export const MemberJoinEvent = eventConfig(
 		embeds: [
 			{
 				title: "Member Joined",
-				author: { name: "{{user.tag}}", icon_url: "{{user.avatar}}" },
+				author: { name: "{{user.tag}}", iconURL: "{{user.avatar}}" },
 				fields: [
 					{
 						name: "Account Created At",
@@ -29,7 +29,7 @@ export const MemberLeaveEvent = eventConfig(
 		embeds: [
 			{
 				title: "Member Left",
-				author: { name: "{{user.tag}}", icon_url: "{{user.avatar}}" },
+				author: { name: "{{user.tag}}", iconURL: "{{user.avatar}}" },
 				fields: [
 					{
 						name: "Joined At",

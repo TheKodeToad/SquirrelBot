@@ -41,7 +41,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			tagsConfigStore,
-			(permissions) => permissions.tag_create,
+			(permissions) => permissions.tagCreate,
 		),
 	async run(ctx, args) {
 		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, args);

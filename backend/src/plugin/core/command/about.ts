@@ -37,7 +37,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			coreConfigStore,
-			(permissions) => permissions.about_command,
+			(permissions) => permissions.aboutCommand,
 		),
 	async run(ctx) {
 		const uptime = Math.floor(process.uptime());

@@ -29,7 +29,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			coreConfigCache,
-			(permissions) => permissions.groups_command,
+			(permissions) => permissions.groupsCommand,
 		),
 	async run(ctx, args) {
 		const coreConfig = coreConfigCache.get(ctx.guild.id);

@@ -82,8 +82,8 @@ function testGroup(group: CoreGroup, member: Member): boolean {
 }
 
 export interface ConfigWithPermissions<P extends Record<string, boolean> = {}> {
-	default_permissions: P;
-	permission_overrides: (Partial<P> & PermissionsFilter)[];
+	defaultPermissions: P;
+	permissionOverrides: (Partial<P> & PermissionsFilter)[];
 }
 
 export function resolvePermissions<P extends Record<string, boolean>>(
@@ -93,12 +93,12 @@ export function resolvePermissions<P extends Record<string, boolean>>(
 ): P {
 	const groups = resolveGroups(member);
 
-	const result = { ...config.default_permissions };
+	const result = { ...config.defaultPermissions };
 	Object.setPrototypeOf(result, Object.prototype);
 
 	const debugMatchedOverrides: number[] = [];
 
-	for (const [i, override] of config.permission_overrides.entries()) {
+	for (const [i, override] of config.permissionOverrides.entries()) {
 		if (!testFilter(override, groups, channel)) {
 			continue;
 		}
@@ -118,8 +118,8 @@ export function resolvePermissions<P extends Record<string, boolean>>(
 		`Resolved permissions for ${debugFormatUser(member.user)} ${debugFormatChannel(channel)} ${debugFormatGuild(member.guild)}`,
 		{
 			groups,
-			defaultPermissions: config.default_permissions,
-			permissionOverrides: config.permission_overrides,
+			defaultPermissions: config.defaultPermissions,
+			permissionOverrides: config.permissionOverrides,
 			matchedOverrides: debugMatchedOverrides,
 			result,
 		},
@@ -142,28 +142,28 @@ function testFilter(
 	const categoryChannel = baseChannel.parent ?? null;
 
 	if (
-		filter.in_group !== undefined &&
-		filter.in_group.some((group) => groups.groups.has(group))
+		filter.inGroup !== undefined &&
+		filter.inGroup.some((group) => groups.groups.has(group))
 	) {
 		return true;
 	}
 
-	if (filter.in_channel && filter.in_channel.includes(baseChannel.id)) {
+	if (filter.inChannel && filter.inChannel.includes(baseChannel.id)) {
 		return true;
 	}
 
 	if (
 		categoryChannel !== null &&
-		filter.in_channel_category &&
-		filter.in_channel_category.includes(categoryChannel.id)
+		filter.inChannelCategory &&
+		filter.inChannelCategory.includes(categoryChannel.id)
 	) {
 		return true;
 	}
 
 	if (
 		channel instanceof ThreadChannel &&
-		filter.in_thread &&
-		filter.in_thread.includes(channel.id)
+		filter.inThread &&
+		filter.inThread.includes(channel.id)
 	) {
 		return true;
 	}

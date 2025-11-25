@@ -2,18 +2,18 @@ import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
 import { z } from "zod";
 
 export const UtilConfig = z.strictObject({
-	default_permissions: z
+	defaultPermissions: z
 		.strictObject({
-			invite_info_command: z.boolean().default(false),
-			ping_command: z.boolean().default(false),
-			snowflake_command: z.boolean().default(false),
+			inviteInfoCommand: z.boolean().default(false),
+			pingCommand: z.boolean().default(false),
+			snowflakeCommand: z.boolean().default(false),
 		})
 		.prefault({}),
-	permission_overrides: z
+	permissionOverrides: z
 		.strictObject({
-			invite_info_command: z.boolean(),
-			ping_command: z.boolean(),
-			snowflake_command: z.boolean(),
+			inviteInfoCommand: z.boolean(),
+			pingCommand: z.boolean(),
+			snowflakeCommand: z.boolean(),
 			...PermissionsFilter.shape,
 		})
 		.partial()

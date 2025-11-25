@@ -103,7 +103,7 @@ async function handle(
 		return false;
 	}
 
-	const { prefix } = config.prefix_commands;
+	const { prefix } = config.prefixCommands;
 
 	const reader = new StringReader(message.content);
 
@@ -115,7 +115,7 @@ async function handle(
 
 	const perms = resolvePermissions(config, message.member, message.channel);
 
-	if (!perms.prefix_commands) {
+	if (!perms.prefixCommands) {
 		return false;
 	}
 
@@ -286,7 +286,7 @@ class PrefixContext implements CommandContext {
 			}
 
 			const shouldReply =
-				config.prefix_commands.reply &&
+				config.prefixCommands.reply &&
 				this.message.channel
 					.permissionsOf(this.message.channel.guild.clientMember)
 					.has(Permissions.READ_MESSAGE_HISTORY);

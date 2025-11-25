@@ -45,9 +45,9 @@ export default defineCommand({
 			(permissions) => permissions.warn,
 		),
 	async run(ctx, args, { config }): Promise<void> {
-		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
+		const sendDirectMessage = args.dm ?? config.ban.sendDirectMessage;
 		const directMessage = sendDirectMessage
-			? config.warn.direct_message.render({
+			? config.warn.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
@@ -65,7 +65,7 @@ export default defineCommand({
 
 				actor: ctx.member,
 				target,
-				ranking: config.member_ranking,
+				ranking: config.memberRanking,
 
 				reason: args.reason ?? undefined,
 

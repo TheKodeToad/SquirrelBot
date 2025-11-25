@@ -51,7 +51,7 @@ async function handle(
 		interaction.channel,
 	);
 
-	if (!perms.slash_commands) {
+	if (!perms.slashCommands) {
 		return;
 	}
 

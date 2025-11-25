@@ -114,7 +114,7 @@ export function renderCommandListPage(
 		entries = [];
 
 		const prefix =
-			coreConfigStore.get(ctx.guild.id)?.prefix_commands.prefix ?? "";
+			coreConfigStore.get(ctx.guild.id)?.prefixCommands.prefix ?? "";
 
 		for (const entry of getCommandsByPlugin(plugin.name) ?? []) {
 			const { command } = entry;

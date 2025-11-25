@@ -62,7 +62,7 @@ async function handleCreate(
 	}
 
 	const shouldTrack = config.loggers.some(
-		(logger) => logger.events.message_edit || logger.events.message_delete,
+		(logger) => logger.events.messageEdit || logger.events.messageDelete,
 	);
 
 	if (!shouldTrack) {
@@ -95,7 +95,7 @@ async function handleUpdate(
 		ctx,
 		message.guild,
 		message.channelID,
-		"message_edit",
+		"messageEdit",
 		async () => {
 			const entry = await getMessageCacheEntry(
 				ctx.db,
@@ -150,7 +150,7 @@ async function handleDelete(
 		ctx,
 		message.guild,
 		message.channelID,
-		"message_delete",
+		"messageDelete",
 		async () => {
 			const entry = await takeMessageCacheEntry(
 				ctx.db,

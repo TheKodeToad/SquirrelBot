@@ -28,7 +28,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			moderationConfigStore,
-			(permissions) => permissions.case_read,
+			(permissions) => permissions.caseRead,
 		),
 	async run(ctx, { number }) {
 		const info = await getCase(ctx.squirrelCtx.db, ctx.guild.id, number);

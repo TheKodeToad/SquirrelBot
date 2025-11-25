@@ -13,7 +13,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			utilConfigStore,
-			(permissions) => permissions.ping_command,
+			(permissions) => permissions.pingCommand,
 		),
 	async run(ctx) {
 		const baseResponse = `${icons.info} **Gateway:** ${ctx.shard.latency}ms`;

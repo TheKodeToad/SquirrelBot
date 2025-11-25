@@ -46,7 +46,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			moderationConfigStore,
-			(permissions) => permissions.case_read,
+			(permissions) => permissions.caseRead,
 		),
 	async run(ctx, args) {
 		await respondWithPaginator<CaseInfo, number>(ctx, {
@@ -74,7 +74,7 @@ async function lookUpCases(
 
 	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (!permissions.case_read) {
+	if (!permissions.caseRead) {
 		return [];
 	}
 

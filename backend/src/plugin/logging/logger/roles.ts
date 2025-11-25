@@ -54,7 +54,7 @@ async function handleCreate(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "role_create", async () => {
+	await logEvent(ctx, guild, null, "roleCreate", async () => {
 		const changes = parseRoleUpdates(entry.changes ?? []);
 		const actor = await fetchMemberCached(ctx.bot, guild, entry.userID!);
 
@@ -84,7 +84,7 @@ async function handleUpdate(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "role_update", async () => {
+	await logEvent(ctx, guild, null, "roleUpdate", async () => {
 		const changes = parseRoleUpdates(entry.changes ?? []);
 		const name =
 			changes.name?.new ?? guild.roles.get(entry.targetID!)?.name;
@@ -132,7 +132,7 @@ async function handleDelete(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "role_delete", async () => {
+	await logEvent(ctx, guild, null, "roleDelete", async () => {
 		const changes = parseRoleUpdates(entry.changes ?? []);
 		const actor = await fetchUserCached(ctx.bot, entry.userID!);
 

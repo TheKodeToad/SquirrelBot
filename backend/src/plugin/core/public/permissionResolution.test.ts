@@ -29,7 +29,7 @@ function mockCoreConfig<T>(
 
 const Permissions = z.strictObject({
 	permissions: z.object({}),
-	permission_overrides: z.object(PermissionsFilter.shape).array(),
+	permissionOverrides: z.object(PermissionsFilter.shape).array(),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

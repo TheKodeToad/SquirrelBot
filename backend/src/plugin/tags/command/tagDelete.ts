@@ -32,7 +32,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			tagsConfigStore,
-			(permissions) => permissions.tag_delete,
+			(permissions) => permissions.tagDelete,
 		),
 	async run(ctx, args) {
 		const tag = await deleteTag(

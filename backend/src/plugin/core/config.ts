@@ -23,7 +23,7 @@ export const CoreConfig = z.strictObject({
 			"and assign it using a permission override which matches it.",
 	),
 
-	prefix_commands: z
+	prefixCommands: z
 		.strictObject({
 			prefix: z.string().default("?"),
 			reply: z
@@ -35,24 +35,24 @@ export const CoreConfig = z.strictObject({
 		})
 		.prefault({}),
 
-	default_permissions: z
+	defaultPermissions: z
 		.strictObject({
-			prefix_commands: z.boolean().default(true),
-			slash_commands: z.boolean().default(true),
-			ephemeral_response: z.boolean().default(true),
-			about_command: z.boolean().default(true),
-			help_command: z.boolean().default(true),
-			groups_command: z.boolean().default(false),
+			prefixCommands: z.boolean().default(true),
+			slashCommands: z.boolean().default(true),
+			ephemeralResponse: z.boolean().default(true),
+			aboutCommand: z.boolean().default(true),
+			helpCommand: z.boolean().default(true),
+			groupsCommand: z.boolean().default(false),
 		})
 		.prefault({}),
-	permission_overrides: z
+	permissionOverrides: z
 		.strictObject({
-			prefix_commands: z.boolean().optional(),
-			slash_commands: z.boolean().optional(),
-			ephemeral_response: z.boolean().optional(),
-			about_command: z.boolean().optional(),
-			help_command: z.boolean().optional(),
-			groups_command: z.boolean().optional(),
+			prefixCommands: z.boolean().optional(),
+			slashCommands: z.boolean().optional(),
+			ephemeralResponse: z.boolean().optional(),
+			aboutCommand: z.boolean().optional(),
+			helpCommand: z.boolean().optional(),
+			groupsCommand: z.boolean().optional(),
 			...PermissionsFilter.shape,
 		})
 		.array()

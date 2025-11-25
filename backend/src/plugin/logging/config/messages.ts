@@ -22,7 +22,7 @@ export const MessageEditEvent = eventConfig(
 				title: "Message Edited",
 				author: {
 					name: "{{author.tag}}",
-					icon_url: "{{author.avatar}}",
+					iconURL: "{{author.avatar}}",
 				},
 				fields: [
 					{
@@ -51,7 +51,7 @@ export const MessageDeleteEvent = eventConfig(
 				title: "Message Deleted",
 				author: {
 					name: "{{author.tag}}",
-					icon_url: "{{author.avatar}}",
+					iconURL: "{{author.avatar}}",
 				},
 				description: "{{message.content}}",
 				color: "red",

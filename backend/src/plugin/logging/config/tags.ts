@@ -23,7 +23,7 @@ export const TagCreateEvent = eventConfig(
 				title: "Created Tag",
 				author: {
 					name: "{{actor.tag}}",
-					icon_url: "{{actor.avatar}}",
+					iconURL: "{{actor.avatar}}",
 				},
 				fields: [
 					{
@@ -61,7 +61,7 @@ export const TagEditEvent = eventConfig(
 				title: "Edited Tag",
 				author: {
 					name: "{{actor.tag}}",
-					icon_url: "{{actor.avatar}}",
+					iconURL: "{{actor.avatar}}",
 				},
 				fields: [
 					{
@@ -98,7 +98,7 @@ export const TagDeleteEvent = eventConfig(
 				title: "Deleted Tag",
 				author: {
 					name: "{{actor.tag}}",
-					icon_url: "{{actor.avatar}}",
+					iconURL: "{{actor.avatar}}",
 				},
 				fields: [
 					{

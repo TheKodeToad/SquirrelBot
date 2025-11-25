@@ -12,24 +12,19 @@ function message<T extends z.ZodType>(stringType: (markdown: boolean) => T) {
 	return z
 		.strictObject({
 			content: stringType(true),
-			allowed_mentions: z
+			allowedMentions: z
 				.strictObject({
 					everyone: z.boolean(),
-					replied_user: z.boolean(),
+					repliedUser: z.boolean(),
 					users: z.union([z.boolean(), Snowflake.array().max(100)]),
 					roles: z.union([z.boolean(), Snowflake.array().max(100)]),
 				})
-				.partial()
-				.transform(({ replied_user, ...input }) => ({
-					repliedUser: replied_user,
-					...input,
-				})),
+				.partial(),
 			embeds: embed(stringType).array(),
 			silent: z.boolean(),
 		})
 		.partial()
-		.transform(({ allowed_mentions, silent, ...input }) => ({
-			allowedMentions: allowed_mentions,
+		.transform(({ silent, ...input }) => ({
 			flags: silent ? MessageFlags.SUPPRESS_NOTIFICATIONS : 0,
 			...input,
 		}));
@@ -53,16 +48,11 @@ function embed<T extends z.ZodType>(stringType: (markdown: boolean) => T) {
 			}),
 			image: stringType(false).transform((url) => ({ url })),
 			thumbnail: stringType(false).transform((url) => ({ url })),
-			author: z
-				.strictObject({
-					name: stringType(false),
-					url: stringType(false).optional(),
-					icon_url: stringType(false).optional(),
-				})
-				.transform(({ icon_url, ...input }) => ({
-					iconURL: icon_url,
-					...input,
-				})),
+			author: z.strictObject({
+				name: stringType(false),
+				url: stringType(false).optional(),
+				iconURL: stringType(false).optional(),
+			}),
 			fields: z
 				.strictObject({
 					name: stringType(true),

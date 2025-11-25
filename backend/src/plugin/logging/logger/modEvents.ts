@@ -18,16 +18,16 @@ async function handleModAction(
 
 	switch (event.type) {
 		case ModEventType.Ban:
-			key = "user_ban";
+			key = "userBan";
 			break;
 		case ModEventType.Unban:
-			key = "user_unban";
+			key = "userUnban";
 			break;
 		case ModEventType.Kick:
-			key = "user_kick";
+			key = "userKick";
 			break;
 		case ModEventType.Warn:
-			key = "user_warn";
+			key = "userWarn";
 			break;
 		default:
 			return;

@@ -76,7 +76,7 @@ async function handle(
 		interaction.channel,
 	);
 
-	if (!perms.slash_commands) {
+	if (!perms.slashCommands) {
 		return;
 	}
 
@@ -92,7 +92,7 @@ async function handle(
 	const privateOption =
 		interaction.data.options.getNumber("private") ??
 		Number(commandEntry.command.ephemeralByDefault);
-	const ephemeral = perms.ephemeral_response && Boolean(privateOption);
+	const ephemeral = perms.ephemeralResponse && Boolean(privateOption);
 	const ctx = new SlashContext(
 		squirrelCtx,
 		commandEntry.command,

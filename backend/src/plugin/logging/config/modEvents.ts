@@ -75,7 +75,7 @@ export const UserBanEvent = eventConfig(messageTemplate(ModEventView), {
 		{
 			title: "User Banned {{#case_number}}(Case #{{.}}){{/case_number}}",
 			color: "red",
-			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
 				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
@@ -98,7 +98,7 @@ export const UserUnbanEvent = eventConfig(messageTemplate(ModEventView), {
 		{
 			title: "Ban Revoked {{#case_number}}(Case #{{.}}){{/case_number}}",
 			color: "green",
-			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
 				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
@@ -113,7 +113,7 @@ export const UserKickEvent = eventConfig(messageTemplate(ModEventView), {
 		{
 			title: "User Kicked {{#case_number}}(Case #{{.}}){{/case_number}}",
 			color: "red",
-			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
 				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
@@ -128,7 +128,7 @@ export const UserTimeoutEvent = eventConfig(messageTemplate(ModEventView), {
 		{
 			title: "User Timed Out {{#case_number}}(Case #{{.}}){{/case_number}}",
 			color: "fuchsia",
-			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
 				{ name: "Moderator", value: "{{moderator.tag_mention}}" },
@@ -147,7 +147,7 @@ export const UserWarnEvent = eventConfig(messageTemplate(ModEventView), {
 		{
 			title: "Warned User {{#case_number}}(Case #{{.}}){{/case_number}}",
 			color: "yellow",
-			author: { name: "{{target}}", icon_url: "{{target.avatar}}" },
+			author: { name: "{{target}}", iconURL: "{{target.avatar}}" },
 			fields: [
 				{ name: "Reason", value: "{{reason}}" },
 				{ name: "Moderator", value: "{{moderator.tag_mention}}" },

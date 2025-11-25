@@ -57,9 +57,9 @@ export default defineCommand({
 			(permissions) => permissions.ban,
 		),
 	async run(ctx, args, { config }) {
-		const sendDirectMessage = args.dm ?? config.ban.send_direct_message;
+		const sendDirectMessage = args.dm ?? config.ban.sendDirectMessage;
 		const directMessage = sendDirectMessage
-			? config.ban.direct_message.render({
+			? config.ban.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
@@ -67,7 +67,7 @@ export default defineCommand({
 			: undefined;
 
 		const deleteMessageSeconds =
-			args.purge !== null ? args.purge / 1000 : config.ban.purge_messages;
+			args.purge !== null ? args.purge / 1000 : config.ban.purgeMessages;
 
 		const { successful, unsuccessful } = await performModActions(
 			ctx.squirrelCtx,
@@ -84,7 +84,7 @@ export default defineCommand({
 
 				actor: ctx.member,
 				target: target,
-				ranking: config.member_ranking,
+				ranking: config.memberRanking,
 
 				reason: args.reason ?? undefined,
 

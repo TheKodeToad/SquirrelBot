@@ -49,24 +49,24 @@ export const LoggerConfig = z.strictObject({
 	avatar: z.url().optional(),
 	events: z
 		.strictObject({
-			message_edit: MessageEditEvent,
-			message_delete: MessageDeleteEvent,
+			messageEdit: MessageEditEvent,
+			messageDelete: MessageDeleteEvent,
 
-			member_join: MemberJoinEvent,
-			member_leave: MemberLeaveEvent,
+			memberJoin: MemberJoinEvent,
+			memberLeave: MemberLeaveEvent,
 
-			role_create: RoleCreateEvent,
-			role_update: RoleUpdateEvent,
-			role_delete: RoleDeleteEvent,
+			roleCreate: RoleCreateEvent,
+			roleUpdate: RoleUpdateEvent,
+			roleDelete: RoleDeleteEvent,
 
-			user_ban: UserBanEvent,
-			user_unban: UserUnbanEvent,
-			user_kick: UserKickEvent,
-			user_warn: UserWarnEvent,
+			userBan: UserBanEvent,
+			userUnban: UserUnbanEvent,
+			userKick: UserKickEvent,
+			userWarn: UserWarnEvent,
 
-			tag_create: TagCreateEvent,
-			tag_edit: TagEditEvent,
-			tag_delete: TagDeleteEvent,
+			tagCreate: TagCreateEvent,
+			tagEdit: TagEditEvent,
+			tagDelete: TagDeleteEvent,
 		})
 		.describe(
 			"Customize what happens when events happen in the server — set them to true to use the default presentation",

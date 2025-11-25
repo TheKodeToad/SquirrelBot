@@ -47,7 +47,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			utilConfigStore,
-			(permissions) => permissions.invite_info_command,
+			(permissions) => permissions.inviteInfoCommand,
 		),
 	async run(ctx, args) {
 		const matches = REGEX.exec(args.link);

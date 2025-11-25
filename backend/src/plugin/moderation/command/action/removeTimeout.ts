@@ -56,9 +56,9 @@ export default defineCommand({
 		),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage =
-			args.dm ?? config.remove_timeout.send_direct_message;
+			args.dm ?? config.removeTimeout.sendDirectMessage;
 		const directMessage = sendDirectMessage
-			? config.remove_timeout.direct_message.render({
+			? config.removeTimeout.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
@@ -76,7 +76,7 @@ export default defineCommand({
 
 				actor: ctx.member,
 				target,
-				ranking: config.member_ranking,
+				ranking: config.memberRanking,
 
 				reason: args.reason ?? undefined,
 

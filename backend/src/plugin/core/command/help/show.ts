@@ -23,7 +23,7 @@ export function renderCommandPage(
 		container.components.push(Divider());
 
 		const prefix =
-			coreConfigStore.get(guildID)?.prefix_commands.prefix ?? "";
+			coreConfigStore.get(guildID)?.prefixCommands.prefix ?? "";
 
 		let content =
 			"**Usage:** " +

@@ -35,12 +35,12 @@ export const enum MemberRanking {
 }
 
 export const ModerationConfig = z.strictObject({
-	preset_reasons: PresetReason.array().default([]), // TODO
-	preset_prefix: z.string().default("!"), // TODO
+	presetReasons: PresetReason.array().default([]), // TODO
+	presetPrefix: z.string().default("!"), // TODO
 
-	member_ranking: mappedEnum({
+	memberRanking: mappedEnum({
 		none: MemberRanking.None,
-		highest_role: MemberRanking.HighestRole,
+		highestRole: MemberRanking.HighestRole,
 		level: MemberRanking.Level,
 	})
 		.default(MemberRanking.HighestRole)
@@ -53,43 +53,43 @@ export const ModerationConfig = z.strictObject({
 
 	ban: z
 		.strictObject({
-			send_direct_message: z.boolean().default(false),
-			direct_message: messageTemplate(actionParams).prefault({
+			sendDirectMessage: z.boolean().default(false),
+			directMessage: messageTemplate(actionParams).prefault({
 				content:
 					"You are banned from **{{server}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}",
 			}),
-			purge_messages: z
+			purgeMessages: z
 				.number()
 				.default(0)
 				.transform((input) => input * DAY),
-			preset_reasons: PresetReason.array().default(discordReasons), // TODO
+			presetReasons: PresetReason.array().default(discordReasons), // TODO
 		})
 		.prefault({})
 		.describe("Configure ban behavior"),
 
 	unban: z
 		.strictObject({
-			preset_reasons: PresetReason.array().default([]),
+			presetReasons: PresetReason.array().default([]),
 		})
 		.prefault({})
 		.describe("Configure unban behavior"),
 
 	kick: z
 		.strictObject({
-			send_direct_message: z.boolean().default(false),
-			direct_message: messageTemplate(actionParams).prefault({
+			sendDirectMessage: z.boolean().default(false),
+			directMessage: messageTemplate(actionParams).prefault({
 				content:
 					"You were kicked in **{{server}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}",
 			}),
-			preset_reasons: PresetReason.array().default(discordReasons), // TODO
+			presetReasons: PresetReason.array().default(discordReasons), // TODO
 		})
 		.prefault({})
 		.describe("Configure kick behavior"),
 
 	timeout: z
 		.strictObject({
-			send_direct_message: z.boolean().default(false),
-			direct_message: messageTemplate(
+			sendDirectMessage: z.boolean().default(false),
+			directMessage: messageTemplate(
 				m.object({
 					...actionParams.entries,
 					duration: DurationView,
@@ -98,36 +98,36 @@ export const ModerationConfig = z.strictObject({
 				content:
 					"You were timed out in **{{server}}** for **{{duration}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}",
 			}),
-			preset_reasons: PresetReason.array().default(discordReasons), // TODO
+			presetReasons: PresetReason.array().default(discordReasons), // TODO
 		})
 		.prefault({})
 		.describe("Configure timeout behavior"),
 
-	remove_timeout: z
+	removeTimeout: z
 		.strictObject({
-			send_direct_message: z.boolean().default(false),
-			direct_message: messageTemplate(actionParams).prefault({
+			sendDirectMessage: z.boolean().default(false),
+			directMessage: messageTemplate(actionParams).prefault({
 				content:
 					"Your timeout was removed in **{{server}}**{{#reason}}:\n>>> {{.}}{{/reason}}{{^reason}}!{{/reason}}",
 			}),
-			preset_reasons: PresetReason.array().default(discordReasons), // TODO
+			presetReasons: PresetReason.array().default(discordReasons), // TODO
 		})
 		.prefault({})
 		.describe("Configure timeout behavior"),
 
 	warn: z
 		.strictObject({
-			send_direct_message: z.boolean().default(false),
-			direct_message: messageTemplate(actionParams).prefault({
+			sendDirectMessage: z.boolean().default(false),
+			directMessage: messageTemplate(actionParams).prefault({
 				content:
 					"You were warned in {{server}}{{#reason}}:\n{{.}}{{/reason}}>>> {{^reason}}!{{/reason}}",
 			}),
-			preset_reasons: PresetReason.array().default(discordReasons),
+			presetReasons: PresetReason.array().default(discordReasons),
 		})
 		.prefault({})
 		.describe("Configure warn behavior"),
 
-	default_permissions: z
+	defaultPermissions: z
 		.strictObject({
 			ban: z.boolean().default(false),
 			unban: z.boolean().default(false),
@@ -135,11 +135,11 @@ export const ModerationConfig = z.strictObject({
 			timeout: z.boolean().default(false),
 			warn: z.boolean().default(false),
 			purge: z.boolean().default(false),
-			case_read: z.boolean().default(false),
-			case_delete: z.boolean().default(false),
+			caseRead: z.boolean().default(false),
+			caseDelete: z.boolean().default(false),
 		})
 		.prefault({}),
-	permission_overrides: z
+	permissionOverrides: z
 		.strictObject({
 			ban: z.boolean().optional(),
 			unban: z.boolean().optional(),
@@ -147,8 +147,8 @@ export const ModerationConfig = z.strictObject({
 			warn: z.boolean().optional(),
 			timeout: z.boolean().optional(),
 			purge: z.boolean().optional(),
-			case_read: z.boolean().optional(),
-			case_delete: z.boolean().optional(),
+			caseRead: z.boolean().optional(),
+			caseDelete: z.boolean().optional(),
 			...PermissionsFilter.shape,
 		})
 		.array()

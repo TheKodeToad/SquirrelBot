@@ -44,7 +44,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			tagsConfigStore,
-			(permissions) => permissions.tag_edit,
+			(permissions) => permissions.tagEdit,
 		),
 	async run(ctx, args) {
 		const oldTag = await updateTag(

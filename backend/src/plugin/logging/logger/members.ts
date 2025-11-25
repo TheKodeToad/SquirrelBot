@@ -14,7 +14,7 @@ async function handleAdd(
 	ctx: SquirrelDiscordContext,
 	member: Member,
 ): Promise<void> {
-	await logEvent(ctx, member.guild, null, "member_join", () => ({
+	await logEvent(ctx, member.guild, null, "memberJoin", () => ({
 		user: makeMemberUserView(member),
 	}));
 }
@@ -34,7 +34,7 @@ async function handleRemove(
 		return;
 	}
 
-	await logEvent(ctx, guild, null, "member_leave", () => ({
+	await logEvent(ctx, guild, null, "memberLeave", () => ({
 		user: "guildID" in user ? makeMemberUserView(user) : makeUserView(user),
 	}));
 }
