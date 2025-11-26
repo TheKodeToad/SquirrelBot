@@ -60,7 +60,8 @@ export const TagEditEvent = eventConfig(
 					name: "{{actor.tag}}",
 					iconURL: "{{actor.avatar}}",
 				},
-				description: "{{#nameChanged}}{{oldTag.name}} → {{/nameChanged}}{{newTag.name}}",
+				description:
+					"{{#nameChanged}}{{oldTag.name}} → {{/nameChanged}}{{newTag.name}}",
 				fields: [
 					{
 						name: "Old Content",

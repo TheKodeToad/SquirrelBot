@@ -1,3 +1,4 @@
+import type { Nullable } from "#common/general.ts";
 import type { Tag } from "#plugin/tags/public/tag.ts";
 import { dbParse } from "#storage/index.ts";
 import type { Pool } from "pg";
@@ -77,7 +78,7 @@ export async function updateTag(
 	db: Pool,
 	guildID: string,
 	name: string,
-	tag: Partial<Tag>,
+	tag: Nullable<Tag>,
 ): Promise<Tag | null> {
 	const result = await db.query(
 		`

@@ -1,4 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
+import type { Nullable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
@@ -11,6 +12,7 @@ import {
 import { autocompleteTags } from "#plugin/tags/helper/autocompletion.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
 import { onTagEdited } from "#plugin/tags/public/extensionPoints.ts";
+import type { Tag } from "#plugin/tags/public/tag.ts";
 import { updateTag } from "#plugin/tags/storage/tags.ts";
 
 const logger = moduleLogger();
@@ -52,14 +54,16 @@ export default defineCommand({
 			(permissions) => permissions.tagEdit,
 		),
 	async run(ctx, args) {
+		const changes = {
+			name: args.newName,
+			content: args.content,
+		};
+
 		const oldTag = await updateTag(
 			ctx.squirrelCtx.db,
 			ctx.guild.id,
 			args.name,
-			{
-				name: args.newName ?? undefined,
-				content: args.content ?? undefined,
-			},
+			changes,
 		);
 
 		if (oldTag === null) {
@@ -69,13 +73,14 @@ export default defineCommand({
 			return;
 		}
 
-		const newTag = {
-			name: args.newName ?? oldTag.name,
-			content: args.content ?? oldTag.content,
-		};
+		// check after we know the tag exists
+		if (args.newName === null && args.content === null) {
+			await ctx.respond(`${icons.error} No changes specified!`);
+			return;
+		}
 
 		onTagEdited
-			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, oldTag, newTag)
+			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, oldTag, changes)
 			.catch((error) => logger.error?.("Error in onTagDeleted", error));
 
 		await ctx.respond(

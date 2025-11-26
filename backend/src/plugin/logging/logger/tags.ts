@@ -1,3 +1,4 @@
+import type { Nullable } from "#common/general.ts";
 import { makeGuildView } from "#common/template/guild.ts";
 import { makeMemberUserView } from "#common/template/user.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
@@ -40,15 +41,8 @@ async function handleEdit(
 	guild: Guild,
 	actor: Member,
 	oldTag: Tag,
-	newTag: Tag,
+	changes: Nullable<Tag>,
 ): Promise<void> {
-	const nameChanged = oldTag.name !== newTag.name;
-	const contentChanged = oldTag.content !== newTag.content;
-
-	if (!(nameChanged || contentChanged)) {
-		return;
-	}
-
 	await logEvent(ctx, {
 		guild,
 		key: "tagEdit",
@@ -57,9 +51,12 @@ async function handleEdit(
 				guild: makeGuildView(guild),
 				actor: makeMemberUserView(actor),
 				oldTag: oldTag,
-				newTag: newTag,
-				nameChanged: nameChanged,
-				contentChanged: contentChanged,
+				newTag: {
+					name: changes.name ?? oldTag.name,
+					content: changes.content ?? oldTag.content,
+				},
+				nameChanged: changes.name !== null,
+				contentChanged: changes.content !== null,
 			};
 		},
 	});

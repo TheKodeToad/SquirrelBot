@@ -18,3 +18,6 @@ export function todo(): never {
 
 export type ValuesOf<T> = T[keyof T];
 export type Awaitable<T> = T | PromiseLike<T>;
+export type Nullable<T> = {
+	[TKey in keyof T]: T[TKey] | null;
+};

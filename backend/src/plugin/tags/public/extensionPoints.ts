@@ -1,3 +1,4 @@
+import type { Nullable } from "#common/general.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { makeEventExtensionPoint } from "#extensionPoint.ts";
 import type { Tag } from "#plugin/tags/public/tag.ts";
@@ -14,7 +15,7 @@ type BinaryEvent = [
 	guild: Guild,
 	actor: Member,
 	oldTag: Tag,
-	newTag: Tag,
+	changes: Nullable<Tag>,
 ];
 
 export const onTagCreated = makeEventExtensionPoint<UnaryEvent>();
