@@ -93,7 +93,7 @@ async function handleUpdate(
 
 	await logEvent(ctx, {
 		guild: message.guild,
-		channel: message.channelID,
+		channelID: message.channelID,
 		key: "messageEdit",
 		async supply() {
 			const entry = await getMessageCacheEntry(
@@ -147,7 +147,7 @@ async function handleDelete(
 
 	await logEvent(ctx, {
 		guild: message.guild,
-		channel: message.channelID,
+		channelID: message.channelID,
 		key: "messageDelete",
 		async supply() {
 			const entry = await takeMessageCacheEntry(
