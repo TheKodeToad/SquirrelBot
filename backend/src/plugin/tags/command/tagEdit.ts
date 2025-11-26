@@ -34,9 +34,14 @@ export default defineCommand({
 		content: {
 			type: OptionType.String,
 			name: ["content", "c"],
-			required: true,
 			position: 1,
 			maxLength: MAX_TAG_CONTENT_LENGTH,
+		},
+		newName: {
+			type: OptionType.String,
+			name: ["new-name", "rename", "nn", "rn"],
+			description: "Change the name of the tag to something else.",
+			maxLength: MAX_TAG_NAME_LENGTH,
 		},
 	},
 
@@ -51,7 +56,10 @@ export default defineCommand({
 			ctx.squirrelCtx.db,
 			ctx.guild.id,
 			args.name,
-			args.content,
+			{
+				name: args.newName ?? undefined,
+				content: args.content ?? undefined,
+			},
 		);
 
 		if (oldTag === null) {
@@ -61,8 +69,13 @@ export default defineCommand({
 			return;
 		}
 
+		const newTag = {
+			name: args.newName ?? oldTag.name,
+			content: args.content ?? oldTag.content,
+		};
+
 		onTagEdited
-			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, oldTag, args)
+			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, oldTag, newTag)
 			.catch((error) => logger.error?.("Error in onTagDeleted", error));
 
 		await ctx.respond(

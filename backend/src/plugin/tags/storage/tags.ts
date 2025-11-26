@@ -9,6 +9,7 @@ const Tag = z.strictObject({
 });
 
 const JustNameArray = z.strictObject({ name: z.string() }).array();
+const OldTag = z.strictObject({ content: z.string() });
 
 export interface TagQuery {
 	name: string;
@@ -76,7 +77,7 @@ export async function updateTag(
 	db: Pool,
 	guildID: string,
 	name: string,
-	content: string,
+	tag: Partial<Tag>,
 ): Promise<Tag | null> {
 	const result = await db.query(
 		`
@@ -85,18 +86,21 @@ export async function updateTag(
 				WHERE "guildID" = $1 AND "name" = $2
 			)
 			UPDATE "tags_tags"
-			SET "content" = $3
+			SET "name" = COALESCE($3, $2), "content" = COALESCE($4, (SELECT "content" FROM "old"))
 			WHERE "guildID" = $1 AND "name" = $2
-			RETURNING "name", (SELECT "content" FROM "old") AS "content"
+			RETURNING (SELECT "content" FROM "old") AS "content"
 		`,
-		[guildID, name, content],
+		[guildID, name, tag.name, tag.content],
 	);
 
 	if (result.rowCount !== 1) {
 		return null;
 	}
 
-	return dbParse(Tag, result.rows[0]);
+	return {
+		name,
+		...dbParse(OldTag, result.rows[0]),
+	};
 }
 
 export async function deleteTag(
