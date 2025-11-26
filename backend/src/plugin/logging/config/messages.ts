@@ -4,7 +4,7 @@ import { eventConfig } from "#plugin/logging/config/index.ts";
 import { m, type InferView } from "mousetache";
 
 export const MessageLogView = m.object({
-	content: m.terminal(),
+	content: m.terminal({ noEscape: true }),
 });
 export type MessageLogView = InferView<typeof MessageLogView>;
 
