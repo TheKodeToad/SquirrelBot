@@ -25,11 +25,8 @@ export const TagCreateEvent = eventConfig(
 					name: "{{actor.tag}}",
 					iconURL: "{{actor.avatar}}",
 				},
+				description: "{{tag.name}}",
 				fields: [
-					{
-						name: "Name",
-						value: "{{tag.name}}",
-					},
 					{
 						name: "Content",
 						value: "{{tag.content}}",
@@ -63,11 +60,8 @@ export const TagEditEvent = eventConfig(
 					name: "{{actor.tag}}",
 					iconURL: "{{actor.avatar}}",
 				},
+				description: "{{#nameChanged}}{{oldTag.name}} → {{/nameChanged}}{{newTag.name}}",
 				fields: [
-					{
-						name: "Name",
-						value: "{{#nameChanged}}{{oldTag.name}} → {{newTag.name}}{{/nameChanged}}{{^nameChanged}}{{newTag.name}}{{/nameChanged}}",
-					},
 					{
 						name: "Old Content",
 						value: "{{#contentChanged}}{{oldTag.content}}{{/contentChanged}}",
@@ -100,11 +94,8 @@ export const TagDeleteEvent = eventConfig(
 					name: "{{actor.tag}}",
 					iconURL: "{{actor.avatar}}",
 				},
+				description: "{{tag.name}}",
 				fields: [
-					{
-						name: "Name",
-						value: "{{tag.name}}",
-					},
 					{
 						name: "Content",
 						value: "{{tag.content}}",
