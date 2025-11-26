@@ -6,7 +6,7 @@ import { m } from "mousetache";
 
 export const TagView = m.object({
 	name: m.terminal(),
-	content: m.terminal(),
+	content: m.terminal({ noEscape: true }),
 });
 
 export const TagCreateEvent = eventConfig(
