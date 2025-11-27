@@ -35,6 +35,11 @@ export default defineCommand({
 			position: 1,
 			maxLength: MAX_TAG_CONTENT_LENGTH,
 		},
+		attachments: {
+			type: OptionType.String,
+			name: ["attachments", "a", "attachment", "attach"],
+			array: true,
+		},
 	},
 
 	preRun: (ctx) =>
@@ -44,7 +49,11 @@ export default defineCommand({
 			(permissions) => permissions.tagCreate,
 		),
 	async run(ctx, args) {
-		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, args);
+		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, {
+			name: args.name,
+			content: args.content,
+			attachments: args.attachments ?? [],
+		});
 
 		if (!success) {
 			await ctx.respond(

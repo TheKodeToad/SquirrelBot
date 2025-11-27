@@ -7,10 +7,11 @@ import z from "zod";
 const Tag = z.strictObject({
 	name: z.string(),
 	content: z.string(),
+	attachments: z.string().array().readonly(),
 });
 
 const JustNameArray = z.strictObject({ name: z.string() }).array();
-const OldTag = z.strictObject({ content: z.string() });
+const OldTag = Tag.omit({ name: true });
 
 export interface TagQuery {
 	name: string;
@@ -25,7 +26,7 @@ export async function getTag(
 ): Promise<Tag | null> {
 	const result = await db.query(
 		`
-			SELECT "name", "content" FROM "tags_tags"
+			SELECT "name", "content", "attachments" FROM "tags_tags"
 			WHERE "guildID" = $1 AND "name" = $2
 		`,
 		[guildID, name],
@@ -64,11 +65,11 @@ export async function createTag(
 ): Promise<boolean> {
 	const result = await db.query(
 		`
-			INSERT INTO "tags_tags" ("guildID", "name", "content")
-			VALUES ($1, $2, $3)
+			INSERT INTO "tags_tags" ("guildID", "name", "content", "attachments")
+			VALUES ($1, $2, $3, $4)
 			ON CONFLICT DO NOTHING
 		`,
-		[guildID, tag.name, tag.content],
+		[guildID, tag.name, tag.content, tag.attachments],
 	);
 
 	return result.rowCount === 1;
@@ -83,16 +84,18 @@ export async function updateTag(
 	const result = await db.query(
 		`
 			WITH "old" AS (
-				SELECT "content" FROM "tags_tags"
+				SELECT "content", "attachments" FROM "tags_tags"
 				WHERE "guildID" = $1 AND "name" = $2
 			)
 			UPDATE "tags_tags"
-			SET "name" = COALESCE($3, $2), "content" = COALESCE($4, (SELECT "content" FROM "old"))
+			SET "name" = COALESCE($3, "name"), "content" = COALESCE($4, "content")
 			WHERE "guildID" = $1 AND "name" = $2
-			RETURNING (SELECT "content" FROM "old") AS "content"
+			RETURNING (SELECT "content" FROM "old") AS "content", (SELECT "attachments" FROM "old") AS "attachments"
 		`,
 		[guildID, name, tag.name, tag.content],
 	);
+
+	console.log(result);
 
 	if (result.rowCount !== 1) {
 		return null;
@@ -113,7 +116,7 @@ export async function deleteTag(
 		`
 			DELETE FROM "tags_tags"
 			WHERE "guildID" = $1 AND "name" = $2
-			RETURNING "name", "content"
+			RETURNING "name", "content", "attachments"
 		`,
 		[guildID, name],
 	);
