@@ -1,0 +1,21 @@
+{
+	"lsp": {
+		"vtsls": {
+			"initialization_options": {
+				"typescript": {
+					"preferences": {
+						"importModuleSpecifier": "non-relative"
+					}
+				}
+			}
+		}
+	},
+	"languages": {
+		"TypeScript": {
+			"code_actions_on_format": {
+				"source.organizeImports": true
+			}
+		}
+	},
+	"format_on_save": "on"
+}
