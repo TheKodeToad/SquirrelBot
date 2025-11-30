@@ -39,30 +39,31 @@ export function makeModEventView(action: ModEvent): ModEventView {
 
 		performedAt: makeTimestampView(action.performedAt),
 		expiresAt:
-			action.expiresAt !== undefined
-				? makeTimestampView(action.expiresAt)
-				: undefined,
+			action.expiresAt !== undefined ?
+				makeTimestampView(action.expiresAt)
+			:	undefined,
 		duration:
-			action.expiresAt !== undefined
-				? makeDurationView(
-						action.expiresAt.getTime() -
-							action.performedAt.getTime(),
-					)
-				: undefined,
+			action.expiresAt !== undefined ?
+				makeDurationView(
+					action.expiresAt.getTime() - action.performedAt.getTime(),
+				)
+			:	undefined,
 
 		moderator: makeMemberUserView(action.actor),
 		target:
-			action.target instanceof Member
-				? makeMemberUserView(action.target)
-				: makeUserView(action.target),
+			action.target instanceof Member ?
+				makeMemberUserView(action.target)
+			:	makeUserView(action.target),
 
 		reason: action.reason,
 
 		purgeDuration:
-			action.deleteMessageSeconds !== undefined &&
-			action.deleteMessageSeconds !== 0
-				? makeDurationView(action.deleteMessageSeconds * 1000)
-				: undefined,
+			(
+				action.deleteMessageSeconds !== undefined &&
+				action.deleteMessageSeconds !== 0
+			) ?
+				makeDurationView(action.deleteMessageSeconds * 1000)
+			:	undefined,
 		dmDelivered: action.dmDelivered,
 		caseNumber: action.caseNumber,
 	};

@@ -172,35 +172,25 @@ interface CustomOption<T extends {} = {}> extends BaseOption {
 	autocomplete?: AutocompleteFunction;
 }
 
-type OptionValue<TOpt extends Option> = TOpt["array"] extends true
-	? ArrayValue<BaseOptionValue<TOpt>, TOpt["required"]>
-	: TOpt["required"] extends true
-		? NullableValue<BaseOptionValue<TOpt>, TOpt["required"]>
-		: BaseOptionValue<TOpt> | null;
+type OptionValue<TOpt extends Option> =
+	TOpt["array"] extends true ?
+		ArrayValue<BaseOptionValue<TOpt>, TOpt["required"]>
+	: TOpt["required"] extends true ?
+		NullableValue<BaseOptionValue<TOpt>, TOpt["required"]>
+	:	BaseOptionValue<TOpt> | null;
 
-type ArrayValue<
-	TOpt,
-	TRequired extends boolean | undefined,
-> = TRequired extends true ? readonly [TOpt, ...TOpt[]] : readonly TOpt[];
-type NullableValue<
-	TOpt,
-	TRequired extends boolean | undefined,
-> = TRequired extends true ? TOpt : TOpt | null;
+type ArrayValue<TOpt, TRequired extends boolean | undefined> =
+	TRequired extends true ? readonly [TOpt, ...TOpt[]] : readonly TOpt[];
+type NullableValue<TOpt, TRequired extends boolean | undefined> =
+	TRequired extends true ? TOpt : TOpt | null;
 
-type BaseOptionValue<TOpt extends Option> = TOpt extends FlagOption
-	? boolean
-	: TOpt extends StringOption
-		? string
-		: TOpt extends IntegerOption
-			? number
-			: TOpt extends NumberOption
-				? number
-				: TOpt extends UserOption
-					? string
-					: TOpt extends RoleOption
-						? string
-						: TOpt extends ChannelOption
-							? string
-							: TOpt extends CustomOption<infer T>
-								? T
-								: never;
+type BaseOptionValue<TOpt extends Option> =
+	TOpt extends FlagOption ? boolean
+	: TOpt extends StringOption ? string
+	: TOpt extends IntegerOption ? number
+	: TOpt extends NumberOption ? number
+	: TOpt extends UserOption ? string
+	: TOpt extends RoleOption ? string
+	: TOpt extends ChannelOption ? string
+	: TOpt extends CustomOption<infer T> ? T
+	: never;

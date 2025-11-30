@@ -62,10 +62,12 @@ async function renderPaginator<E, K>(
 
 	if (!prevDisabled || !nextDisabled) {
 		const componentTarget =
-			reply.components.length === 1 &&
-			reply.components[0]!.type === ComponentTypes.CONTAINER
-				? reply.components[0]!.components
-				: reply.components;
+			(
+				reply.components.length === 1 &&
+				reply.components[0]!.type === ComponentTypes.CONTAINER
+			) ?
+				reply.components[0]!.components
+			:	reply.components;
 
 		componentTarget.push(Divider());
 		componentTarget.push(
@@ -83,9 +85,9 @@ async function renderPaginator<E, K>(
 			if (customID === "paginator-prev") {
 				const firstItem = queryResult[0];
 				const before =
-					firstItem !== undefined
-						? paginator.getKey(firstItem)
-						: undefined;
+					firstItem !== undefined ?
+						paginator.getKey(firstItem)
+					:	undefined;
 
 				await ctx.edit(
 					await renderPaginator(
@@ -100,9 +102,9 @@ async function renderPaginator<E, K>(
 			} else if (customID === "paginator-next") {
 				const lastItem = queryResult[queryResult.length - 1];
 				const after =
-					lastItem !== undefined
-						? paginator.getKey(lastItem)
-						: undefined;
+					lastItem !== undefined ?
+						paginator.getKey(lastItem)
+					:	undefined;
 
 				await ctx.edit(
 					await renderPaginator(

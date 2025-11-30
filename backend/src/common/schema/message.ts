@@ -109,13 +109,13 @@ function applyEmbedTemplate<T extends Shape>(
 	view: InferView<T>,
 ) {
 	const author =
-		template.author !== undefined
-			? {
-					name: template.author.name.render(view),
-					url: template.author.url?.render(view),
-					iconURL: template.author.iconURL?.render(view),
-				}
-			: undefined;
+		template.author !== undefined ?
+			{
+				name: template.author.name.render(view),
+				url: template.author.url?.render(view),
+				iconURL: template.author.iconURL?.render(view),
+			}
+		:	undefined;
 
 	const fields = template.fields
 		?.map(({ name, value, ...field }) => ({
@@ -126,22 +126,22 @@ function applyEmbedTemplate<T extends Shape>(
 		.filter(({ value }) => value.length !== 0);
 
 	const footer =
-		template.footer !== undefined
-			? {
-					text: template.footer.text.render(view),
-					icon: template.footer.icon?.render(view),
-				}
-			: undefined;
+		template.footer !== undefined ?
+			{
+				text: template.footer.text.render(view),
+				icon: template.footer.icon?.render(view),
+			}
+		:	undefined;
 
 	const image =
-		template.image !== undefined
-			? { url: template.image.url.render(view) }
-			: undefined;
+		template.image !== undefined ?
+			{ url: template.image.url.render(view) }
+		:	undefined;
 
 	const thumbnail =
-		template.thumbnail !== undefined
-			? { url: template.thumbnail.url.render(view) }
-			: undefined;
+		template.thumbnail !== undefined ?
+			{ url: template.thumbnail.url.render(view) }
+		:	undefined;
 
 	return {
 		...template,

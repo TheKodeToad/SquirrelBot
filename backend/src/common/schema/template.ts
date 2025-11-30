@@ -16,9 +16,10 @@ export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 		try {
 			return compileTemplate(input, shape, {
 				fallbackValue: "",
-				escape: allowEscape
-					? (value) => escapeMarkdown(String(value))
-					: undefined,
+				escape:
+					allowEscape ?
+						(value) => escapeMarkdown(String(value))
+					:	undefined,
 			});
 		} catch (error) {
 			if (

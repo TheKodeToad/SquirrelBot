@@ -58,13 +58,14 @@ export default defineCommand({
 		),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.sendDirectMessage;
-		const directMessage = sendDirectMessage
-			? config.ban.directMessage.render({
+		const directMessage =
+			sendDirectMessage ?
+				config.ban.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
 				})
-			: undefined;
+			:	undefined;
 
 		const deleteMessageSeconds =
 			args.purge !== null ? args.purge / 1000 : config.ban.purgeMessages;
@@ -78,9 +79,9 @@ export default defineCommand({
 
 				type: ModEventType.Ban,
 				expiresAt:
-					args.duration !== null
-						? new Date(Date.now() + args.duration)
-						: undefined,
+					args.duration !== null ?
+						new Date(Date.now() + args.duration)
+					:	undefined,
 
 				actor: ctx.member,
 				target: target,

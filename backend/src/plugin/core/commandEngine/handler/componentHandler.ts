@@ -70,9 +70,9 @@ async function handle(
 
 	try {
 		const values =
-			"values" in interaction.data
-				? interaction.data.values.raw
-				: undefined;
+			"values" in interaction.data ?
+				interaction.data.values.raw
+			:	undefined;
 
 		await handler.callback(ctx, interaction.data.customID, values);
 	} catch (error) {

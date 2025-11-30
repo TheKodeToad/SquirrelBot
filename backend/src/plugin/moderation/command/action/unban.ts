@@ -73,9 +73,9 @@ export default defineCommand({
 					});
 				} else {
 					const user =
-						error.code === JSONErrorCodes.UNKNOWN_USER
-							? { id: target }
-							: await fetchUserCachedSupressed(ctx.bot, target);
+						error.code === JSONErrorCodes.UNKNOWN_USER ?
+							{ id: target }
+						:	await fetchUserCachedSupressed(ctx.bot, target);
 
 					unsuccessful.push({
 						target: user,

@@ -43,9 +43,9 @@ async function handleRemove(
 		key: "memberLeave",
 		supply: () => ({
 			user:
-				"guildID" in user
-					? makeMemberUserView(user)
-					: makeUserView(user),
+				"guildID" in user ?
+					makeMemberUserView(user)
+				:	makeUserView(user),
 		}),
 	});
 }

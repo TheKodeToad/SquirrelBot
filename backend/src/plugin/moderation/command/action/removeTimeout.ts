@@ -56,13 +56,14 @@ export default defineCommand({
 	async run(ctx, args, { config }) {
 		const sendDirectMessage =
 			args.dm ?? config.removeTimeout.sendDirectMessage;
-		const directMessage = sendDirectMessage
-			? config.removeTimeout.directMessage.render({
+		const directMessage =
+			sendDirectMessage ?
+				config.removeTimeout.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
 				})
-			: undefined;
+			:	undefined;
 
 		const { successful, unsuccessful } = await performModActions(
 			ctx.squirrelCtx,

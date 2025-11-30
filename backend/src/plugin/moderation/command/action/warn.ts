@@ -45,13 +45,14 @@ export default defineCommand({
 		),
 	async run(ctx, args, { config }): Promise<void> {
 		const sendDirectMessage = args.dm ?? config.ban.sendDirectMessage;
-		const directMessage = sendDirectMessage
-			? config.warn.directMessage.render({
+		const directMessage =
+			sendDirectMessage ?
+				config.warn.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
 				})
-			: undefined;
+			:	undefined;
 
 		const { successful, unsuccessful } = await performModActions(
 			ctx.squirrelCtx,

@@ -127,9 +127,9 @@ async function handleUpdate(
 
 			return {
 				author:
-					message.member !== undefined
-						? makeMemberUserView(message.member)
-						: makeUserView(message.author),
+					message.member !== undefined ?
+						makeMemberUserView(message.member)
+					:	makeUserView(message.author),
 				oldMessage: { content: entry?.content },
 				newMessage: { content: message.content },
 			};
@@ -162,14 +162,14 @@ async function handleDelete(
 			}
 
 			const avatarURL =
-				entry.authorAvatarHash !== null
-					? ctx.bot.util.formatImage(
-							Routes.USER_AVATAR(
-								entry.authorID,
-								entry.authorAvatarHash,
-							),
-						)
-					: getDefaultAvatarURL(ctx.bot, BigInt(entry.authorID));
+				entry.authorAvatarHash !== null ?
+					ctx.bot.util.formatImage(
+						Routes.USER_AVATAR(
+							entry.authorID,
+							entry.authorAvatarHash,
+						),
+					)
+				:	getDefaultAvatarURL(ctx.bot, BigInt(entry.authorID));
 
 			return {
 				author: {

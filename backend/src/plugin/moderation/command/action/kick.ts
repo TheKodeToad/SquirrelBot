@@ -47,13 +47,13 @@ export default defineCommand({
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.sendDirectMessage;
 		const directMessage: CreateMessageOptions | undefined =
-			sendDirectMessage
-				? config.kick.directMessage.render({
-						server: makeGuildView(ctx.guild),
-						moderator: makeUserView(ctx.user),
-						reason: args.reason ?? undefined,
-					})
-				: undefined;
+			sendDirectMessage ?
+				config.kick.directMessage.render({
+					server: makeGuildView(ctx.guild),
+					moderator: makeUserView(ctx.user),
+					reason: args.reason ?? undefined,
+				})
+			:	undefined;
 
 		const { successful, unsuccessful } = await performModActions(
 			ctx.squirrelCtx,
