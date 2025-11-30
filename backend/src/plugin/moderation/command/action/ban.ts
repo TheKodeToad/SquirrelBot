@@ -1,8 +1,8 @@
 import { makeGuildView } from "#common/template/guild.ts";
 import { makeUserView } from "#common/template/user.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
+import { duration } from "#plugin/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import {
 	formatModActionFailure,
@@ -18,32 +18,32 @@ export default defineCommand({
 
 	options: {
 		user: {
-			type: OptionType.User,
+			type: "user",
 			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		duration: {
-			type: OptionType.Duration,
+			type: duration,
 			name: ["duration", "d", "for"],
 			position: 1,
 			skipIfInvalid: true,
 		},
 		reason: {
-			type: OptionType.String,
+			type: "string",
 			name: ["reason", "r"],
 			position: 2,
 		},
 		dm: {
-			type: OptionType.Flag,
+			type: "boolean",
 			description:
 				"Choose whether to notify the banned user with a DM (overrides the configured default).",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},
 		purge: {
-			type: OptionType.Duration,
+			type: duration,
 			description:
 				"Request to delete messages within the specified duration of being sent.",
 			name: ["purge", "p", "delete"],

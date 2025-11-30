@@ -2,12 +2,10 @@ import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSecs } from "#common/time.ts";
 import { BOT_ALLOWED_GUILDS, BOT_STAFF } from "#environment.ts";
 import { grantAccess, revokeAccess } from "#plugin/core/guildInfoSync.ts";
-import {
-	OptionType,
-	type CommandContext,
-} from "#plugin/core/public/command.ts";
+import { type CommandContext } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { icons } from "#plugin/core/public/icons.ts";
+import { snowflake } from "../public/helper/customOptionTypes.ts";
 
 function checkBotStaff(ctx: CommandContext): boolean {
 	return BOT_STAFF.includes(ctx.user.id);
@@ -20,7 +18,7 @@ const grantAccessCommand = defineCommand({
 
 	options: {
 		guild: {
-			type: OptionType.Snowflake,
+			type: snowflake,
 			name: ["server"],
 			required: true,
 			position: 0,
@@ -52,7 +50,7 @@ const revokeAccessCommand = defineCommand({
 
 	options: {
 		guild: {
-			type: OptionType.Snowflake,
+			type: snowflake,
 			name: ["server"],
 			required: true,
 			position: 0,

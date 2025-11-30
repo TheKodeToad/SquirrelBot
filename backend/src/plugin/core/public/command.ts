@@ -1,4 +1,5 @@
 import type { Awaitable } from "#common/general.ts";
+import type { StringReader } from "#common/stringReader.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import {
 	type AnyTextableGuildChannel,
@@ -88,26 +89,10 @@ export interface ReplyObject
 
 export type Reply = ReplyObject | string;
 
-export const enum OptionType {
-	Flag,
-	Integer,
-	Number,
-	String,
-	Snowflake,
-	User,
-	Role,
-	Channel,
-	Duration,
-}
-
 /**
  * Any value which is permitted in args.
  */
-export type AnyArgsValue = OptionValue<any>;
-/**
- * Any type which is permitted in an array in args.
- */
-export type AnyArgsValueItem = OptionTypeValue<any>;
+export type AnyArgsValue = {};
 
 export type Option =
 	| FlagOption
@@ -117,77 +102,81 @@ export type Option =
 	| UserOption
 	| RoleOption
 	| ChannelOption
-	| SnowflakeOption
-	| DurationOption;
+	| CustomOption;
+
+export const MAX_AUTOCOMPLETE_CHOICES = 25;
+export type AutocompleteFunction = (
+	ctx: AutocompleteContext,
+	value: string,
+) => Awaitable<string[]>;
 
 interface BaseOption {
-	type: OptionType;
 	name: NameList;
 	description?: string;
+
 	required?: boolean;
 	skipIfInvalid?: boolean;
+
 	array?: boolean;
 	position?: number;
 }
 
 interface FlagOption extends BaseOption {
-	type: OptionType.Flag;
+	type: "boolean";
+
 	/**  For prefix commands - specify an option to set the value to false insetad of true. */
 	negativeName?: NameList;
+
 	/** For slash commands - override the values from yes/no. */
 	values?: [string, string];
+
 	array?: false;
 	position?: undefined;
 }
 
-export const MAX_AUTOCOMPLETE_CHOICES = 25;
-
 interface StringOption extends BaseOption {
-	type: OptionType.String;
+	type: "string";
+
 	minLength?: number;
 	maxLength?: number;
-	/** For prefix commands - set to false to only parse one word unless quoted. */
-	greedy?: boolean;
-	/** For slash commands - provide autocompletion */
-	autocomplete?: (
-		ctx: AutocompleteContext,
-		value: string,
-	) => Awaitable<string[]>;
+
+	autocomplete?: AutocompleteFunction;
 }
 
 interface IntegerOption extends BaseOption {
-	type: OptionType.Integer;
+	type: "integer";
 }
 
 interface NumberOption extends BaseOption {
-	type: OptionType.Number;
+	type: "number";
 }
 
 interface UserOption extends BaseOption {
-	type: OptionType.User;
+	type: "user";
 }
 
 interface RoleOption extends BaseOption {
-	type: OptionType.Role;
+	type: "role";
 }
 
 interface ChannelOption extends BaseOption {
-	type: OptionType.Channel;
+	type: "channel";
 }
 
-interface SnowflakeOption extends BaseOption {
-	type: OptionType.Snowflake;
-}
+interface CustomOption<T extends {} = {}> extends BaseOption {
+	type: {
+		name: string;
+		read: (reader: StringReader) => T | null;
+	};
 
-interface DurationOption extends BaseOption {
-	type: OptionType.Duration;
+	autocomplete?: AutocompleteFunction;
 }
 
 type OptionValue<TOpt extends Option> = TOpt["array"] extends true
-	? ArrayValue<OptionTypeValue<TOpt["type"]>, TOpt["required"]>
+	? ArrayValue<BaseOptionValue<TOpt>, TOpt["required"]>
 	: TOpt["required"] extends true
-		? NullableValue<OptionTypeValue<TOpt["type"]>, TOpt["required"]>
-		: OptionTypeValue<TOpt["type"]> | null;
+		? NullableValue<BaseOptionValue<TOpt>, TOpt["required"]>
+		: BaseOptionValue<TOpt> | null;
 
 type ArrayValue<
 	TOpt,
@@ -198,22 +187,20 @@ type NullableValue<
 	TRequired extends boolean | undefined,
 > = TRequired extends true ? TOpt : TOpt | null;
 
-type OptionTypeValue<T extends OptionType> = T extends OptionType.Flag
+type BaseOptionValue<TOpt extends Option> = TOpt extends FlagOption
 	? boolean
-	: T extends OptionType.String
+	: TOpt extends StringOption
 		? string
-		: T extends OptionType.Integer
+		: TOpt extends IntegerOption
 			? number
-			: T extends OptionType.Number
+			: TOpt extends NumberOption
 				? number
-				: T extends OptionType.User
+				: TOpt extends UserOption
 					? string
-					: T extends OptionType.Role
+					: TOpt extends RoleOption
 						? string
-						: T extends OptionType.Channel
+						: TOpt extends ChannelOption
 							? string
-							: T extends OptionType.Snowflake
-								? string
-								: T extends OptionType.Duration
-									? number
-									: never;
+							: TOpt extends CustomOption<infer T>
+								? T
+								: never;

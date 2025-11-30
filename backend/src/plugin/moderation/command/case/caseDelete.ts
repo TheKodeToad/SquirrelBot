@@ -1,4 +1,3 @@
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -19,7 +18,7 @@ export default defineCommand({
 	options: {
 		number: {
 			name: ["number", "n"],
-			type: OptionType.Integer,
+			type: "integer",
 			required: true,
 			position: 0,
 		},

@@ -1,5 +1,3 @@
-import type { AnyArgsValue } from "#plugin/core/public/command.ts";
-
 export const enum ArgsParseError {
 	MissingOptions,
 	BadNamedKey,
@@ -24,7 +22,7 @@ export type ArgsParseResultWithError =
 	  };
 
 export type ArgsParseResult =
-	| { error: null; result: Record<string, AnyArgsValue> }
+	| { error: null; result: Record<string, {} | null> }
 	| ArgsParseResultWithError;
 
 export function formatArgsParseError(error: ArgsParseResultWithError): string {

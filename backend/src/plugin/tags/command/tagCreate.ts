@@ -1,6 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -20,7 +19,7 @@ export default defineCommand({
 
 	options: {
 		name: {
-			type: OptionType.String,
+			type: "string",
 			name: ["name", "n"],
 			description: "The name of the tag to create.",
 			required: true,
@@ -29,14 +28,14 @@ export default defineCommand({
 			greedy: false,
 		},
 		content: {
-			type: OptionType.String,
+			type: "string",
 			name: ["content", "c"],
 			required: true,
 			position: 1,
 			maxLength: MAX_TAG_CONTENT_LENGTH,
 		},
 		attachments: {
-			type: OptionType.String,
+			type: "string",
 			name: ["attachments", "a", "attachment", "attach"],
 			array: true,
 		},

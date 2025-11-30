@@ -1,7 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import type { Nullable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -12,7 +10,6 @@ import {
 import { autocompleteTags } from "#plugin/tags/helper/autocompletion.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
 import { onTagEdited } from "#plugin/tags/public/extensionPoints.ts";
-import type { Tag } from "#plugin/tags/public/tag.ts";
 import { updateTag } from "#plugin/tags/storage/tags.ts";
 
 const logger = moduleLogger();
@@ -23,7 +20,7 @@ export default defineCommand({
 
 	options: {
 		name: {
-			type: OptionType.String,
+			type: "string",
 			name: ["name", "n"],
 			description: "The name of the tag to modify.",
 			required: true,
@@ -34,13 +31,13 @@ export default defineCommand({
 			autocomplete: (ctx, value) => autocompleteTags(ctx, value),
 		},
 		content: {
-			type: OptionType.String,
+			type: "string",
 			name: ["content", "c"],
 			position: 1,
 			maxLength: MAX_TAG_CONTENT_LENGTH,
 		},
 		newName: {
-			type: OptionType.String,
+			type: "string",
 			name: ["new-name", "rename", "nn", "rn"],
 			description: "Change the name of the tag to something else.",
 			maxLength: MAX_TAG_NAME_LENGTH,

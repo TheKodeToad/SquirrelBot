@@ -21,7 +21,6 @@ import { coreConfigStore } from "#plugin/core/index.ts";
 import {
 	type Command,
 	type CommandContext,
-	OptionType,
 	type Reply,
 } from "#plugin/core/public/command.ts";
 import { onBotEvent } from "#plugin/core/public/extensionPoints.ts";
@@ -214,7 +213,7 @@ function mapCommand({
 		};
 
 		switch (option.type) {
-			case OptionType.Flag:
+			case "boolean":
 				options.push({
 					type: SlashOptionTypes.NUMBER,
 					choices: [
@@ -224,7 +223,7 @@ function mapCommand({
 					...base,
 				});
 				break;
-			case OptionType.String:
+			case "string":
 				options.push({
 					type: SlashOptionTypes.STRING,
 					autocomplete: option.autocomplete !== undefined,
@@ -234,29 +233,24 @@ function mapCommand({
 					...base,
 				});
 				break;
-			case OptionType.Integer:
+			case "integer":
 				options.push({ type: SlashOptionTypes.INTEGER, ...base });
 				break;
-			case OptionType.Number:
+			case "number":
 				options.push({ type: SlashOptionTypes.NUMBER, ...base });
 				break;
-			case OptionType.User:
+			case "user":
 				options.push({ type: SlashOptionTypes.USER, ...base });
 				break;
-			case OptionType.Role:
+			case "role":
 				options.push({ type: SlashOptionTypes.ROLE, ...base });
 				break;
-			case OptionType.Channel:
+			case "channel":
 				options.push({ type: SlashOptionTypes.CHANNEL, ...base });
 				break;
-			case OptionType.Snowflake:
-				options.push({ type: SlashOptionTypes.STRING, ...base });
-				break;
-			case OptionType.Duration:
-				options.push({ type: SlashOptionTypes.STRING, ...base });
-				break;
 			default:
-				option satisfies never;
+				option satisfies object;
+				options.push({ type: SlashOptionTypes.STRING, ...base });
 				break;
 		}
 	}

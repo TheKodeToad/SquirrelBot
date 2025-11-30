@@ -5,7 +5,6 @@ import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
 import { safePreRun } from "#plugin/core/helper/commands.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
 import {
-	OptionType,
 	type AutocompleteContext,
 	type Command,
 } from "#plugin/core/public/command.ts";
@@ -97,7 +96,7 @@ async function handle(
 	)!;
 
 	if (
-		commandOption.type !== OptionType.String ||
+		commandOption.type !== "string" ||
 		commandOption.autocomplete === undefined
 	) {
 		return;

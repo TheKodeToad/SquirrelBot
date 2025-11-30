@@ -1,5 +1,4 @@
 import {
-	OptionType,
 	type ActionContext,
 	type ReplyObject,
 } from "#plugin/core/public/command.ts";
@@ -27,15 +26,15 @@ export default defineCommand({
 
 	options: {
 		actorID: {
-			type: OptionType.User,
+			type: "user",
 			name: ["moderator", "mod", "m", "by"],
 		},
 		targetID: {
-			type: OptionType.User,
+			type: "user",
 			name: ["target", "t", "for", "user"],
 		},
 		compact: {
-			type: OptionType.Flag,
+			type: "boolean",
 			description: "Display more cases but less information about them.",
 			name: ["compact", "c"],
 		},

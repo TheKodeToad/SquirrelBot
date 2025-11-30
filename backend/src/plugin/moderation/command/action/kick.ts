@@ -1,6 +1,5 @@
 import { makeGuildView } from "#common/template/guild.ts";
 import { makeUserView } from "#common/template/user.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -19,19 +18,19 @@ export default defineCommand({
 
 	options: {
 		user: {
-			type: OptionType.User,
+			type: "user",
 			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
-			type: OptionType.String,
+			type: "string",
 			name: ["reason", "r"],
 			position: 1,
 		},
 		dm: {
-			type: OptionType.Flag,
+			type: "boolean",
 			name: ["dm", "d", "direct-message"],
 			description:
 				"Choose whether to notify the kicked user with a DM (overrides the configured default).",

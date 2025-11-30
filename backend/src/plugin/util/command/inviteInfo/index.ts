@@ -1,7 +1,6 @@
 import { formatRESTError } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -31,13 +30,13 @@ export default defineCommand({
 
 	options: {
 		link: {
-			type: OptionType.String,
+			type: "string",
 			name: ["link", "l"],
 			required: true,
 			position: 0,
 		},
 		hideImages: {
-			type: OptionType.Flag,
+			type: "boolean",
 			name: ["hide-images", "h", "hi", "no-images"],
 			description: "Do not display images in the invite information.",
 		},

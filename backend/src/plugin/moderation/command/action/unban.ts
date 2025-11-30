@@ -1,6 +1,5 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
 import { formatRESTError } from "#common/discord/format.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -27,14 +26,14 @@ export default defineCommand({
 
 	options: {
 		user: {
-			type: OptionType.User,
+			type: "user",
 			name: ["user", "u"],
 			array: true,
 			required: true,
 			position: 0,
 		},
 		reason: {
-			type: OptionType.String,
+			type: "string",
 			name: ["reason", "r"],
 			position: 1,
 		},

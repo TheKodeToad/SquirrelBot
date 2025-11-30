@@ -1,18 +1,10 @@
+import { StringReader } from "#common/stringReader.ts";
 import type { CommandCacheEntry } from "#plugin/core/commandEngine/commandCache.ts";
 import {
 	ArgsParseError,
 	type ArgsParseResult,
 } from "#plugin/core/commandEngine/parsing/index.ts";
-import {
-	readDuration,
-	readSnowflake,
-} from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
-import { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import { SafeArgs } from "#plugin/core/commandEngine/safeArgs.ts";
-import {
-	OptionType,
-	type AnyArgsValueItem,
-} from "#plugin/core/public/command.ts";
 import type { InteractionOptions } from "oceanic.js";
 
 export function readSlashArgs(
@@ -34,23 +26,20 @@ export function readSlashArgs(
 			interactionOption.name,
 		)!;
 
-		let value: AnyArgsValueItem | null = interactionOption.value;
+		let value: {} | null = interactionOption.value;
 
-		switch (typeof interactionOption.value) {
-			case "string":
-				if (option.type === OptionType.Snowflake) {
-					value = readValue(interactionOption.value, readSnowflake);
-				} else if (option.type === OptionType.Duration) {
-					value = readValue(interactionOption.value, readDuration);
-				}
+		if (typeof option.type === "object" && typeof value === "string") {
+			const reader = new StringReader(value);
 
-				break;
-			case "number":
-				if (option.type === OptionType.Flag) {
-					value = interactionOption.value !== 0;
-				}
+			reader.skipWhitespace();
+			value = option.type.read(reader);
+			reader.skipWhitespace();
 
-				break;
+			if (reader.canRead()) {
+				value = null;
+			}
+		} else if (option.type === "boolean" && typeof value === "number") {
+			value = interactionOption.value !== 0;
 		}
 
 		if (value === null) {
@@ -71,21 +60,4 @@ export function readSlashArgs(
 		error: null,
 		result: output.getFrozenResult(),
 	};
-}
-
-export function readValue<T>(
-	value: string,
-	valueReader: (reader: StringReader) => T,
-): T | null {
-	const reader = new StringReader(value);
-
-	reader.skipWhitespace();
-	const result = valueReader(reader);
-	reader.skipWhitespace();
-
-	if (reader.canRead() || result === null) {
-		return null;
-	}
-
-	return result;
 }

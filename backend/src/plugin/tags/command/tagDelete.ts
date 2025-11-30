@@ -1,6 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -18,7 +17,7 @@ export default defineCommand({
 
 	options: {
 		name: {
-			type: OptionType.String,
+			type: "string",
 			name: ["name", "n"],
 			required: true,
 			position: 0,

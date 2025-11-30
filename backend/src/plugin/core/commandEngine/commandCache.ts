@@ -1,10 +1,6 @@
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { EventListenerPhase } from "#extensionPoint.ts";
-import {
-	OptionType,
-	type Command,
-	type Option,
-} from "#plugin/core/public/command.ts";
+import { type Command, type Option } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 
 export interface CommandCacheEntry {
@@ -146,7 +142,7 @@ function formatCommandPrefixUsage(
 			result += "-" + option.name[0];
 		}
 
-		if (option.type !== OptionType.Flag) {
+		if (option.type !== "boolean") {
 			result += " <" + formatOptionValue(option) + ">";
 		}
 
@@ -160,23 +156,21 @@ function formatCommandPrefixUsage(
 
 function formatOptionValue(option: Option): string {
 	switch (option.type) {
-		case OptionType.Flag:
+		case "boolean":
 			return "";
-		case OptionType.Integer:
+		case "integer":
 			return option.array ? "integer(s)" : "integer";
-		case OptionType.Number:
+		case "number":
 			return option.array ? "number(s)" : "number";
-		case OptionType.String:
+		case "string":
 			return option.array ? "text(s)" : "text";
-		case OptionType.Snowflake:
-			return option.array ? "id(s)" : "id";
-		case OptionType.User:
+		case "user":
 			return option.array ? "user(s)" : "user";
-		case OptionType.Role:
+		case "role":
 			return option.array ? "role(s)" : "role";
-		case OptionType.Channel:
+		case "channel":
 			return option.array ? "channel(s)" : "channel";
-		case OptionType.Duration:
-			return option.array ? "duration(s)" : "duration";
+		default:
+			return option.type.name;
 	}
 }

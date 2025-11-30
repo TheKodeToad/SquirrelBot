@@ -5,7 +5,6 @@ import {
 import { renderCommandPage } from "#plugin/core/command/help/show.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
 import { coreConfigStore } from "#plugin/core/index.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -18,7 +17,7 @@ export default defineCommand({
 
 	options: {
 		command: {
-			type: OptionType.String,
+			type: "string",
 			name: ["command", "c"],
 			position: 0,
 		},

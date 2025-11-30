@@ -1,6 +1,5 @@
 import { isUndeletableMessageType } from "#common/discord/general.ts";
 import { WEEK } from "#common/time.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -13,27 +12,27 @@ export default defineCommand({
 
 	options: {
 		count: {
-			type: OptionType.Integer,
+			type: "integer",
 			description: "The limit of messages to delete.",
 			name: ["count", "c"],
 			position: 0,
 			required: true,
 		},
 		match: {
-			type: OptionType.String,
+			type: "string",
 			description: "Only delete messages including the specified text.",
 			name: ["match", "m"],
 			position: 1,
 		},
 		apps: {
-			type: OptionType.Flag,
+			type: "boolean",
 			description: "How to handle apps.",
 			name: ["apps", "a", "bots", "b"],
 			negativeName: ["no-apps", "na", "no-bots", "nb", "humans"],
 			values: ["include only apps", "exclude apps"],
 		},
 		author: {
-			type: OptionType.User,
+			type: "user",
 			name: ["author", "a", "by", "from"],
 			array: true,
 		},

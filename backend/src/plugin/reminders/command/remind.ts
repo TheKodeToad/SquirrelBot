@@ -1,7 +1,7 @@
 import { dateToUnixSecs } from "#common/time.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
+import { duration } from "#plugin/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { remindersConfigStore } from "#plugin/reminders/index.ts";
 import { trackNewReminder } from "#plugin/reminders/scheduler.ts";
@@ -17,13 +17,13 @@ export default defineCommand({
 
 	options: {
 		delay: {
-			type: OptionType.Duration,
+			type: duration,
 			name: ["delay", "d"],
 			required: true,
 			position: 0,
 		},
 		message: {
-			type: OptionType.String,
+			type: "string",
 			name: ["message", "m"],
 			required: true,
 			position: 1,

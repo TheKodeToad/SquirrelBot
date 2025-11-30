@@ -1,26 +1,19 @@
-import type { CommandCacheEntry } from "#plugin/core/commandEngine/commandCache.ts";
+import type { StringReader } from "#common/stringReader.ts";
 import {
 	ArgsParseError,
 	type ArgsParseResult,
 } from "#plugin/core/commandEngine/parsing/index.ts";
 import {
 	readChannel,
-	readDuration,
 	readInteger,
 	readNumber,
 	readRole,
-	readSnowflake,
 	readString,
 	readUser,
-} from "#plugin/core/commandEngine/parsing/primitiveParser.ts";
-import type { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
+} from "#plugin/core/commandEngine/parsing/primitiveParsers.ts";
 import { SafeArgs } from "#plugin/core/commandEngine/safeArgs.ts";
-import {
-	OptionType,
-	type AnyArgsValue,
-	type AnyArgsValueItem,
-	type Option,
-} from "#plugin/core/public/command.ts";
+import { type Option } from "#plugin/core/public/command.ts";
+import type { CommandCacheEntry } from "../commandCache.ts";
 
 const LIMITED_WHITESPACE_EATER_PATTERN = /\s{0,3}/y;
 
@@ -93,8 +86,8 @@ export function readPrefixArgs(
 			};
 		}
 
-		if (value instanceof Array) {
-			output.pushTo(key, ...value);
+		if (Array.isArray(value)) {
+			output.pushTo(key, ...(value as unknown[]));
 		} else {
 			output.set(key, value);
 		}
@@ -154,7 +147,7 @@ function readNamedArg(
 
 		// maybe best not to make this immutable? it causes typing issues
 		if (value instanceof Array) {
-			output.pushTo(key, ...value);
+			output.pushTo(key, ...(value as unknown[]));
 		} else {
 			output.set(key, value);
 		}
@@ -182,8 +175,8 @@ function readCommandArg(
 	reader: StringReader,
 	option: Option,
 	propagateArrayError: boolean,
-): AnyArgsValue | null {
-	if (option.type === OptionType.Flag) {
+): {} | null {
+	if (option.type === "boolean") {
 		return true;
 	}
 
@@ -198,7 +191,7 @@ function readCommandArg(
 		return result;
 	}
 
-	const result: AnyArgsValueItem[] = [];
+	const result: unknown[] = [];
 
 	while (reader.canRead() && !reader.match(ARRAY_TERMINATOR)) {
 		const prevCursor = reader.cursor;
@@ -223,21 +216,16 @@ function readCommandArg(
 	return result;
 }
 
-function readCommandArgValue(
-	reader: StringReader,
-	option: Option,
-): AnyArgsValueItem | null {
+function readCommandArgValue(reader: StringReader, option: Option): {} | null {
 	switch (option.type) {
-		case OptionType.Flag:
+		case "boolean":
 			return true;
-		case OptionType.Integer:
+		case "integer":
 			return readInteger(reader);
-		case OptionType.Number:
+		case "number":
 			return readNumber(reader);
-		case OptionType.String: {
-			const terminator =
-				(option.greedy ?? true) ? GREEDY_VALUE_TERMINATOR : undefined;
-			const result = readString(reader, terminator);
+		case "string": {
+			const result = readString(reader, GREEDY_VALUE_TERMINATOR);
 
 			if (result === null || result.length === 0) {
 				return null;
@@ -259,15 +247,13 @@ function readCommandArgValue(
 
 			return result;
 		}
-		case OptionType.Snowflake:
-			return readSnowflake(reader);
-		case OptionType.User:
+		case "user":
 			return readUser(reader);
-		case OptionType.Role:
+		case "role":
 			return readRole(reader);
-		case OptionType.Channel:
+		case "channel":
 			return readChannel(reader);
-		case OptionType.Duration:
-			return readDuration(reader);
+		default:
+			return option.type.read(reader);
 	}
 }

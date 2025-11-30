@@ -1,14 +1,9 @@
 import { INTERNAL_TYPE_INTEGRITY } from "#environment.ts";
-import {
-	OptionType,
-	type AnyArgsValue,
-	type AnyArgsValueItem,
-	type Option,
-} from "#plugin/core/public/command.ts";
+import { type Option } from "#plugin/core/public/command.ts";
 
 export class SafeArgs {
 	private _schema: Record<string, Option>;
-	private _result: Record<string, AnyArgsValue>;
+	private _result: Record<string, {} | null>;
 	private _missing: Set<string>;
 	private _frozen: boolean;
 
@@ -30,7 +25,7 @@ export class SafeArgs {
 				continue;
 			}
 
-			const value: AnyArgsValue = (option.array ?? false) ? [] : null;
+			const value: {} | null = (option.array ?? false) ? [] : null;
 			this._result[key] = value;
 
 			if (option.required ?? false) {
@@ -54,7 +49,7 @@ export class SafeArgs {
 		return option;
 	}
 
-	set(key: string, value: AnyArgsValue): void {
+	set(key: string, value: {}): void {
 		if (this._frozen) {
 			throw new Error("set cannot be called after getFrozenResult");
 		}
@@ -65,13 +60,15 @@ export class SafeArgs {
 			throw new Error(`Set instead of add used for options['${key}']`);
 		}
 
-		validateType(option.type, value);
+		if (INTERNAL_TYPE_INTEGRITY) {
+			validateType(option.type, value);
+		}
 
 		this._result[key] = value;
 		this._missing.delete(key);
 	}
 
-	pushTo(key: string, ...value: AnyArgsValueItem[]): void {
+	pushTo(key: string, ...value: unknown[]): void {
 		if (this._frozen) {
 			throw new Error("pushTo cannot be called after getFrozenResult");
 		}
@@ -98,8 +95,10 @@ export class SafeArgs {
 			return;
 		}
 
-		for (const item of value) {
-			validateType(option.type, item);
+		if (INTERNAL_TYPE_INTEGRITY) {
+			for (const item of value) {
+				validateType(option.type, item);
+			}
 		}
 
 		array.push(...value);
@@ -141,13 +140,9 @@ export class SafeArgs {
 	}
 }
 
-function validateType(type: OptionType, value: unknown): void {
-	if (!INTERNAL_TYPE_INTEGRITY) {
-		return;
-	}
-
+function validateType(type: Option["type"], value: unknown): void {
 	switch (type) {
-		case OptionType.Flag:
+		case "boolean":
 			if (typeof value !== "boolean") {
 				throw new Error(
 					`typeof value is '${typeof value}'; expected 'boolean'`,
@@ -155,19 +150,19 @@ function validateType(type: OptionType, value: unknown): void {
 			}
 
 			break;
-		case OptionType.Integer:
+		case "integer":
 			if (!Number.isSafeInteger(value)) {
 				throw new Error(`Number.isSafeInteger(value) is false`);
 			}
 
 			break;
-		case OptionType.Number:
+		case "number":
 			if (!Number.isFinite(value)) {
 				throw new Error(`Number.isFinite(value) is false`);
 			}
 
 			break;
-		case OptionType.String:
+		case "string":
 			if (typeof value !== "string") {
 				throw new Error(
 					`typeof value is '${typeof value}'; expected 'string'`,
@@ -175,27 +170,23 @@ function validateType(type: OptionType, value: unknown): void {
 			}
 
 			break;
-		case OptionType.Snowflake:
-		case OptionType.User:
-		case OptionType.Role:
-		case OptionType.Channel:
+		case "user":
+		case "role":
+		case "channel":
 			if (typeof value !== "string") {
 				throw new Error(
 					`typeof value is '${typeof value}'; expected 'string'`,
-				);
-			}
-
-			break;
-		case OptionType.Duration:
-			if (typeof value !== "number") {
-				throw new Error(
-					`typeof value is '${typeof value}'; expected 'number'`,
 				);
 			}
 
 			break;
 		default:
-			(type) satisfies never;
+			(type) satisfies object;
+
+			if (value == null) {
+				throw new Error(`value is nullish`);
+			}
+
 			break;
 	}
 }

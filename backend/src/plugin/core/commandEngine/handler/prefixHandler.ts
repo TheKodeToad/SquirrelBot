@@ -2,6 +2,7 @@ import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/index.ts";
+import { StringReader } from "#common/stringReader.ts";
 import { TTLMap } from "#common/ttlMap.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { getCommandByName } from "#plugin/core/commandEngine/commandCache.ts";
@@ -14,7 +15,6 @@ import {
 	readPrefixArgs,
 	readPrefixName,
 } from "#plugin/core/commandEngine/parsing/prefixParser.ts";
-import { StringReader } from "#plugin/core/commandEngine/parsing/stringReader.ts";
 import {
 	COMMAND_STATE_CLEANUP_INTERVAL,
 	COMMAND_STATE_EXPIRE_AFTER,

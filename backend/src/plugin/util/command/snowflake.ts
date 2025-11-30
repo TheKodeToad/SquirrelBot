@@ -1,6 +1,6 @@
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
+import { snowflake } from "#plugin/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugin/core/public/icons.ts";
 import { utilConfigStore } from "#plugin/util/index.ts";
 
@@ -14,7 +14,7 @@ export default defineCommand({
 	trackUpdates: true,
 	options: {
 		input: {
-			type: OptionType.Snowflake,
+			type: snowflake,
 			description: "The Discord ID of a channel, user or something else.",
 			name: ["input", "i"],
 			required: true,

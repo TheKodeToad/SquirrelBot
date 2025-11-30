@@ -5,7 +5,6 @@ import {
 	makeMarkdownInlineCodeblock,
 } from "#common/discord/markdown.ts";
 import { coreConfigStore as coreConfigCache } from "#plugin/core/index.ts";
-import { OptionType } from "#plugin/core/public/command.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -19,7 +18,7 @@ export default defineCommand({
 
 	options: {
 		user: {
-			type: OptionType.User,
+			type: "user",
 			name: ["user", "u"],
 			position: 0,
 		},
