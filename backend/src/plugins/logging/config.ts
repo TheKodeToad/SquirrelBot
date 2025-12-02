@@ -5,27 +5,27 @@ import { Snowflake } from "#common/schemas/general.ts";
 import {
 	MemberJoinEvent,
 	MemberLeaveEvent,
-} from "#plugins/logging/config/members.ts";
+} from "#plugins/logging/loggers/members/config.ts";
 import {
 	MessageDeleteEvent,
 	MessageEditEvent,
-} from "#plugins/logging/config/messages.ts";
+} from "#plugins/logging/loggers/messages/config.ts";
 import {
 	UserBanEvent,
 	UserKickEvent,
 	UserUnbanEvent,
 	UserWarnEvent,
-} from "#plugins/logging/config/modEvents.ts";
+} from "#plugins/logging/loggers/modEvents/config.ts";
 import {
 	RoleCreateEvent,
 	RoleDeleteEvent,
 	RoleUpdateEvent,
-} from "#plugins/logging/config/roles.ts";
+} from "#plugins/logging/loggers/roles/config.ts";
 import {
 	TagCreateEvent,
 	TagDeleteEvent,
 	TagEditEvent,
-} from "#plugins/logging/config/tags.ts";
+} from "#plugins/logging/loggers/tags/config.ts";
 import { z } from "zod";
 
 export function eventConfig<T extends z.ZodType>(

@@ -1,9 +1,9 @@
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import type { Awaitable, ValuesOf } from "#common/general.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
-import type { LoggerConfig } from "#plugins/logging/config/index.ts";
-import { logViaWebhook } from "#plugins/logging/helper/webhooks.ts";
+import type { LoggerConfig } from "#plugins/logging/config.ts";
 import { loggingConfigStore } from "#plugins/logging/index.ts";
+import { logViaWebhook } from "#plugins/logging/webhooks.ts";
 import type { Guild } from "oceanic.js";
 
 type EventConfigs = LoggerConfig["events"];

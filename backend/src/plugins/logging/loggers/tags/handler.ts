@@ -2,8 +2,7 @@ import type { Nullable } from "#common/general.ts";
 import { makeGuildView } from "#common/views/guild.ts";
 import { makeMemberUserView } from "#common/views/user.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
-import { makeTagView } from "#plugins/logging/config/tags.ts";
-import { logEvent } from "#plugins/logging/helper/logging.ts";
+import { logEvent } from "#plugins/logging/logEvent.ts";
 import {
 	onTagCreated,
 	onTagDeleted,
@@ -11,6 +10,7 @@ import {
 } from "#plugins/tags/public/extensionPoints.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";
 import type { Guild, Member } from "oceanic.js";
+import { makeTagView } from "./views.ts";
 
 export default [
 	onTagCreated(handleCreate),

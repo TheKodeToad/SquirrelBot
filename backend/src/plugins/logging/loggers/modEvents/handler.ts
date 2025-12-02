@@ -1,7 +1,7 @@
 import type { SquirrelDiscordContext } from "#discord/index.ts";
-import type { LoggerConfig } from "#plugins/logging/config/index.ts";
-import { makeModEventView } from "#plugins/logging/config/modEvents.ts";
-import { logEvent } from "#plugins/logging/helper/logging.ts";
+import type { LoggerConfig } from "#plugins/logging/config.ts";
+import { logEvent } from "#plugins/logging/logEvent.ts";
+import { makeModEventView } from "#plugins/logging/loggers/modEvents/views.ts";
 import { onModAction } from "#plugins/moderation/public/extensionPoints.ts";
 import {
 	ModEventType,

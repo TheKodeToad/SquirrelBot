@@ -8,8 +8,8 @@ import {
 	MESSAGE_CLEANUP_INTERVAL,
 	MESSAGE_CLEANUP_THRESHOLD,
 } from "#plugins/logging/constants.ts";
-import { logEvent } from "#plugins/logging/helper/logging.ts";
 import { loggingConfigStore } from "#plugins/logging/index.ts";
+import { logEvent } from "#plugins/logging/logEvent.ts";
 import {
 	cleanUpMessageCacheEntries,
 	getMessageCacheEntry,

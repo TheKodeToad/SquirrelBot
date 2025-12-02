@@ -1,8 +1,8 @@
 import { makeMemberUserView, makeUserView } from "#common/views/user.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
-import { logEvent } from "#plugins/logging/helper/logging.ts";
 import { loggingConfigStore } from "#plugins/logging/index.ts";
+import { logEvent } from "#plugins/logging/logEvent.ts";
 import { Guild, Member, type Uncached, type User } from "oceanic.js";
 
 export default [
