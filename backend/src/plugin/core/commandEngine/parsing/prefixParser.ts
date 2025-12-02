@@ -225,7 +225,9 @@ function readCommandArgValue(reader: StringReader, option: Option): {} | null {
 		case "number":
 			return readNumber(reader);
 		case "string": {
-			const result = readString(reader, GREEDY_VALUE_TERMINATOR);
+			const terminator =
+				(option.greedy ?? true) ? GREEDY_VALUE_TERMINATOR : undefined;
+			const result = readString(reader, terminator);
 
 			if (result === null || result.length === 0) {
 				return null;

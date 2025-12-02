@@ -137,6 +137,7 @@ interface FlagOption extends BaseOption {
 interface StringOption extends BaseOption {
 	type: "string";
 
+	greedy?: boolean;
 	minLength?: number;
 	maxLength?: number;
 
