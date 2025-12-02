@@ -13,8 +13,8 @@ export const Home = () => (
 );
 
 const INVITE_URL =
-	"https://discord.com/oauth2/authorize?" +
-	new URLSearchParams({
+	"https://discord.com/oauth2/authorize?"
+	+ new URLSearchParams({
 		client_id: CLIENT_ID,
 		permissions: APP_INVITE_PERMISSIONS,
 		integration_type: "0",

@@ -36,8 +36,8 @@ export const NumberFilter = z.string().transform((input, ctx) => {
 
 	if (Number.isNaN(number)) {
 		ctx.addIssue(
-			"Invalid value: Expected comparison operator (=, !=, >, >=, <, <=) followed by a number, but received " +
-				input,
+			"Invalid value: Expected comparison operator (=, !=, >, >=, <, <=) followed by a number, but received "
+				+ input,
 		);
 		return z.NEVER;
 	}

@@ -19,8 +19,8 @@ export default (backendCtx: BackendHTTPContext): Hono => {
 	for (const plugin of backendCtx.plugins.values()) {
 		const pluginRouter = new Hono<{ Variables: GuildAuthVars }>();
 
-		for (const setup of definePluginGuildRoutes.contributions.get(plugin) ??
-			[]) {
+		for (const setup of definePluginGuildRoutes.contributions.get(plugin)
+			?? []) {
 			setup(backendCtx, pluginRouter);
 		}
 

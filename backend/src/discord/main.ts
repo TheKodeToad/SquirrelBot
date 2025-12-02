@@ -15,9 +15,9 @@ const bot = new Client({
 	auth: `Bot ${BOT_TOKEN}`,
 	gateway: {
 		intents:
-			Constants.AllNonPrivilegedIntents |
-			Constants.Intents.MESSAGE_CONTENT |
-			Constants.Intents.GUILD_MEMBERS,
+			Constants.AllNonPrivilegedIntents
+			| Constants.Intents.MESSAGE_CONTENT
+			| Constants.Intents.GUILD_MEMBERS,
 		lookupDisallowedIntents: true,
 	},
 

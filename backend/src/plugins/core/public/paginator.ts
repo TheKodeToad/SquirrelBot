@@ -63,8 +63,8 @@ async function renderPaginator<E, K>(
 	if (!prevDisabled || !nextDisabled) {
 		const componentTarget =
 			(
-				reply.components.length === 1 &&
-				reply.components[0]!.type === ComponentTypes.CONTAINER
+				reply.components.length === 1
+				&& reply.components[0]!.type === ComponentTypes.CONTAINER
 			) ?
 				reply.components[0]!.components
 			:	reply.components;

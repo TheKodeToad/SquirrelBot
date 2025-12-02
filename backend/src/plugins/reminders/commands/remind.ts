@@ -50,9 +50,9 @@ export default defineCommand({
 			firesAt: new Date(firesAt),
 			message: args.message ?? undefined,
 			silent:
-				((ctx.message?.flags ?? 0) &
-					MessageFlags.SUPPRESS_NOTIFICATIONS) !==
-				0,
+				((ctx.message?.flags ?? 0)
+					& MessageFlags.SUPPRESS_NOTIFICATIONS)
+				!== 0,
 		};
 		const number = await remindersTable.insert(
 			ctx.backendCtx.db,
@@ -67,8 +67,8 @@ export default defineCommand({
 		const firesAtSecs = dateToUnixSecs(firesAt);
 
 		await ctx.respond(
-			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${number})!\n` +
-				`${icons.tip} No notification will be sent if you are timed out or not present in the server.`,
+			`${icons.success} Reminder set for **<t:${firesAtSecs}>** (<t:${firesAtSecs}:R>) (reminder #${number})!\n`
+				+ `${icons.tip} No notification will be sent if you are timed out or not present in the server.`,
 		);
 	},
 });

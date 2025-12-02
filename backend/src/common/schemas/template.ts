@@ -24,8 +24,8 @@ export function zTemplate<T extends Shape>(shape: T, allowEscape = true) {
 		} catch (error) {
 			if (
 				!(
-					error instanceof TemplateCompileError ||
-					error instanceof TemplateParseError
+					error instanceof TemplateCompileError
+					|| error instanceof TemplateParseError
 				)
 			) {
 				throw error;

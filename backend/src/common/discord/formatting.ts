@@ -11,8 +11,8 @@ import {
 
 export function formatRESTError(restError: DiscordRESTError): string {
 	if (
-		restError.resBody !== null &&
-		typeof restError.resBody.message === "string"
+		restError.resBody !== null
+		&& typeof restError.resBody.message === "string"
 	) {
 		return `API Error ${restError.code}: ${escapeMarkdown(restError.resBody.message)}`;
 	}

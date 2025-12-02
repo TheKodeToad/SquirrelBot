@@ -31,8 +31,8 @@ export function readString(
 	terminator?: RegExp,
 ): string | null {
 	if (
-		!(reader.peek() === "'" || reader.peek() === '"') ||
-		reader.peek() === "`"
+		!(reader.peek() === "'" || reader.peek() === '"')
+		|| reader.peek() === "`"
 	) {
 		if (terminator !== undefined) {
 			return reader.readUntil(terminator);

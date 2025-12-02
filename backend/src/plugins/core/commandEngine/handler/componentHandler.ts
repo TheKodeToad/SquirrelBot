@@ -161,8 +161,8 @@ class ComponentContextImpl implements ComponentContext {
 			},
 			Math.max(
 				0,
-				COMMAND_AUTO_DEFER_AFTER -
-					(Date.now() - interaction.createdAt.getTime()),
+				COMMAND_AUTO_DEFER_AFTER
+					- (Date.now() - interaction.createdAt.getTime()),
 			),
 		).unref();
 		this._ackPromise = null;
@@ -204,9 +204,9 @@ class ComponentContextImpl implements ComponentContext {
 		}
 
 		if (
-			typeof reply !== "string" &&
-			reply.componentHandler !== undefined &&
-			this._responseID !== null
+			typeof reply !== "string"
+			&& reply.componentHandler !== undefined
+			&& this._responseID !== null
 		) {
 			listenForInteractions(
 				this._responseID,

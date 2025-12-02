@@ -76,9 +76,9 @@ async function handle(
 
 	// yes, non-bot webhook is/has been possible
 	if (
-		message.author.bot ||
-		message.author.system ||
-		message.webhookID !== undefined
+		message.author.bot
+		|| message.author.system
+		|| message.webhookID !== undefined
 	) {
 		return false;
 	}
@@ -150,9 +150,9 @@ async function handle(
 
 	if (args.error !== null) {
 		await ctx.respond(
-			`${icons.error} ${formatArgsParseError(args)}\n` +
-				`${icons.tip} Edit your original message to fix the error!\n` +
-				`${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`,
+			`${icons.error} ${formatArgsParseError(args)}\n`
+				+ `${icons.tip} Edit your original message to fix the error!\n`
+				+ `${icons.info} Usage: ${makeMarkdownInlineCodeblock(prefix + name + commandEntry.usage)}.\n`,
 		);
 
 		if (ctx._response !== null) {
@@ -286,8 +286,8 @@ class PrefixContext implements CommandContext {
 			}
 
 			const shouldReply =
-				config.prefixCommands.reply &&
-				this.message.channel
+				config.prefixCommands.reply
+				&& this.message.channel
 					.permissionsOf(this.message.channel.guild.clientMember)
 					.has(Permissions.READ_MESSAGE_HISTORY);
 

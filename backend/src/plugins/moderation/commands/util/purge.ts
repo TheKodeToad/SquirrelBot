@@ -65,8 +65,8 @@ export default defineCommand({
 				}
 
 				if (
-					args.match !== null &&
-					!message.content.includes(args.match)
+					args.match !== null
+					&& !message.content.includes(args.match)
 				) {
 					continue;
 				}
@@ -79,8 +79,8 @@ export default defineCommand({
 				}
 
 				if (
-					args.author.length !== 0 &&
-					!args.author.includes(message.author.id)
+					args.author.length !== 0
+					&& !args.author.includes(message.author.id)
 				) {
 					continue;
 				}

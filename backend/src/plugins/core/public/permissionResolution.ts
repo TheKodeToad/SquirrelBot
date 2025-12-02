@@ -142,8 +142,8 @@ function testFilter(
 	const categoryChannel = baseChannel.parent ?? null;
 
 	if (
-		filter.inGroup !== undefined &&
-		filter.inGroup.some((group) => groups.groups.has(group))
+		filter.inGroup !== undefined
+		&& filter.inGroup.some((group) => groups.groups.has(group))
 	) {
 		return true;
 	}
@@ -153,24 +153,24 @@ function testFilter(
 	}
 
 	if (
-		categoryChannel !== null &&
-		filter.inChannelCategory &&
-		filter.inChannelCategory.includes(categoryChannel.id)
+		categoryChannel !== null
+		&& filter.inChannelCategory
+		&& filter.inChannelCategory.includes(categoryChannel.id)
 	) {
 		return true;
 	}
 
 	if (
-		channel instanceof ThreadChannel &&
-		filter.inThread &&
-		filter.inThread.includes(channel.id)
+		channel instanceof ThreadChannel
+		&& filter.inThread
+		&& filter.inThread.includes(channel.id)
 	) {
 		return true;
 	}
 
 	if (
-		filter.level !== undefined &&
-		testNumberFilter(filter.level, groups.level)
+		filter.level !== undefined
+		&& testNumberFilter(filter.level, groups.level)
 	) {
 		return true;
 	}

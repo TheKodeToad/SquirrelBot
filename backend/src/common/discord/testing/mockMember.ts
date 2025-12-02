@@ -36,10 +36,10 @@ class MockMember implements Member {
 
 	get displayName() {
 		return (
-			this._props.displayName ??
-			this._props.user?.globalName ??
-			this.nick ??
-			this.username
+			this._props.displayName
+			?? this._props.user?.globalName
+			?? this.nick
+			?? this.username
 		);
 	}
 

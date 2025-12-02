@@ -121,8 +121,8 @@ export function renderCommandListPage(
 
 			if (
 				!(
-					(command.supportPrefix ?? true) ||
-					(command.supportSlash ?? true)
+					(command.supportPrefix ?? true)
+					|| (command.supportSlash ?? true)
 				)
 			) {
 				continue;
@@ -144,8 +144,8 @@ export function renderCommandListPage(
 				entries.push([
 					summaryComponent,
 					Text(
-						"**Usage:** " +
-							makeMarkdownInlineCodeblock(
+						"**Usage:** "
+							+ makeMarkdownInlineCodeblock(
 								prefix + command.name[0] + entry.usage,
 							),
 					),

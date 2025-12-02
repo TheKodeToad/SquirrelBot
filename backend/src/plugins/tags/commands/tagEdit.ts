@@ -86,10 +86,10 @@ export default defineCommand({
 
 		// check after we know the tag exists
 		if (
-			changes.name === null &&
-			changes.content === null &&
-			changes.attachments === null &&
-			changes.color === null
+			changes.name === null
+			&& changes.content === null
+			&& changes.attachments === null
+			&& changes.color === null
 		) {
 			await ctx.respond(`${icons.error} No changes specified!`);
 			return;

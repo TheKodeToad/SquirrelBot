@@ -17,10 +17,10 @@ export type CoreGroups = z.output<typeof CoreGroups>;
 
 export const CoreConfig = z.strictObject({
 	groups: CoreGroups.prefault({}).describe(
-		"Declare permission groups. " +
-			"Permission groups are used to assign permissions to users — " +
-			"for example, you can create a permission group for admins called 'admin' " +
-			"and assign it using a permission override which matches it.",
+		"Declare permission groups. "
+			+ "Permission groups are used to assign permissions to users — "
+			+ "for example, you can create a permission group for admins called 'admin' "
+			+ "and assign it using a permission override which matches it.",
 	),
 
 	prefixCommands: z

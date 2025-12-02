@@ -43,8 +43,8 @@ export async function fetchMemberCached(
 	userID: string,
 ): Promise<Member> {
 	return (
-		guild.members.get(userID) ??
-		(await bot.rest.guilds.getMember(guild.id, userID))
+		guild.members.get(userID)
+		?? (await bot.rest.guilds.getMember(guild.id, userID))
 	);
 }
 
@@ -57,9 +57,8 @@ export async function createDMCached(
 	userID: string,
 ): Promise<PrivateChannel> {
 	return (
-		bot.privateChannels.find(
-			(channel) => channel.recipient.id === userID,
-		) ?? (await bot.rest.users.createDM(userID))
+		bot.privateChannels.find((channel) => channel.recipient.id === userID)
+		?? (await bot.rest.users.createDM(userID))
 	);
 }
 

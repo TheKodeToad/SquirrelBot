@@ -96,8 +96,8 @@ async function handle(
 	)!;
 
 	if (
-		commandOption.type !== "string" ||
-		commandOption.autocomplete === undefined
+		commandOption.type !== "string"
+		|| commandOption.autocomplete === undefined
 	) {
 		return;
 	}

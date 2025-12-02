@@ -97,9 +97,9 @@ export default defineCommand({
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** warned!\n` +
-						`Successful warns:\n${successfulMessage}\n` +
-						`Unsuccessful warns:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** warned!\n`
+						+ `Successful warns:\n${successfulMessage}\n`
+						+ `Unsuccessful warns:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

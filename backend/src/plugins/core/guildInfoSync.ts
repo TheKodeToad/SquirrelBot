@@ -73,9 +73,9 @@ async function init(ctx: BackendDiscordContext): Promise<void> {
 		}
 
 		if (
-			guildInfo.name === realGuild.name &&
-			guildInfo.iconHash === realGuild.icon &&
-			guildInfo.ownerID === realGuild.ownerID
+			guildInfo.name === realGuild.name
+			&& guildInfo.iconHash === realGuild.icon
+			&& guildInfo.ownerID === realGuild.ownerID
 		) {
 			continue;
 		}
@@ -146,9 +146,9 @@ async function handleUpdate(
 	}
 
 	if (
-		oldGuild.name === guild.name &&
-		oldGuild.icon === guild.icon &&
-		oldGuild.ownerID === guild.ownerID
+		oldGuild.name === guild.name
+		&& oldGuild.icon === guild.icon
+		&& oldGuild.ownerID === guild.ownerID
 	) {
 		return;
 	}

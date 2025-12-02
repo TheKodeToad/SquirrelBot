@@ -46,16 +46,16 @@ export default defineCommand({
 
 		const rssMiB = process.memoryUsage().rss / 1024 / 1024;
 		const usedMiB =
-			(process.memoryUsage().heapUsed +
-				process.memoryUsage().arrayBuffers +
-				process.memoryUsage().external) /
-			1024 /
-			1024;
+			(process.memoryUsage().heapUsed
+				+ process.memoryUsage().arrayBuffers
+				+ process.memoryUsage().external)
+			/ 1024
+			/ 1024;
 
 		const uptimeComponent = Text(
-			`**Uptime:** ${uptimeString}\n` +
-				`**Used Memory**: ${usedMiB.toLocaleString("en-US")} MiB (\`heapUsed\` + \`arrayBuffers\` + \`external\`)\n` +
-				`**Total Memory**: ${rssMiB.toLocaleString("en-US")} MiB (\`rss\`)`,
+			`**Uptime:** ${uptimeString}\n`
+				+ `**Used Memory**: ${usedMiB.toLocaleString("en-US")} MiB (\`heapUsed\` + \`arrayBuffers\` + \`external\`)\n`
+				+ `**Total Memory**: ${rssMiB.toLocaleString("en-US")} MiB (\`rss\`)`,
 		);
 
 		const container = Container([

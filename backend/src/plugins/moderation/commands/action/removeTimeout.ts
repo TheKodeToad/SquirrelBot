@@ -108,9 +108,9 @@ export default defineCommand({
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** had their timeouts removed!\n` +
-						`Successful removals:\n${successfulMessage}\n` +
-						`Unsuccessful removals:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** had their timeouts removed!\n`
+						+ `Successful removals:\n${successfulMessage}\n`
+						+ `Unsuccessful removals:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

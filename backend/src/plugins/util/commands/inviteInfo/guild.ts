@@ -37,10 +37,10 @@ export function renderGuildInvite(
 	const mainInfo: string[] = [];
 
 	mainInfo.push(
-		"## " +
-			escapeMarkdown(guild.name) +
-			"\n**Server Invite**\n" +
-			(guild.description || "*No description provided.*"),
+		"## "
+			+ escapeMarkdown(guild.name)
+			+ "\n**Server Invite**\n"
+			+ (guild.description || "*No description provided.*"),
 	);
 
 	if (totalMembers !== undefined && onlineMembers !== undefined) {

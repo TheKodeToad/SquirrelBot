@@ -27,8 +27,8 @@ export async function logIn(): Promise<void> {
 	sessionStorage.setItem("authVerifier", verifier);
 
 	const url =
-		`https://discord.com/oauth2/authorize?` +
-		new URLSearchParams({
+		`https://discord.com/oauth2/authorize?`
+		+ new URLSearchParams({
 			client_id: CLIENT_ID,
 			response_type: "code",
 			redirect_uri: REDIRECT_URI,
@@ -37,9 +37,9 @@ export async function logIn(): Promise<void> {
 			code_challenge: challenge,
 			code_challenge_method: "S256",
 			state:
-				window.location.pathname +
-				window.location.search +
-				window.location.hash,
+				window.location.pathname
+				+ window.location.search
+				+ window.location.hash,
 		});
 
 	window.location.assign(url);

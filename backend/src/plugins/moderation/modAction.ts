@@ -63,8 +63,8 @@ export async function performModAction(
 		}
 
 		if (
-			botNeedsPerm(action.type) &&
-			!canModerate(
+			botNeedsPerm(action.type)
+			&& !canModerate(
 				MemberRanking.HighestRole,
 				action.guild.clientMember,
 				action.target,
@@ -88,9 +88,9 @@ export async function performModAction(
 				break;
 			case ModEventType.ClearTimeout:
 				if (
-					action.target.communicationDisabledUntil === null ||
-					action.target.communicationDisabledUntil.getTime() <
-						Date.now()
+					action.target.communicationDisabledUntil === null
+					|| action.target.communicationDisabledUntil.getTime()
+						< Date.now()
 				) {
 					return {
 						target: action.target,
@@ -226,10 +226,10 @@ function canModerate(
 			}
 
 			return (
-				target.id !== guild.ownerID &&
-				(actor.id === guild.ownerID ||
-					getHighestRole(actor).position >
-						getHighestRole(target).position)
+				target.id !== guild.ownerID
+				&& (actor.id === guild.ownerID
+					|| getHighestRole(actor).position
+						> getHighestRole(target).position)
 			);
 		case MemberRanking.Level: {
 			const { level: actorLevel } = resolveGroups(actor);

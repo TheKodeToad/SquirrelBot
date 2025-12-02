@@ -8,8 +8,8 @@ export function StatusFallback(props: {
 		<Switch>
 			<Match
 				when={
-					props.resource.state === "ready" &&
-					props.resource() !== undefined
+					props.resource.state === "ready"
+					&& props.resource() !== undefined
 				}
 			>
 				{props.children}

@@ -98,9 +98,9 @@ export default defineCommand({
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were kicked!\n` +
-						`Successful kicks:\n${successfulMessage}\n` +
-						`Unsuccessful kicks:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were kicked!\n`
+						+ `Successful kicks:\n${successfulMessage}\n`
+						+ `Unsuccessful kicks:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

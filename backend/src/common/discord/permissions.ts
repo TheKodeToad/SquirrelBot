@@ -28,9 +28,9 @@ export function getHighestRole(member: Member): Role {
 }
 
 const QUARANTINE =
-	GuildMemberFlags.AUTOMOD_QUARANTINED_BIO |
-	GuildMemberFlags.AUTOMOD_QUARANTINED_CLAN_TAG |
-	GuildMemberFlags.AUTOMOD_QUARANTINED_USERNAME_OR_GUILD_NICKNAME;
+	GuildMemberFlags.AUTOMOD_QUARANTINED_BIO
+	| GuildMemberFlags.AUTOMOD_QUARANTINED_CLAN_TAG
+	| GuildMemberFlags.AUTOMOD_QUARANTINED_USERNAME_OR_GUILD_NICKNAME;
 
 export function canWriteInChannel(
 	bot: Client,
@@ -55,8 +55,8 @@ export function canWriteInChannel(
 	}
 
 	if (
-		member.communicationDisabledUntil !== null &&
-		member.communicationDisabledUntil.getTime() >= Date.now()
+		member.communicationDisabledUntil !== null
+		&& member.communicationDisabledUntil.getTime() >= Date.now()
 	) {
 		return false;
 	}
@@ -73,9 +73,9 @@ export function canWriteInChannel(
 		case ChannelTypes.GUILD_VOICE:
 		case ChannelTypes.GUILD_STAGE_VOICE:
 			return perms.has(
-				Permissions.VIEW_CHANNEL |
-					Permissions.CONNECT |
-					Permissions.SEND_MESSAGES,
+				Permissions.VIEW_CHANNEL
+					| Permissions.CONNECT
+					| Permissions.SEND_MESSAGES,
 			);
 
 		case ChannelTypes.ANNOUNCEMENT_THREAD:
@@ -83,11 +83,11 @@ export function canWriteInChannel(
 		case ChannelTypes.PRIVATE_THREAD:
 			return (
 				perms.has(
-					Permissions.VIEW_CHANNEL |
-						Permissions.SEND_MESSAGES_IN_THREADS,
-				) &&
-				(!channel.threadMetadata.locked ||
-					perms.has(Permissions.MANAGE_THREADS))
+					Permissions.VIEW_CHANNEL
+						| Permissions.SEND_MESSAGES_IN_THREADS,
+				)
+				&& (!channel.threadMetadata.locked
+					|| perms.has(Permissions.MANAGE_THREADS))
 			);
 
 		// these channel types can only have messages in child channels

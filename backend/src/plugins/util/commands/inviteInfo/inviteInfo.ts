@@ -95,8 +95,8 @@ export default defineCommand({
 				args.hideImages ?? false,
 			);
 		} else if (
-			invite.type === InviteTypes.FRIEND &&
-			invite.inviter !== undefined
+			invite.type === InviteTypes.FRIEND
+			&& invite.inviter !== undefined
 		) {
 			container = renderFriendInvite(
 				invite.inviter,
@@ -104,8 +104,8 @@ export default defineCommand({
 				args.hideImages ?? false,
 			);
 		} else if (
-			invite.type === InviteTypes.GROUP_DM &&
-			invite.channel !== null
+			invite.type === InviteTypes.GROUP_DM
+			&& invite.channel !== null
 		) {
 			container = renderGroupDMInvite(
 				ctx.bot,
@@ -131,10 +131,10 @@ function stealthyGetInvite(bot: Client, code: string) {
 
 	const desc = Object.getOwnPropertyDescriptor(bot.options, "auth");
 	const trivialDesc =
-		desc !== undefined &&
-		desc.writable &&
-		desc.get === undefined &&
-		desc.set === undefined;
+		desc !== undefined
+		&& desc.writable
+		&& desc.get === undefined
+		&& desc.set === undefined;
 
 	const prefix = "Bot ";
 	const oldValue = bot.options.auth;

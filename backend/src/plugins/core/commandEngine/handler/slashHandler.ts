@@ -89,8 +89,8 @@ async function handle(
 	}
 
 	const privateOption =
-		interaction.data.options.getNumber("private") ??
-		Number(commandEntry.command.ephemeralByDefault);
+		interaction.data.options.getNumber("private")
+		?? Number(commandEntry.command.ephemeralByDefault);
 	const ephemeral = perms.ephemeralResponse && Boolean(privateOption);
 	const ctx = new SlashContext(
 		backendCtx,
@@ -175,9 +175,9 @@ async function syncSlashCommands(bot: Client): Promise<void> {
 	} catch (error) {
 		if (
 			!(
-				error instanceof Error &&
-				"code" in error &&
-				typeof "code" === "string"
+				error instanceof Error
+				&& "code" in error
+				&& typeof "code" === "string"
 			)
 		) {
 			throw error;
@@ -327,8 +327,8 @@ class SlashContext implements CommandContext {
 			},
 			Math.max(
 				0,
-				COMMAND_AUTO_DEFER_AFTER -
-					(Date.now() - interaction.createdAt.getTime()),
+				COMMAND_AUTO_DEFER_AFTER
+					- (Date.now() - interaction.createdAt.getTime()),
 			),
 		).unref();
 	}
@@ -362,9 +362,9 @@ class SlashContext implements CommandContext {
 		}
 
 		if (
-			typeof reply !== "string" &&
-			reply.componentHandler !== undefined &&
-			this._responseID !== null
+			typeof reply !== "string"
+			&& reply.componentHandler !== undefined
+			&& this._responseID !== null
 		) {
 			listenForInteractions(
 				this._responseID,

@@ -1,5 +1,6 @@
 {
 	"useTabs": true,
 	"tabWidth": 4,
-	"experimentalTernaries": true
+	"experimentalTernaries": true,
+	"experimentalOperatorPosition": "start"
 }

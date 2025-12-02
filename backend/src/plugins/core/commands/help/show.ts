@@ -26,13 +26,15 @@ export function renderCommandPage(
 			coreConfigStore.get(guildID)?.prefixCommands.prefix ?? "";
 
 		let content =
-			"**Usage:** " +
-			makeMarkdownInlineCodeblock(prefix + command.name[0] + entry.usage);
+			"**Usage:** "
+			+ makeMarkdownInlineCodeblock(
+				prefix + command.name[0] + entry.usage,
+			);
 
 		if (command.name.length > 1) {
 			content +=
-				"\n**Aliases:** " +
-				command.name
+				"\n**Aliases:** "
+				+ command.name
 					.slice(1)
 					.map((name) => makeMarkdownInlineCodeblock(prefix + name))
 					.join(", ");

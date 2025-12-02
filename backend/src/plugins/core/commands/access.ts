@@ -66,13 +66,13 @@ const revokeAccessCommand = defineCommand({
 		if (result !== false) {
 			if (result instanceof Date) {
 				await ctx.respond(
-					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! ` +
-						`Plugin data will be purged on <t:${dateToUnixSecs(result)}:d>.`,
+					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
+						+ `Plugin data will be purged on <t:${dateToUnixSecs(result)}:d>.`,
 				);
 			} else {
 				await ctx.respond(
-					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! ` +
-						"The server might still have access if it is configured in the environment.",
+					`${icons.success} Revoked access for **${escapeMarkdown(guildName)}**! `
+						+ "The server might still have access if it is configured in the environment.",
 				);
 			}
 		} else {

@@ -118,9 +118,9 @@ export default defineCommand({
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n` +
-						`Successful:\n${successfulMessage}\n` +
-						`Unsuccessful:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n`
+						+ `Successful:\n${successfulMessage}\n`
+						+ `Unsuccessful:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

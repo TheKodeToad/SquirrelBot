@@ -45,10 +45,10 @@ export const ModerationConfig = z.strictObject({
 	})
 		.default(MemberRanking.HighestRole)
 		.describe(
-			"Customize the system used to determine whether a moderator can moderate a user.\n" +
-				"'none' allows anyone to be moderated by a moderator.\n" +
-				"'highest_role' reflects the behavior of Discord; you can only moderate users who's highest role is below yours.\n" +
-				"'level' is based on who has a higher level in the app's group system.",
+			"Customize the system used to determine whether a moderator can moderate a user.\n"
+				+ "'none' allows anyone to be moderated by a moderator.\n"
+				+ "'highest_role' reflects the behavior of Discord; you can only moderate users who's highest role is below yours.\n"
+				+ "'level' is based on who has a higher level in the app's group system.",
 		),
 
 	ban: z

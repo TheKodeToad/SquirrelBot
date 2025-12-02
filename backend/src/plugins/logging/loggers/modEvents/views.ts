@@ -54,8 +54,8 @@ export function makeModEventView(action: ModEvent): ModEventView {
 
 		purgeDuration:
 			(
-				action.deleteMessageSeconds !== undefined &&
-				action.deleteMessageSeconds !== 0
+				action.deleteMessageSeconds !== undefined
+				&& action.deleteMessageSeconds !== 0
 			) ?
 				makeDurationView(action.deleteMessageSeconds * 1000)
 			:	undefined,

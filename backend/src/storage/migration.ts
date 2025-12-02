@@ -128,8 +128,8 @@ async function processMigrations(
 					continue;
 				} else {
 					throw new MigrationError(
-						message +
-							" - you may bypass this with pnpm migration perform --ignore-changes",
+						message
+							+ " - you may bypass this with pnpm migration perform --ignore-changes",
 					);
 				}
 			}

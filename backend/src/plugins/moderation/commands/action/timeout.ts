@@ -108,9 +108,9 @@ export default defineCommand({
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were timed out!\n` +
-						`Successful timeouts:\n${successfulMessage}\n` +
-						`Unsuccessful timeouts:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were timed out!\n`
+						+ `Successful timeouts:\n${successfulMessage}\n`
+						+ `Unsuccessful timeouts:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

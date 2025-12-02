@@ -234,15 +234,15 @@ function readCommandArgValue(reader: StringReader, option: Option): {} | null {
 			}
 
 			if (
-				option.minLength !== undefined &&
-				result.length < option.minLength
+				option.minLength !== undefined
+				&& result.length < option.minLength
 			) {
 				return null;
 			}
 
 			if (
-				option.maxLength !== undefined &&
-				result.length > option.maxLength
+				option.maxLength !== undefined
+				&& result.length > option.maxLength
 			) {
 				return null;
 			}
