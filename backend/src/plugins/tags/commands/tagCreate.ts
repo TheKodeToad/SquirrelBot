@@ -7,10 +7,7 @@ import {
 	MAX_TAG_CONTENT_LENGTH,
 	MAX_TAG_NAME_LENGTH,
 } from "#plugins/tags/constants.ts";
-import {
-	attachments,
-	optionalColor,
-} from "#plugins/tags/helper/customOptionTypes.ts";
+import { attachments, optionalColor } from "#plugins/tags/customOptionTypes.ts";
 import { tagsConfigStore } from "#plugins/tags/index.ts";
 import { onTagCreated } from "#plugins/tags/public/extensionPoints.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";

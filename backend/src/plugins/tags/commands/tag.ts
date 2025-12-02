@@ -2,8 +2,8 @@ import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
+import { autocompleteTags } from "#plugins/tags/autocompletion.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugins/tags/constants.ts";
-import { autocompleteTags } from "#plugins/tags/helper/autocompletion.ts";
 import { tagsConfigStore } from "#plugins/tags/index.ts";
 import { getTag } from "#plugins/tags/storage/tags.ts";
 import {
