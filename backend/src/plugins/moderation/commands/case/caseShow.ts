@@ -4,7 +4,7 @@ import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatCaseDescription,
 	formatCaseFields,
-} from "#plugins/moderation/helper/format.ts";
+} from "#plugins/moderation/format.ts";
 import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import { getCase } from "#plugins/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";

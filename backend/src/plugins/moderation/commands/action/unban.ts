@@ -7,13 +7,13 @@ import { MemberRanking } from "#plugins/moderation/config.ts";
 import {
 	formatModActionFailure,
 	formatModActionSuccess,
-} from "#plugins/moderation/helper/format.ts";
+} from "#plugins/moderation/format.ts";
+import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import {
 	performModAction,
 	type ModAction,
 	type ModActionFailure,
-} from "#plugins/moderation/helper/modAction.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
+} from "#plugins/moderation/modAction.ts";
 import {
 	ModEventType,
 	type ModEvent,

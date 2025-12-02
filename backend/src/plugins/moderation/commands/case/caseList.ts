@@ -14,7 +14,7 @@ import {
 	formatCaseDescription,
 	formatCaseFields,
 	formatCompactCaseSummary,
-} from "#plugins/moderation/helper/format.ts";
+} from "#plugins/moderation/format.ts";
 import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import { getCases, type CaseInfo } from "#plugins/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";

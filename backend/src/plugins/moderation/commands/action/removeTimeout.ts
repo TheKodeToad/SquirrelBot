@@ -6,9 +6,9 @@ import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatModActionFailure,
 	formatModActionSuccess,
-} from "#plugins/moderation/helper/format.ts";
-import { performModActions } from "#plugins/moderation/helper/modAction.ts";
+} from "#plugins/moderation/format.ts";
 import { moderationConfigStore } from "#plugins/moderation/index.ts";
+import { performModActions } from "#plugins/moderation/modAction.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";
 
 export default defineCommand({
