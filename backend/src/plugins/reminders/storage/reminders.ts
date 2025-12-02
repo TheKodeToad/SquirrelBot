@@ -1,3 +1,4 @@
+import { isSigned32 } from "#common/general.ts";
 import { poolTransaction } from "#common/pg/transaction.ts";
 import { dbParse } from "#storage/storage.ts";
 import { ChannelTypes } from "oceanic.js";
@@ -27,7 +28,7 @@ export namespace remindersTable {
 		guildID: string,
 		number: number,
 	): Promise<Reminder | null> {
-		if (number < 0 || number >= 2 ** 32) {
+		if (!isSigned32(number)) {
 			return null;
 		}
 
@@ -163,7 +164,7 @@ export namespace remindersTable {
 		guildID: string,
 		number: number,
 	): Promise<boolean> {
-		if (number < 0 || number >= 2 ** 32) {
+		if (!isSigned32(number)) {
 			return false;
 		}
 
@@ -184,7 +185,7 @@ export namespace remindersTable {
 		number: number,
 		ownerID: string,
 	): Promise<boolean> {
-		if (number < 0 || number >= 2 ** 32) {
+		if (!isSigned32(number)) {
 			return false;
 		}
 

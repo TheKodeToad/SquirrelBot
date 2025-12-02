@@ -1,3 +1,4 @@
+import { isSigned32 } from "#common/general.ts";
 import { poolTransaction } from "#common/pg/transaction.ts";
 import { dbParse } from "#storage/storage.ts";
 import type { Pool } from "pg";
@@ -35,7 +36,7 @@ export namespace casesTable {
 		guildID: string,
 		number: number,
 	): Promise<CaseInfo | null> {
-		if (number < 0 || number >= 2 ** 32) {
+		if (!isSigned32(number)) {
 			return null;
 		}
 
@@ -222,7 +223,7 @@ export namespace casesTable {
 		guildID: string,
 		number: number,
 	): Promise<boolean> {
-		if (number < 0 || number >= 2 ** 32) {
+		if (!isSigned32(number)) {
 			return false;
 		}
 
