@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { APP_NAME } from "#brand.ts";
-import { Snowflake } from "#common/schema/general.ts";
+import { Snowflake } from "#common/schemas/general.ts";
 import {
 	MemberJoinEvent,
 	MemberLeaveEvent,

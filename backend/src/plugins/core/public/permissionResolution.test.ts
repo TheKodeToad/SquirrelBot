@@ -3,7 +3,7 @@ import {
 	DUMMY_GUILD,
 	mockSnowflake,
 } from "#common/discord/testing/mockSnowflake.ts";
-import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
+import { PermissionsFilter } from "#common/schemas/permissionsFilter.ts";
 import type { CoreConfig } from "#plugins/core/config.ts";
 import { coreConfigStore } from "#plugins/core/index.ts";
 import { resolveGroups } from "#plugins/core/public/permissionResolution.ts";

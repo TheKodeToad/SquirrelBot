@@ -1,10 +1,10 @@
-import { mappedEnum } from "#common/schema/general.ts";
-import { messageTemplate } from "#common/schema/message.ts";
-import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
-import { DurationView } from "#common/template/duration.ts";
-import { GuildView } from "#common/template/guild.ts";
-import { UserView } from "#common/template/user.ts";
+import { mappedEnum } from "#common/schemas/general.ts";
+import { messageTemplate } from "#common/schemas/message.ts";
+import { PermissionsFilter } from "#common/schemas/permissionsFilter.ts";
 import { DAY } from "#common/time.ts";
+import { DurationView } from "#common/views/duration.ts";
+import { GuildView } from "#common/views/guild.ts";
+import { UserView } from "#common/views/user.ts";
 import { m } from "mousetache";
 import { z } from "zod";
 

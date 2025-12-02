@@ -3,12 +3,9 @@ import {
 	formatUserBold,
 	formatUserTag,
 } from "#common/discord/format.ts";
-import { DurationView, makeDurationView } from "#common/template/duration.ts";
-import { GuildView, makeGuildView } from "#common/template/guild.ts";
-import {
-	TimestampView,
-	makeTimestampView,
-} from "#common/template/timestamp.ts";
+import { DurationView, makeDurationView } from "#common/views/duration.ts";
+import { GuildView, makeGuildView } from "#common/views/guild.ts";
+import { TimestampView, makeTimestampView } from "#common/views/timestamp.ts";
 import { m, type InferView } from "mousetache";
 import { BASE_URL, Member, Routes, type User } from "oceanic.js";
 

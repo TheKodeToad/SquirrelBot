@@ -1,15 +1,12 @@
-import { messageTemplate } from "#common/schema/message.ts";
-import { DurationView, makeDurationView } from "#common/template/duration.ts";
-import { GuildView, makeGuildView } from "#common/template/guild.ts";
-import {
-	makeTimestampView,
-	TimestampView,
-} from "#common/template/timestamp.ts";
+import { messageTemplate } from "#common/schemas/message.ts";
+import { DurationView, makeDurationView } from "#common/views/duration.ts";
+import { GuildView, makeGuildView } from "#common/views/guild.ts";
+import { makeTimestampView, TimestampView } from "#common/views/timestamp.ts";
 import {
 	makeMemberUserView,
 	makeUserView,
 	UserView,
-} from "#common/template/user.ts";
+} from "#common/views/user.ts";
 import { eventConfig } from "#plugins/logging/config/index.ts";
 import type { ModEvent } from "#plugins/moderation/public/modEvent.ts";
 import { m, type InferView } from "mousetache";

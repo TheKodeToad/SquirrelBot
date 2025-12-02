@@ -1,10 +1,10 @@
 import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugins/core/public/configStore.ts";
 import { defineConfig } from "#plugins/core/public/extensionPoints.ts";
-import tag from "#plugins/tags/command/tag.ts";
-import tagCreate from "#plugins/tags/command/tagCreate.ts";
-import tagDelete from "#plugins/tags/command/tagDelete.ts";
-import tagEdit from "#plugins/tags/command/tagEdit.ts";
+import tag from "#plugins/tags/commands/tag.ts";
+import tagCreate from "#plugins/tags/commands/tagCreate.ts";
+import tagDelete from "#plugins/tags/commands/tagDelete.ts";
+import tagEdit from "#plugins/tags/commands/tagEdit.ts";
 import { TagsConfig } from "#plugins/tags/config.ts";
 
 export const tagsConfigStore = new ConfigStore(TagsConfig);

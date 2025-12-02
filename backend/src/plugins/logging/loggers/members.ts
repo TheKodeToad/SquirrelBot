@@ -1,4 +1,4 @@
-import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
+import { makeMemberUserView, makeUserView } from "#common/views/user.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
 import { logEvent } from "#plugins/logging/helper/logging.ts";

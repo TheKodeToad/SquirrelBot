@@ -1,6 +1,6 @@
 import { getDefaultAvatarURL } from "#common/discord/urls.ts";
 import { moduleLogger } from "#common/logger/index.ts";
-import { makeMemberUserView, makeUserView } from "#common/template/user.ts";
+import { makeMemberUserView, makeUserView } from "#common/views/user.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";

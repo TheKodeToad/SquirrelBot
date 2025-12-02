@@ -1,4 +1,4 @@
-import { Color } from "#common/schema/general.ts";
+import { Color } from "#common/schemas/general.ts";
 import type { StringReader } from "#common/stringReader.ts";
 
 const CLEAR_PATTERN = /clear\b/iy;

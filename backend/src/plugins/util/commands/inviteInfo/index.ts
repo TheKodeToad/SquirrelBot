@@ -4,9 +4,9 @@ import { moduleLogger } from "#common/logger/index.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { renderFriendInvite } from "#plugins/util/command/inviteInfo/friend.ts";
-import { renderGroupDMInvite } from "#plugins/util/command/inviteInfo/groupDM.ts";
-import { renderGuildInvite } from "#plugins/util/command/inviteInfo/guild.ts";
+import { renderFriendInvite } from "#plugins/util/commands/inviteInfo/friend.ts";
+import { renderGroupDMInvite } from "#plugins/util/commands/inviteInfo/groupDM.ts";
+import { renderGuildInvite } from "#plugins/util/commands/inviteInfo/guild.ts";
 import { utilConfigStore } from "#plugins/util/index.ts";
 import {
 	Client,

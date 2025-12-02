@@ -1,5 +1,5 @@
-import { Snowflake } from "#common/schema/general.ts";
-import { NumberFilter } from "#common/schema/numberFilter.ts";
+import { Snowflake } from "#common/schemas/general.ts";
+import { NumberFilter } from "#common/schemas/numberFilter.ts";
 import { z } from "zod";
 
 export const PermissionsFilter = z.strictObject({

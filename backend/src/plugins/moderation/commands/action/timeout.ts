@@ -1,7 +1,9 @@
-import { makeGuildView } from "#common/template/guild.ts";
-import { makeUserView } from "#common/template/user.ts";
+import { makeDurationView } from "#common/views/duration.ts";
+import { makeGuildView } from "#common/views/guild.ts";
+import { makeUserView } from "#common/views/user.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
+import { duration } from "#plugins/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatModActionFailure,
@@ -12,17 +14,8 @@ import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";
 
 export default defineCommand({
-	name: [
-		"removetimeout",
-		"timeoutremove",
-		"rmtimeout",
-		"untimeout",
-		"removemute",
-		"muteremove",
-		"rmmute",
-		"unmute",
-	],
-	description: "Remove a member's timeout.",
+	name: ["timeout", "mute"],
+	description: "Time out a member (only allow them to read messages).",
 
 	options: {
 		user: {
@@ -32,16 +25,22 @@ export default defineCommand({
 			required: true,
 			position: 0,
 		},
+		duration: {
+			type: duration,
+			name: ["duration", "d", "for"],
+			required: true,
+			position: 1,
+		},
 		reason: {
 			type: "string",
 			name: ["reason", "r"],
 			required: false,
-			position: 1,
+			position: 2,
 		},
 		dm: {
 			type: "boolean",
 			description:
-				"Choose whether to notify the affected user with a DM (overrides the configured default).",
+				"Choose whether to notify the timed out user with a DM (overrides the configured default).",
 			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
 		},
@@ -54,14 +53,14 @@ export default defineCommand({
 			(permissions) => permissions.timeout,
 		),
 	async run(ctx, args, { config }) {
-		const sendDirectMessage =
-			args.dm ?? config.removeTimeout.sendDirectMessage;
+		const sendDirectMessage = args.dm ?? config.timeout.sendDirectMessage;
 		const directMessage =
 			sendDirectMessage ?
-				config.removeTimeout.directMessage.render({
+				config.timeout.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
+					duration: makeDurationView(args.duration),
 				})
 			:	undefined;
 
@@ -72,7 +71,8 @@ export default defineCommand({
 			(target) => ({
 				guild: ctx.guild,
 
-				type: ModEventType.ClearTimeout,
+				type: ModEventType.Timeout,
+				expiresAt: new Date(Date.now() + args.duration),
 
 				actor: ctx.member,
 				target,
@@ -87,11 +87,11 @@ export default defineCommand({
 		if (args.user.length === 1) {
 			if (successful.length === 1) {
 				await ctx.respond(
-					`${icons.success} Removed timeout from ${formatModActionSuccess(successful[0]!)}!`,
+					`${icons.success} Timed out ${formatModActionSuccess(successful[0]!)}!`,
 				);
 			} else if (unsuccessful.length === 1) {
 				await ctx.respond(
-					`${icons.error} Could not remove timeout from ${formatModActionFailure(unsuccessful[0]!)}!`,
+					`${icons.error} Could not time out ${formatModActionFailure(unsuccessful[0]!)}!`,
 				);
 			}
 		} else {
@@ -104,17 +104,17 @@ export default defineCommand({
 
 			if (unsuccessful.length === 0) {
 				await ctx.respond(
-					`${icons.success} Removed timeout for all **${args.user.length} users**:\n${successfulMessage}`,
+					`${icons.success} Timed out all **${args.user.length} users**:\n${successfulMessage}`,
 				);
 			} else if (successful.length === 0) {
 				await ctx.respond(
-					`${icons.error} None of **${args.user.length} users** had their timeouts removed:\n${unsuccessfulMessage}`,
+					`${icons.error} None of **${args.user.length} users** were timed out:\n${unsuccessfulMessage}`,
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** had their timeouts removed!\n` +
-						`Successful removals:\n${successfulMessage}\n` +
-						`Unsuccessful removals:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were timed out!\n` +
+						`Successful timeouts:\n${successfulMessage}\n` +
+						`Unsuccessful timeouts:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

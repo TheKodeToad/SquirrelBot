@@ -1,9 +1,9 @@
+import { getCommandByName } from "#plugins/core/commandEngine/commandCache.ts";
 import {
 	renderCommandListPage,
 	renderCommandListPageMinimal,
-} from "#plugins/core/command/help/list.ts";
-import { renderCommandPage } from "#plugins/core/command/help/show.ts";
-import { getCommandByName } from "#plugins/core/commandEngine/commandCache.ts";
+} from "#plugins/core/commands/help/list.ts";
+import { renderCommandPage } from "#plugins/core/commands/help/show.ts";
 import { coreConfigStore } from "#plugins/core/index.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";

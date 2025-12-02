@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { Color, Snowflake } from "#common/schema/general.ts";
-import { zTemplate, type ZTemplate } from "#common/schema/template.ts";
+import { Color, Snowflake } from "#common/schemas/general.ts";
+import { zTemplate, type ZTemplate } from "#common/schemas/template.ts";
 import type { InferView, m, Shape } from "mousetache";
 import { MessageFlags } from "oceanic.js";
 import { TomlDate } from "smol-toml";

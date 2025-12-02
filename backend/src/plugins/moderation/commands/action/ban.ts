@@ -1,7 +1,8 @@
-import { makeGuildView } from "#common/template/guild.ts";
-import { makeUserView } from "#common/template/user.ts";
+import { makeGuildView } from "#common/views/guild.ts";
+import { makeUserView } from "#common/views/user.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
+import { duration } from "#plugins/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatModActionFailure,
@@ -10,11 +11,10 @@ import {
 import { performModActions } from "#plugins/moderation/helper/modAction.ts";
 import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";
-import type { CreateMessageOptions } from "oceanic.js";
 
 export default defineCommand({
-	name: ["kick"],
-	description: "Remove a member from the server.",
+	name: ["ban"],
+	description: "Ban a user from the server.",
 
 	options: {
 		user: {
@@ -24,17 +24,29 @@ export default defineCommand({
 			required: true,
 			position: 0,
 		},
+		duration: {
+			type: duration,
+			name: ["duration", "d", "for"],
+			position: 1,
+			skipIfInvalid: true,
+		},
 		reason: {
 			type: "string",
 			name: ["reason", "r"],
-			position: 1,
+			position: 2,
 		},
 		dm: {
 			type: "boolean",
-			name: ["dm", "d", "direct-message"],
 			description:
-				"Choose whether to notify the kicked user with a DM (overrides the configured default).",
+				"Choose whether to notify the banned user with a DM (overrides the configured default).",
+			name: ["dm", "d", "direct-message"],
 			negativeName: ["no-dm", "nd", "no-direct-message"],
+		},
+		purge: {
+			type: duration,
+			description:
+				"Request to delete messages within the specified duration of being sent.",
+			name: ["purge", "p", "delete"],
 		},
 	},
 
@@ -42,18 +54,21 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			moderationConfigStore,
-			(permissions) => permissions.kick,
+			(permissions) => permissions.ban,
 		),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage = args.dm ?? config.ban.sendDirectMessage;
-		const directMessage: CreateMessageOptions | undefined =
+		const directMessage =
 			sendDirectMessage ?
-				config.kick.directMessage.render({
+				config.ban.directMessage.render({
 					server: makeGuildView(ctx.guild),
 					moderator: makeUserView(ctx.user),
 					reason: args.reason ?? undefined,
 				})
 			:	undefined;
+
+		const deleteMessageSeconds =
+			args.purge !== null ? args.purge / 1000 : config.ban.purgeMessages;
 
 		const { successful, unsuccessful } = await performModActions(
 			ctx.squirrelCtx,
@@ -62,14 +77,19 @@ export default defineCommand({
 			(target) => ({
 				guild: ctx.guild,
 
-				type: ModEventType.Kick,
+				type: ModEventType.Ban,
+				expiresAt:
+					args.duration !== null ?
+						new Date(Date.now() + args.duration)
+					:	undefined,
 
 				actor: ctx.member,
-				target,
+				target: target,
 				ranking: config.memberRanking,
 
 				reason: args.reason ?? undefined,
 
+				deleteMessageSeconds,
 				directMessage,
 			}),
 		);
@@ -77,11 +97,11 @@ export default defineCommand({
 		if (args.user.length === 1) {
 			if (successful.length === 1) {
 				await ctx.respond(
-					`${icons.success} Kicked ${formatModActionSuccess(successful[0]!)}!`,
+					`${icons.success} Banned ${formatModActionSuccess(successful[0]!)}!`,
 				);
 			} else if (unsuccessful.length === 1) {
 				await ctx.respond(
-					`${icons.error} Could not kick ${formatModActionFailure(unsuccessful[0]!)}!`,
+					`${icons.error} Could not ban ${formatModActionFailure(unsuccessful[0]!)}!`,
 				);
 			}
 		} else {
@@ -94,17 +114,17 @@ export default defineCommand({
 
 			if (unsuccessful.length === 0) {
 				await ctx.respond(
-					`${icons.success} Kicked all **${args.user.length} users**:\n${successfulMessage}`,
+					`${icons.success} Banned all **${args.user.length} users**:\n${successfulMessage}`,
 				);
 			} else if (successful.length === 0) {
 				await ctx.respond(
-					`${icons.error} None of **${args.user.length} users** were kicked:\n${unsuccessfulMessage}`,
+					`${icons.error} None of **${args.user.length} users** were banned:\n${unsuccessfulMessage}`,
 				);
 			} else {
 				await ctx.respond(
-					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were kicked!\n` +
-						`Successful kicks:\n${successfulMessage}\n` +
-						`Unsuccessful kicks:\n${unsuccessfulMessage}`,
+					`${icons.warning} Only **${successful.length} of ${args.user.length} users** were banned!\n` +
+						`Successful:\n${successfulMessage}\n` +
+						`Unsuccessful:\n${unsuccessfulMessage}`,
 				);
 			}
 		}

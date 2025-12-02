@@ -1,6 +1,6 @@
 import type { Nullable } from "#common/general.ts";
-import { makeGuildView } from "#common/template/guild.ts";
-import { makeMemberUserView } from "#common/template/user.ts";
+import { makeGuildView } from "#common/views/guild.ts";
+import { makeMemberUserView } from "#common/views/user.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { makeTagView } from "#plugins/logging/config/tags.ts";
 import { logEvent } from "#plugins/logging/helper/logging.ts";

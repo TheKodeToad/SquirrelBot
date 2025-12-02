@@ -8,8 +8,8 @@ import { moduleLogger } from "#common/logger/index.ts";
 import {
 	NumberFilterMode,
 	type NumberFilter,
-} from "#common/schema/numberFilter.ts";
-import type { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
+} from "#common/schemas/numberFilter.ts";
+import type { PermissionsFilter } from "#common/schemas/permissionsFilter.ts";
 import type { CoreConfig, CoreGroup } from "#plugins/core/config.ts";
 import { coreConfigStore } from "#plugins/core/index.ts";
 import {

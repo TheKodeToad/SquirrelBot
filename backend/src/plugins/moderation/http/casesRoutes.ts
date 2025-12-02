@@ -1,4 +1,4 @@
-import { Snowflake } from "#common/schema/general.ts";
+import { Snowflake } from "#common/schemas/general.ts";
 import { definePluginGuildRoutes } from "#http/extensionPoints.ts";
 import { validate } from "#http/middleware/zod.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";

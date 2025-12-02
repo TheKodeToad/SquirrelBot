@@ -1,7 +1,7 @@
 import { paddedHex } from "#common/general.ts";
-import { messageTemplate } from "#common/schema/message.ts";
-import { GuildView } from "#common/template/guild.ts";
-import { UserView } from "#common/template/user.ts";
+import { messageTemplate } from "#common/schemas/message.ts";
+import { GuildView } from "#common/views/guild.ts";
+import { UserView } from "#common/views/user.ts";
 import { eventConfig } from "#plugins/logging/config/index.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";
 import { m, type InferView } from "mousetache";

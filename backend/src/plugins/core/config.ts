@@ -1,5 +1,5 @@
-import { Snowflake } from "#common/schema/general.ts";
-import { PermissionsFilter } from "#common/schema/permissionsFilter.ts";
+import { Snowflake } from "#common/schemas/general.ts";
+import { PermissionsFilter } from "#common/schemas/permissionsFilter.ts";
 import { z } from "zod";
 
 const CoreGroup = z.strictObject({
