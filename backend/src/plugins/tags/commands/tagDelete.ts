@@ -7,7 +7,7 @@ import { autocompleteTags } from "#plugins/tags/autocompletion.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugins/tags/constants.ts";
 import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { onTagDeleted } from "#plugins/tags/public/extensionPoints.ts";
-import { deleteTag } from "#plugins/tags/storage/tags.ts";
+import { tagsTable } from "#plugins/tags/storage/tags.ts";
 
 const logger = moduleLogger();
 
@@ -30,7 +30,11 @@ export default defineCommand({
 	preRun: (ctx) =>
 		permissionsGuard(ctx, tagsConfigStore, (perms) => perms.tagDelete),
 	async run(ctx, args) {
-		const tag = await deleteTag(ctx.backendCtx.db, ctx.guild.id, args.name);
+		const tag = await tagsTable.remove(
+			ctx.backendCtx.db,
+			ctx.guild.id,
+			args.name,
+		);
 
 		if (tag === null) {
 			await ctx.respond(

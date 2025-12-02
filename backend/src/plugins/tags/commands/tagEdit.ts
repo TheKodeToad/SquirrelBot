@@ -11,7 +11,7 @@ import {
 import { attachments, optionalColor } from "#plugins/tags/customOptionTypes.ts";
 import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { onTagEdited } from "#plugins/tags/public/extensionPoints.ts";
-import { updateTag } from "#plugins/tags/storage/tags.ts";
+import { tagsTable } from "#plugins/tags/storage/tags.ts";
 
 const logger = moduleLogger();
 
@@ -70,7 +70,7 @@ export default defineCommand({
 			color: args.color,
 		};
 
-		const oldTag = await updateTag(
+		const oldTag = await tagsTable.update(
 			ctx.backendCtx.db,
 			ctx.guild.id,
 			args.name,

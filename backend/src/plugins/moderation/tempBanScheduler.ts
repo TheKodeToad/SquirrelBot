@@ -11,8 +11,7 @@ import { SECOND } from "#common/time.ts";
 import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import {
-	deleteTempBan,
-	getTempBansByEndsAt,
+	tempBanTable,
 	type TempBan,
 } from "#plugins/moderation/storage/tempBans.ts";
 import { Client, Constants, DiscordRESTError } from "oceanic.js";
@@ -35,7 +34,7 @@ async function beginPollingTempBans(ctx: BackendDiscordContext): Promise<void> {
 		discriminator: "moderationTempBans",
 		pollRate: 60 * SECOND,
 
-		poll: (start, end) => getTempBansByEndsAt(ctx.db, start, end),
+		poll: (start, end) => tempBanTable.allEndingBetween(ctx.db, start, end),
 		run: (ban) => trigger(ctx, ban),
 
 		getKey: (ban) => getTempBanKey(ban.guildID, ban.targetID),
@@ -82,6 +81,6 @@ async function trigger(
 		}
 	} finally {
 		// TODO: does this always run, even if the catch throws
-		await deleteTempBan(ctx.db, ban.guildID, ban.targetID);
+		await tempBanTable.remove(ctx.db, ban.guildID, ban.targetID);
 	}
 }

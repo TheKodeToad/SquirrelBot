@@ -5,10 +5,7 @@ import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { remindersConfigStore } from "#plugins/reminders/plugin.ts";
 import { trackNewReminder } from "#plugins/reminders/scheduler.ts";
-import {
-	createReminder,
-	type CreateReminderOptions,
-} from "#plugins/reminders/storage/reminders.ts";
+import { remindersTable } from "#plugins/reminders/storage/reminders.ts";
 import { MessageFlags } from "oceanic.js";
 
 export default defineCommand({
@@ -44,7 +41,8 @@ export default defineCommand({
 		const now = Date.now();
 		const firesAt = now + args.delay;
 
-		const options: CreateReminderOptions = {
+		const reminders = {
+			guildID: ctx.guild.id,
 			ownerID: ctx.user.id,
 			channelID: ctx.channel.id,
 			channelType: ctx.channel.type,
@@ -56,16 +54,14 @@ export default defineCommand({
 					MessageFlags.SUPPRESS_NOTIFICATIONS) !==
 				0,
 		};
-		const number = await createReminder(
+		const number = await remindersTable.insert(
 			ctx.backendCtx.db,
-			ctx.guild.id,
-			options,
+			reminders,
 		);
 
 		trackNewReminder({
-			guildID: ctx.guild.id,
 			number,
-			...options,
+			...reminders,
 		});
 
 		const firesAtSecs = dateToUnixSecs(firesAt);

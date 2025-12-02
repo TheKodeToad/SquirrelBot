@@ -8,7 +8,7 @@ import {
 	guildAuthMiddleware,
 	type GuildAuthVars,
 } from "#http/middleware/guildAuth.ts";
-import { getAPIGuildInfoByOwner } from "#plugins/core/storage/guildInfo.ts";
+import { guildInfoTable } from "#plugins/core/storage/guildInfo.ts";
 import { Hono } from "hono";
 
 export default (backendCtx: BackendHTTPContext): Hono => {
@@ -35,7 +35,10 @@ export default (backendCtx: BackendHTTPContext): Hono => {
 	app.route("/:guildID/plugins", guildRouter);
 	app.get("/", authMiddleware(backendCtx.db), async (ctx) =>
 		ctx.json(
-			await getAPIGuildInfoByOwner(backendCtx.db, ctx.var.discordUserID),
+			await guildInfoTable.getPublicByOwner(
+				backendCtx.db,
+				ctx.var.discordUserID,
+			),
 		),
 	);
 

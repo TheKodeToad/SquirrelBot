@@ -10,12 +10,7 @@ import {
 } from "#plugins/logging/constants.ts";
 import { logEvent } from "#plugins/logging/logEvent.ts";
 import { loggingConfigStore } from "#plugins/logging/plugin.ts";
-import {
-	cleanUpMessageCacheEntries,
-	getMessageCacheEntry,
-	takeMessageCacheEntry,
-	upsertMessageCacheEntry,
-} from "#plugins/logging/storage/messageCache.ts";
+import { messageCacheTable } from "#plugins/logging/storage/messageCache.ts";
 import { Message, Routes, type PossiblyUncachedMessage } from "oceanic.js";
 
 const logger = moduleLogger();
@@ -33,7 +28,7 @@ async function beginMessageCleanupLoop(
 	try {
 		logger.debug?.("Cleaning up old message cache entries");
 
-		const deletedCount = await cleanUpMessageCacheEntries(
+		const deletedCount = await messageCacheTable.cleanUp(
 			ctx.db,
 			new Date(Date.now() - MESSAGE_CLEANUP_THRESHOLD),
 		);
@@ -69,18 +64,16 @@ async function handleCreate(
 		return;
 	}
 
-	await upsertMessageCacheEntry(
-		ctx.db,
-		message.guildID,
-		message.channelID,
-		message.id,
-		{
-			authorID: message.author.id,
-			authorName: message.author.tag,
-			authorAvatarHash: message.author.avatar,
-			content: message.content,
-		},
-	);
+	await messageCacheTable.upsert(ctx.db, {
+		guildID: message.guildID,
+		channelID: message.channelID,
+		id: message.id,
+		lastUpdated: new Date(),
+		authorID: message.author.id,
+		authorName: message.author.tag,
+		authorAvatarHash: message.author.avatar,
+		content: message.content,
+	});
 }
 
 async function handleUpdate(
@@ -96,7 +89,7 @@ async function handleUpdate(
 		channelID: message.channelID,
 		key: "messageEdit",
 		async supply() {
-			const entry = await getMessageCacheEntry(
+			const entry = await messageCacheTable.get(
 				ctx.db,
 				message.guild!.id,
 				message.channelID,
@@ -112,18 +105,16 @@ async function handleUpdate(
 				return null;
 			}
 
-			await upsertMessageCacheEntry(
-				ctx.db,
-				message.guild!.id,
-				message.channelID,
-				message.id,
-				{
-					authorID: message.author.id,
-					authorName: message.author.tag,
-					authorAvatarHash: message.author.avatar,
-					content: message.content,
-				},
-			);
+			await messageCacheTable.upsert(ctx.db, {
+				guildID: message.guild!.id,
+				channelID: message.channelID,
+				id: message.id,
+				lastUpdated: new Date(),
+				authorID: message.author.id,
+				authorName: message.author.tag,
+				authorAvatarHash: message.author.avatar,
+				content: message.content,
+			});
 
 			return {
 				author:
@@ -150,7 +141,7 @@ async function handleDelete(
 		channelID: message.channelID,
 		key: "messageDelete",
 		async supply() {
-			const entry = await takeMessageCacheEntry(
+			const entry = await messageCacheTable.take(
 				ctx.db,
 				message.guild!.id,
 				message.channelID,

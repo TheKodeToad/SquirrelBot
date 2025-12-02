@@ -22,8 +22,7 @@ import { onBotInit } from "#discord/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { remindersConfigStore } from "#plugins/reminders/plugin.ts";
 import {
-	deleteReminder,
-	getRemindersByFiresAt,
+	remindersTable,
 	type Reminder,
 } from "#plugins/reminders/storage/reminders.ts";
 import {
@@ -54,7 +53,8 @@ async function beginPollingReminders(
 		discriminator: "reminders",
 		pollRate: 60 * SECOND,
 
-		poll: (start, end) => getRemindersByFiresAt(ctx.db, start, end),
+		poll: (start, end) =>
+			remindersTable.allFiringBetween(ctx.db, start, end),
 		run: (reminder) => fire(ctx, reminder),
 
 		getKey: (reminder) => getReminderKey(reminder.guildID, reminder.number),
@@ -76,7 +76,13 @@ async function fire(
 	reminder: Reminder,
 ): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!
-	if (!(await deleteReminder(ctx.db, reminder.guildID, reminder.number))) {
+	if (
+		!(await remindersTable.remove(
+			ctx.db,
+			reminder.guildID,
+			reminder.number,
+		))
+	) {
 		return;
 	}
 

@@ -3,10 +3,8 @@ import { isThreadChannel } from "#common/discord/general.ts";
 import type { Awaitable } from "#common/general.ts";
 import type { BackendDiscordContext } from "#discord/discord.ts";
 import {
-	getLoggingWebhook,
-	insertLoggingWebhook,
-	updateLoggingWebhook,
 	type WebhookAuth,
+	webhooksTable,
 } from "#plugins/logging/storage/webhooks.ts";
 import AsyncLock from "async-lock";
 import {
@@ -41,7 +39,7 @@ async function acquireWebhook(
 	return webhookLock.acquire(channel.id, async () => {
 		const baseChannel = isThreadChannel(channel) ? channel.parent : channel;
 
-		const existingWebhook = await getLoggingWebhook(
+		const existingWebhook = await webhooksTable.get(
 			ctx.db,
 			channel.guildID,
 			channel.id,
@@ -85,14 +83,14 @@ async function acquireWebhook(
 		};
 
 		if (existingWebhook !== null) {
-			await updateLoggingWebhook(
+			await webhooksTable.update(
 				ctx.db,
 				channel.guildID,
 				channel.id,
 				auth,
 			);
 		} else {
-			await insertLoggingWebhook(
+			await webhooksTable.insert(
 				ctx.db,
 				channel.guildID,
 				channel.id,

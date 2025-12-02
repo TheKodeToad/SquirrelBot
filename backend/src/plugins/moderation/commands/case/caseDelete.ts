@@ -2,7 +2,7 @@ import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
-import { deleteCase } from "#plugins/moderation/storage/cases.ts";
+import { casesTable } from "#plugins/moderation/storage/cases.ts";
 
 export default defineCommand({
 	name: [
@@ -31,7 +31,7 @@ export default defineCommand({
 			(perms) => perms.caseDelete,
 		),
 	async run(ctx, { number }) {
-		const deleted = await deleteCase(
+		const deleted = await casesTable.remove(
 			ctx.backendCtx.db,
 			ctx.guild.id,
 			number,

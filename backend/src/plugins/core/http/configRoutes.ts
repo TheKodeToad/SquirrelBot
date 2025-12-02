@@ -1,14 +1,11 @@
 import { defineGlobalPluginGuildRoutes } from "#http/extensionPoints.ts";
-import {
-	getGuildConfig,
-	updateGuildConfig,
-} from "#plugins/core/storage/configs.ts";
+import { guildConfigsTable } from "#plugins/core/storage/guildConfigs.ts";
 import { notifyChannel } from "#storage/notification.ts";
 import { HTTPException } from "hono/http-exception";
 
 export default defineGlobalPluginGuildRoutes((backendCtx, plugin, app) => {
 	app.get("/config", async (ctx) => {
-		const config = await getGuildConfig(
+		const config = await guildConfigsTable.get(
 			backendCtx.db,
 			ctx.var.discordGuildID,
 			plugin.id,
@@ -29,7 +26,7 @@ export default defineGlobalPluginGuildRoutes((backendCtx, plugin, app) => {
 		}
 
 		const body = await ctx.req.text();
-		const exists = await updateGuildConfig(
+		const exists = await guildConfigsTable.update(
 			backendCtx.db,
 			ctx.var.discordGuildID,
 			plugin.id,

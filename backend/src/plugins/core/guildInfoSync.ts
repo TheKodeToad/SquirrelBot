@@ -8,17 +8,7 @@ import {
 	makeEventExtensionPoint,
 } from "#extensionPoint.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
-import {
-	cancelGuildInfoDeletion,
-	deleteExpiredGuildInfo,
-	getAllGuildInfo,
-	insertGuildInfo,
-	markGuildAllowed,
-	markGuildNotAllowed,
-	markUnknownGuildAllowed,
-	scheduleGuildInfoDeletion,
-	updateGuildInfo,
-} from "#plugins/core/storage/guildInfo.ts";
+import { guildInfoTable } from "#plugins/core/storage/guildInfo.ts";
 import type { Guild, JSONGuild } from "oceanic.js";
 import type { Pool } from "pg";
 
@@ -50,7 +40,7 @@ export default [
 async function init(ctx: BackendDiscordContext): Promise<void> {
 	logger.debug?.("Initializing guild info");
 
-	const guildsInfo = await getAllGuildInfo(ctx.db);
+	const guildsInfo = await guildInfoTable.all(ctx.db);
 	// guilds from env var, remove those which are already present
 	const missing = [...BOT_ALLOWED_GUILDS];
 
@@ -61,12 +51,12 @@ async function init(ctx: BackendDiscordContext): Promise<void> {
 			missing.splice(missingIndex, 1);
 
 			if (guildInfo.deleteAt !== null) {
-				await cancelGuildInfoDeletion(ctx.db, guildInfo.id);
+				await guildInfoTable.cancelDeletion(ctx.db, guildInfo.id);
 			}
 		} else if (!guildInfo.allowed) {
 			// was removed from env var
 			if (guildInfo.deleteAt === null) {
-				await scheduleGuildInfoDeletion(ctx.db, guildInfo.id);
+				await guildInfoTable.scheduleDeletion(ctx.db, guildInfo.id);
 			}
 
 			continue;
@@ -90,7 +80,7 @@ async function init(ctx: BackendDiscordContext): Promise<void> {
 			continue;
 		}
 
-		await updateGuildInfo(
+		await guildInfoTable.update(
 			ctx.db,
 			guildInfo.id,
 			realGuild.name,
@@ -102,7 +92,7 @@ async function init(ctx: BackendDiscordContext): Promise<void> {
 	for (const missingGuildID of missing) {
 		const realGuild = ctx.bot.guilds.get(missingGuildID);
 
-		await insertGuildInfo(
+		await guildInfoTable.insert(
 			ctx.db,
 			missingGuildID,
 			realGuild?.name ?? null,
@@ -122,7 +112,7 @@ export async function beginDeleteGuildInfoLoop(db: Pool): Promise<void> {
 	try {
 		logger.debug?.("Deleting expired guild info");
 
-		const deletedCount = await deleteExpiredGuildInfo(db);
+		const deletedCount = await guildInfoTable.deleteExpired(db);
 
 		logger.debug?.(`Deleted ${deletedCount} guilds`);
 	} finally {
@@ -132,7 +122,7 @@ export async function beginDeleteGuildInfoLoop(db: Pool): Promise<void> {
 
 async function handleCreate(db: Pool, guild: Guild): Promise<void> {
 	if (isGuildAllowed(guild.id)) {
-		await updateGuildInfo(
+		await guildInfoTable.update(
 			db,
 			guild.id,
 			guild.name,
@@ -163,7 +153,13 @@ async function handleUpdate(
 		return;
 	}
 
-	await updateGuildInfo(db, guild.id, guild.name, guild.icon, guild.ownerID);
+	await guildInfoTable.update(
+		db,
+		guild.id,
+		guild.name,
+		guild.icon,
+		guild.ownerID,
+	);
 }
 
 export function isGuildAllowed(id: string): boolean {
@@ -193,7 +189,7 @@ export async function grantAccess(
 	const realGuild = ctx.bot.guilds.get(id);
 
 	if (realGuild !== undefined) {
-		await markGuildAllowed(
+		await guildInfoTable.markAllowed(
 			ctx.db,
 			id,
 			realGuild?.name ?? null,
@@ -201,7 +197,7 @@ export async function grantAccess(
 			realGuild?.ownerID ?? null,
 		);
 	} else {
-		await markUnknownGuildAllowed(ctx.db, id);
+		await guildInfoTable.markUnknownAllowed(ctx.db, id);
 	}
 
 	allowedGuilds.add(id);
@@ -222,11 +218,11 @@ export async function revokeAccess(
 	}
 
 	if (BOT_ALLOWED_GUILDS.includes(id)) {
-		await markGuildNotAllowed(ctx.db, id);
+		await guildInfoTable.markNotAllowed(ctx.db, id);
 		allowedGuilds.delete(id);
 		return true;
 	} else {
-		const date = await scheduleGuildInfoDeletion(ctx.db, id);
+		const date = await guildInfoTable.scheduleDeletion(ctx.db, id);
 		allowedGuilds.delete(id);
 
 		await onGuildAccessRevoked.fire(ctx, id);

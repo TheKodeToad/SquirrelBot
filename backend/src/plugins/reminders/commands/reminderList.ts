@@ -13,7 +13,7 @@ import { icons } from "#plugins/core/public/icons.ts";
 import { resolvePermissions } from "#plugins/core/public/permissionResolution.ts";
 import { remindersConfigStore } from "#plugins/reminders/plugin.ts";
 import {
-	getReminders,
+	remindersTable,
 	type Reminder,
 } from "#plugins/reminders/storage/reminders.ts";
 import { Container, Text } from "oceanic-component-helper";
@@ -56,7 +56,7 @@ async function lookUpReminders(
 		return [];
 	}
 
-	return getReminders(ctx.backendCtx.db, ctx.guild.id, {
+	return remindersTable.query(ctx.backendCtx.db, ctx.guild.id, {
 		ownerID: ctx.user.id,
 		limit: query.limit,
 		firesBefore: query.before,

@@ -12,10 +12,7 @@ import {
 } from "#plugins/core/guildInfoSync.ts";
 import type { ConfigStore } from "#plugins/core/public/configStore.ts";
 import { defineConfig } from "#plugins/core/public/extensionPoints.ts";
-import {
-	getGuildConfig,
-	insertGuildConfig,
-} from "#plugins/core/storage/configs.ts";
+import { guildConfigsTable } from "#plugins/core/storage/guildConfigs.ts";
 import AsyncLock from "async-lock";
 import type { Client } from "oceanic.js";
 import { parse as parseToml, TomlError } from "smol-toml";
@@ -136,7 +133,7 @@ async function createAndLoadConfigs(
 	await Promise.all(
 		defineConfig.contributions.entries().map(async ([plugin, config]) => {
 			await acquireConfig(guildID, plugin.id, async () => {
-				const inserted = await insertGuildConfig(
+				const inserted = await guildConfigsTable.insert(
 					ctx.db,
 					guildID,
 					plugin.id,
@@ -194,7 +191,7 @@ async function parseConfig(
 	pluginID: string,
 	configCache: ConfigStore,
 ): Promise<{} | null> {
-	const rawValue = await getGuildConfig(ctx.db, guildID, pluginID);
+	const rawValue = await guildConfigsTable.get(ctx.db, guildID, pluginID);
 
 	if (rawValue === null) {
 		return null;

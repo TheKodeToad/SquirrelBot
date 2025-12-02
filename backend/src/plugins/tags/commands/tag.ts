@@ -5,7 +5,7 @@ import { icons } from "#plugins/core/public/icons.ts";
 import { autocompleteTags } from "#plugins/tags/autocompletion.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugins/tags/constants.ts";
 import { tagsConfigStore } from "#plugins/tags/plugin.ts";
-import { getTag } from "#plugins/tags/storage/tags.ts";
+import { tagsTable } from "#plugins/tags/storage/tags.ts";
 import {
 	Container,
 	Gallery,
@@ -32,7 +32,7 @@ export default defineCommand({
 	preRun: (ctx) =>
 		permissionsGuard(ctx, tagsConfigStore, (perms) => perms.tagSend),
 	async run(ctx, { name }) {
-		const tag = await getTag(ctx.backendCtx.db, ctx.guild.id, name);
+		const tag = await tagsTable.get(ctx.backendCtx.db, ctx.guild.id, name);
 
 		if (tag === null) {
 			await ctx.respond(

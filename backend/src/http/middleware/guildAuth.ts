@@ -1,5 +1,5 @@
 import { isSnowflake } from "#common/snowflakes.ts";
-import { getGuildOwnerID } from "#plugins/core/storage/guildInfo.ts";
+import { guildInfoTable } from "#plugins/core/storage/guildInfo.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { Pool } from "pg";
@@ -27,7 +27,7 @@ export function guildAuthMiddleware(db: Pool) {
 			throw new HTTPException(400, { message: "Malformed guild id" });
 		}
 
-		const owner = await getGuildOwnerID(db, guildID);
+		const owner = await guildInfoTable.getOwnerID(db, guildID);
 
 		if (owner === null || owner !== discordUserID) {
 			throw new HTTPException(403, { message: "Missing permission" });

@@ -14,10 +14,9 @@ import {
 	ModEventType,
 	type ModEvent,
 } from "#plugins/moderation/public/modEvent.ts";
-import { createCase } from "#plugins/moderation/storage/cases.ts";
+import { casesTable } from "#plugins/moderation/storage/cases.ts";
 import {
-	deleteTempBan,
-	upsertTempBan,
+	tempBanTable,
 	type TempBan,
 } from "#plugins/moderation/storage/tempBans.ts";
 import {
@@ -168,7 +167,7 @@ export async function performModAction(
 	}
 
 	const result: ModEvent = { ...action, performedAt, dmDelivered };
-	result.caseNumber = await createCase(ctx.db, action.guild.id, result);
+	result.caseNumber = await casesTable.insertFromEvent(ctx.db, result);
 
 	if (action.type === ModEventType.Ban) {
 		untrackTempBan(action.guild.id, action.target.id);
@@ -183,10 +182,14 @@ export async function performModAction(
 				caseNumber: result.caseNumber,
 			};
 
-			await upsertTempBan(ctx.db, action.guild.id, tempBan);
+			await tempBanTable.upsert(ctx.db, tempBan);
 			trackNewTempBan(tempBan);
 		} else {
-			await deleteTempBan(ctx.db, action.guild.id, action.target.id);
+			await tempBanTable.remove(
+				ctx.db,
+				action.guild.id,
+				action.target.id,
+			);
 		}
 	}
 

@@ -49,6 +49,7 @@ export default defineConfig(
 					],
 				},
 			],
+			"@typescript-eslint/no-namespace": "off",
 			"no-var": "off",
 			"no-console": "warn",
 			"prefer-const": "warn",

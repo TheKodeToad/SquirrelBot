@@ -3,10 +3,8 @@ import { definePluginGuildRoutes } from "#http/extensionPoints.ts";
 import { validate } from "#http/middleware/zod.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";
 import {
-	getCase,
-	getCases,
+	casesTable,
 	type CaseInfo,
-	type CaseQuery,
 } from "#plugins/moderation/storage/cases.ts";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -46,7 +44,7 @@ const querySchema = z
 					input["delete-message-seconds-gt"],
 				reversed: input.order,
 				limit: input.limit,
-			}) satisfies CaseQuery,
+			}) satisfies casesTable.Query,
 	);
 
 export default definePluginGuildRoutes((backendCtx, app) => {
@@ -57,7 +55,7 @@ export default definePluginGuildRoutes((backendCtx, app) => {
 			throw new HTTPException(400, { message: "Bad case number" });
 		}
 
-		const info = await getCase(
+		const info = await casesTable.get(
 			backendCtx.db,
 			ctx.var.discordGuildID,
 			number,
@@ -71,7 +69,7 @@ export default definePluginGuildRoutes((backendCtx, app) => {
 	});
 
 	app.get("/", validate("query", querySchema), async (ctx) => {
-		const result = await getCases(
+		const result = await casesTable.query(
 			backendCtx.db,
 			ctx.var.discordGuildID,
 			ctx.req.valid("query"),

@@ -11,7 +11,7 @@ import { attachments, optionalColor } from "#plugins/tags/customOptionTypes.ts";
 import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { onTagCreated } from "#plugins/tags/public/extensionPoints.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";
-import { createTag } from "#plugins/tags/storage/tags.ts";
+import { tagsTable } from "#plugins/tags/storage/tags.ts";
 
 const logger = moduleLogger();
 
@@ -57,7 +57,11 @@ export default defineCommand({
 			attachments: args.attachments ?? [],
 			color: args.color ?? -1,
 		};
-		const success = await createTag(ctx.backendCtx.db, ctx.guild.id, tag);
+		const success = await tagsTable.insert(
+			ctx.backendCtx.db,
+			ctx.guild.id,
+			tag,
+		);
 
 		if (!success) {
 			await ctx.respond(
