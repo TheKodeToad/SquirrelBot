@@ -5,8 +5,8 @@ import {
 } from "#common/discord/cachedRequest.ts";
 import { formatRESTError } from "#common/discord/format.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
-import { moduleLogger } from "#common/logger/index.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { resolveGroups } from "#plugins/core/public/permissionResolution.ts";
 import { MemberRanking } from "#plugins/moderation/config.ts";
 import { onModAction } from "#plugins/moderation/public/extensionPoints.ts";
@@ -50,7 +50,7 @@ export interface ModActionFailure {
 }
 
 export async function performModAction(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	action: ModAction,
 ): Promise<ModActionResult> {
 	let dmDelivered = false;
@@ -243,7 +243,7 @@ export interface BulkModActionResult {
 }
 
 export async function performModActions(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild,
 	ids: readonly string[],
 	makeAction: (target: Member | User) => ModAction,

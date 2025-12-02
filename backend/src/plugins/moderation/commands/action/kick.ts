@@ -7,8 +7,8 @@ import {
 	formatModActionFailure,
 	formatModActionSuccess,
 } from "#plugins/moderation/format.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import { performModActions } from "#plugins/moderation/modAction.ts";
+import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";
 import type { CreateMessageOptions } from "oceanic.js";
 
@@ -56,7 +56,7 @@ export default defineCommand({
 			:	undefined;
 
 		const { successful, unsuccessful } = await performModActions(
-			ctx.squirrelCtx,
+			ctx.backendCtx,
 			ctx.guild,
 			args.user,
 			(target) => ({

@@ -1,4 +1,4 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { ClientBase, Pool, type PoolClient } from "pg";
 
 const logger = moduleLogger();

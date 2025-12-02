@@ -6,10 +6,10 @@ import {
 import { notifyChannel } from "#storage/notification.ts";
 import { HTTPException } from "hono/http-exception";
 
-export default defineGlobalPluginGuildRoutes((squirrelCtx, plugin, app) => {
+export default defineGlobalPluginGuildRoutes((backendCtx, plugin, app) => {
 	app.get("/config", async (ctx) => {
 		const config = await getGuildConfig(
-			squirrelCtx.db,
+			backendCtx.db,
 			ctx.var.discordGuildID,
 			plugin.id,
 		);
@@ -30,7 +30,7 @@ export default defineGlobalPluginGuildRoutes((squirrelCtx, plugin, app) => {
 
 		const body = await ctx.req.text();
 		const exists = await updateGuildConfig(
-			squirrelCtx.db,
+			backendCtx.db,
 			ctx.var.discordGuildID,
 			plugin.id,
 			body,
@@ -41,7 +41,7 @@ export default defineGlobalPluginGuildRoutes((squirrelCtx, plugin, app) => {
 		}
 
 		await notifyChannel(
-			squirrelCtx.db,
+			backendCtx.db,
 			"core_configUpdate",
 			JSON.stringify({
 				guildID: ctx.var.discordGuildID,

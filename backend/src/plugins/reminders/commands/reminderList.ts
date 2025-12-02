@@ -11,7 +11,7 @@ import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { resolvePermissions } from "#plugins/core/public/permissionResolution.ts";
-import { remindersConfigStore } from "#plugins/reminders/index.ts";
+import { remindersConfigStore } from "#plugins/reminders/plugin.ts";
 import {
 	getReminders,
 	type Reminder,
@@ -56,7 +56,7 @@ async function lookUpReminders(
 		return [];
 	}
 
-	return getReminders(ctx.squirrelCtx.db, ctx.guild.id, {
+	return getReminders(ctx.backendCtx.db, ctx.guild.id, {
 		ownerID: ctx.user.id,
 		limit: query.limit,
 		firesBefore: query.before,

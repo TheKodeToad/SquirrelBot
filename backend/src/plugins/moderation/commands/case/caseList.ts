@@ -15,7 +15,7 @@ import {
 	formatCaseFields,
 	formatCompactCaseSummary,
 } from "#plugins/moderation/format.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
+import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { getCases, type CaseInfo } from "#plugins/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 import type { Client } from "oceanic.js";
@@ -77,7 +77,7 @@ async function lookUpCases(
 		return [];
 	}
 
-	return await getCases(ctx.squirrelCtx.db, ctx.guild.id, {
+	return await getCases(ctx.backendCtx.db, ctx.guild.id, {
 		actorIDs: actorID !== null ? [actorID] : undefined,
 		targetIDs: targetID !== null ? [targetID] : undefined,
 		limit: query.limit,

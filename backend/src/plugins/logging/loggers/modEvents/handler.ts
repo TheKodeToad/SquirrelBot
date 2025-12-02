@@ -1,4 +1,4 @@
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import type { LoggerConfig } from "#plugins/logging/config.ts";
 import { logEvent } from "#plugins/logging/logEvent.ts";
 import { makeModEventView } from "#plugins/logging/loggers/modEvents/views.ts";
@@ -11,7 +11,7 @@ import {
 export default [onModAction(handleModAction)];
 
 async function handleModAction(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	event: ModEvent,
 ): Promise<void> {
 	let key: keyof LoggerConfig["events"];

@@ -3,7 +3,7 @@ import { duration } from "#plugins/core/public//customOptionTypes.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { remindersConfigStore } from "#plugins/reminders/index.ts";
+import { remindersConfigStore } from "#plugins/reminders/plugin.ts";
 import { trackNewReminder } from "#plugins/reminders/scheduler.ts";
 import {
 	createReminder,
@@ -57,7 +57,7 @@ export default defineCommand({
 				0,
 		};
 		const number = await createReminder(
-			ctx.squirrelCtx.db,
+			ctx.backendCtx.db,
 			ctx.guild.id,
 			options,
 		);

@@ -1,7 +1,7 @@
 import { APP_NAME } from "#brand.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import type { Awaitable } from "#common/general.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import {
 	getLoggingWebhook,
 	insertLoggingWebhook,
@@ -18,7 +18,7 @@ import {
 } from "oceanic.js";
 
 export async function logViaWebhook(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	channel: AnyTextableGuildChannel,
 	message: ExecuteWebhookOptions,
 ): Promise<void> {
@@ -34,7 +34,7 @@ export async function logViaWebhook(
 const webhookLock = new AsyncLock();
 
 async function acquireWebhook(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	channel: AnyTextableGuildChannel,
 	action: (auth: WebhookAuth) => Awaitable<void>,
 ): Promise<void> {

@@ -1,9 +1,9 @@
-import type { SquirrelHTTPContext } from "#http/index.ts";
+import type { BackendHTTPContext } from "#http/http.ts";
 import { deleteToken } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 
-export default (squirrelCtx: SquirrelHTTPContext): Hono => {
+export default (backendCtx: BackendHTTPContext): Hono => {
 	const app = new Hono();
 
 	app.get("/", async (ctx) => {
@@ -15,7 +15,7 @@ export default (squirrelCtx: SquirrelHTTPContext): Hono => {
 			});
 		}
 
-		if (!(await deleteToken(squirrelCtx.db, authorization))) {
+		if (!(await deleteToken(backendCtx.db, authorization))) {
 			throw new HTTPException(401, {
 				message: "Invalid or expired token",
 			});

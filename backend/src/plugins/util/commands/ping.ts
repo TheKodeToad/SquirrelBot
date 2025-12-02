@@ -1,7 +1,7 @@
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { utilConfigStore } from "#plugins/util/index.ts";
+import { utilConfigStore } from "#plugins/util/plugin.ts";
 
 export default defineCommand({
 	name: ["ping"],

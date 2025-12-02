@@ -2,7 +2,7 @@ import type { StringReader } from "#common/stringReader.ts";
 import {
 	ArgsParseError,
 	type ArgsParseResult,
-} from "#plugins/core/commandEngine/parsing/index.ts";
+} from "#plugins/core/commandEngine/parsing/parsing.ts";
 import {
 	readChannel,
 	readInteger,

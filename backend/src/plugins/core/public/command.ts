@@ -1,6 +1,6 @@
 import type { Awaitable } from "#common/general.ts";
 import type { StringReader } from "#common/stringReader.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import {
 	type AnyTextableGuildChannel,
 	Client,
@@ -49,7 +49,7 @@ export interface Command<
 }
 
 export interface ActionContext {
-	squirrelCtx: SquirrelDiscordContext;
+	backendCtx: BackendDiscordContext;
 	bot: Client;
 	shard: Shard;
 	guild: Guild;

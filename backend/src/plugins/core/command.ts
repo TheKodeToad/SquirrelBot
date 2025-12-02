@@ -1,4 +1,4 @@
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import {
 	type ActionContext,
 	type Command,
@@ -22,15 +22,15 @@ export function transformReply(reply: Reply): ReplyObject & { flags: number } {
 }
 
 export function canRunCommand(
-	squirrelCtx: SquirrelDiscordContext,
+	backendCtx: BackendDiscordContext,
 	command: Command,
 	member: Member,
 	channel: AnyTextableGuildChannel,
 ): boolean {
 	const data = safePreRun(
 		{
-			squirrelCtx,
-			bot: squirrelCtx.bot,
+			backendCtx,
+			bot: backendCtx.bot,
 			member,
 			channel,
 			user: member.user,

@@ -1,8 +1,8 @@
 import { fetchTextableGuildChannelCached } from "#common/discord/cachedRequest.ts";
 import type { Awaitable, ValuesOf } from "#common/general.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import type { LoggerConfig } from "#plugins/logging/config.ts";
-import { loggingConfigStore } from "#plugins/logging/index.ts";
+import { loggingConfigStore } from "#plugins/logging/plugin.ts";
 import { logViaWebhook } from "#plugins/logging/webhooks.ts";
 import type { Guild } from "oceanic.js";
 
@@ -19,7 +19,7 @@ export interface LogEventOptions<T extends keyof EventConfigs> {
 }
 
 export async function logEvent<T extends keyof EventConfigs>(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	options: LogEventOptions<T>,
 ): Promise<void> {
 	const config = loggingConfigStore.get(options.guild.id);

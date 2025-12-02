@@ -1,5 +1,5 @@
 import type { Awaitable } from "#common/general.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { makeMapExtensionPoint } from "#extensionPoint.ts";
 import type { Contribution, Plugin } from "#plugin.ts";
 import type { Command, Option } from "#plugins/core/public/command.ts";
@@ -11,7 +11,7 @@ import type { ClientEvents } from "oceanic.js";
 export interface BotEventListener<T extends keyof ClientEvents = any> {
 	type: T;
 	listener: (
-		ctx: SquirrelDiscordContext,
+		ctx: BackendDiscordContext,
 		...args: ClientEvents[T]
 	) => Awaitable<void>;
 }

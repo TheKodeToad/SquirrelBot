@@ -8,12 +8,12 @@ import {
 	formatModActionFailure,
 	formatModActionSuccess,
 } from "#plugins/moderation/format.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
 import {
 	performModAction,
 	type ModAction,
 	type ModActionFailure,
 } from "#plugins/moderation/modAction.ts";
+import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import {
 	ModEventType,
 	type ModEvent,
@@ -98,10 +98,7 @@ export default defineCommand({
 				reason: args.reason ?? undefined,
 			};
 
-			const actionResult = await performModAction(
-				ctx.squirrelCtx,
-				action,
-			);
+			const actionResult = await performModAction(ctx.backendCtx, action);
 
 			if ("error" in actionResult) {
 				unsuccessful.push(actionResult);

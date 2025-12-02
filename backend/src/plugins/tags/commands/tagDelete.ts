@@ -1,11 +1,11 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { autocompleteTags } from "#plugins/tags/autocompletion.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugins/tags/constants.ts";
-import { tagsConfigStore } from "#plugins/tags/index.ts";
+import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { onTagDeleted } from "#plugins/tags/public/extensionPoints.ts";
 import { deleteTag } from "#plugins/tags/storage/tags.ts";
 
@@ -34,11 +34,7 @@ export default defineCommand({
 			(permissions) => permissions.tagDelete,
 		),
 	async run(ctx, args) {
-		const tag = await deleteTag(
-			ctx.squirrelCtx.db,
-			ctx.guild.id,
-			args.name,
-		);
+		const tag = await deleteTag(ctx.backendCtx.db, ctx.guild.id, args.name);
 
 		if (tag === null) {
 			await ctx.respond(
@@ -48,7 +44,7 @@ export default defineCommand({
 		}
 
 		onTagDeleted
-			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, tag)
+			.fire(ctx.backendCtx, ctx.guild, ctx.member, tag)
 			.catch((error) => logger.error?.("Error in onTagDeleted", error));
 
 		await ctx.respond(

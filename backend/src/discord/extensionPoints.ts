@@ -1,5 +1,5 @@
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { makeEventExtensionPoint } from "#extensionPoint.ts";
 
 export const onBotInit =
-	makeEventExtensionPoint<[ctx: SquirrelDiscordContext]>();
+	makeEventExtensionPoint<[ctx: BackendDiscordContext]>();

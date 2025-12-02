@@ -1,4 +1,4 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import type { Plugin } from "#plugin.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";
 import {
@@ -9,7 +9,7 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { Pool } from "pg";
 
-export interface SquirrelContext {
+export interface BackendContext {
 	plugins: Map<string, Plugin>;
 	db: Pool;
 	dbNotifs: NotifDispatcher;
@@ -17,7 +17,7 @@ export interface SquirrelContext {
 
 const logger = moduleLogger();
 
-export async function squirrelInit(): Promise<SquirrelContext> {
+export async function backendInit(): Promise<BackendContext> {
 	preInit();
 
 	const db = new Pool();
@@ -50,7 +50,7 @@ export async function squirrelInit(): Promise<SquirrelContext> {
 	};
 }
 
-export async function squirrelShutdown(ctx: SquirrelContext): Promise<void> {
+export async function backendShutdown(ctx: BackendContext): Promise<void> {
 	ctx.dbNotifs.disconnect();
 	await ctx.db.end();
 }
@@ -94,7 +94,7 @@ async function loadPlugins(): Promise<Map<string, Plugin>> {
 			continue;
 		}
 
-		const index = path.join(entry.parentPath, entry.name, "index.ts");
+		const index = path.join(entry.parentPath, entry.name, "plugin.ts");
 		const { default: plugin } = (await import(index)) as {
 			default: Plugin;
 		};

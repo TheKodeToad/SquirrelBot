@@ -1,7 +1,7 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { HOUR } from "#common/time.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { BOT_ALLOWED_GUILDS } from "#environment.ts";
 import {
 	EventListenerPhase,
@@ -28,11 +28,11 @@ const allowedGuilds: Set<string> = new Set();
 
 export type GuildAccessListener = (guildID: string) => void;
 export const onGuildAccessGranted =
-	makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
+	makeEventExtensionPoint<[ctx: BackendDiscordContext, id: string]>();
 export const onGuildAccessRevoked =
-	makeEventExtensionPoint<[ctx: SquirrelDiscordContext, id: string]>();
+	makeEventExtensionPoint<[ctx: BackendDiscordContext, id: string]>();
 export const onGuildInfoReady =
-	makeEventExtensionPoint<[ctx: SquirrelDiscordContext]>();
+	makeEventExtensionPoint<[ctx: BackendDiscordContext]>();
 
 export default [
 	onBotInit(init, EventListenerPhase.Pre),
@@ -47,7 +47,7 @@ export default [
 	}),
 ];
 
-async function init(ctx: SquirrelDiscordContext): Promise<void> {
+async function init(ctx: BackendDiscordContext): Promise<void> {
 	logger.debug?.("Initializing guild info");
 
 	const guildsInfo = await getAllGuildInfo(ctx.db);
@@ -183,7 +183,7 @@ export function* getAllowedGuilds(): Generator<string> {
 }
 
 export async function grantAccess(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	id: string,
 ): Promise<boolean> {
 	if (allowedGuilds.has(id)) {
@@ -214,7 +214,7 @@ export async function grantAccess(
 }
 
 export async function revokeAccess(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	id: string,
 ): Promise<false | true | Date> {
 	if (!allowedGuilds.has(id)) {

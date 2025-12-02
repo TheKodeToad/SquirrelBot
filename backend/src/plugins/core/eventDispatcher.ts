@@ -1,7 +1,7 @@
 import type { Awaitable } from "#common/general.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { EventListenerPhase } from "#extensionPoint.ts";
 import { isGuildAllowed } from "#plugins/core/guildInfoSync.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
@@ -11,7 +11,7 @@ const logger = moduleLogger();
 
 export default [onBotInit(installListeners, EventListenerPhase.Post)];
 
-function installListeners(ctx: SquirrelDiscordContext): void {
+function installListeners(ctx: BackendDiscordContext): void {
 	logger.debug?.("Installing onBotEvent listeners");
 
 	for (const listener of onBotEvent.contributions) {
@@ -24,10 +24,10 @@ function installListeners(ctx: SquirrelDiscordContext): void {
 }
 
 export function wrapListener<E extends keyof ClientEvents>(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	event: E,
 	listener: (
-		ctx: SquirrelDiscordContext,
+		ctx: BackendDiscordContext,
 		...args: ClientEvents[E]
 	) => Awaitable<void>,
 ) {
@@ -54,10 +54,10 @@ export function wrapListener<E extends keyof ClientEvents>(
 }
 
 export function installWrappedListener<E extends keyof ClientEvents>(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	event: E,
 	listener: (
-		ctx: SquirrelDiscordContext,
+		ctx: BackendDiscordContext,
 		...args: ClientEvents[E]
 	) => Awaitable<void>,
 ): void {

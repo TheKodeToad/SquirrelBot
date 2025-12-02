@@ -1,5 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
@@ -9,7 +9,7 @@ import {
 	MAX_TAG_NAME_LENGTH,
 } from "#plugins/tags/constants.ts";
 import { attachments, optionalColor } from "#plugins/tags/customOptionTypes.ts";
-import { tagsConfigStore } from "#plugins/tags/index.ts";
+import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { onTagEdited } from "#plugins/tags/public/extensionPoints.ts";
 import { updateTag } from "#plugins/tags/storage/tags.ts";
 
@@ -75,7 +75,7 @@ export default defineCommand({
 		};
 
 		const oldTag = await updateTag(
-			ctx.squirrelCtx.db,
+			ctx.backendCtx.db,
 			ctx.guild.id,
 			args.name,
 			changes,
@@ -100,7 +100,7 @@ export default defineCommand({
 		}
 
 		onTagEdited
-			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, oldTag, changes)
+			.fire(ctx.backendCtx, ctx.guild, ctx.member, oldTag, changes)
 			.catch((error) => logger.error?.("Error in onTagDeleted", error));
 
 		await ctx.respond(

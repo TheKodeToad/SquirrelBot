@@ -1,7 +1,7 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { EventListenerPhase } from "#extensionPoint.ts";
 import { safePreRun, transformReply } from "#plugins/core/command.ts";
@@ -14,10 +14,10 @@ import {
 	listenForInteractions,
 	unlistenForInteractions,
 } from "#plugins/core/commandEngine/handler/componentHandler.ts";
-import { formatArgsParseError } from "#plugins/core/commandEngine/parsing/index.ts";
+import { formatArgsParseError } from "#plugins/core/commandEngine/parsing/parsing.ts";
 import { readSlashArgs } from "#plugins/core/commandEngine/parsing/slashParser.ts";
 import { COMMAND_AUTO_DEFER_AFTER } from "#plugins/core/constants.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import {
 	type Command,
 	type CommandContext,
@@ -52,7 +52,7 @@ export default [
 ];
 
 async function handle(
-	squirrelCtx: SquirrelDiscordContext,
+	backendCtx: BackendDiscordContext,
 	interaction: AnyInteractionGateway,
 ): Promise<void> {
 	if (!interaction.inCachedGuildChannel()) {
@@ -93,7 +93,7 @@ async function handle(
 		Number(commandEntry.command.ephemeralByDefault);
 	const ephemeral = perms.ephemeralResponse && Boolean(privateOption);
 	const ctx = new SlashContext(
-		squirrelCtx,
+		backendCtx,
 		commandEntry.command,
 		interaction,
 		ephemeral,
@@ -278,9 +278,9 @@ class SlashContext implements CommandContext {
 	command: Command;
 	ephemeral: boolean;
 
-	squirrelCtx: SquirrelDiscordContext;
+	backendCtx: BackendDiscordContext;
 	get bot(): Client {
-		return this.squirrelCtx.bot;
+		return this.backendCtx.bot;
 	}
 	get shard(): Shard {
 		return this._interaction.guild.shard;
@@ -305,12 +305,12 @@ class SlashContext implements CommandContext {
 	_deferPromise: Promise<void> | null;
 
 	constructor(
-		squirrelCtx: SquirrelDiscordContext,
+		backendCtx: BackendDiscordContext,
 		command: Command,
 		interaction: CommandInteraction<AnyTextableGuildChannel>,
 		ephemeral: boolean,
 	) {
-		this.squirrelCtx = squirrelCtx;
+		this.backendCtx = backendCtx;
 		this.command = command;
 		this.ephemeral = ephemeral;
 		this._interaction = interaction;

@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
 import { transaction } from "#common/pg/transaction.ts";
-import { dbParse } from "#storage/index.ts";
+import { dbParse } from "#storage/storage.ts";
 import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";

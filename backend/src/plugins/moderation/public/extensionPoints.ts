@@ -1,6 +1,6 @@
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { makeEventExtensionPoint } from "#extensionPoint.ts";
 import type { ModEvent } from "./modEvent.ts";
 
 export const onModAction =
-	makeEventExtensionPoint<[ctx: SquirrelDiscordContext, event: ModEvent]>();
+	makeEventExtensionPoint<[ctx: BackendDiscordContext, event: ModEvent]>();

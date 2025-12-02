@@ -3,7 +3,7 @@ import {
 	makeMarkdownInlineCodeblock,
 } from "#common/discord/markdown.ts";
 import type { CommandCacheEntry } from "#plugins/core/commandEngine/commandCache.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import { type ReplyObject } from "#plugins/core/public/command.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 

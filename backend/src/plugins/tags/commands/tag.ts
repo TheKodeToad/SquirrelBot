@@ -4,7 +4,7 @@ import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { autocompleteTags } from "#plugins/tags/autocompletion.ts";
 import { MAX_TAG_NAME_LENGTH } from "#plugins/tags/constants.ts";
-import { tagsConfigStore } from "#plugins/tags/index.ts";
+import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { getTag } from "#plugins/tags/storage/tags.ts";
 import {
 	Container,
@@ -36,7 +36,7 @@ export default defineCommand({
 			(permissions) => permissions.tagSend,
 		),
 	async run(ctx, { name }) {
-		const tag = await getTag(ctx.squirrelCtx.db, ctx.guild.id, name);
+		const tag = await getTag(ctx.backendCtx.db, ctx.guild.id, name);
 
 		if (tag === null) {
 			await ctx.respond(

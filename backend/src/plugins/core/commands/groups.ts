@@ -4,7 +4,7 @@ import {
 	escapeMarkdown,
 	makeMarkdownInlineCodeblock,
 } from "#common/discord/markdown.ts";
-import { coreConfigStore as coreConfigCache } from "#plugins/core/index.ts";
+import { coreConfigStore as coreConfigCache } from "#plugins/core/plugin.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";

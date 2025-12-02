@@ -1,7 +1,7 @@
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
+import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { deleteCase } from "#plugins/moderation/storage/cases.ts";
 
 export default defineCommand({
@@ -32,7 +32,7 @@ export default defineCommand({
 		),
 	async run(ctx, { number }) {
 		const deleted = await deleteCase(
-			ctx.squirrelCtx.db,
+			ctx.backendCtx.db,
 			ctx.guild.id,
 			number,
 		);

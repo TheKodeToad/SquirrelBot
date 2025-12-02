@@ -1,5 +1,5 @@
 import type { Awaitable } from "#common/general.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 
 const logger = moduleLogger();
 

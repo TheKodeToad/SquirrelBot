@@ -4,7 +4,7 @@ import {
 	renderCommandListPageMinimal,
 } from "#plugins/core/commands/help/list.ts";
 import { renderCommandPage } from "#plugins/core/commands/help/show.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
@@ -50,7 +50,7 @@ export default defineCommand({
 			);
 		} else {
 			await ctx.respond(
-				renderCommandListPageMinimal(ctx.squirrelCtx, ctx.guild.id),
+				renderCommandListPageMinimal(ctx.backendCtx, ctx.guild.id),
 			);
 		}
 	},

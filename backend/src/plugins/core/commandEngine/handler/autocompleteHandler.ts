@@ -1,9 +1,9 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
-import { moduleLogger } from "#common/logger/index.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { safePreRun } from "#plugins/core/command.ts";
 import { getCommandByName } from "#plugins/core/commandEngine/commandCache.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import {
 	type AutocompleteContext,
 	type Command,
@@ -27,7 +27,7 @@ export default [onBotEvent({ type: "interactionCreate", listener: handle })];
 const logger = moduleLogger();
 
 async function handle(
-	squirrelCtx: SquirrelDiscordContext,
+	backendCtx: BackendDiscordContext,
 	interaction: AnyInteractionGateway,
 ): Promise<void> {
 	if (!interaction.inCachedGuildChannel()) {
@@ -64,7 +64,7 @@ async function handle(
 	}
 
 	const ctx = new AutoCompleteContextImpl(
-		squirrelCtx,
+		backendCtx,
 		commandEntry.command,
 		interaction,
 	);
@@ -130,9 +130,9 @@ async function handle(
 }
 
 class AutoCompleteContextImpl implements AutocompleteContext {
-	squirrelCtx: SquirrelDiscordContext;
+	backendCtx: BackendDiscordContext;
 	get bot(): Client {
-		return this.squirrelCtx.bot;
+		return this.backendCtx.bot;
 	}
 	get shard(): Shard {
 		return this._interaction.guild.shard;
@@ -155,11 +155,11 @@ class AutoCompleteContextImpl implements AutocompleteContext {
 	_interaction: AutocompleteInteraction<AnyTextableGuildChannel>;
 
 	constructor(
-		squirrelCtx: SquirrelDiscordContext,
+		backendCtx: BackendDiscordContext,
 		command: Command,
 		interaction: AutocompleteInteraction<AnyTextableGuildChannel>,
 	) {
-		this.squirrelCtx = squirrelCtx;
+		this.backendCtx = backendCtx;
 		this.command = command;
 		this._interaction = interaction;
 	}

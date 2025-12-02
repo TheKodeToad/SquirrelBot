@@ -4,14 +4,14 @@ import {
 	debugFormatUser,
 } from "#common/discord/debugFormat.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import {
 	NumberFilterMode,
 	type NumberFilter,
 } from "#common/schemas/numberFilter.ts";
 import type { PermissionsFilter } from "#common/schemas/permissionsFilter.ts";
 import type { CoreConfig, CoreGroup } from "#plugins/core/config.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import {
 	CategoryChannel,
 	Member,

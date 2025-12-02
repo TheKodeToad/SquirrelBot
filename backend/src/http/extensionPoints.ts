@@ -2,7 +2,7 @@ import {
 	makeArrayExtensionPoint,
 	makeMultiMapExtensionPoint,
 } from "#extensionPoint.ts";
-import type { SquirrelHTTPContext } from "#http/index.ts";
+import type { BackendHTTPContext } from "#http/http.ts";
 import type { GuildAuthVars } from "#http/middleware/guildAuth.ts";
 import type { Plugin } from "#plugin.ts";
 import type { Hono } from "hono";
@@ -10,13 +10,13 @@ import type { Hono } from "hono";
 /** Added to plugins/[YOUR PLUGIN]  */
 export const definePluginRoutes =
 	makeArrayExtensionPoint<
-		(squirrelCtx: SquirrelHTTPContext, plugin: Plugin, app: Hono) => void
+		(backendCtx: BackendHTTPContext, plugin: Plugin, app: Hono) => void
 	>();
 /** Added to guilds/[*]/plugins/[YOUR PLUGIN] */
 export const definePluginGuildRoutes =
 	makeMultiMapExtensionPoint<
 		(
-			squirrelCtx: SquirrelHTTPContext,
+			backendCtx: BackendHTTPContext,
 			app: Hono<{ Variables: GuildAuthVars }>,
 		) => void
 	>();
@@ -24,7 +24,7 @@ export const definePluginGuildRoutes =
 export const defineGlobalPluginGuildRoutes =
 	makeArrayExtensionPoint<
 		(
-			squirrelCtx: SquirrelHTTPContext,
+			backendCtx: BackendHTTPContext,
 			plugin: Plugin,
 			app: Hono<{ Variables: GuildAuthVars }>,
 		) => void

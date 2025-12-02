@@ -5,7 +5,7 @@ import {
 } from "#common/discord/testing/mockSnowflake.ts";
 import { PermissionsFilter } from "#common/schemas/permissionsFilter.ts";
 import type { CoreConfig } from "#plugins/core/config.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import { resolveGroups } from "#plugins/core/public/permissionResolution.ts";
 import assert from "assert";
 import { suite, test } from "node:test";

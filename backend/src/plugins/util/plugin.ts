@@ -1,7 +1,7 @@
 import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugins/core/public/configStore.ts";
 import { defineConfig } from "#plugins/core/public/extensionPoints.ts";
-import inviteInfo from "#plugins/util/commands/inviteInfo/index.ts";
+import inviteInfo from "#plugins/util/commands/inviteInfo/inviteInfo.ts";
 import ping from "#plugins/util/commands/ping.ts";
 import snowflake from "#plugins/util/commands/snowflake.ts";
 import { UtilConfig } from "#plugins/util/config.ts";

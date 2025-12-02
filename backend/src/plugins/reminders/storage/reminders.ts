@@ -1,5 +1,5 @@
 import { poolTransaction } from "#common/pg/transaction.ts";
-import { dbParse } from "#storage/index.ts";
+import { dbParse } from "#storage/storage.ts";
 import { ChannelTypes } from "oceanic.js";
 import type { Pool } from "pg";
 import { z } from "zod";

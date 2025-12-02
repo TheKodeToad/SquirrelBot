@@ -5,7 +5,7 @@ import {
 	formatCaseDescription,
 	formatCaseFields,
 } from "#plugins/moderation/format.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
+import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { getCase } from "#plugins/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
 
@@ -30,7 +30,7 @@ export default defineCommand({
 			(permissions) => permissions.caseRead,
 		),
 	async run(ctx, { number }) {
-		const info = await getCase(ctx.squirrelCtx.db, ctx.guild.id, number);
+		const info = await getCase(ctx.backendCtx.db, ctx.guild.id, number);
 
 		if (info === null) {
 			await ctx.respond(`${icons.error} Case **#${number}** not found!`);

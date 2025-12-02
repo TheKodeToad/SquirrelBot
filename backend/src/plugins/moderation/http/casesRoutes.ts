@@ -49,7 +49,7 @@ const querySchema = z
 			}) satisfies CaseQuery,
 	);
 
-export default definePluginGuildRoutes((squirrelCtx, app) => {
+export default definePluginGuildRoutes((backendCtx, app) => {
 	app.get("/cases/:number{\\d+}", async (ctx) => {
 		const number = Number(ctx.req.param("number"));
 
@@ -58,7 +58,7 @@ export default definePluginGuildRoutes((squirrelCtx, app) => {
 		}
 
 		const info = await getCase(
-			squirrelCtx.db,
+			backendCtx.db,
 			ctx.var.discordGuildID,
 			number,
 		);
@@ -72,7 +72,7 @@ export default definePluginGuildRoutes((squirrelCtx, app) => {
 
 	app.get("/", validate("query", querySchema), async (ctx) => {
 		const result = await getCases(
-			squirrelCtx.db,
+			backendCtx.db,
 			ctx.var.discordGuildID,
 			ctx.req.valid("query"),
 		);

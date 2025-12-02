@@ -5,7 +5,7 @@ import {
 } from "#common/discord/cachedRequest.ts";
 import { makeRoleView } from "#common/views/role.ts";
 import { makeMemberUserView, makeUserView } from "#common/views/user.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
 import { logEvent } from "#plugins/logging/logEvent.ts";
 import {
@@ -20,7 +20,7 @@ export default [
 ];
 
 async function handleAuditLog(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild | Uncached,
 	entry: AuditLogEntry,
 ): Promise<void> {
@@ -42,7 +42,7 @@ async function handleAuditLog(
 }
 
 async function handleCreate(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild | Uncached,
 	entry: AuditLogEntry,
 ): Promise<void> {
@@ -80,7 +80,7 @@ async function handleCreate(
 }
 
 async function handleUpdate(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild | Uncached,
 	entry: AuditLogEntry,
 ): Promise<void> {
@@ -136,7 +136,7 @@ async function handleUpdate(
 }
 
 async function handleDelete(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild | Uncached,
 	entry: AuditLogEntry,
 ): Promise<void> {

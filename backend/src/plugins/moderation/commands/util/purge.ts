@@ -3,7 +3,7 @@ import { WEEK } from "#common/time.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { moderationConfigStore } from "#plugins/moderation/index.ts";
+import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 
 export default defineCommand({
 	name: ["purge", "sweep", "clear"],

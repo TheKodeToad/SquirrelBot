@@ -7,7 +7,7 @@ import slashHandler from "#plugins/core/commandEngine/handler/slashHandler.ts";
 import about from "#plugins/core/commands/about.ts";
 import access from "#plugins/core/commands/access.ts";
 import groups from "#plugins/core/commands/groups.ts";
-import help from "#plugins/core/commands/help/index.ts";
+import help from "#plugins/core/commands/help/help.ts";
 import { CoreConfig } from "#plugins/core/config.ts";
 import configSync from "#plugins/core/configSync.ts";
 import eventDispatcher from "#plugins/core/eventDispatcher.ts";

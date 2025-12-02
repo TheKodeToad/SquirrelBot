@@ -1,7 +1,7 @@
 import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
 import { mapIterable, type Awaitable } from "#common/general.ts";
-import { moduleLogger } from "#common/logger/index.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { CoreConfig } from "#plugins/core/config.ts";
 import {
 	getAllowedGuilds,
@@ -29,7 +29,7 @@ export default [
 	onGuildAccessRevoked((_, ctx) => unloadConfigs(ctx)),
 ];
 
-async function init(ctx: SquirrelDiscordContext): Promise<void> {
+async function init(ctx: BackendDiscordContext): Promise<void> {
 	await Promise.all(
 		mapIterable(getAllowedGuilds(), (guildID) =>
 			createAndLoadConfigs(ctx, guildID),
@@ -57,7 +57,7 @@ function formatGuildPlugin(
 }
 
 async function installConfigChangeListener(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 ): Promise<void> {
 	await ctx.dbNotifs.addListener("core_configUpdate", async (payload) => {
 		if (payload === undefined) {
@@ -130,7 +130,7 @@ async function installConfigChangeListener(
 }
 
 async function createAndLoadConfigs(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guildID: string,
 ): Promise<void> {
 	await Promise.all(
@@ -170,7 +170,7 @@ const coreConfigDefault = CoreConfig.parse(
 );
 
 async function loadConfig(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guildID: string,
 	pluginID: string,
 	configStore: ConfigStore,
@@ -189,7 +189,7 @@ async function loadConfig(
 }
 
 async function parseConfig(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guildID: string,
 	pluginID: string,
 	configCache: ConfigStore,

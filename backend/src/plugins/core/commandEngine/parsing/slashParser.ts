@@ -3,7 +3,7 @@ import type { CommandCacheEntry } from "#plugins/core/commandEngine/commandCache
 import {
 	ArgsParseError,
 	type ArgsParseResult,
-} from "#plugins/core/commandEngine/parsing/index.ts";
+} from "#plugins/core/commandEngine/parsing/parsing.ts";
 import { SafeArgs } from "#plugins/core/commandEngine/safeArgs.ts";
 import type { InteractionOptions } from "oceanic.js";
 

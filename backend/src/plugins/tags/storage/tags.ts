@@ -1,6 +1,6 @@
 import type { Nullable } from "#common/general.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";
-import { dbParse } from "#storage/index.ts";
+import { dbParse } from "#storage/storage.ts";
 import type { Pool } from "pg";
 import z from "zod";
 

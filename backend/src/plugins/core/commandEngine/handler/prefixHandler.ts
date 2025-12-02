@@ -1,17 +1,17 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { StringReader } from "#common/stringReader.ts";
 import { TTLMap } from "#common/ttlMap.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { transformReply } from "#plugins/core/command.ts";
 import { getCommandByName } from "#plugins/core/commandEngine/commandCache.ts";
 import {
 	listenForInteractions,
 	unlistenForInteractions,
 } from "#plugins/core/commandEngine/handler/componentHandler.ts";
-import { formatArgsParseError } from "#plugins/core/commandEngine/parsing/index.ts";
+import { formatArgsParseError } from "#plugins/core/commandEngine/parsing/parsing.ts";
 import {
 	readPrefixArgs,
 	readPrefixName,
@@ -20,7 +20,7 @@ import {
 	COMMAND_STATE_CLEANUP_INTERVAL,
 	COMMAND_STATE_EXPIRE_AFTER,
 } from "#plugins/core/constants.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import type {
 	Command,
 	CommandContext,
@@ -66,7 +66,7 @@ setInterval(
 ).unref();
 
 async function handle(
-	squirrelCtx: SquirrelDiscordContext,
+	backendCtx: BackendDiscordContext,
 	message: Message,
 	prevResponse?: Message,
 ): Promise<boolean> {
@@ -89,7 +89,7 @@ async function handle(
 
 	if (
 		!canWriteInChannel(
-			squirrelCtx.bot,
+			backendCtx.bot,
 			message.channel,
 			message.channel.guild.clientMember,
 		)
@@ -127,7 +127,7 @@ async function handle(
 	}
 
 	const ctx = new PrefixContext(
-		squirrelCtx,
+		backendCtx,
 		commandEntry.command,
 		message,
 		prevResponse,
@@ -187,7 +187,7 @@ async function handle(
 }
 
 async function handleEdit(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	message: Message,
 ): Promise<void> {
 	const response = trackedMessages.get(message.id);
@@ -208,7 +208,7 @@ async function handleEdit(
 }
 
 async function handleDelete(
-	_: SquirrelDiscordContext,
+	_: BackendDiscordContext,
 	message: PossiblyUncachedMessage,
 ): Promise<void> {
 	const response = trackedMessages.get(message.id);
@@ -226,9 +226,9 @@ class PrefixContext implements CommandContext {
 	command: Command;
 	message: Message<AnyTextableGuildChannel>;
 
-	squirrelCtx: SquirrelDiscordContext;
+	backendCtx: BackendDiscordContext;
 	get bot(): Client {
-		return this.squirrelCtx.bot;
+		return this.backendCtx.bot;
 	}
 	get shard(): Shard {
 		return this.message.guild.shard;
@@ -249,12 +249,12 @@ class PrefixContext implements CommandContext {
 	_response: Message | null;
 
 	constructor(
-		squirrelCtx: SquirrelDiscordContext,
+		backendCtx: BackendDiscordContext,
 		command: Command,
 		message: Message<AnyTextableGuildChannel>,
 		response?: Message,
 	) {
-		this.squirrelCtx = squirrelCtx;
+		this.backendCtx = backendCtx;
 		this.command = command;
 		this.message = message;
 		this._response = response ?? null;

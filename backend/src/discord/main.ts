@@ -1,12 +1,12 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { backendInit, backendShutdown } from "#backend.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { setupShutdownHook } from "#common/shutdownHook.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
 import { BOT_TOKEN, CACHE_PATH } from "#environment.ts";
-import { squirrelInit, squirrelShutdown } from "#index.ts";
 import { mkdir } from "node:fs/promises";
 import { Client, Constants } from "oceanic.js";
 
-const baseCtx = await squirrelInit();
+const baseCtx = await backendInit();
 await mkdir(CACHE_PATH, { recursive: true });
 
 const logger = moduleLogger();
@@ -32,7 +32,7 @@ bot.once("ready", async () => {
 
 		setupShutdownHook(async () => {
 			bot.disconnect(false);
-			await squirrelShutdown(ctx);
+			await backendShutdown(ctx);
 		});
 
 		logger.debug?.("Firing onBotInit");

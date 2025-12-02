@@ -1,5 +1,5 @@
 import { DAY } from "#common/time.ts";
-import { dbParse } from "#storage/index.ts";
+import { dbParse } from "#storage/storage.ts";
 import crypto from "crypto";
 import type { Pool } from "pg";
 import { z } from "zod";

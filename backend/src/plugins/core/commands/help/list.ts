@@ -1,8 +1,8 @@
 import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { canRunCommand } from "#plugins/core/command.ts";
 import { getCommandsByPlugin } from "#plugins/core/commandEngine/commandCache.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import type {
 	ActionContext,
 	Reply,
@@ -31,7 +31,7 @@ interface CommandListState {
 }
 
 export function renderCommandListPageMinimal(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guildID: string,
 ): Reply {
 	return {
@@ -62,7 +62,7 @@ export function renderCommandListPageMinimal(
 }
 
 function renderPluginSelection(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	selected: string | null,
 	guildID: string,
 ): StringSelectMenu {
@@ -90,7 +90,7 @@ export function renderCommandListPage(
 	ctx: ActionContext,
 	state: CommandListState,
 ): ReplyObject {
-	const plugin = ctx.squirrelCtx.plugins.get(state.plugin);
+	const plugin = ctx.backendCtx.plugins.get(state.plugin);
 
 	if (plugin === undefined) {
 		return {
@@ -104,7 +104,7 @@ export function renderCommandListPage(
 
 	container.components.push(
 		ActionRow([
-			renderPluginSelection(ctx.squirrelCtx, state.plugin, ctx.guild.id),
+			renderPluginSelection(ctx.backendCtx, state.plugin, ctx.guild.id),
 		]),
 	);
 
@@ -129,12 +129,7 @@ export function renderCommandListPage(
 			}
 
 			if (
-				!canRunCommand(
-					ctx.squirrelCtx,
-					command,
-					ctx.member,
-					ctx.channel,
-				)
+				!canRunCommand(ctx.backendCtx, command, ctx.member, ctx.channel)
 			) {
 				continue;
 			}

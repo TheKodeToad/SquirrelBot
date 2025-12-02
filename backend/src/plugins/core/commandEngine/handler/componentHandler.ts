@@ -1,6 +1,6 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { TTLMap } from "#common/ttlMap.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { transformReply } from "#plugins/core/command.ts";
 import {
 	COMMAND_AUTO_DEFER_AFTER,
@@ -45,7 +45,7 @@ setInterval(
 export default [onBotEvent({ type: "interactionCreate", listener: handle })];
 
 async function handle(
-	squirrelCtx: SquirrelDiscordContext,
+	backendCtx: BackendDiscordContext,
 	interaction: AnyInteractionGateway,
 ): Promise<void> {
 	if (!interaction.inCachedGuildChannel()) {
@@ -63,7 +63,7 @@ async function handle(
 	}
 
 	const ctx = new ComponentContextImpl(
-		squirrelCtx,
+		backendCtx,
 		interaction,
 		handler.originalUserID,
 	);
@@ -107,9 +107,9 @@ export function unlistenForInteractions(messageID: string): void {
 }
 
 class ComponentContextImpl implements ComponentContext {
-	squirrelCtx: SquirrelDiscordContext;
+	backendCtx: BackendDiscordContext;
 	get bot(): Client {
-		return this.squirrelCtx.bot;
+		return this.backendCtx.bot;
 	}
 	get shard(): Shard {
 		return this._interaction.guild.shard;
@@ -140,14 +140,14 @@ class ComponentContextImpl implements ComponentContext {
 	_ackTimeout: NodeJS.Timeout | null;
 
 	constructor(
-		squirrelCtx: SquirrelDiscordContext,
+		backendCtx: BackendDiscordContext,
 		interaction: ComponentInteraction<
 			MessageComponentTypes,
 			AnyTextableGuildChannel
 		>,
 		originalUserID: string,
 	) {
-		this.squirrelCtx = squirrelCtx;
+		this.backendCtx = backendCtx;
 		this._interaction = interaction;
 		this.originalUserID = originalUserID;
 		this._responseID = null;

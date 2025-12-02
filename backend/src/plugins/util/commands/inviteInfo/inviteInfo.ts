@@ -1,13 +1,13 @@
 import { formatRESTError } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { renderFriendInvite } from "#plugins/util/commands/inviteInfo/friend.ts";
 import { renderGroupDMInvite } from "#plugins/util/commands/inviteInfo/groupDM.ts";
 import { renderGuildInvite } from "#plugins/util/commands/inviteInfo/guild.ts";
-import { utilConfigStore } from "#plugins/util/index.ts";
+import { utilConfigStore } from "#plugins/util/plugin.ts";
 import {
 	Client,
 	DiscordRESTError,

@@ -11,16 +11,16 @@ import {
 	isThreadChannelType,
 } from "#common/discord/general.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import {
 	startPollingScheduler,
 	type PollingSchedulerHandle,
 } from "#common/pollingScheduler.ts";
 import { dateToUnixSecs, SECOND } from "#common/time.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { remindersConfigStore } from "#plugins/reminders/index.ts";
+import { remindersConfigStore } from "#plugins/reminders/plugin.ts";
 import {
 	deleteReminder,
 	getRemindersByFiresAt,
@@ -48,7 +48,7 @@ function getReminderKey(guildID: string, number: number): string {
 }
 
 async function beginPollingReminders(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 ): Promise<void> {
 	scheduler = await startPollingScheduler({
 		discriminator: "reminders",
@@ -72,7 +72,7 @@ export function untrackReminder(guildID: string, number: number): void {
 }
 
 async function fire(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	reminder: Reminder,
 ): Promise<void> {
 	// delete it right away - don't remind the user awkwardly late!

@@ -1,17 +1,17 @@
 import type { Nullable } from "#common/general.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { makeEventExtensionPoint } from "#extensionPoint.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";
 import type { Guild, Member } from "oceanic.js";
 
 type UnaryEvent = [
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild,
 	actor: Member,
 	tag: Tag,
 ];
 type BinaryEvent = [
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild,
 	actor: Member,
 	oldTag: Tag,

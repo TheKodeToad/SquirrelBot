@@ -8,7 +8,7 @@ export async function autocompleteTags(
 	ctx: AutocompleteContext,
 	value: string,
 ): Promise<string[]> {
-	return await searchTagNames(ctx.squirrelCtx.db, ctx.guild.id, {
+	return await searchTagNames(ctx.backendCtx.db, ctx.guild.id, {
 		name: value,
 		limit: MAX_AUTOCOMPLETE_CHOICES,
 	});

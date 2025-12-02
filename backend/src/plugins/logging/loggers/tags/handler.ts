@@ -1,7 +1,7 @@
 import type { Nullable } from "#common/general.ts";
 import { makeGuildView } from "#common/views/guild.ts";
 import { makeMemberUserView } from "#common/views/user.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { logEvent } from "#plugins/logging/logEvent.ts";
 import {
 	onTagCreated,
@@ -19,7 +19,7 @@ export default [
 ];
 
 async function handleCreate(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild,
 	actor: Member,
 	tag: Tag,
@@ -38,7 +38,7 @@ async function handleCreate(
 }
 
 async function handleEdit(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild,
 	actor: Member,
 	oldTag: Tag,
@@ -68,7 +68,7 @@ async function handleEdit(
 }
 
 async function handleDelete(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	guild: Guild,
 	actor: Member,
 	tag: Tag,

@@ -1,4 +1,4 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { dateToHMSString } from "#common/time.ts";
 
 const logger = moduleLogger();

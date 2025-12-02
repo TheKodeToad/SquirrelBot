@@ -1,5 +1,5 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
-import { moduleLogger } from "#common/logger/index.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
@@ -8,7 +8,7 @@ import {
 	MAX_TAG_NAME_LENGTH,
 } from "#plugins/tags/constants.ts";
 import { attachments, optionalColor } from "#plugins/tags/customOptionTypes.ts";
-import { tagsConfigStore } from "#plugins/tags/index.ts";
+import { tagsConfigStore } from "#plugins/tags/plugin.ts";
 import { onTagCreated } from "#plugins/tags/public/extensionPoints.ts";
 import type { Tag } from "#plugins/tags/public/tag.ts";
 import { createTag } from "#plugins/tags/storage/tags.ts";
@@ -61,7 +61,7 @@ export default defineCommand({
 			attachments: args.attachments ?? [],
 			color: args.color ?? -1,
 		};
-		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, tag);
+		const success = await createTag(ctx.backendCtx.db, ctx.guild.id, tag);
 
 		if (!success) {
 			await ctx.respond(
@@ -71,7 +71,7 @@ export default defineCommand({
 		}
 
 		onTagCreated
-			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, tag)
+			.fire(ctx.backendCtx, ctx.guild, ctx.member, tag)
 			.catch((error) => logger.error?.("Error in onTagCreated", error));
 
 		await ctx.respond(

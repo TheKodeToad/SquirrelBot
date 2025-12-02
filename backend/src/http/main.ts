@@ -1,19 +1,19 @@
-import { moduleLogger } from "#common/logger/index.ts";
+import { backendInit, backendShutdown } from "#backend.ts";
+import { moduleLogger } from "#common/logger/logger.ts";
 import { setupShutdownHook } from "#common/shutdownHook.ts";
 import { HOUR } from "#common/time.ts";
 import { HTTP_PORT } from "#environment.ts";
-import type { SquirrelHTTPContext } from "#http/index.ts";
-import api from "#http/route/api/index.ts";
+import type { BackendHTTPContext } from "#http/http.ts";
+import api from "#http/route/api/api.ts";
 import frontend from "#http/route/frontend.ts";
 import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
-import { squirrelInit, squirrelShutdown } from "#index.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders as nortonAntivirusPlus } from "hono/secure-headers";
 import type { ResponseHeader } from "hono/utils/headers";
 
-const ctx: SquirrelHTTPContext = await squirrelInit();
+const ctx: BackendHTTPContext = await backendInit();
 
 const logger = moduleLogger();
 
@@ -80,5 +80,5 @@ setupShutdownHook(async () => {
 		}),
 	);
 
-	await squirrelShutdown(ctx);
+	await backendShutdown(ctx);
 });

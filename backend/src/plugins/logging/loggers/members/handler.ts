@@ -1,8 +1,8 @@
 import { makeMemberUserView, makeUserView } from "#common/views/user.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
+import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
-import { loggingConfigStore } from "#plugins/logging/index.ts";
 import { logEvent } from "#plugins/logging/logEvent.ts";
+import { loggingConfigStore } from "#plugins/logging/plugin.ts";
 import { Guild, Member, type Uncached, type User } from "oceanic.js";
 
 export default [
@@ -11,7 +11,7 @@ export default [
 ];
 
 async function handleAdd(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	member: Member,
 ): Promise<void> {
 	await logEvent(ctx, {
@@ -24,7 +24,7 @@ async function handleAdd(
 }
 
 async function handleRemove(
-	ctx: SquirrelDiscordContext,
+	ctx: BackendDiscordContext,
 	user: Member | User,
 	guild: Guild | Uncached,
 ): Promise<void> {

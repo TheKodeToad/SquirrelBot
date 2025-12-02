@@ -4,7 +4,7 @@ import {
 	APP_NAME,
 	APP_SOURCE_CODE,
 } from "#brand.ts";
-import { coreConfigStore } from "#plugins/core/index.ts";
+import { coreConfigStore } from "#plugins/core/plugin.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import {
