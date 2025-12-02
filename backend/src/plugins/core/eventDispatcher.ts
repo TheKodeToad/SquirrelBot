@@ -1,10 +1,27 @@
 import type { Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/index.ts";
+import { onBotInit } from "#discord/extensionPoints.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { EventListenerPhase } from "#extensionPoint.ts";
 import { isGuildAllowed } from "#plugins/core/guildInfoSync.ts";
+import { onBotEvent } from "#plugins/core/public/extensionPoints.ts";
 import type { ClientEvents } from "oceanic.js";
 
 const logger = moduleLogger();
+
+export default [onBotInit(installListeners, EventListenerPhase.Post)];
+
+function installListeners(ctx: SquirrelDiscordContext): void {
+	logger.debug?.("Installing onBotEvent listeners");
+
+	for (const listener of onBotEvent.contributions) {
+		installWrappedListener(
+			ctx,
+			listener.type,
+			listener.listener.bind(listener),
+		);
+	}
+}
 
 export function wrapListener<E extends keyof ClientEvents>(
 	ctx: SquirrelDiscordContext,

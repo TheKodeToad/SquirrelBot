@@ -1,7 +1,3 @@
-import { moduleLogger } from "#common/logger/index.ts";
-import { onBotInit } from "#discord/extensionPoints.ts";
-import type { SquirrelDiscordContext } from "#discord/index.ts";
-import { EventListenerPhase } from "#extensionPoint.ts";
 import { definePlugin } from "#plugin.ts";
 import commandCache from "#plugins/core/commandEngine/commandCache.ts";
 import autoCompleteHandler from "#plugins/core/commandEngine/handler/autocompleteHandler.ts";
@@ -14,17 +10,12 @@ import groups from "#plugins/core/commands/groups.ts";
 import help from "#plugins/core/commands/help/index.ts";
 import { CoreConfig } from "#plugins/core/config.ts";
 import configSync from "#plugins/core/configSync.ts";
-import { installWrappedListener } from "#plugins/core/eventWrapper.ts";
+import eventDispatcher from "#plugins/core/eventDispatcher.ts";
 import guildInfoSync from "#plugins/core/guildInfoSync.ts";
 import configRoutes from "#plugins/core/http/configRoutes.ts";
 import iconSync from "#plugins/core/iconSync.ts";
 import { ConfigStore } from "#plugins/core/public/configStore.ts";
-import {
-	defineConfig,
-	onBotEvent,
-} from "#plugins/core/public/extensionPoints.ts";
-
-const logger = moduleLogger();
+import { defineConfig } from "#plugins/core/public/extensionPoints.ts";
 
 export const coreConfigStore = new ConfigStore(CoreConfig);
 
@@ -58,13 +49,12 @@ export default definePlugin({
 		...configSync,
 		...iconSync,
 
+		...eventDispatcher,
 		...commandCache,
 		...prefixHandler,
 		...slashHandler,
 		...autoCompleteHandler,
 		...componentHandler,
-
-		onBotInit(postInit, EventListenerPhase.Post),
 
 		help,
 		about,
@@ -74,15 +64,3 @@ export default definePlugin({
 		configRoutes,
 	],
 });
-
-function postInit(ctx: SquirrelDiscordContext): void {
-	logger.debug?.("Installing onBotEvent listeners");
-
-	for (const listener of onBotEvent.contributions) {
-		installWrappedListener(
-			ctx,
-			listener.type,
-			listener.listener.bind(listener),
-		);
-	}
-}
