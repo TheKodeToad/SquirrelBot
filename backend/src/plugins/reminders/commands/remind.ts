@@ -34,7 +34,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			remindersConfigStore,
-			(permissions) => permissions.personalReminders,
+			(perms) => perms.personalReminders,
 		),
 	async run(ctx, args) {
 		if (ctx.guild === null) {

@@ -4,7 +4,7 @@ import {
 	APP_LIBRARIES_LINK,
 	APP_NAME,
 	APP_SOURCE_CODE,
-} from "#brand.ts";
+} from "#branding.ts";
 import { CLIENT_ID, REDIRECT_URI } from "#environment.ts";
 import type { BackendHTTPContext } from "#http/http.ts";
 import { serveStatic } from "@hono/node-server/serve-static";

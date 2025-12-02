@@ -3,7 +3,7 @@ import {
 	fetchMembersCached,
 	fetchUserCached,
 } from "#common/discord/cachedRequest.ts";
-import { formatRESTError } from "#common/discord/format.ts";
+import { formatRESTError } from "#common/discord/formatting.ts";
 import { getHighestRole } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/logger.ts";
 import type { BackendDiscordContext } from "#discord/discord.ts";

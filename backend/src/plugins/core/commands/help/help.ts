@@ -24,11 +24,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			coreConfigStore,
-			(permissions) => permissions.helpCommand,
-		),
+		permissionsGuard(ctx, coreConfigStore, (perms) => perms.helpCommand),
 	async run(ctx, args) {
 		if (args.command !== null) {
 			const command = getCommandByName(args.command);

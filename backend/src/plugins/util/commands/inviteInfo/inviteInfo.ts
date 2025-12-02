@@ -1,4 +1,4 @@
-import { formatRESTError } from "#common/discord/format.ts";
+import { formatRESTError } from "#common/discord/formatting.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/logger.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
@@ -46,7 +46,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			utilConfigStore,
-			(permissions) => permissions.inviteInfoCommand,
+			(perms) => perms.inviteInfoCommand,
 		),
 	async run(ctx, args) {
 		const matches = REGEX.exec(args.link);

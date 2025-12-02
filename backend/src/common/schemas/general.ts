@@ -1,5 +1,5 @@
 import { colors } from "#common/discord/colors.ts";
-import { isSnowflake } from "#common/snowflake.ts";
+import { isSnowflake } from "#common/snowflakes.ts";
 import { z } from "zod";
 import type { $ZodEnumParams } from "zod/v4/core";
 

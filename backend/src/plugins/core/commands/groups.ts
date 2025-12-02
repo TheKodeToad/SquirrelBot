@@ -1,5 +1,5 @@
 import { fetchMemberCached } from "#common/discord/cachedRequest.ts";
-import { formatRESTError, formatUserBold } from "#common/discord/format.ts";
+import { formatRESTError, formatUserBold } from "#common/discord/formatting.ts";
 import {
 	escapeMarkdown,
 	makeMarkdownInlineCodeblock,
@@ -25,11 +25,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			coreConfigCache,
-			(permissions) => permissions.groupsCommand,
-		),
+		permissionsGuard(ctx, coreConfigCache, (perms) => perms.groupsCommand),
 	async run(ctx, args) {
 		const coreConfig = coreConfigCache.get(ctx.guild.id);
 

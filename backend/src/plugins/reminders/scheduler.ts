@@ -5,7 +5,7 @@ import {
 import {
 	debugFormatChannel,
 	debugFormatGuildByID,
-} from "#common/discord/debugFormat.ts";
+} from "#common/discord/debugFormatting.ts";
 import {
 	isTextableChannel,
 	isThreadChannelType,

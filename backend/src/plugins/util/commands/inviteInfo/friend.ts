@@ -1,4 +1,4 @@
-import { formatUserTagRich } from "#common/discord/format.ts";
+import { formatUserTagRich } from "#common/discord/formatting.ts";
 import { dateToUnixSecs } from "#common/time.ts";
 import {
 	Container,

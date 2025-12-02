@@ -2,7 +2,7 @@ import {
 	debugFormatChannel,
 	debugFormatGuild,
 	debugFormatUser,
-} from "#common/discord/debugFormat.ts";
+} from "#common/discord/debugFormatting.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import { moduleLogger } from "#common/logger/logger.ts";
 import {

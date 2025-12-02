@@ -1,7 +1,7 @@
 import {
 	debugFormatGuild,
 	debugFormatGuildByID,
-} from "#common/discord/debugFormat.ts";
+} from "#common/discord/debugFormatting.ts";
 import { moduleLogger } from "#common/logger/logger.ts";
 import {
 	startPollingScheduler,

@@ -14,7 +14,7 @@ import {
 	formatCaseDescription,
 	formatCaseFields,
 	formatCompactCaseSummary,
-} from "#plugins/moderation/format.ts";
+} from "#plugins/moderation/formatting.ts";
 import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { getCases, type CaseInfo } from "#plugins/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
@@ -42,11 +42,7 @@ export default defineCommand({
 	trackUpdates: true,
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			moderationConfigStore,
-			(permissions) => permissions.caseRead,
-		),
+		permissionsGuard(ctx, moderationConfigStore, (perms) => perms.caseRead),
 	async run(ctx, args) {
 		await respondWithPaginator<CaseInfo, number>(ctx, {
 			pageSize: args.compact ? 16 : 3,
@@ -71,9 +67,9 @@ async function lookUpCases(
 		return [];
 	}
 
-	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
+	const perms = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (!permissions.caseRead) {
+	if (!perms.caseRead) {
 		return [];
 	}
 

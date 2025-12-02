@@ -39,11 +39,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			moderationConfigStore,
-			(permissions) => permissions.purge,
-		),
+		permissionsGuard(ctx, moderationConfigStore, (perms) => perms.purge),
 	async run(ctx, args) {
 		let purged = 0;
 

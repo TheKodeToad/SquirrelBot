@@ -4,7 +4,7 @@ import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatCaseDescription,
 	formatCaseFields,
-} from "#plugins/moderation/format.ts";
+} from "#plugins/moderation/formatting.ts";
 import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { getCase } from "#plugins/moderation/storage/cases.ts";
 import { Container, Divider, Text } from "oceanic-component-helper";
@@ -24,11 +24,7 @@ export default defineCommand({
 	trackUpdates: true,
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			moderationConfigStore,
-			(permissions) => permissions.caseRead,
-		),
+		permissionsGuard(ctx, moderationConfigStore, (perms) => perms.caseRead),
 	async run(ctx, { number }) {
 		const info = await getCase(ctx.backendCtx.db, ctx.guild.id, number);
 

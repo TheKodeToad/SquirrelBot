@@ -61,11 +61,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			tagsConfigStore,
-			(permissions) => permissions.tagEdit,
-		),
+		permissionsGuard(ctx, tagsConfigStore, (perms) => perms.tagEdit),
 	async run(ctx, args) {
 		const changes = {
 			name: args.newName,

@@ -1,4 +1,4 @@
-import { formatUser } from "#common/discord/format.ts";
+import { formatUser } from "#common/discord/formatting.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { dateToUnixSecs } from "#common/time.ts";
 import { icons } from "#plugins/core/public/icons.ts";

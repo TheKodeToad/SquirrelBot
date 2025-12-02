@@ -1,4 +1,4 @@
-import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
+import { debugFormatGuildByID } from "#common/discord/debugFormatting.ts";
 import { mapIterable, type Awaitable } from "#common/general.ts";
 import { moduleLogger } from "#common/logger/logger.ts";
 import type { BackendDiscordContext } from "#discord/discord.ts";

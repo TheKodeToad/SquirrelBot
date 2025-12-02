@@ -28,7 +28,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			remindersConfigStore,
-			(permissions) => permissions.personalReminders,
+			(perms) => perms.personalReminders,
 		),
 	async run(ctx) {
 		await respondWithPaginator<Reminder, Date>(ctx, {
@@ -50,9 +50,9 @@ async function lookUpReminders(
 		return [];
 	}
 
-	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
+	const perms = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (!permissions.personalReminders) {
+	if (!perms.personalReminders) {
 		return [];
 	}
 

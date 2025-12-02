@@ -49,11 +49,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			tagsConfigStore,
-			(permissions) => permissions.tagCreate,
-		),
+		permissionsGuard(ctx, tagsConfigStore, (perms) => perms.tagCreate),
 	async run(ctx, args) {
 		const tag: Tag = {
 			name: args.name,

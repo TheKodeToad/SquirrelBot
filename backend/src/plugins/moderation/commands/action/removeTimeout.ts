@@ -6,7 +6,7 @@ import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatModActionFailure,
 	formatModActionSuccess,
-} from "#plugins/moderation/format.ts";
+} from "#plugins/moderation/formatting.ts";
 import { performModActions } from "#plugins/moderation/modAction.ts";
 import { moderationConfigStore } from "#plugins/moderation/plugin.ts";
 import { ModEventType } from "#plugins/moderation/public/modEvent.ts";
@@ -48,11 +48,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			moderationConfigStore,
-			(permissions) => permissions.timeout,
-		),
+		permissionsGuard(ctx, moderationConfigStore, (perms) => perms.timeout),
 	async run(ctx, args, { config }) {
 		const sendDirectMessage =
 			args.dm ?? config.removeTimeout.sendDirectMessage;

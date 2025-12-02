@@ -2,8 +2,8 @@ import { moduleLogger } from "#common/logger/logger.ts";
 import type { Plugin } from "#plugin.ts";
 import { checkMigrationsOrExit } from "#storage/migration.ts";
 import {
-	type NotifDispatcher,
-	connectNotifDispatcher,
+	type NotificationDispatcher,
+	connectNotificationDispatcher,
 } from "#storage/notification.ts";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
@@ -12,7 +12,7 @@ import { Pool } from "pg";
 export interface BackendContext {
 	plugins: Map<string, Plugin>;
 	db: Pool;
-	dbNotifs: NotifDispatcher;
+	dbNotifs: NotificationDispatcher;
 }
 
 const logger = moduleLogger();
@@ -41,7 +41,7 @@ export async function backendInit(): Promise<BackendContext> {
 	);
 
 	logger.info?.("Connecting Postgres notification dispatcher");
-	const dbNotifs = await connectNotifDispatcher(db);
+	const dbNotifs = await connectNotificationDispatcher(db);
 
 	return {
 		plugins,

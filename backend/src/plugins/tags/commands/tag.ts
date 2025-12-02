@@ -30,11 +30,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			tagsConfigStore,
-			(permissions) => permissions.tagSend,
-		),
+		permissionsGuard(ctx, tagsConfigStore, (perms) => perms.tagSend),
 	async run(ctx, { name }) {
 		const tag = await getTag(ctx.backendCtx.db, ctx.guild.id, name);
 

@@ -3,14 +3,14 @@ import type { Pool } from "pg";
 
 export type Listener = (payload: string | undefined) => Awaitable<void>;
 
-export interface NotifDispatcher {
+export interface NotificationDispatcher {
 	addListener(channel: string, listener: Listener): Promise<void>;
 	disconnect(): void;
 }
 
-export async function connectNotifDispatcher(
+export async function connectNotificationDispatcher(
 	pool: Pool,
-): Promise<NotifDispatcher> {
+): Promise<NotificationDispatcher> {
 	const client = await pool.connect();
 	const listenersLookup: Map<string, Listener[]> = new Map();
 

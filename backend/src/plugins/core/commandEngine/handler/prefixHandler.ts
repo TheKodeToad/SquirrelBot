@@ -1,4 +1,4 @@
-import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
+import { debugFormatPermissionContext } from "#common/discord/debugFormatting.ts";
 import { makeMarkdownInlineCodeblock } from "#common/discord/markdown.ts";
 import { canWriteInChannel } from "#common/discord/permissions.ts";
 import { moduleLogger } from "#common/logger/logger.ts";

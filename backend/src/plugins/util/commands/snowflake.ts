@@ -26,7 +26,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			utilConfigStore,
-			(permissions) => permissions.snowflakeCommand,
+			(perms) => perms.snowflakeCommand,
 		),
 	async run(ctx, args) {
 		const snowflake = BigInt(args.input);

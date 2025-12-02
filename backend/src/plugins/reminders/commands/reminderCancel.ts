@@ -22,7 +22,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			remindersConfigStore,
-			(permissions) => permissions.personalReminders,
+			(perms) => perms.personalReminders,
 		),
 	async run(ctx, { number }) {
 		const deleted = await deleteReminderIfOwnedBy(

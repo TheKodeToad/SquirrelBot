@@ -28,11 +28,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			tagsConfigStore,
-			(permissions) => permissions.tagDelete,
-		),
+		permissionsGuard(ctx, tagsConfigStore, (perms) => perms.tagDelete),
 	async run(ctx, args) {
 		const tag = await deleteTag(ctx.backendCtx.db, ctx.guild.id, args.name);
 

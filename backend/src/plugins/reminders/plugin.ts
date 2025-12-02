@@ -1,4 +1,4 @@
-import { debugFormatGuildByID } from "#common/discord/debugFormat.ts";
+import { debugFormatGuildByID } from "#common/discord/debugFormatting.ts";
 import { definePlugin } from "#plugin.ts";
 import { ConfigStore } from "#plugins/core/public/configStore.ts";
 import { defineConfig } from "#plugins/core/public/extensionPoints.ts";

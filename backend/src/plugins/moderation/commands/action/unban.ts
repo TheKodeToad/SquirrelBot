@@ -1,5 +1,5 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
-import { formatRESTError } from "#common/discord/format.ts";
+import { formatRESTError } from "#common/discord/formatting.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
@@ -7,7 +7,7 @@ import { MemberRanking } from "#plugins/moderation/config.ts";
 import {
 	formatModActionFailure,
 	formatModActionSuccess,
-} from "#plugins/moderation/format.ts";
+} from "#plugins/moderation/formatting.ts";
 import {
 	performModAction,
 	type ModAction,
@@ -40,11 +40,7 @@ export default defineCommand({
 	},
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			moderationConfigStore,
-			(permissions) => permissions.unban,
-		),
+		permissionsGuard(ctx, moderationConfigStore, (perms) => perms.unban),
 	async run(ctx, args) {
 		const successful: ModEvent[] = [];
 		const unsuccessful: ModActionFailure[] = [];

@@ -3,7 +3,7 @@ import {
 	APP_LIBRARIES_LINK,
 	APP_NAME,
 	APP_SOURCE_CODE,
-} from "#brand.ts";
+} from "#branding.ts";
 import { coreConfigStore } from "#plugins/core/plugin.ts";
 import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
@@ -34,11 +34,7 @@ export default defineCommand({
 	trackUpdates: true,
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			coreConfigStore,
-			(permissions) => permissions.aboutCommand,
-		),
+		permissionsGuard(ctx, coreConfigStore, (perms) => perms.aboutCommand),
 	async run(ctx) {
 		const uptime = Math.floor(process.uptime());
 		let uptimeString = "";

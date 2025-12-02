@@ -28,7 +28,7 @@ export default defineCommand({
 		permissionsGuard(
 			ctx,
 			moderationConfigStore,
-			(permissions) => permissions.caseDelete,
+			(perms) => perms.caseDelete,
 		),
 	async run(ctx, { number }) {
 		const deleted = await deleteCase(

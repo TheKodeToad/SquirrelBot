@@ -10,11 +10,7 @@ export default defineCommand({
 	trackUpdates: true, // allow deleting
 
 	preRun: (ctx) =>
-		permissionsGuard(
-			ctx,
-			utilConfigStore,
-			(permissions) => permissions.pingCommand,
-		),
+		permissionsGuard(ctx, utilConfigStore, (perms) => perms.pingCommand),
 	async run(ctx) {
 		const baseResponse = `${icons.info} **Gateway:** ${ctx.shard.latency}ms`;
 		const preRespond = Date.now();

@@ -1,4 +1,4 @@
-import { isSnowflake } from "#common/snowflake.ts";
+import { isSnowflake } from "#common/snowflakes.ts";
 import { getGuildOwnerID } from "#plugins/core/storage/guildInfo.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";

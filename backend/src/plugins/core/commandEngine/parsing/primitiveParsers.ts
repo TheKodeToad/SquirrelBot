@@ -1,4 +1,4 @@
-import { isSnowflake } from "#common/snowflake.ts";
+import { isSnowflake } from "#common/snowflakes.ts";
 import type { StringReader } from "#common/stringReader.ts";
 
 export function readInteger(reader: StringReader): number | null {

@@ -3,7 +3,7 @@ import {
 	formatUserBoldByID,
 	formatUserByID,
 	formatUserTagByID,
-} from "#common/discord/format.ts";
+} from "#common/discord/formatting.ts";
 import { escapeMarkdown, makeMarkdownQuote } from "#common/discord/markdown.ts";
 import { dateToUnixSecs, humanizeDuration } from "#common/time.ts";
 import type { ModActionFailure } from "#plugins/moderation/modAction.ts";

@@ -1,4 +1,4 @@
-import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
+import { debugFormatPermissionContext } from "#common/discord/debugFormatting.ts";
 import { moduleLogger } from "#common/logger/logger.ts";
 import type { BackendDiscordContext } from "#discord/discord.ts";
 import { onBotInit } from "#discord/extensionPoints.ts";

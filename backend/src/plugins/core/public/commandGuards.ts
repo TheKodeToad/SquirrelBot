@@ -9,7 +9,7 @@ import { z } from "zod";
 export function permissionsGuard<C extends ConfigWithPermissions>(
 	ctx: ActionContext,
 	configCache: ConfigStore<z.ZodType<C>>,
-	requirement?: (permissions: C["defaultPermissions"], config: C) => boolean,
+	requirement?: (perms: C["defaultPermissions"], config: C) => boolean,
 ): false | PermissionsGuardData<C> {
 	const config = configCache.get(ctx.guild.id);
 
@@ -17,13 +17,13 @@ export function permissionsGuard<C extends ConfigWithPermissions>(
 		return false;
 	}
 
-	const permissions = resolvePermissions(config, ctx.member, ctx.channel);
+	const perms = resolvePermissions(config, ctx.member, ctx.channel);
 
-	if (requirement !== undefined && !requirement(permissions, config)) {
+	if (requirement !== undefined && !requirement(perms, config)) {
 		return false;
 	}
 
-	return { config, permissions };
+	return { config, permissions: perms };
 }
 
 interface PermissionsGuardData<C extends ConfigWithPermissions> {

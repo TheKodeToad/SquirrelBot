@@ -1,4 +1,4 @@
-import { APP_NAME } from "#brand.ts";
+import { APP_NAME } from "#branding.ts";
 import { isThreadChannel } from "#common/discord/general.ts";
 import type { Awaitable } from "#common/general.ts";
 import type { BackendDiscordContext } from "#discord/discord.ts";
