@@ -1,3 +1,4 @@
+import { Color } from "#common/schema/general.ts";
 import { isSnowflake } from "#common/snowflake.ts";
 import type { StringReader } from "#common/stringReader.ts";
 import {

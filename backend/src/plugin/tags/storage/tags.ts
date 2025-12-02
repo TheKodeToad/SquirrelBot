@@ -8,6 +8,7 @@ const Tag = z.strictObject({
 	name: z.string(),
 	content: z.string(),
 	attachments: z.string().array().readonly(),
+	color: z.number(),
 });
 
 const JustNameArray = z.strictObject({ name: z.string() }).array();
@@ -26,7 +27,7 @@ export async function getTag(
 ): Promise<Tag | null> {
 	const result = await db.query(
 		`
-			SELECT "name", "content", "attachments" FROM "tags_tags"
+			SELECT "name", "content", "attachments", "color" FROM "tags_tags"
 			WHERE "guildID" = $1 AND "name" = $2
 		`,
 		[guildID, name],
@@ -65,11 +66,11 @@ export async function createTag(
 ): Promise<boolean> {
 	const result = await db.query(
 		`
-			INSERT INTO "tags_tags" ("guildID", "name", "content", "attachments")
-			VALUES ($1, $2, $3, $4)
+			INSERT INTO "tags_tags" ("guildID", "name", "content", "attachments", "color")
+			VALUES ($1, $2, $3, $4, $5)
 			ON CONFLICT DO NOTHING
 		`,
-		[guildID, tag.name, tag.content, tag.attachments],
+		[guildID, tag.name, tag.content, tag.attachments, tag.color],
 	);
 
 	return result.rowCount === 1;
@@ -88,14 +89,12 @@ export async function updateTag(
 				WHERE "guildID" = $1 AND "name" = $2
 			)
 			UPDATE "tags_tags"
-			SET "name" = COALESCE($3, "name"), "content" = COALESCE($4, "content")
+			SET "name" = COALESCE($3, "name"), "content" = COALESCE($4, "content"), "color" = COALESCE($5, "color"), "attachments" = COALESCE($6, "attachments")
 			WHERE "guildID" = $1 AND "name" = $2
-			RETURNING (SELECT "content" FROM "old") AS "content", (SELECT "attachments" FROM "old") AS "attachments"
+			RETURNING (SELECT "content" FROM "old") AS "content", (SELECT "attachments" FROM "old") AS "attachments", (SELECT "color" FROM "old") AS "color"
 		`,
-		[guildID, name, tag.name, tag.content],
+		[guildID, name, tag.name, tag.content, tag.color, tag.attachments],
 	);
-
-	console.log(result);
 
 	if (result.rowCount !== 1) {
 		return null;
@@ -116,7 +115,7 @@ export async function deleteTag(
 		`
 			DELETE FROM "tags_tags"
 			WHERE "guildID" = $1 AND "name" = $2
-			RETURNING "name", "content", "attachments"
+			RETURNING "name", "content", "attachments", "color"
 		`,
 		[guildID, name],
 	);

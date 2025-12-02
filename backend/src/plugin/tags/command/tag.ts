@@ -6,8 +6,13 @@ import { MAX_TAG_NAME_LENGTH } from "#plugin/tags/constants.ts";
 import { autocompleteTags } from "#plugin/tags/helper/autocompletion.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
 import { getTag } from "#plugin/tags/storage/tags.ts";
-import { Gallery, GalleryItem, Text } from "oceanic-component-helper";
-import type { MessageComponent } from "oceanic.js";
+import {
+	Container,
+	Gallery,
+	GalleryItem,
+	Text,
+} from "oceanic-component-helper";
+import type { ContainerComponent, MessageComponent } from "oceanic.js";
 
 export default defineCommand({
 	name: ["tag", "tagsend", "sendtag"],
@@ -41,10 +46,14 @@ export default defineCommand({
 			return;
 		}
 
-		const components: MessageComponent[] = [Text(tag.content)];
+		const container = Container([Text(tag.content)]);
+
+		if (tag.color !== -1) {
+			container.accentColor = tag.color;
+		}
 
 		if (tag.attachments.length !== 0) {
-			components.push(
+			container.components.push(
 				Gallery(
 					tag.attachments.map((attachment) =>
 						GalleryItem(attachment),
@@ -53,6 +62,6 @@ export default defineCommand({
 			);
 		}
 
-		await ctx.respond({ components });
+		await ctx.respond({ components: [container] });
 	},
 });

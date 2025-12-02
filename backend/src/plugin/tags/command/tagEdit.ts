@@ -1,5 +1,7 @@
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
+import { Color } from "#common/schema/general.ts";
+import type { StringReader } from "#common/stringReader.ts";
 import { defineCommand } from "#plugin/core/public/extensionPoints.ts";
 import { permissionsGuard } from "#plugin/core/public/helper/commandGuards.ts";
 import { icons } from "#plugin/core/public/icons.ts";
@@ -8,6 +10,7 @@ import {
 	MAX_TAG_NAME_LENGTH,
 } from "#plugin/tags/constants.ts";
 import { autocompleteTags } from "#plugin/tags/helper/autocompletion.ts";
+import { attachments, optionalColor } from "#plugin/tags/helper/customOptionTypes.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
 import { onTagEdited } from "#plugin/tags/public/extensionPoints.ts";
 import { updateTag } from "#plugin/tags/storage/tags.ts";
@@ -25,22 +28,36 @@ export default defineCommand({
 			description: "The name of the tag to modify.",
 			required: true,
 			position: 0,
-			maxLength: MAX_TAG_NAME_LENGTH,
+
 			greedy: false,
+			maxLength: MAX_TAG_NAME_LENGTH,
 
 			autocomplete: (ctx, value) => autocompleteTags(ctx, value),
-		},
-		content: {
-			type: "string",
-			name: ["content", "c"],
-			position: 1,
-			maxLength: MAX_TAG_CONTENT_LENGTH,
 		},
 		newName: {
 			type: "string",
 			name: ["new-name", "rename", "nn", "rn"],
-			description: "Change the name of the tag to something else.",
+			description: "Specify a new name to rename to.",
+
 			maxLength: MAX_TAG_NAME_LENGTH,
+		},
+		content: {
+			type: "string",
+			name: ["content", "c"],
+			description: "Modify the content.",
+			position: 1,
+
+			maxLength: MAX_TAG_CONTENT_LENGTH,
+		},
+		attachments: {
+			type: attachments,
+			name: ["attachments", "attach", "a"],
+			description: "Modify attachments, specified as links separated by spaces or simply 'clear' to remove them."
+		},
+		color: {
+			type: optionalColor,
+			name: ["color", "c"],
+			description: "Modify the color of the tag. This will display "
 		},
 	},
 
@@ -54,6 +71,8 @@ export default defineCommand({
 		const changes = {
 			name: args.newName,
 			content: args.content,
+			attachments: args.attachments,
+			color: args.color,
 		};
 
 		const oldTag = await updateTag(
@@ -71,7 +90,7 @@ export default defineCommand({
 		}
 
 		// check after we know the tag exists
-		if (args.newName === null && args.content === null) {
+		if (changes.name === null && changes.content === null && changes.attachments === null && changes.color === null) {
 			await ctx.respond(`${icons.error} No changes specified!`);
 			return;
 		}

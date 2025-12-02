@@ -2,6 +2,7 @@ import type { Nullable } from "#common/general.ts";
 import { makeGuildView } from "#common/template/guild.ts";
 import { makeMemberUserView } from "#common/template/user.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { makeTagView } from "#plugin/logging/config/tags.ts";
 import { logEvent } from "#plugin/logging/helper/logging.ts";
 import {
 	onTagCreated,
@@ -30,7 +31,7 @@ async function handleCreate(
 			return {
 				guild: makeGuildView(guild),
 				actor: makeMemberUserView(actor),
-				tag,
+				tag: makeTagView(tag),
 			};
 		},
 	});
@@ -50,13 +51,17 @@ async function handleEdit(
 			return {
 				guild: makeGuildView(guild),
 				actor: makeMemberUserView(actor),
-				oldTag: oldTag,
-				newTag: {
+				oldTag: makeTagView(oldTag),
+				newTag: makeTagView({
 					name: changes.name ?? oldTag.name,
 					content: changes.content ?? oldTag.content,
-				},
+					color: changes.color ?? oldTag.color,
+					attachments: changes.attachments ?? oldTag.attachments,
+				}),
 				nameChanged: changes.name !== null,
 				contentChanged: changes.content !== null,
+				colorChanged: changes.color !== null,
+				attachmentsChanged: changes.attachments !== null,
 			};
 		},
 	});
@@ -75,7 +80,7 @@ async function handleDelete(
 			return {
 				guild: makeGuildView(guild),
 				actor: makeMemberUserView(actor),
-				tag,
+				tag: makeTagView(tag),
 			};
 		},
 	});

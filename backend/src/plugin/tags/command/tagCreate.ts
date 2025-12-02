@@ -7,8 +7,10 @@ import {
 	MAX_TAG_CONTENT_LENGTH,
 	MAX_TAG_NAME_LENGTH,
 } from "#plugin/tags/constants.ts";
+import { attachments, optionalColor } from "#plugin/tags/helper/customOptionTypes.ts";
 import { tagsConfigStore } from "#plugin/tags/index.ts";
 import { onTagCreated } from "#plugin/tags/public/extensionPoints.ts";
+import type { Tag } from "#plugin/tags/public/tag.ts";
 import { createTag } from "#plugin/tags/storage/tags.ts";
 
 const logger = moduleLogger();
@@ -24,20 +26,25 @@ export default defineCommand({
 			description: "The name of the tag to create.",
 			required: true,
 			position: 0,
-			maxLength: MAX_TAG_NAME_LENGTH,
+
 			greedy: false,
+			maxLength: MAX_TAG_NAME_LENGTH,
 		},
 		content: {
 			type: "string",
 			name: ["content", "c"],
 			required: true,
 			position: 1,
+
 			maxLength: MAX_TAG_CONTENT_LENGTH,
 		},
 		attachments: {
-			type: "string",
+			type: attachments,
 			name: ["attachments", "a", "attachment", "attach"],
-			array: true,
+		},
+		color: {
+			type: optionalColor,
+			name: ["color", "c"],
 		},
 	},
 
@@ -48,11 +55,13 @@ export default defineCommand({
 			(permissions) => permissions.tagCreate,
 		),
 	async run(ctx, args) {
-		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, {
+		const tag: Tag = {
 			name: args.name,
 			content: args.content,
 			attachments: args.attachments ?? [],
-		});
+			color: args.color ?? -1,
+		};
+		const success = await createTag(ctx.squirrelCtx.db, ctx.guild.id, tag);
 
 		if (!success) {
 			await ctx.respond(
@@ -62,7 +71,7 @@ export default defineCommand({
 		}
 
 		onTagCreated
-			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, args)
+			.fire(ctx.squirrelCtx, ctx.guild, ctx.member, tag)
 			.catch((error) => logger.error?.("Error in onTagCreated", error));
 
 		await ctx.respond(

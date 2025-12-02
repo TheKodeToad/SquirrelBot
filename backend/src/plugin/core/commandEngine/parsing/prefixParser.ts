@@ -146,7 +146,7 @@ function readNamedArg(
 		}
 
 		// maybe best not to make this immutable? it causes typing issues
-		if (value instanceof Array) {
+		if (option.array) {
 			output.pushTo(key, ...(value as unknown[]));
 		} else {
 			output.set(key, value);
