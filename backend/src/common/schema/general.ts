@@ -19,6 +19,8 @@ export const HexColor = z
 			ctx.addIssue("Invalid color specification");
 			return z.NEVER;
 		}
+
+		return result;
 	});
 
 export const NamedColor = z.enum(Object.keys(colors)).transform((name, ctx) => {
