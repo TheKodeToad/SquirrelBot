@@ -275,6 +275,9 @@ function mapCommand({
 }
 
 class SlashContext implements CommandContext {
+	command: Command;
+	ephemeral: boolean;
+
 	squirrelCtx: SquirrelDiscordContext;
 	get bot(): Client {
 		return this.squirrelCtx.bot;
@@ -295,12 +298,9 @@ class SlashContext implements CommandContext {
 		return this._interaction.channel;
 	}
 
-	command: Command;
-	ephemeral: boolean;
-
 	_interaction: CommandInteraction<AnyTextableGuildChannel>;
 	_responseID: string | null;
-	_acked: boolean;
+	_replied: boolean;
 	_deferTimeout: NodeJS.Timeout | null;
 	_deferPromise: Promise<void> | null;
 
@@ -315,12 +315,12 @@ class SlashContext implements CommandContext {
 		this.ephemeral = ephemeral;
 		this._interaction = interaction;
 		this._responseID = null;
-		this._acked = false;
+		this._replied = false;
 		this._deferPromise = null;
 		this._deferTimeout = setTimeout(
 			() => {
 				this._deferTimeout = null;
-				this._acked = true;
+				this._replied = true;
 				this._deferPromise = interaction
 					.defer(this.ephemeral ? MessageFlags.EPHEMERAL : 0)
 					.then();
@@ -342,26 +342,23 @@ class SlashContext implements CommandContext {
 			messageOptions.flags &= ~MessageFlags.EPHEMERAL;
 		}
 
-		if (this._acked) {
+		if (this._replied) {
 			await this._deferPromise;
 
 			if (this._responseID !== null) {
 				unlistenForInteractions(this._responseID);
 			}
 
-			await this._interaction
-				.editOriginal(messageOptions)
-				.then((message) => (this._responseID ??= message?.id ?? null));
+			const message =
+				await this._interaction.editOriginal(messageOptions);
+			this._responseID ??= message?.id ?? null;
 		} else {
 			this._clearTimeout();
-			await this._interaction
-				.reply(messageOptions)
-				.then(
-					({ callback }) =>
-						(this._responseID ??=
-							callback?.resource?.message?.id ?? null),
-				);
-			this._acked = true;
+
+			const response = await this._interaction.reply(messageOptions);
+			this._responseID ??=
+				response.callback?.resource?.message?.id ?? null;
+			this._replied = true;
 		}
 
 		if (
