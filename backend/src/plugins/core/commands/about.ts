@@ -5,8 +5,8 @@ import {
 	APP_SOURCE_CODE,
 } from "#brand.ts";
 import { coreConfigStore } from "#plugins/core/index.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import {
 	Container,
 	Divider,

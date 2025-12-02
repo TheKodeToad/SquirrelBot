@@ -2,13 +2,13 @@ import {
 	type ActionContext,
 	type ReplyObject,
 } from "#plugins/core/public/command.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
+import { icons } from "#plugins/core/public/icons.ts";
 import {
 	respondWithPaginator,
 	type PaginatorQuery,
-} from "#plugins/core/public/helper/paginator.ts";
-import { icons } from "#plugins/core/public/icons.ts";
+} from "#plugins/core/public/paginator.ts";
 import { resolvePermissions } from "#plugins/core/public/permissionResolution.ts";
 import {
 	formatCaseDescription,

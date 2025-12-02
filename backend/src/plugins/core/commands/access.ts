@@ -5,7 +5,7 @@ import { grantAccess, revokeAccess } from "#plugins/core/guildInfoSync.ts";
 import { type CommandContext } from "#plugins/core/public/command.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
 import { icons } from "#plugins/core/public/icons.ts";
-import { snowflake } from "../public/helper/customOptionTypes.ts";
+import { snowflake } from "../public/customOptionTypes.ts";
 
 function checkBotStaff(ctx: CommandContext): boolean {
 	return BOT_STAFF.includes(ctx.user.id);

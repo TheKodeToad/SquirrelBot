@@ -1,8 +1,8 @@
 import { debugFormatPermissionContext } from "#common/discord/debugFormat.ts";
 import { moduleLogger } from "#common/logger/index.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { safePreRun } from "#plugins/core/command.ts";
 import { getCommandByName } from "#plugins/core/commandEngine/commandCache.ts";
-import { safePreRun } from "#plugins/core/helper/commands.ts";
 import { coreConfigStore } from "#plugins/core/index.ts";
 import {
 	type AutocompleteContext,

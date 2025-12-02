@@ -1,12 +1,12 @@
 import { moduleLogger } from "#common/logger/index.ts";
 import { TTLMap } from "#common/ttlMap.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
+import { transformReply } from "#plugins/core/command.ts";
 import {
 	COMMAND_AUTO_DEFER_AFTER,
 	COMMAND_STATE_CLEANUP_INTERVAL,
 	COMMAND_STATE_EXPIRE_AFTER,
 } from "#plugins/core/constants.ts";
-import { transformReply } from "#plugins/core/helper/commands.ts";
 import type {
 	ComponentContext,
 	Reply,

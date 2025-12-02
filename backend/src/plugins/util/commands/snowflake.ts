@@ -1,6 +1,6 @@
+import { snowflake } from "#plugins/core/public//customOptionTypes.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
-import { snowflake } from "#plugins/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { utilConfigStore } from "#plugins/util/index.ts";
 

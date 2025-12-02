@@ -95,7 +95,7 @@ export type Reply = ReplyObject | string;
 export type AnyArgsValue = {};
 
 export type Option =
-	| FlagOption
+	| BooleanOption
 	| StringOption
 	| IntegerOption
 	| NumberOption
@@ -121,9 +121,8 @@ interface BaseOption {
 	position?: number;
 }
 
-interface FlagOption extends BaseOption {
+interface BooleanOption extends BaseOption {
 	type: "boolean";
-
 	/**  For prefix commands - specify an option to set the value to false insetad of true. */
 	negativeName?: NameList;
 
@@ -186,7 +185,7 @@ type NullableValue<TOpt, TRequired extends boolean | undefined> =
 	TRequired extends true ? TOpt : TOpt | null;
 
 type BaseOptionValue<TOpt extends Option> =
-	TOpt extends FlagOption ? boolean
+	TOpt extends BooleanOption ? boolean
 	: TOpt extends StringOption ? string
 	: TOpt extends IntegerOption ? number
 	: TOpt extends NumberOption ? number

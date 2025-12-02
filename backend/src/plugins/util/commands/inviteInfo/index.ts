@@ -1,8 +1,8 @@
 import { formatRESTError } from "#common/discord/format.ts";
 import { escapeMarkdown } from "#common/discord/markdown.ts";
 import { moduleLogger } from "#common/logger/index.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { renderFriendInvite } from "#plugins/util/commands/inviteInfo/friend.ts";
 import { renderGroupDMInvite } from "#plugins/util/commands/inviteInfo/groupDM.ts";

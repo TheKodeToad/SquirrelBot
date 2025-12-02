@@ -1,7 +1,7 @@
 import { isUndeletableMessageType } from "#common/discord/general.ts";
 import { WEEK } from "#common/time.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { moderationConfigStore } from "#plugins/moderation/index.ts";
 

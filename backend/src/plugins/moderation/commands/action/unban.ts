@@ -1,7 +1,7 @@
 import { fetchUserCachedSupressed } from "#common/discord/cachedRequest.ts";
 import { formatRESTError } from "#common/discord/format.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { MemberRanking } from "#plugins/moderation/config.ts";
 import {

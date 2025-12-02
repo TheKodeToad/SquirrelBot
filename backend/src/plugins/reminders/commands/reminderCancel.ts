@@ -1,5 +1,5 @@
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { remindersConfigStore } from "#plugins/reminders/index.ts";
 import { untrackReminder } from "#plugins/reminders/scheduler.ts";

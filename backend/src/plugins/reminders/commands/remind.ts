@@ -1,7 +1,7 @@
 import { dateToUnixSecs } from "#common/time.ts";
+import { duration } from "#plugins/core/public//customOptionTypes.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
-import { duration } from "#plugins/core/public/helper/customOptionTypes.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { remindersConfigStore } from "#plugins/reminders/index.ts";
 import { trackNewReminder } from "#plugins/reminders/scheduler.ts";

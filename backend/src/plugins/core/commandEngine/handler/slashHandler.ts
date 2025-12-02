@@ -4,6 +4,7 @@ import { onBotInit } from "#discord/extensionPoints.ts";
 import type { SquirrelDiscordContext } from "#discord/index.ts";
 import { CACHE_PATH } from "#environment.ts";
 import { EventListenerPhase } from "#extensionPoint.ts";
+import { safePreRun, transformReply } from "#plugins/core/command.ts";
 import {
 	type CommandCacheEntry,
 	getCommandByName,
@@ -16,7 +17,6 @@ import {
 import { formatArgsParseError } from "#plugins/core/commandEngine/parsing/index.ts";
 import { readSlashArgs } from "#plugins/core/commandEngine/parsing/slashParser.ts";
 import { COMMAND_AUTO_DEFER_AFTER } from "#plugins/core/constants.ts";
-import { safePreRun, transformReply } from "#plugins/core/helper/commands.ts";
 import { coreConfigStore } from "#plugins/core/index.ts";
 import {
 	type Command,

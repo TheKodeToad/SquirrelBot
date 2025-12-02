@@ -1,7 +1,7 @@
 import { makeGuildView } from "#common/views/guild.ts";
 import { makeUserView } from "#common/views/user.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import {
 	formatModActionFailure,

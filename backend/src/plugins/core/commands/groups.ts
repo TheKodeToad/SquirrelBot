@@ -5,8 +5,8 @@ import {
 	makeMarkdownInlineCodeblock,
 } from "#common/discord/markdown.ts";
 import { coreConfigStore as coreConfigCache } from "#plugins/core/index.ts";
+import { permissionsGuard } from "#plugins/core/public/commandGuards.ts";
 import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
-import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
 import { icons } from "#plugins/core/public/icons.ts";
 import { resolveGroups } from "#plugins/core/public/permissionResolution.ts";
 import { DiscordRESTError, JSONErrorCodes } from "oceanic.js";
