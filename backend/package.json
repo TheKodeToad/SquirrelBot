@@ -1,9 +1,6 @@
 {
 	"name": "backend",
 	"type": "module",
-	"imports": {
-		"#*": "./src/*"
-	},
 	"scripts": {
 		"bot": "pnpm run _node src/discord/main.ts",
 		"http": "pnpm run _node src/http/main.ts",

@@ -1,5 +1,5 @@
 import { isSnowflake } from "#common/snowflake.ts";
-import { getGuildOwnerID } from "#plugin/core/storage/guildInfo.ts";
+import { getGuildOwnerID } from "#plugins/core/storage/guildInfo.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { Pool } from "pg";

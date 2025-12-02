@@ -84,7 +84,7 @@ function hasProto(): boolean {
 async function loadPlugins(): Promise<Map<string, Plugin>> {
 	const result: Map<string, Plugin> = new Map();
 
-	const pluginDir = path.join(import.meta.dirname, "plugin");
+	const pluginDir = path.join(import.meta.dirname, "plugins");
 	const entries = await readdir(pluginDir, { withFileTypes: true });
 
 	entries.sort((a, b) => a.name.localeCompare(b.name, "en-US"));

@@ -1,0 +1,57 @@
+import {
+	renderCommandListPage,
+	renderCommandListPageMinimal,
+} from "#plugins/core/command/help/list.ts";
+import { renderCommandPage } from "#plugins/core/command/help/show.ts";
+import { getCommandByName } from "#plugins/core/commandEngine/commandCache.ts";
+import { coreConfigStore } from "#plugins/core/index.ts";
+import { defineCommand } from "#plugins/core/public/extensionPoints.ts";
+import { permissionsGuard } from "#plugins/core/public/helper/commandGuards.ts";
+import { icons } from "#plugins/core/public/icons.ts";
+
+export default defineCommand({
+	name: ["help"],
+	description: "View available commands and prefixed usage information.",
+	trackUpdates: true,
+	ephemeralByDefault: true,
+
+	options: {
+		command: {
+			type: "string",
+			name: ["command", "c"],
+			position: 0,
+		},
+	},
+
+	preRun: (ctx) =>
+		permissionsGuard(
+			ctx,
+			coreConfigStore,
+			(permissions) => permissions.helpCommand,
+		),
+	async run(ctx, args) {
+		if (args.command !== null) {
+			const command = getCommandByName(args.command);
+
+			if (command === undefined) {
+				await ctx.respond(
+					`${icons.error} No command named '${args.command}'!`,
+				);
+				return;
+			}
+
+			await ctx.respond(renderCommandPage(ctx.guild.id, command));
+			return;
+		}
+
+		if (ctx.ephemeral ?? false) {
+			await ctx.respond(
+				renderCommandListPage(ctx, { page: 0, plugin: "core" }),
+			);
+		} else {
+			await ctx.respond(
+				renderCommandListPageMinimal(ctx.squirrelCtx, ctx.guild.id),
+			);
+		}
+	},
+});

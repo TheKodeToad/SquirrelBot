@@ -8,7 +8,7 @@ import {
 	guildAuthMiddleware,
 	type GuildAuthVars,
 } from "#http/middleware/guildAuth.ts";
-import { getAPIGuildInfoByOwner } from "#plugin/core/storage/guildInfo.ts";
+import { getAPIGuildInfoByOwner } from "#plugins/core/storage/guildInfo.ts";
 import { Hono } from "hono";
 
 export default (squirrelCtx: SquirrelHTTPContext): Hono => {
