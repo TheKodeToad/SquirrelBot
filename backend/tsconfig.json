@@ -9,6 +9,9 @@
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
 		"isolatedModules": true,
-		"inlineSourceMap": true
+		"inlineSourceMap": true,
+		"paths": {
+			"#*": ["./src/*"]
+		}
 	}
 }
