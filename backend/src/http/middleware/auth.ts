@@ -1,4 +1,4 @@
-import { validateToken } from "#http/storage/api/tokens.ts";
+import { tokensTable } from "#http/storage/api/tokens.ts";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { Pool } from "pg";
@@ -18,7 +18,7 @@ export function authMiddleware(db: Pool) {
 			});
 		}
 
-		const user = await validateToken(db, authorization);
+		const user = await tokensTable.validate(db, authorization);
 
 		if (user === null) {
 			throw new HTTPException(401, {

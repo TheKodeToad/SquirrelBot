@@ -1,7 +1,7 @@
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "#environment.ts";
 import type { BackendHTTPContext } from "#http/http.ts";
 import { validate } from "#http/middleware/zod.ts";
-import { generateToken } from "#http/storage/api/tokens.ts";
+import { tokensTable } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -97,7 +97,7 @@ export default (backendCtx: BackendHTTPContext): Hono => {
 			}),
 		});
 
-		const [token, expiresAt] = await generateToken(
+		const [token, expiresAt] = await tokensTable.generateAndInsert(
 			backendCtx.db,
 			userJSON.id,
 		);

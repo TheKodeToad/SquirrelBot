@@ -1,5 +1,5 @@
 import type { BackendHTTPContext } from "#http/http.ts";
-import { deleteToken } from "#http/storage/api/tokens.ts";
+import { tokensTable } from "#http/storage/api/tokens.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 
@@ -15,7 +15,7 @@ export default (backendCtx: BackendHTTPContext): Hono => {
 			});
 		}
 
-		if (!(await deleteToken(backendCtx.db, authorization))) {
+		if (!(await tokensTable.remove(backendCtx.db, authorization))) {
 			throw new HTTPException(401, {
 				message: "Invalid or expired token",
 			});

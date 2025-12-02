@@ -6,7 +6,7 @@ import { HTTP_PORT } from "#environment.ts";
 import type { BackendHTTPContext } from "#http/http.ts";
 import api from "#http/route/api/api.ts";
 import frontend from "#http/route/frontend.ts";
-import { deleteExpiredTokens } from "#http/storage/api/tokens.ts";
+import { tokensTable } from "#http/storage/api/tokens.ts";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -59,7 +59,7 @@ async function beginDeleteTokenLoop(): Promise<void> {
 	try {
 		logger.debug?.("Deleting expired tokens");
 
-		const deletedCount = await deleteExpiredTokens(ctx.db);
+		const deletedCount = await tokensTable.removeExpiredTokens(ctx.db);
 
 		logger.debug?.(`Deleted ${deletedCount} tokens`);
 	} finally {
