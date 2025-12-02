@@ -24,6 +24,8 @@ export function moduleLogger(): Logger {
 	return new Logger(discriminator);
 }
 
+const HAS_COLORS = process.stdout.hasColors();
+
 function logLevelColor(level: LogLevel): string {
 	switch (level) {
 		case LogLevel.Debug:
@@ -111,11 +113,17 @@ export class Logger {
 		}
 
 		return (message, data) => {
-			// you mean you DON'T know ansi escape codes off by heart
-			// too bad!
-			console.error(
-				`\x1b[2m${dateToHMSString()} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`,
-			);
+			if (HAS_COLORS) {
+				// you mean you DON'T know ansi escape codes off by heart
+				// too bad!
+				console.error(
+					`\x1b[2m${dateToHMSString()} \x1b[0m${logLevelColor(level)}${logLevelName(level)}:\x1b[0m ${message} \x1b[2m(${this.discriminator})\x1b[0m`,
+				);
+			} else {
+				console.error(
+					`[${dateToHMSString()}] [${logLevelName(level)}]: ${message} (${this.discriminator})`,
+				);
+			}
 
 			if (data !== undefined) {
 				console.group();
